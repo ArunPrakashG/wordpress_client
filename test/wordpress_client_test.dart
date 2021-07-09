@@ -3,14 +3,14 @@ import 'package:test/test.dart';
 
 void main() {
   group('A group of tests', () {
-    Awesome awesome;
+    WordpressClient client;
 
     setUp(() {
-      awesome = Awesome();
+      client = WordpressClient();
     });
 
     test('First Test', () {
-      expect(awesome.isAwesome, isTrue);
+      client.withDefaultUserAgent('');
     });
   });
 }
