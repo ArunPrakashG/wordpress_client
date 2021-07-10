@@ -6,11 +6,12 @@ void main() {
     WordpressClient client;
 
     setUp(() {
-      client = WordpressClient();
+      client = WordpressClient('');
     });
 
     test('First Test', () {
       client.withDefaultUserAgent('');
+      client.fetchPosts((builder) => builder.build());
     });
   });
 }

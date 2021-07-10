@@ -1,20 +1,24 @@
-import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/cookie_container.dart';
+import 'package:wordpress_client/src/request_builder.dart';
+import 'package:wordpress_client/src/responses/post_response.dart';
+
+import 'request.dart';
+import 'response_container.dart';
 
 class WordpressClient {
-  HttpClient _client;
+  Dio _client;
   CookieContainer _cookies;
-  List<Map<String, String>> _defaultHeaders;
+  String _baseUrl;
 
-  WordpressClient({CookieContainer cookieContainer}) {
-    _client = HttpClient();
-    _client.autoUncompress = true;
+  WordpressClient(String baseUrl, {CookieContainer cookieContainer}) {
+    _client = Dio(BaseOptions());
+    _baseUrl = baseUrl;
     _cookies = cookieContainer ?? CookieContainer();
   }
 
   WordpressClient withDefaultUserAgent(String userAgent) {
-    _client.userAgent = userAgent;
+    _client.options.headers['User-Agent'] = userAgent;
     return this;
   }
 
@@ -23,8 +27,32 @@ class WordpressClient {
     return this;
   }
 
-  WordpressClient withDefaultRequestHeaders(List<Map<String, String>> headers) {
-    _defaultHeaders = headers;
+  WordpressClient withDefaultRequestHeaders(List<Pair<String, String>> headers) {
+    for (final header in headers) {
+      _client.options.headers[header.a] = header.b;
+    }
+
     return this;
+  }
+
+  Future<ResponseContainer<List<Post>>> fetchPosts(Request Function(RequestBuilder) builder) async {
+    builder(RequestBuilder());
+  }
+
+  Future<ResponseContainer<T>> _postRequestAsync<T>(Request request) {
+    if (request == null || request.requestUri == null) {
+      return null;
+    }
+
+    var watch = Stopwatch()..start();
+    try {
+      _client.fetch(RequestOptions(
+        method: request.httpMethod,
+        baseUrl: request.requestUri.toString(),
+        path: request.endpoint,
+      ));
+    } on Exception catch (e) {} finally {
+      watch.stop();
+    }
   }
 }
