@@ -5,9 +5,9 @@ enum StatusEnum { PUBLISH }
 enum PostType { POST }
 enum PostFormat { STANDARD, AUDIO, VIDEO }
 enum Status { OPEN, CLOSED }
+enum HttpMethod { PUT, POST, GET, DELETE, UPDATE, HEAD, OPTIONS, PATCH, TRACE }
 
-
-extension ParseToString on PostType {
+extension ParseToString on HttpMethod {
   String toShortString() {
     // ignore: unnecessary_this
     return this.toString().split('.').last;
