@@ -110,7 +110,7 @@ class Post implements ISerializable<Post> {
         'modified_gmt': modifiedGmt == null ? null : modifiedGmt.toIso8601String(),
         'slug': slug ?? '',
         'status': status ?? '',
-        'type': type ?? type.toShortString(),
+        'type': type ?? type.toString().split('.').last,
         'link': link ?? '',
         'title': title == null ? null : title.toMap(),
         'content': content == null ? null : content.toMap(),
