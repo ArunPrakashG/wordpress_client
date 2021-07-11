@@ -506,8 +506,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
     return null;
   }
-
-  @override
+  
   Request buildWithCallback(Callback callback) {
     if (_createUri()) {
       return Request(

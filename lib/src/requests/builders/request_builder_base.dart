@@ -4,6 +4,4 @@ abstract class IRequestBuilder<TRequestType, YReturnType> {
   TRequestType initializeWithDefaultValues();
 
   YReturnType build();
-
-  YReturnType buildWithCallback(Callback callback);
 }
