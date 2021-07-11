@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/exceptions/null_reference_exception.dart';
+import 'package:wordpress_client/src/requests/builders/post_builder.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/src/utilities/pair.dart';
 import '../../utilities/callback.dart';
@@ -242,6 +243,11 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
   RequestBuilder withUri(Uri requestUri) {
     _baseUri = requestUri;
+    return this;
+  }
+
+  RequestBuilder withPostBody(Map<String, dynamic> Function(PostBuilder) builder) {
+    _formBody = builder(PostBuilder().initializeWithDefaultValues());
     return this;
   }
 
@@ -506,7 +512,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
     return null;
   }
-  
+
   Request buildWithCallback(Callback callback) {
     if (_createUri()) {
       return Request(
