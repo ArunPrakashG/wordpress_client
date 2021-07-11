@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/cookie_container.dart';
-import 'package:wordpress_client/src/request_builder.dart';
-import 'package:wordpress_client/src/responses/post_response.dart';
 
-import 'request.dart';
-import 'response_container.dart';
+import 'utilities/cookie_container.dart';
+import 'requests/builders/request_builder.dart';
+import 'requests/request.dart';
+import 'responses/post_response.dart';
+import 'responses/response_container.dart';
+import 'utilities/pair.dart';
 
 class WordpressClient {
   Dio _client;
@@ -47,7 +48,7 @@ class WordpressClient {
     var watch = Stopwatch()..start();
     try {
       _client.fetch(RequestOptions(
-        method: request.httpMethod,
+        method: request.httpMethod.toString().split('.').last,
         baseUrl: request.requestUri.toString(),
         path: request.endpoint,
       ));

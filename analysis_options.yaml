@@ -1,14 +1,11 @@
-# Defines a default set of lint rules enforced for
-# projects at Google. For details and rationale,
-# see https://github.com/dart-lang/pedantic#enabled-lints.
-include: package:pedantic/analysis_options.yaml
-
-# For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
-# Uncomment to specify additional rules.
-# linter:
-#   rules:
-#     - camel_case_types
-
 analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    # This is generated from the i18n vscode extension
+    - "**/i18n.dart"
+
+linter:
+  rules:
+    # Not nessecary for an application and more pointed towards public API's
+    public_member_api_docs: false

@@ -11,7 +11,7 @@ void main() {
 
     test('First Test', () {
       client.withDefaultUserAgent('');
-      client.fetchPosts((builder) => builder.build());
+      client.fetchPosts((builder) => builder.withPageNumber(2).build());
     });
   });
 }

@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/callback.dart';
 
-import 'response_container.dart';
+import '../utilities/callback.dart';
+import '../enums.dart';
+import '../utilities/pair.dart';
 
 class Request {
   final Uri requestUri;
@@ -9,7 +10,7 @@ class Request {
   final Callback callback;
   final bool Function(String) validationDelegate;
   final CancelToken cancelToken;
-  final String httpMethod;
+  final HttpMethod httpMethod;
   final dynamic formBody;
   final int perPageCount;
   final List<Pair<String, String>> headers;

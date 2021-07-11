@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import '../enums.dart';
-import '../serializable_instance.dart';
-import 'partials/author_meta.dart';
-import 'partials/content.dart';
-import 'partials/guid.dart';
-import 'partials/links.dart';
+import '../utilities/serializable_instance.dart';
+import 'partial_responses/author_meta.dart';
+import 'partial_responses/content.dart';
+import 'partial_responses/guid.dart';
+import 'partial_responses/links.dart';
 
 class Post implements ISerializable<Post> {
   Post({
