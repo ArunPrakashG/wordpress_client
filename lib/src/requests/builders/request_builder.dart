@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/exceptions/null_reference_exception.dart';
+import 'package:wordpress_client/src/requests/builders/media_builder.dart';
 import 'package:wordpress_client/src/requests/builders/post_builder.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/src/utilities/pair.dart';
@@ -251,12 +252,17 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
     return this;
   }
 
+  RequestBuilder withMediaBody(Map<String, dynamic> Function(MediaBuilder) builder) {
+    _formBody = builder(MediaBuilder().initializeWithDefaultValues());
+    return this;
+  }
+
   RequestBuilder withHttpBody<T1 extends IRequestBuilder<T1, T2>, T2 extends Map<String, dynamic>>(T1 instance, T2 Function(T1) builder) {
     _formBody = builder(instance.initializeWithDefaultValues());
     return this;
   }
 
-  RequestBuilder withQueryParameters<T1 extends IRequestBuilder<T1, T2>, T2 extends List<Pair<String, String>>>(
+  RequestBuilder withQueryParameters<T1 extends IRequestBuilder<T1, T2>, T2 extends Iterable<Pair<String, String>>>(
       T1 instance, T2 Function(T1) builder) {
     _queryParameters ??= [];
     _queryParameters.addAll(builder(instance.initializeWithDefaultValues()));

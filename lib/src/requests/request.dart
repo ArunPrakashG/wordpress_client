@@ -11,7 +11,7 @@ class Request {
   final bool Function(String) validationDelegate;
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
-  final dynamic formBody;
+  final Map<String,dynamic> formBody;
   final int perPageCount;
   final List<Pair<String, String>> headers;
 

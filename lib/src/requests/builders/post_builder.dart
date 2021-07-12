@@ -8,7 +8,7 @@ class PostBuilder extends QueryBuilder<PostBuilder> implements IRequestBuilder<P
   String _title;
   DateTime _postDate;
   String _slug;
-  PostStatus _status;
+  ContentStatus _status;
   String _password;
   int _authorId;
   String _excerpt;
@@ -100,6 +100,7 @@ class PostBuilder extends QueryBuilder<PostBuilder> implements IRequestBuilder<P
 
   @override
   Map<String, dynamic> build() => {
+        'REQUEST_TYPE': 'post_request',
         if (!isNullOrEmpty(_content)) 'content': _content,
         if (!isNullOrEmpty(_title)) 'title': _title,
         if (!isNullOrEmpty(_slug)) 'slug': _slug,
@@ -122,7 +123,7 @@ class PostBuilder extends QueryBuilder<PostBuilder> implements IRequestBuilder<P
     _commandStatus = Status.OPEN;
     _pingStatus = Status.OPEN;
     _postFormat = PostFormat.STANDARD;
-    _status = PostStatus.PENDING;
+    _status = ContentStatus.PENDING;
     _authorId = -1;
     _featuredImageId = -1;
     return this;
