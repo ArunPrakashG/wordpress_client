@@ -1,6 +1,30 @@
+import 'package:html/parser.dart';
+
 bool isNullOrEmpty(String value) => value == null || value.isEmpty;
 
 bool isAlphaNumeric(String value) => RegExp(r"^[a-zA-Z0-9]*$").hasMatch(value);
+
+String parseUrl(String baseUrl, String path) {
+  if (baseUrl == null || path == null) {
+    return '';
+  }
+
+  if (!baseUrl.endsWith('/')) {
+    baseUrl = '$baseUrl/';
+  }
+
+  if (path.startsWith('/')) {
+    path = path.substring(1, path.length);
+  }
+
+  if (path.endsWith('/')) {
+    path = path.substring(0, path.length - 1);
+  }
+
+  return '$baseUrl$path';
+}
+
+String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types

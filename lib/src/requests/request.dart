@@ -8,10 +8,10 @@ class Request {
   final Uri requestUri;
   final String endpoint;
   final Callback callback;
-  final bool Function(String) validationDelegate;
+  final bool Function(Map<String, dynamic>) validationDelegate;
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
-  final Map<String,dynamic> formBody;
+  final Map<String, dynamic> formBody;
   final int perPageCount;
   final List<Pair<String, String>> headers;
 

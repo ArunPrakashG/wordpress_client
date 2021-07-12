@@ -17,3 +17,27 @@ extension ParseToString on HttpMethod {
     return this.toString().split('.').last;
   }
 }
+
+ContentStatus getContentStatusFromValue(String value) {
+  if (value == null) {
+    return ContentStatus.PENDING;
+  }
+
+  return ContentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
+}
+
+PostFormat getFormatFromValue(String value) {
+  if (value == null) {
+    return PostFormat.STANDARD;
+  }
+
+  return PostFormat.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
+}
+
+Status getStatusFromValue(String value) {
+  if (value == null) {
+    return Status.OPEN;
+  }
+
+  return Status.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
+}

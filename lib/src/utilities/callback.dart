@@ -1,7 +1,7 @@
 class Callback {
-  final Function(Exception) unhandledExceptionCallback;
-  final Function(String) responseCallback;
-  final Function(RequestStatus) requestCallback;
+  final void Function(Exception) unhandledExceptionCallback;
+  final void Function(dynamic) responseCallback;
+  final void Function(RequestStatus) requestCallback;
 
   Callback({this.unhandledExceptionCallback, this.responseCallback, this.requestCallback});
 }

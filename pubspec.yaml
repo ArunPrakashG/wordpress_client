@@ -3,7 +3,7 @@ description: A starting point for Dart libraries or applications.
 # version: 1.0.0
 # homepage: https://www.example.com
 environment:
-  sdk: '>=2.10.0 <3.0.0'
+  sdk: ">=2.10.0 <3.0.0"
 
 #dependencies:
 #  path: ^1.7.0
@@ -13,5 +13,6 @@ dev_dependencies:
 
 dependencies:
   dio: ^4.0.0
+  html: ^0.15.0
   http_parser: ^4.0.0
   path: ^1.8.0

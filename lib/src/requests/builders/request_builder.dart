@@ -38,8 +38,8 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   CancelToken _cancelToken;
   String _endpoint;
   String _context;
-  int _pageNumber;
-  int _perPageCount;
+  int _pageNumber = 1;
+  int _perPageCount = 10;
   String _searchQuery;
   DateTime _after;
   DateTime _before;
@@ -47,7 +47,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   List<int> _excludedAuthors;
   List<int> _excludedIds;
   List<int> _allowedIds;
-  int _resultOffset;
+  int _resultOffset = 0;
   String _resultOrder;
   String _sortOrder;
   List<String> _limitBySlug;
@@ -57,11 +57,11 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   List<int> _excludedTags;
   List<int> _allowedCategories;
   List<int> _excludedCategories;
-  bool _onlySticky;
-  bool _emdeded;
+  bool _onlySticky = false;
+  bool _emdeded = false;
   // TODO: Handle Authoriation
-  bool Function(String) _responseValidationDelegate;
-  HttpMethod _httpMethod;
+  bool Function(Map<String, dynamic>) _responseValidationDelegate;
+  HttpMethod _httpMethod = HttpMethod.GET;
   List<Pair<String, String>> _headers;
   List<Pair<String, String>> _queryParameters;
   Map<String, dynamic> _formBody;
@@ -166,11 +166,11 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
     }
 
     if (!isNullOrEmpty(_sortOrder)) {
-      baseUrl += '${_getJoiningChar(baseUrl)}order=$_sortOrder';
+      baseUrl += '${_getJoiningChar(baseUrl)}orderby=$_sortOrder';
     }
 
     if (!isNullOrEmpty(_resultOrder)) {
-      baseUrl += '${_getJoiningChar(baseUrl)}orderby=$_resultOrder';
+      baseUrl += '${_getJoiningChar(baseUrl)}order=$_resultOrder';
     }
 
     if (_limitBySlug != null && _limitBySlug.isNotEmpty) {
@@ -227,11 +227,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
       throw NullReferenceException('Endpoint is invalid.');
     }
 
-    if (!requestUrlBase.endsWith('/')) {
-      requestUrlBase = '$requestUrlBase/';
-    }
-
-    final requestUri = Uri.tryParse('$requestUrlBase$endpoint');
+    final requestUri = Uri.tryParse(parseUrl(requestUrlBase, endpoint));
 
     if (requestUri == null) {
       throw Exception('Failed to parse urls. $requestUrlBase $endpoint');
@@ -287,7 +283,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
     return this;
   }
 
-  RequestBuilder withResponseValidationOverride(bool Function(String) responseDelegate) {
+  RequestBuilder withResponseValidationOverride(bool Function(Map<String, dynamic>) responseDelegate) {
     _responseValidationDelegate = responseDelegate;
     return this;
   }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
+import 'package:wordpress_client/wordpress_client.dart';
 
 import 'exceptions/null_reference_exception.dart';
 import 'requests/builders/request_builder.dart';
@@ -9,20 +11,38 @@ import 'responses/post_response.dart';
 import 'responses/response_container.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/pair.dart';
+import 'utilities/helpers.dart';
 
 class WordpressClient {
   Dio _client;
   CookieContainer _cookies;
   String _baseUrl;
+  String _path;
+  bool Function(dynamic) _responsePreprocessorDelegate;
 
-  WordpressClient(String baseUrl, {CookieContainer cookieContainer}) {
+  WordpressClient(String baseUrl, String path, {CookieContainer cookieContainer}) {
     _client = Dio(BaseOptions());
+
+    if (baseUrl == null) {
+      throw NullReferenceException('Base URL is invalid.');
+    }
+
+    if (path == null) {
+      throw NullReferenceException('Endpoint is invalid.');
+    }
+
     _baseUrl = baseUrl;
+    _path = path;
     _cookies = cookieContainer ?? CookieContainer();
   }
 
   WordpressClient withDefaultUserAgent(String userAgent) {
     _client.options.headers['User-Agent'] = userAgent;
+    return this;
+  }
+
+  WordpressClient withGlobalResponsePreprocessorDelegate(bool Function(dynamic) delgate) {
+    _responsePreprocessorDelegate = delgate;
     return this;
   }
 
@@ -39,10 +59,22 @@ class WordpressClient {
     return this;
   }
 
-  Future<ResponseContainer<List<Post>>> fetchPosts(Request Function(RequestBuilder) builder) =>
-      _postRequestAsync<List<Post>>(<Post>[], builder(RequestBuilder()));
+  Future<ResponseContainer<List<Post>>> fetchPosts(Request Function(RequestBuilder) builder) async {
+    final response = await _postRequestAsync<dynamic>(
+        builder(RequestBuilder().initializeWithDefaultValues().withBaseAndEndpoint(parseUrl(_baseUrl, _path), 'posts')));
 
-  Future<ResponseContainer<T>> _postRequestAsync<T>(T instance, Request request) async {
+    return ResponseContainer(
+      List<Post>.from((response.value as Iterable<dynamic>).map<Post>((e) => Post.fromMap(e))),
+      responseCode: response.responseCode,
+      status: response.status,
+      responseHeaders: response.responseHeaders,
+      duration: response.duration,
+      exception: response.exception,
+      errorMessage: response.errorMessage,
+    );
+  }
+
+  Future<ResponseContainer<T>> _postRequestAsync<T>(Request request) async {
     if (request == null || request.requestUri == null) {
       return null;
     }
@@ -62,22 +94,32 @@ class WordpressClient {
         );
       }
 
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(jsonDecode(response.data as String));
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data as String))) {
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
-          errorMessage: 'Request abort by user in validationDelegate()',
+          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (request.callback?.responseCallback != null) {
+        request.callback.responseCallback(response.data);
+      }
+
+      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in validationDelegate()',
           status: false,
           responseCode: response.statusCode,
         );
       }
 
       return ResponseContainer<T>(
-        jsonDecode(response.data),
+        response.data,
         responseCode: response.statusCode,
         status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
@@ -117,14 +159,17 @@ class WordpressClient {
     }
 
     RequestOptions options = RequestOptions(
-      path: request.endpoint,
+      path: request.requestUri.toString(),
       method: request.httpMethod.toString().split('.').last,
-      baseUrl: request.requestUri.toString(),
       cancelToken: request.cancelToken,
     );
 
-    for (final pair in request.headers) {
-      options.headers[pair.a] = pair.b;
+    print('Request URL: ${options.path}');
+
+    if (request.headers != null && request.headers.isNotEmpty) {
+      for (final pair in request.headers) {
+        options.headers[pair.a] = pair.b;
+      }
     }
 
     if (request.formBody != null) {

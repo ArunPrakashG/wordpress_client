@@ -4,7 +4,6 @@ import '../enums.dart';
 import '../utilities/serializable_instance.dart';
 import 'partial_responses/author_meta.dart';
 import 'partial_responses/content.dart';
-import 'partial_responses/guid.dart';
 import 'partial_responses/links.dart';
 
 class Post implements ISerializable<Post> {
@@ -41,14 +40,14 @@ class Post implements ISerializable<Post> {
   final int id;
   final DateTime date;
   final DateTime dateGmt;
-  final Guid guid;
+  final Content guid;
   final DateTime modified;
   final DateTime modifiedGmt;
   final String slug;
-  final String status;
-  final PostType type;
+  final ContentStatus status;
+  final String type;
   final String link;
-  final Guid title;
+  final Content title;
   final Content content;
   final Content excerpt;
   final int author;
@@ -75,23 +74,23 @@ class Post implements ISerializable<Post> {
         id: json['id'] ?? -1,
         date: json['date'] == null ? null : DateTime.parse(json['date']),
         dateGmt: json['date_gmt'] == null ? null : DateTime.parse(json['date_gmt']),
-        guid: json['guid'] == null ? null : Guid.fromMap(json['guid']),
+        guid: json['guid'] == null ? null : Content.fromMap(json['guid']),
         modified: json['modified'] == null ? null : DateTime.parse(json['modified']),
         modifiedGmt: json['modified_gmt'] == null ? null : DateTime.parse(json['modified_gmt']),
         slug: json['slug'] ?? '',
-        status: json['status'] ?? '',
+        status: getContentStatusFromValue(json['status']) ?? ContentStatus.PENDING,
         type: json['type'] ?? '',
         link: json['link'] ?? '',
-        title: json['title'] == null ? null : Guid.fromMap(json['title']),
+        title: json['title'] == null ? null : Content.fromMap(json['title']),
         content: json['content'] == null ? null : Content.fromMap(json['content']),
         excerpt: json['excerpt'] == null ? null : Content.fromMap(json['excerpt']),
         author: json['author'] ?? '',
         featuredMedia: json['featured_media'] ?? '',
-        commentStatus: json['comment_status'] ?? Status.CLOSED,
-        pingStatus: json['ping_status'] ?? Status.CLOSED,
+        commentStatus: getStatusFromValue(json['comment_status']) ?? Status.CLOSED,
+        pingStatus: getStatusFromValue(json['ping_status']) ?? Status.CLOSED,
         sticky: json['sticky'] ?? false,
         template: json['template'] ?? '',
-        format: json['format'] ?? PostFormat.STANDARD,
+        format: getFormatFromValue(json['format']) ?? PostFormat.STANDARD,
         meta: json['meta'] == null ? null : List<dynamic>.from(json['meta'].map((x) => x)),
         categories: json['categories'] == null ? null : List<int>.from(json['categories'].map((x) => x)),
         tags: json['tags'] == null ? null : List<int>.from(json['tags'].map((x) => x)),
@@ -109,7 +108,7 @@ class Post implements ISerializable<Post> {
         'modified': modified == null ? null : modified.toIso8601String(),
         'modified_gmt': modifiedGmt == null ? null : modifiedGmt.toIso8601String(),
         'slug': slug ?? '',
-        'status': status ?? '',
+        'status': status.toString().split('.').last ?? '',
         'type': type ?? type.toString().split('.').last,
         'link': link ?? '',
         'title': title == null ? null : title.toMap(),
