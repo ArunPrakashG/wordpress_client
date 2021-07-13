@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
+import 'package:wordpress_client/src/enums.dart';
+import 'package:wordpress_client/src/wordpress_authorization.dart';
 import 'package:wordpress_client/wordpress_client.dart';
-
+import 'exceptions/authorization_failed_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'requests/builders/request_builder.dart';
 import 'requests/request.dart';
@@ -13,15 +14,25 @@ import 'utilities/cookie_container.dart';
 import 'utilities/pair.dart';
 import 'utilities/helpers.dart';
 
+const int defaultRequestTimeout = 60;
+
 class WordpressClient {
   Dio _client;
   CookieContainer _cookies;
   String _baseUrl;
   String _path;
+  WordpressAuthorization _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
 
   WordpressClient(String baseUrl, String path, {CookieContainer cookieContainer}) {
-    _client = Dio(BaseOptions());
+    _client = Dio(
+      BaseOptions(
+        connectTimeout: defaultRequestTimeout,
+        receiveTimeout: defaultRequestTimeout,
+        followRedirects: true,
+        maxRedirects: 5,
+      ),
+    );
 
     if (baseUrl == null) {
       throw NullReferenceException('Base URL is invalid.');
@@ -38,6 +49,32 @@ class WordpressClient {
 
   WordpressClient withDefaultUserAgent(String userAgent) {
     _client.options.headers['User-Agent'] = userAgent;
+    return this;
+  }
+
+  Future<WordpressClient> withDefaultAuthorization(WordpressAuthorization auth) async {
+    if (auth == null || auth.isDefault) {
+      return this;
+    }
+
+    if (_defaultAuthorization != null && !_defaultAuthorization.isDefault) {
+      return this;
+    }
+
+    _defaultAuthorization = auth;
+    var encryptedAccessToken = null;
+    if (!_defaultAuthorization.isValidAuth &&
+        _defaultAuthorization.authType == AuthorizationType.JWT &&
+        !await _defaultAuthorization.handleJwtAuthentication(parseUrl(_baseUrl, _path), _client, (token) {
+          encryptedAccessToken = token;
+        })) {
+      return this;
+    }
+
+    if (!isNullOrEmpty(encryptedAccessToken)) {
+      _client.options.headers['Authorization'] = '${_defaultAuthorization.scheme} $encryptedAccessToken';
+    }
+
     return this;
   }
 
@@ -81,7 +118,7 @@ class WordpressClient {
 
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(_parseAsDioRequest(request));
+      final response = await _client.fetch(await _parseAsDioRequest(request));
       watch.stop();
 
       if (response == null || response.statusCode != 200) {
@@ -135,6 +172,7 @@ class WordpressClient {
         duration: watch.elapsed,
         errorMessage: 'Exception occured.',
         status: false,
+        exception: e,
         responseCode: 400,
       );
     }
@@ -153,7 +191,7 @@ class WordpressClient {
     return headerPairs;
   }
 
-  RequestOptions _parseAsDioRequest(Request request) {
+  Future<RequestOptions> _parseAsDioRequest(Request request) async {
     if (request == null) {
       throw NullReferenceException('Request object is null');
     }
@@ -163,6 +201,14 @@ class WordpressClient {
       method: request.httpMethod.toString().split('.').last,
       cancelToken: request.cancelToken,
     );
+
+    if (request.shouldAuthorize) {
+      options = await WordpressAuthorization.authorizeRequest(options, _client, parseUrl(_baseUrl, _path), request.authorization);
+
+      if (options == null) {
+        throw AuthorizationFailedException();
+      }
+    }
 
     print('Request URL: ${options.path}');
 

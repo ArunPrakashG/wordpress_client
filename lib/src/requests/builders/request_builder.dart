@@ -4,6 +4,7 @@ import 'package:wordpress_client/src/requests/builders/media_builder.dart';
 import 'package:wordpress_client/src/requests/builders/post_builder.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/src/utilities/pair.dart';
+import 'package:wordpress_client/src/wordpress_authorization.dart';
 import '../../utilities/callback.dart';
 import '../../enums.dart';
 import '../request.dart';
@@ -59,7 +60,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   List<int> _excludedCategories;
   bool _onlySticky = false;
   bool _emdeded = false;
-  // TODO: Handle Authoriation
+  WordpressAuthorization _authorization;
   bool Function(Map<String, dynamic>) _responseValidationDelegate;
   HttpMethod _httpMethod = HttpMethod.GET;
   List<Pair<String, String>> _headers;
@@ -263,6 +264,15 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
     _queryParameters ??= [];
     _queryParameters.addAll(builder(instance.initializeWithDefaultValues()));
 
+    return this;
+  }
+
+  RequestBuilder withAuthorization(WordpressAuthorization authorization) {
+    if (authorization == null || authorization.isDefault) {
+      return this;
+    }
+
+    _authorization = authorization;
     return this;
   }
 
@@ -507,6 +517,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
         cancelToken: _cancelToken,
         httpMethod: _httpMethod,
         formBody: _formBody,
+        authorization: _authorization,
         perPageCount: _perPageCount,
         headers: _headers,
       );
@@ -525,6 +536,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
         cancelToken: _cancelToken,
         httpMethod: _httpMethod,
         formBody: _formBody,
+        authorization: _authorization,
         perPageCount: _perPageCount,
         headers: _headers,
       );

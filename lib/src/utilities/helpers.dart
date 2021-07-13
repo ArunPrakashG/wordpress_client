@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:html/parser.dart';
 
 bool isNullOrEmpty(String value) => value == null || value.isEmpty;
@@ -22,6 +24,14 @@ String parseUrl(String baseUrl, String path) {
   }
 
   return '$baseUrl$path';
+}
+
+String base64Encode(String text) {
+  if (isNullOrEmpty(text)) {
+    return '';
+  }
+
+  return base64.encode(utf8.encode(text));
 }
 
 String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;

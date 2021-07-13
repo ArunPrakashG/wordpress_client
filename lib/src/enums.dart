@@ -11,6 +11,7 @@ enum TaxonomyRelation { AND, OR }
 enum ContentStatus { PUBLISH, FUTURE, DRAFT, PENDING, PRIVATE }
 enum PostAvailabilityStatus { PUBLISHED, DRAFT, TRASH }
 enum PostFormat { STANDARD, ASIDE, CHAT, GALLERY, LINK, IMAGE, QUOTE, STATUS, VIDEO, AUDIO }
+enum AuthorizationType { JWT, BASIC }
 
 extension ParseToString on HttpMethod {
   String toShortString() {
