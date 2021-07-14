@@ -1,108 +1,80 @@
-import 'dart:convert';
+import 'package:wordpress_client/src/exceptions/bootstrap_failed_exception.dart';
+import 'package:wordpress_client/src/exceptions/client_not_initialized_exception.dart';
+import 'package:wordpress_client/src/utilities/helpers.dart';
 
-import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/endpoints/posts.dart';
-import 'package:wordpress_client/src/enums.dart';
-import 'package:wordpress_client/src/wordpress_authorization.dart';
-import 'package:wordpress_client/wordpress_client.dart';
-import 'exceptions/authorization_failed_exception.dart';
 import 'exceptions/null_reference_exception.dart';
-import 'requests/builders/request_builder.dart';
+import 'interface/media.dart';
+import 'interface/posts.dart';
+import 'internal_requester.dart';
+import 'requests/builders/retrive_request_builder.dart';
 import 'requests/request.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
 import 'utilities/cookie_container.dart';
-import 'utilities/pair.dart';
-import 'utilities/helpers.dart';
 
 const int defaultRequestTimeout = 60;
 
 class WordpressClient {
-  Dio _client;
-  CookieContainer _cookies;
-  String _baseUrl;
-  String _path;
-  PostsInterface _posts;
-  WordpressAuthorization _defaultAuthorization;
-  bool Function(dynamic) _responsePreprocessorDelegate;
+  Map<String, dynamic> _interfaces;
+  InternalRequester _requester;
 
   WordpressClient(String baseUrl, String path, {CookieContainer cookieContainer}) {
-    _client = Dio(
-      BaseOptions(
-        connectTimeout: defaultRequestTimeout,
-        receiveTimeout: defaultRequestTimeout,
-        followRedirects: true,
-        maxRedirects: 5,
-      ),
-    );
-
-    if (baseUrl == null) {
+    if (isNullOrEmpty(baseUrl)) {
       throw NullReferenceException('Base URL is invalid.');
     }
 
-    if (path == null) {
+    if (isNullOrEmpty(path)) {
       throw NullReferenceException('Endpoint is invalid.');
     }
 
-    _baseUrl = baseUrl;
-    _path = path;
-    _cookies = cookieContainer ?? CookieContainer();
-    _posts = PostsInterface<Post>();
+    _requester = InternalRequester(baseUrl, path, cookieContainer: cookieContainer ?? CookieContainer());
+    _initializeInterfaces();
   }
 
-  WordpressClient withDefaultUserAgent(String userAgent) {
-    _client.options.headers['User-Agent'] = userAgent;
-    return this;
+  void _initializeInterfaces() {
+    _interfaces ??= new Map<String, dynamic>();
+    _interfaces['posts'] = PostsInterface<Post>();
+    //_interfaces['media'] = MediaInterface<Media>();
   }
 
-  Future<WordpressClient> withDefaultAuthorization(WordpressAuthorization auth) async {
-    if (auth == null || auth.isDefault) {
-      return this;
-    }
+  WordpressClient bootstrap(InternalRequester Function(InternalRequester) requesterConfiguration) {
+    _requester = requesterConfiguration(_requester);
 
-    if (_defaultAuthorization != null && !_defaultAuthorization.isDefault) {
-      return this;
-    }
-
-    _defaultAuthorization = auth;
-    var encryptedAccessToken = null;
-    if (!_defaultAuthorization.isValidAuth &&
-        _defaultAuthorization.authType == AuthorizationType.JWT &&
-        !await _defaultAuthorization.handleJwtAuthentication(_client, (token) {
-          encryptedAccessToken = token;
-        })) {
-      return this;
-    }
-
-    if (!isNullOrEmpty(encryptedAccessToken)) {
-      _client.options.headers['Authorization'] = '${_defaultAuthorization.scheme} $encryptedAccessToken';
+    if (_requester == null) {
+      throw BootstrapFailedException('Bootstrap configuration failed.');
     }
 
     return this;
   }
 
-  WordpressClient withGlobalResponsePreprocessorDelegate(bool Function(dynamic) delgate) {
-    _responsePreprocessorDelegate = delgate;
-    return this;
-  }
-
-  WordpressClient withCookieContainer(CookieContainer cookies) {
-    _cookies = cookies;
-    return this;
-  }
-
-  WordpressClient withDefaultRequestHeaders(List<Pair<String, String>> headers) {
-    for (final header in headers) {
-      _client.options.headers[header.key] = header.value;
+  T getInterfaceByName<T>(String name) {
+    if (isNullOrEmpty(name)) {
+      throw NullReferenceException('Interface name is invalid.');
     }
 
-    return this;
+    return _interfaces[name];
   }
 
+  T getInterfaceByType<T>() {
+    if (_interfaces == null || _interfaces.isEmpty) {
+      throw ClientNotInitializedException('Please correctly initialize WordpressClient before retriving the available interfaces.');
+    }
+
+    return _interfaces.entries.singleWhere((i) => i.value is T).value;
+  }
+
+  Future<ResponseContainer<List<Post>>> getPosts(Request Function(RetriveRequestBuilder) builder) async {
+    return getInterfaceByName<PostsInterface<Post>>('posts').list<Post>(
+      request: builder(RetriveRequestBuilder.withEndpoint('posts').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+/*
   Future<ResponseContainer<List<Post>>> fetchPosts(Request Function(RequestBuilder) builder) async {
     final response = await _postRequestAsync<dynamic>(
         builder(RequestBuilder().initializeWithDefaultValues().withBaseAndEndpoint(parseUrl(_baseUrl, _path), 'posts')));
-    
+
     return ResponseContainer(
       List<Post>.from((response.value as Iterable<dynamic>).map<Post>((e) => Post.fromMap(e))),
       responseCode: response.responseCode,
@@ -113,126 +85,5 @@ class WordpressClient {
       errorMessage: response.errorMessage,
     );
   }
-
-  Future<ResponseContainer<T>> _postRequestAsync<T>(Request request) async {
-    if (request == null || !request.isRequestExecutable) {
-      return null;
-    }
-
-    var watch = Stopwatch()..start();
-    try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
-      watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
-
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
-
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(response.data);
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in validationDelegate()',
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
-
-      return ResponseContainer<T>(
-        response.data,
-        responseCode: response.statusCode,
-        status: true,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
-        duration: watch.elapsed,
-      );
-    } on Exception catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
-
-      return ResponseContainer<T>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
-    }
-  }
-
-  List<Pair<String, String>> _parseResponseHeaders(Map<String, List<String>> headers) {
-    if (headers == null) {
-      return [];
-    }
-
-    var headerPairs = <Pair<String, String>>[];
-    for (final header in headers.entries) {
-      headerPairs.add(Pair(header.key, header.value.join(';')));
-    }
-
-    return headerPairs;
-  }
-
-  Future<RequestOptions> _parseAsDioRequest(Request request) async {
-    if (request == null) {
-      throw NullReferenceException('Request object is null');
-    }
-
-    RequestOptions options = RequestOptions(
-      path: request.requestUri.toString(),
-      method: request.httpMethod.toString().split('.').last,
-      cancelToken: request.cancelToken,
-    );
-
-    if (request.shouldAuthorize) {
-      options = await WordpressAuthorization.authorizeRequest(options, _client, parseUrl(_baseUrl, _path), request.authorization);
-
-      if (options == null) {
-        throw AuthorizationFailedException();
-      }
-    }
-
-    print('Request URL: ${options.path}');
-
-    if (request.headers != null && request.headers.isNotEmpty) {
-      for (final pair in request.headers) {
-        options.headers[pair.key] = pair.value;
-      }
-    }
-
-    if (request.formBody != null) {
-      switch (request.formBody['REQUEST_TYPE']) {
-        case 'media_request':
-          options.headers.addEntries(request.formBody.entries.where((element) => element.key != 'file'));
-          options.data = request.formBody['file'];
-          break;
-        case 'post_request':
-          options.data = request.formBody;
-          break;
-      }
-    }
-
-    return options;
-  }
+*/
 }

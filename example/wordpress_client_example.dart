@@ -4,7 +4,7 @@ import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
   WordpressClient client = WordpressClient('https://www.pathanamthittamedia.com/wp-json', 'wp/v2');
-
+  
   final postsContainer = await client.fetchPosts(
     (builder) => builder.initializeWithDefaultValues().orderResultsBy(FilterOrder.DESCENDING).withPerPage(20).withPageNumber(1).buildWithCallback(
           Callback(

@@ -9,7 +9,7 @@ import '../request.dart';
 import 'request_builder_base.dart';
 
 class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Request> {
-  RetriveRequestBuilder.withValues(String endpoint) {
+  RetriveRequestBuilder.withEndpoint(String endpoint) {
     if (endpoint == null) {
       throw NullReferenceException('Invalid parameters.');
     }
