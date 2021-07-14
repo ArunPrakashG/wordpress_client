@@ -208,11 +208,11 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
     if (_queryParameters != null && _queryParameters.isNotEmpty) {
       for (final pair in _queryParameters) {
-        if (isNullOrEmpty(pair.a) || isNullOrEmpty(pair.b)) {
+        if (isNullOrEmpty(pair.key) || isNullOrEmpty(pair.value)) {
           continue;
         }
 
-        baseUrl += '${_getJoiningChar(baseUrl)}${pair.a}=${pair.b}';
+        baseUrl += '${_getJoiningChar(baseUrl)}${pair.key}=${pair.value}';
       }
     }
 
@@ -518,7 +518,6 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
         httpMethod: _httpMethod,
         formBody: _formBody,
         authorization: _authorization,
-        perPageCount: _perPageCount,
         headers: _headers,
       );
     }
@@ -537,7 +536,6 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
         httpMethod: _httpMethod,
         formBody: _formBody,
         authorization: _authorization,
-        perPageCount: _perPageCount,
         headers: _headers,
       );
     }

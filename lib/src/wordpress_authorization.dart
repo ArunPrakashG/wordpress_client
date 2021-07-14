@@ -45,8 +45,8 @@ class WordpressAuthorization {
     return true;
   }
 
-  Future<bool> handleJwtAuthentication(String baseUrl, Dio client, void Function(String) tokenCallback, {Callback callback}) async {
-    if (authType != AuthorizationType.JWT || client == null || isNullOrEmpty(baseUrl)) {
+  Future<bool> handleJwtAuthentication(Dio client, void Function(String) tokenCallback, {Callback callback}) async {
+    if (authType != AuthorizationType.JWT || client == null) {
       return false;
     }
 
@@ -54,12 +54,12 @@ class WordpressAuthorization {
       return true;
     }
 
-    if (!isNullOrEmpty(_encryptedAccessToken) && await validateExistingToken(baseUrl, client)) {
+    if (!isNullOrEmpty(_encryptedAccessToken) && await validateExistingToken(client)) {
       return true;
     }
 
     final response = await client.post(
-      parseUrl(baseUrl, 'jwt-auth/v1/token'),
+      'jwt-auth/v1/token',
       data: {
         'username': _userName,
         'password': _password,
@@ -80,13 +80,13 @@ class WordpressAuthorization {
     return true;
   }
 
-  Future<bool> validateExistingToken(String baseUrl, Dio client) async {
-    if (authType != AuthorizationType.JWT || client == null || isNullOrEmpty(baseUrl) || isNullOrEmpty(_encryptedAccessToken)) {
+  Future<bool> validateExistingToken(Dio client) async {
+    if (authType != AuthorizationType.JWT || client == null || isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
 
     final response = await client.post(
-      parseUrl(baseUrl, 'jwt-auth/v1/token/validate'),
+      'jwt-auth/v1/token/validate',
       options: Options(
         method: 'POST',
         headers: {'Authorization': '$scheme $_encryptedAccessToken'},
@@ -131,13 +131,12 @@ class WordpressAuthorization {
     return validationResult.success;
   }
 
-  static Future<RequestOptions> authorizeRequest(RequestOptions requestOptions, Dio client, String baseUrl, WordpressAuthorization auth,
-      {Callback callback}) async {
-    if (auth == null || auth.isDefault || isNullOrEmpty(baseUrl)) {
+  static Future<RequestOptions> authorizeRequest(RequestOptions requestOptions, Dio client, WordpressAuthorization auth, {Callback callback}) async {
+    if (auth == null || auth.isDefault) {
       return requestOptions;
     }
 
-    if (auth.authType == AuthorizationType.JWT && !await auth.handleJwtAuthentication(baseUrl, client, (accessToken) {})) {
+    if (auth.authType == AuthorizationType.JWT && !await auth.handleJwtAuthentication(client, (accessToken) {})) {
       return null;
     }
 

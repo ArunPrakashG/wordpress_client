@@ -115,9 +115,9 @@ class MediaBuilder extends QueryBuilder<MediaBuilder> implements IRequestBuilder
       'comment_status': _commandStatus.toString().split('.').last,
       'ping_status': _pingStatus.toString().split('.').last,
       'status': _mediaStatus.toString().split('.').last,
-      if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(0) != null) 'Content-Type': _contentHeaders.elementAt(0).b,
+      if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(0) != null) 'Content-Type': _contentHeaders.elementAt(0).value,
       if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(1) != null)
-        'Content-Disposition': 'attachment; filename=${_contentHeaders.elementAt(1).b}',
+        'Content-Disposition': 'attachment; filename=${_contentHeaders.elementAt(1).value}',
       'file': _multipartFile,
     };
   }

@@ -1,6 +1,6 @@
 class Pair<T1, T2> {
-  final T1 a;
-  final T2 b;
+  final T1 key;
+  final T2 value;
 
-  Pair(this.a, this.b);
+  Pair(this.key, this.value);
 }
