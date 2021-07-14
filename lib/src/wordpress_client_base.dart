@@ -1,3 +1,4 @@
+import 'package:wordpress_client/src/builders/retrive/post_retrive.dart';
 import 'package:wordpress_client/src/exceptions/bootstrap_failed_exception.dart';
 import 'package:wordpress_client/src/exceptions/client_not_initialized_exception.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
@@ -6,7 +7,7 @@ import 'exceptions/null_reference_exception.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'internal_requester.dart';
-import 'requests/builders/retrive_request_builder.dart';
+import 'builders/list/post_list.dart';
 import 'requests/request.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
@@ -63,9 +64,16 @@ class WordpressClient {
     return _interfaces.entries.singleWhere((i) => i.value is T).value;
   }
 
-  Future<ResponseContainer<List<Post>>> getPosts(Request Function(RetriveRequestBuilder) builder) async {
+  Future<ResponseContainer<List<Post>>> listPosts(Request Function(PostListBuilder) builder) async {
     return getInterfaceByName<PostsInterface<Post>>('posts').list<Post>(
-      request: builder(RetriveRequestBuilder.withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostListBuilder.withEndpoint('posts').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Post>> retrivePost(Request Function(PostRetriveBuilder) builder) async {
+    return getInterfaceByName<PostsInterface<Post>>('posts').retrive<Post>(
+      request: builder(PostRetriveBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

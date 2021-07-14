@@ -10,9 +10,8 @@ import '../../exceptions/null_reference_exception.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import 'query_builder.dart';
-import 'request_builder_base.dart';
 
-class MediaBuilder extends QueryBuilder<MediaBuilder> implements IRequestBuilder<MediaBuilder, Map<String, dynamic>> {
+class MediaBuilder extends QueryBuilder<MediaBuilder> {
   MultipartFile _multipartFile;
   String _altText;
   String _caption;
@@ -123,7 +122,7 @@ class MediaBuilder extends QueryBuilder<MediaBuilder> implements IRequestBuilder
   }
 
   @override
-  MediaBuilder initializeWithDefaultValues() {
+  MediaBuilder withDefaultValues() {
     _associatedPostId = -1;
     _commandStatus = Status.OPEN;
     _pingStatus = Status.OPEN;

@@ -510,8 +510,7 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   Request build() {
     if (_createUri()) {
       return Request(
-        _requestUri,
-        endpoint: _endpoint,
+        _endpoint,
         callback: null,
         validationDelegate: _responseValidationDelegate,
         cancelToken: _cancelToken,

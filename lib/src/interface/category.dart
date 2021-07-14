@@ -1,15 +1,14 @@
-import 'package:wordpress_client/src/operations/list.dart';
-
+import '../internal_requester.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
+import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../internal_requester.dart';
 import '../requests/request.dart';
 import '../responses/response_container.dart';
 import '../utilities/serializable_instance.dart';
 
-class PostsInterface<T extends ISerializable<T>>
+class CategoryInterface<T extends ISerializable<T>>
     implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
   @override
   Future<ResponseContainer<T>> create<T>({Request request, InternalRequester requesterClient}) {

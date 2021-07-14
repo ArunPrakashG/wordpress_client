@@ -5,24 +5,22 @@ import 'package:wordpress_client/src/utilities/pair.dart';
 
 import '../../enums.dart';
 import '../../wordpress_authorization.dart';
-import '../request.dart';
-import 'request_builder_base.dart';
+import '../../requests/request.dart';
+import '../../requests/builders/request_builder_base.dart';
 
-class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Request> {
-  RetriveRequestBuilder.withEndpoint(String endpoint) {
+class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
+  PostListBuilder.withEndpoint(String endpoint) {
     if (endpoint == null) {
       throw NullReferenceException('Invalid parameters.');
     }
 
-    _endpoint = endpoint;
+    endpoint = endpoint;
   }
 
-  static RetriveRequestBuilder create() => RetriveRequestBuilder();
+  static PostListBuilder create() => PostListBuilder();
 
-  RetriveRequestBuilder();
+  PostListBuilder();
 
-  String _endpoint;
-  CancelToken _cancelToken;
   String _context;
   int _pageNumber = 1;
   int _perPageCount = 10;
@@ -45,126 +43,141 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
   List<int> _excludedCategories;
   bool _onlySticky = false;
   bool _emdeded = false;
-  WordpressAuthorization _authorization;
-  bool Function(Map<String, dynamic>) _responseValidationDelegate;
-  List<Pair<String, String>> _headers;
-  List<Pair<String, String>> _queryParameters;
 
-  RetriveRequestBuilder withAuthorization(WordpressAuthorization authorization) {
-    if (authorization == null || authorization.isDefault) {
+  @override
+  WordpressAuthorization authorization;
+
+  @override
+  CancelToken cancelToken;
+
+  @override
+  String endpoint;
+
+  @override
+  List<Pair<String, String>> headers;
+
+  @override
+  List<Pair<String, String>> queryParameters;
+
+  @override
+  bool Function(Map<String, dynamic>) responseValidationDelegate;
+
+  PostListBuilder withAuthorization(WordpressAuthorization auth) {
+    if (auth == null || auth.isDefault) {
       return this;
     }
 
-    _authorization = authorization;
+    authorization = auth;
     return this;
   }
 
-  RetriveRequestBuilder withHeader(Pair<String, String> header) {
-    _headers ??= [];
-    _headers.add(header);
+  PostListBuilder withHeader(Pair<String, String> customHeader) {
+    headers ??= [];
+    headers.add(customHeader);
     return this;
   }
 
-  RetriveRequestBuilder withHeaders(Iterable<Pair<String, String>> headers) {
-    _headers ??= [];
-    _headers.addAll(headers);
+  PostListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+    headers ??= [];
+    headers.addAll(customHeaders);
     return this;
   }
 
-  RetriveRequestBuilder withQueryParameter(Pair<String, String> queryParameter) {
-    _queryParameters ??= [];
-    _queryParameters.add(queryParameter);
+  PostListBuilder withQueryParameter(Pair<String, String> queryParameter) {
+    queryParameters ??= [];
+    queryParameters.add(queryParameter);
     return this;
   }
 
-  RetriveRequestBuilder withQueryParameters(Iterable<Pair<String, String>> queryParameters) {
-    _queryParameters ??= [];
-    _queryParameters.addAll(queryParameters);
+  PostListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+    queryParameters ??= [];
+    queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
-  RetriveRequestBuilder withResponseValidationOverride(bool Function(Map<String, dynamic>) responseDelegate) {
-    _responseValidationDelegate = responseDelegate;
+  @override
+  PostListBuilder withResponseValidationOverride(bool Function(Map<String, dynamic>) responseDelegate) {
+    responseValidationDelegate = responseDelegate;
     return this;
   }
 
-  RetriveRequestBuilder withCancellationToken(CancelToken token) {
-    _cancelToken = token;
+  PostListBuilder withCancellationToken(CancelToken token) {
+    cancelToken = token;
     return this;
   }
 
-  RetriveRequestBuilder withSearchQuery(String query) {
+  PostListBuilder withSearchQuery(String query) {
     _searchQuery = query;
     return this;
   }
 
-  RetriveRequestBuilder setEmbeded(bool value) {
+  PostListBuilder setEmbeded(bool value) {
     _emdeded = value;
     return this;
   }
 
-  RetriveRequestBuilder withPerPage(int count) {
+  PostListBuilder withPerPage(int count) {
     _perPageCount = count;
     return this;
   }
 
-  RetriveRequestBuilder withPageNumber(int pageNumber) {
+  PostListBuilder withPageNumber(int pageNumber) {
     _pageNumber = pageNumber;
     return this;
   }
 
-  RetriveRequestBuilder withValuesBefore(DateTime dateTime) {
+  PostListBuilder withValuesBefore(DateTime dateTime) {
     _before = dateTime;
     return this;
   }
 
-  RetriveRequestBuilder withValuesAfter(DateTime dateTime) {
+  PostListBuilder withValuesAfter(DateTime dateTime) {
     _after = dateTime;
     return this;
   }
 
-  RetriveRequestBuilder withValuesBetween(DateTime start, DateTime end) {
+  PostListBuilder withValuesBetween(DateTime start, DateTime end) {
     _before = start;
     _after = end;
     return this;
   }
 
-  RetriveRequestBuilder allowAuthors(Iterable<int> ids) {
+  PostListBuilder allowAuthors(Iterable<int> ids) {
     _allowedAuthors ??= [];
     _allowedAuthors.addAll(ids);
     return this;
   }
 
-  RetriveRequestBuilder excludeAuthors(Iterable<int> ids) {
+  PostListBuilder excludeAuthors(Iterable<int> ids) {
     _excludedAuthors ??= [];
     _excludedAuthors.addAll(ids);
     return this;
   }
 
-  RetriveRequestBuilder includeIds(Iterable<int> ids) {
+  PostListBuilder includeIds(Iterable<int> ids) {
     _allowedIds ??= [];
     _allowedIds.addAll(ids);
     return this;
   }
 
-  RetriveRequestBuilder excludeIds(Iterable<int> ids) {
+  PostListBuilder excludeIds(Iterable<int> ids) {
     _excludedIds ??= [];
     _excludedIds.addAll(ids);
     return this;
   }
 
-  RetriveRequestBuilder withResultOffset(int offset) {
+  PostListBuilder withResultOffset(int offset) {
     _resultOffset = offset;
     return this;
   }
 
-  RetriveRequestBuilder allowSlugs(Iterable<String> slugs) {
+  PostListBuilder allowSlugs(Iterable<String> slugs) {
     _limitBySlug ??= [];
     _limitBySlug.addAll(slugs);
     return this;
   }
 
-  RetriveRequestBuilder orderResultsBy(FilterOrder order) {
+  PostListBuilder orderResultsBy(FilterOrder order) {
     switch (order) {
       case FilterOrder.ASCENDING:
         _resultOrder = 'asc';
@@ -177,12 +190,12 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
     return this;
   }
 
-  RetriveRequestBuilder sortResultsBy(FilterSortOrder sortOrder) {
-    if (isNullOrEmpty(_endpoint)) {
+  PostListBuilder sortResultsBy(FilterSortOrder sortOrder) {
+    if (isNullOrEmpty(endpoint)) {
       return this;
     }
 
-    if (sortOrder == FilterSortOrder.DATE && _endpoint.toLowerCase() == 'users') {
+    if (sortOrder == FilterSortOrder.DATE && endpoint.toLowerCase() == 'users') {
       _sortOrder = 'registered_date';
       return this;
     }
@@ -200,17 +213,17 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
         _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         break;
       case FilterSortOrder.EMAIL:
-        if (_endpoint.toLowerCase() == 'users') {
+        if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
       case FilterSortOrder.URL:
-        if (_endpoint.toLowerCase() == 'users') {
+        if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
       case FilterSortOrder.NAME:
-        if (_endpoint.toLowerCase() == 'users') {
+        if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
@@ -222,7 +235,7 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
     return this;
   }
 
-  RetriveRequestBuilder withScope(FilterScope scope) {
+  PostListBuilder withScope(FilterScope scope) {
     switch (scope) {
       case FilterScope.VIEW:
         _context = 'view';
@@ -238,36 +251,36 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
     return this;
   }
 
-  RetriveRequestBuilder limitToSticky(bool shouldLimit) {
+  PostListBuilder limitToSticky(bool shouldLimit) {
     _onlySticky = shouldLimit;
     return this;
   }
 
-  RetriveRequestBuilder allowTags(Iterable<int> tags) {
+  PostListBuilder allowTags(Iterable<int> tags) {
     _allowedTags ??= [];
     _allowedTags.addAll(tags);
     return this;
   }
 
-  RetriveRequestBuilder excludeTags(Iterable<int> tags) {
+  PostListBuilder excludeTags(Iterable<int> tags) {
     _excludedTags ??= [];
     _excludedTags.addAll(tags);
     return this;
   }
 
-  RetriveRequestBuilder allowCategories(Iterable<int> categories) {
+  PostListBuilder allowCategories(Iterable<int> categories) {
     _allowedCategories ??= [];
     _allowedCategories.addAll(categories);
     return this;
   }
 
-  RetriveRequestBuilder excludeCategories(Iterable<int> categories) {
+  PostListBuilder excludeCategories(Iterable<int> categories) {
     _excludedCategories ??= [];
     _excludedCategories.addAll(categories);
     return this;
   }
 
-  RetriveRequestBuilder setAllowedTaxonomyRelation(TaxonomyRelation relation) {
+  PostListBuilder setAllowedTaxonomyRelation(TaxonomyRelation relation) {
     switch (relation) {
       case TaxonomyRelation.AND:
         _limitByTaxonomyRelation = 'AND';
@@ -280,7 +293,7 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
     return this;
   }
 
-  RetriveRequestBuilder setAllowedStatus(PostAvailabilityStatus status) {
+  PostListBuilder setAllowedStatus(PostAvailabilityStatus status) {
     switch (status) {
       case PostAvailabilityStatus.PUBLISHED:
         _limitByStatus = 'published';
@@ -295,7 +308,7 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
 
     return this;
   }
- 
+
   Map<String, String> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
@@ -321,8 +334,8 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
       if (_allowedTags != null && _allowedTags.isNotEmpty) 'tags': _allowedTags.join(','),
       if (_excludedTags != null && _excludedTags.isNotEmpty) 'tags_exclude': _excludedTags.join(','),
       if (_onlySticky) 'sticky': '1',
-      if (_queryParameters != null && _queryParameters.isNotEmpty)
-        for (var pair in _queryParameters)
+      if (queryParameters != null && queryParameters.isNotEmpty)
+        for (var pair in queryParameters)
           if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value)) pair.key: pair.value
     };
   }
@@ -330,20 +343,23 @@ class RetriveRequestBuilder implements IRequestBuilder<RetriveRequestBuilder, Re
   @override
   Request build() {
     return Request(
-      _endpoint,
+      endpoint,
       callback: null,
       httpMethod: HttpMethod.GET,
-      validationDelegate: _responseValidationDelegate,
-      cancelToken: _cancelToken,
-      authorization: _authorization,
-      headers: _headers,
+      validationDelegate: responseValidationDelegate,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      headers: headers,
       queryParams: _parseQueryParameters(),
     );
   }
 
   @override
-  RetriveRequestBuilder initializeWithDefaultValues() {
-    // TODO: implement initializeWithDefaultValues
-    throw UnimplementedError();
+  PostListBuilder initializeWithDefaultValues() => this;
+
+  @override
+  PostListBuilder withEndpoint(String newEndpoint) {
+    endpoint = newEndpoint;
+    return this;
   }
 }
