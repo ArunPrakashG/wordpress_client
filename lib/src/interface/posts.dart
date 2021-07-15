@@ -13,17 +13,17 @@ class PostsInterface<T extends ISerializable<T>>
     implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
   @override
   Future<ResponseContainer<T>> create<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.requestAsync<T>(request);
+    return requesterClient.createRequest<T>(request);
   }
 
   @override
   Future<ResponseContainer<T>> delete<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.requestAsync<T>(request);
+    return requesterClient.deleteRequest<T>(request);
   }
 
   @override
-  Future<ResponseContainer<List<T>>> list<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.requestAsync<List<T>>(request);
+  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T resolver, Request request, InternalRequester requesterClient}) {
+    return requesterClient.listRequest<T>(resolver, request);
   }
 
   @override

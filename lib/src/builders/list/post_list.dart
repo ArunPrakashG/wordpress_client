@@ -19,7 +19,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
 
   static PostListBuilder create() => PostListBuilder();
 
-  PostListBuilder();
+  PostListBuilder() {}
 
   String _context;
   int _pageNumber = 1;
@@ -342,8 +342,9 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
 
   @override
   Request build() {
-    return Request(
+    var req = Request(
       endpoint,
+      isListRequest: true,
       callback: null,
       httpMethod: HttpMethod.GET,
       validationDelegate: responseValidationDelegate,
@@ -352,6 +353,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
       headers: headers,
       queryParams: _parseQueryParameters(),
     );
+    return req;
   }
 
   @override

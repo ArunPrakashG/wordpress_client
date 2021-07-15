@@ -106,6 +106,7 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, Request> {
   Request build() {
     return Request(
       endpoint,
+      isListRequest: true,
       queryParams: _parseQueryParameters(),
       callback: null,
       cancelToken: cancelToken,

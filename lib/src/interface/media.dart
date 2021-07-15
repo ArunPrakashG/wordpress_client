@@ -22,7 +22,7 @@ class MediaInterface<T extends ISerializable<T>>
   }
 
   @override
-  Future<ResponseContainer<List<T>>> list<T>({Request request, InternalRequester requesterClient}) {
+  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T resolver, Request request, InternalRequester requesterClient}) {
     return requesterClient.requestAsync<List<T>>(request);
   }
 

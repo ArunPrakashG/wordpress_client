@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/utilities/serializable_instance.dart';
 
 import 'enums.dart';
 import 'exceptions/authorization_failed_exception.dart';
@@ -13,7 +14,7 @@ import 'utilities/helpers.dart';
 import 'utilities/pair.dart';
 import 'wordpress_authorization.dart';
 
-const int defaultRequestTimeout = 60;
+const int defaultRequestTimeout = 60 * 1000;
 
 class InternalRequester {
   Dio _client;
@@ -87,6 +88,191 @@ class InternalRequester {
     return this;
   }
 
+  // Always POST
+  Future<ResponseContainer<T>> createRequest<T>(Request request) async {
+    if (request == null) {
+      throw NullReferenceException('Request is invalid.');
+    }
+
+    var watch = Stopwatch()..start();
+    try {
+      final response = await _client.fetch(await _parseAsDioRequest(request));
+      watch.stop();
+
+      if (response == null || response.statusCode != 200) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: response.statusMessage,
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (request.callback?.responseCallback != null) {
+        request.callback.responseCallback(response.data);
+      }
+
+      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in validationDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      return ResponseContainer<T>(
+        response.data as T,
+        responseCode: response.statusCode,
+        status: true,
+        responseHeaders: _parseResponseHeaders(response.headers.map),
+        duration: watch.elapsed,
+      );
+    } on Exception catch (e) {
+      if (request.callback?.unhandledExceptionCallback != null) {
+        request.callback.unhandledExceptionCallback(e);
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        errorMessage: 'Exception occured.',
+        status: false,
+        exception: e,
+        responseCode: 400,
+      );
+    }
+  }
+
+  // always DELETE
+  // No validator
+  Future<ResponseContainer<T>> deleteRequest<T>(Request request) async {
+    if (request == null) {
+      throw NullReferenceException('Request is invalid.');
+    }
+
+    var watch = Stopwatch()..start();
+    try {
+      final response = await _client.fetch(await _parseAsDioRequest(request));
+      watch.stop();
+
+      if (response == null || response.statusCode != 200) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: response.statusMessage,
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (request.callback?.responseCallback != null) {
+        request.callback.responseCallback(response.data);
+      }
+
+      return ResponseContainer<T>(
+        null,
+        responseCode: response.statusCode,
+        status: response.statusCode == 200,
+        responseHeaders: _parseResponseHeaders(response.headers.map),
+        duration: watch.elapsed,
+      );
+    } on Exception catch (e) {
+      if (request.callback?.unhandledExceptionCallback != null) {
+        request.callback.unhandledExceptionCallback(e);
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        errorMessage: 'Exception occured.',
+        status: false,
+        exception: e,
+        responseCode: 400,
+      );
+    }
+  }
+
+  Future<ResponseContainer<List<T>>> listRequest<T extends ISerializable<T>>(T resolver, Request request) async {
+    if (request == null) {
+      throw NullReferenceException('Request is invalid.');
+    }
+    
+    var watch = Stopwatch()..start();
+    try {
+      final response = await _client.fetch(await _parseAsDioRequest(request));
+      watch.stop();
+
+      if (response == null || response.statusCode != 200) {
+        return ResponseContainer<List<T>>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: response.statusMessage,
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
+        return ResponseContainer<List<T>>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (request.callback?.responseCallback != null) {
+        request.callback.responseCallback(response.data);
+      }
+
+      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+        return ResponseContainer<List<T>>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in validationDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      var test = (response.data as Iterable<dynamic>).map<T>((e) => resolver.fromJson(e)).toList();
+      return ResponseContainer<List<T>>(
+        test,
+        responseCode: response.statusCode,
+        status: true,
+        responseHeaders: _parseResponseHeaders(response.headers.map),
+        duration: watch.elapsed,
+      );
+    } on Exception catch (e) {
+      if (request.callback?.unhandledExceptionCallback != null) {
+        request.callback.unhandledExceptionCallback(e);
+      }
+
+      return ResponseContainer<List<T>>.failed(
+        null,
+        duration: watch.elapsed,
+        errorMessage: 'Exception occured.',
+        status: false,
+        exception: e,
+        responseCode: 400,
+      );
+    }
+  }
+
   Future<ResponseContainer<T>> requestAsync<T>(Request request) async {
     if (request == null || isNullOrEmpty(request.generatedRequestPath)) {
       return null;
@@ -132,7 +318,7 @@ class InternalRequester {
       }
 
       return ResponseContainer<T>(
-        response.data,
+        request.isListRequest ? (response.data as Iterable<T>) : response.data as T,
         responseCode: response.statusCode,
         status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),

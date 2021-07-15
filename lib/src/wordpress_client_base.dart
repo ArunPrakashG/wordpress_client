@@ -16,9 +16,6 @@ import 'responses/response_container.dart';
 import 'responses/user_response.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
-
-const int defaultRequestTimeout = 60;
-
 class WordpressClient {
   Map<String, dynamic> _interfaces;
   InternalRequester _requester;
@@ -75,6 +72,7 @@ class WordpressClient {
 
   Future<ResponseContainer<List<User>>> listUsers(Request Function(UserListBuilder) builder) async {
     return getInterfaceByName<UsersInterface<User>>('users').list<User>(
+      resolver: User(),
       request: builder(UserListBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
@@ -96,7 +94,8 @@ class WordpressClient {
 
   Future<ResponseContainer<List<Post>>> listPosts(Request Function(PostListBuilder) builder) async {
     return getInterfaceByName<PostsInterface<Post>>('posts').list<Post>(
-      request: builder(PostListBuilder.withEndpoint('posts').initializeWithDefaultValues()),
+      resolver: Post(),
+      request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

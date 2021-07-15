@@ -17,9 +17,11 @@ class Request {
   final List<Pair<String, String>> headers;
   final Map<String, String> queryParams;
   String generatedRequestPath;
+  final bool isListRequest;
 
   Request(
     this.endpoint, {
+    this.isListRequest = false,
     this.callback,
     this.validationDelegate,
     this.cancelToken,
@@ -58,5 +60,5 @@ class Request {
 
   bool get hasValidCallbacks => hasValidExceptionCallback && callback.requestCallback != null && callback.responseCallback != null;
 
-  bool get isRequestExecutable => isNullOrEmpty(endpoint) || httpMethod == null;
+  bool get isRequestExecutable => !isNullOrEmpty(endpoint) || httpMethod != null;
 }

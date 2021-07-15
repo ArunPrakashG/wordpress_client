@@ -4,7 +4,17 @@ import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
   WordpressClient client = WordpressClient('https://www.pathanamthittamedia.com/wp-json', 'wp/v2');
-  
+  var posts = await client.listPosts((builder) => builder.withPerPage(20).build());
+
+  if (posts == null || posts.responseCode != 200) {
+    print('Error: ' + posts.responseCode.toString());
+  }
+
+  for (var post in posts.value) {
+    print('Title: ' + post.title.parsedText);
+    print('Content: ' + post.content.parsedText.substring(0, 30) + '...');
+  }
+
   /*
   final postsContainer = await client.fetchPosts(
     (builder) => builder.initializeWithDefaultValues().orderResultsBy(FilterOrder.DESCENDING).withPerPage(20).withPageNumber(1).buildWithCallback(
