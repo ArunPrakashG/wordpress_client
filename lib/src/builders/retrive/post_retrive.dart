@@ -32,7 +32,7 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Request>
 
   PostRetriveBuilder withPostId(int postId) {
     _postId = postId;
-    endpoint += '/$postId';
+    endpoint += '/$_postId';
     return this;
   }
 

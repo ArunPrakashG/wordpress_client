@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
-import 'package:wordpress_client/src/utilities/pair.dart';
-import 'package:wordpress_client/src/wordpress_authorization.dart';
+
+import '../../utilities/pair.dart';
+import '../../wordpress_authorization.dart';
 
 abstract class IRequestBuilder<TRequestType, YReturnType> {
   bool Function(Map<String, dynamic>) responseValidationDelegate;

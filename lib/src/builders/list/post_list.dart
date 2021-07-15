@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/exceptions/null_reference_exception.dart';
-import 'package:wordpress_client/src/utilities/helpers.dart';
-import 'package:wordpress_client/src/utilities/pair.dart';
 
 import '../../enums.dart';
-import '../../wordpress_authorization.dart';
-import '../../requests/request.dart';
+import '../../exceptions/null_reference_exception.dart';
 import '../../requests/builders/request_builder_base.dart';
+import '../../requests/request.dart';
+import '../../utilities/helpers.dart';
+import '../../utilities/pair.dart';
+import '../../wordpress_authorization.dart';
 
 class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
   PostListBuilder.withEndpoint(String endpoint) {
@@ -190,44 +190,44 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
     return this;
   }
 
-  PostListBuilder sortResultsBy(FilterSortOrder sortOrder) {
+  PostListBuilder sortResultsBy(FilterPostSortOrder sortOrder) {
     if (isNullOrEmpty(endpoint)) {
       return this;
     }
 
-    if (sortOrder == FilterSortOrder.DATE && endpoint.toLowerCase() == 'users') {
+    if (sortOrder == FilterPostSortOrder.DATE && endpoint.toLowerCase() == 'users') {
       _sortOrder = 'registered_date';
       return this;
     }
 
     switch (sortOrder) {
-      case FilterSortOrder.DATE:
-      case FilterSortOrder.AUTHOR:
-      case FilterSortOrder.ID:
-      case FilterSortOrder.INCLUDE:
-      case FilterSortOrder.MODIFIED:
-      case FilterSortOrder.PARENT:
-      case FilterSortOrder.RELEVANCE:
-      case FilterSortOrder.SLUG:
-      case FilterSortOrder.TITLE:
+      case FilterPostSortOrder.DATE:
+      case FilterPostSortOrder.AUTHOR:
+      case FilterPostSortOrder.ID:
+      case FilterPostSortOrder.INCLUDE:
+      case FilterPostSortOrder.MODIFIED:
+      case FilterPostSortOrder.PARENT:
+      case FilterPostSortOrder.RELEVANCE:
+      case FilterPostSortOrder.SLUG:
+      case FilterPostSortOrder.TITLE:
         _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         break;
-      case FilterSortOrder.EMAIL:
+      case FilterPostSortOrder.EMAIL:
         if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.URL:
+      case FilterPostSortOrder.URL:
         if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.NAME:
+      case FilterPostSortOrder.NAME:
         if (endpoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.INCLUDESLUGS:
+      case FilterPostSortOrder.INCLUDESLUGS:
         _sortOrder = 'include_slugs';
         break;
     }
