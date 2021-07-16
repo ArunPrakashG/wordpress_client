@@ -1,5 +1,6 @@
 import 'package:wordpress_client/src/enums.dart';
 import 'package:wordpress_client/src/responses/post_response.dart';
+import 'package:wordpress_client/src/responses/user_response.dart';
 import 'package:wordpress_client/src/utilities/callback.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
@@ -9,6 +10,7 @@ void main() async {
     'wp/v2',
     bootstrapper: (builder) => builder.withDefaultMaxRedirects(5).withFollowRedirects(true).withRequestTimeout(60).build(),
   );
+  /*
   var listPostsResponse = await client.listPosts(
     (builder) => builder
         .withPerPage(10)
@@ -73,28 +75,33 @@ void main() async {
   print('ID: ' + retrivePostResponse.value.id.toString());
   print('Title: ' + retrivePostResponse.value.title.parsedText.substring(0, 40) + '...');
   print('Content: ' + retrivePostResponse.value.content.parsedText.substring(0, 40) + '...');
-
-  /*
-  final postsContainer = await client.fetchPosts(
-    (builder) => builder.initializeWithDefaultValues().orderResultsBy(FilterOrder.DESCENDING).withPerPage(20).withPageNumber(1).buildWithCallback(
+*/
+  var listUsersResponse = await client.listUsers(
+    (builder) => builder
+        .withPerPage(10)
+        .withResponseValidationOverride((List<User> response) {
+          print('Response received in validator. (${response.length} users)');
+          return true;
+        })
+        .withCallback(
           Callback(
             unhandledExceptionCallback: (e) {
-              print(e.toString());
+              print('Unhandled exception: ${e.toString()}');
             },
-            responseCallback: (response) {
-              print('Response Received');
+            responseCallback: (responseRaw) {
+              print('Response received in Callback');
             },
           ),
-        ),
+        )
+        .build(),
   );
 
-  print('Request completed in ${postsContainer.duration.inSeconds} seconds');
-  print('Status Code: ${postsContainer.responseCode}');
-  print('Total Posts: ${postsContainer.value.length}');
+  print('Request completed in ${listUsersResponse.duration.inSeconds} second(s)');
+  print('Status Code: ${listUsersResponse.responseCode}');
 
-  for (final post in postsContainer.value) {
-    print(post.title.parsedText);
-    print(post.content.parsedText);
-    break;
-  }*/
+  for (var user in listUsersResponse.value) {
+    print('ID: ' + user.id.toString());
+    print('Username: ' + user.name);
+    print('Slug: ${user.slug}');
+  }
 }
