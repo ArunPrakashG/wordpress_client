@@ -2,11 +2,13 @@ import 'package:dio/src/cancel_token.dart';
 import 'package:wordpress_client/src/enums.dart';
 import 'package:wordpress_client/src/requests/builders/request_builder_base.dart';
 import 'package:wordpress_client/src/requests/request.dart';
+import 'package:wordpress_client/src/responses/user_response.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/src/wordpress_authorization.dart';
 import 'package:wordpress_client/src/utilities/pair.dart';
 
-class UserListBuilder implements IRequestBuilder<UserListBuilder, Request> {
+class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
   String _context;
   int _page = 1;
   int _perPage = 10;
@@ -36,7 +38,10 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, Request> {
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(Map<String, dynamic> p1) responseValidationDelegate;
+  bool Function(List<User>) responseValidationDelegate;
+
+  @override
+  Callback callback;
 
   static UserListBuilder create() => UserListBuilder();
 
@@ -103,12 +108,13 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, Request> {
   }
 
   @override
-  Request build() {
-    return Request(
+  Request<List<User>> build() {
+    return Request<List<User>>(
       endpoint,
       isListRequest: true,
       queryParams: _parseQueryParameters(),
-      callback: null,
+      callback: callback,
+      validationDelegate: responseValidationDelegate,
       cancelToken: cancelToken,
       headers: headers,
       formBody: null,
@@ -170,8 +176,14 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, Request> {
   }
 
   @override
-  UserListBuilder withResponseValidationOverride(bool Function(Map<String, dynamic> p1) responseDelegate) {
+  UserListBuilder withResponseValidationOverride(bool Function(List<User>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
+    return this;
+  }
+
+  @override
+  UserListBuilder withCallback(Callback requestCallback) {
+    callback = requestCallback;
     return this;
   }
 }

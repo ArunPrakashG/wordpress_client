@@ -8,6 +8,13 @@ class ResponseContainer<T> {
   final Duration duration;
   final Exception exception;
   final String errorMessage;
+  int get totalPagesCount => responseHeaders != null && responseHeaders.isNotEmpty
+      ? int.tryParse(responseHeaders.singleWhere((element) => element.key == 'x-wp-totalpages')?.value ?? '0') ?? 0
+      : 0;
+
+  int get totalPostsCount => responseHeaders != null && responseHeaders.isNotEmpty
+      ? int.tryParse(responseHeaders.singleWhere((element) => element.key == 'x-wp-total')?.value ?? '0') ?? 0
+      : 0;
 
   ResponseContainer(this.value, {this.responseCode, this.status = false, this.responseHeaders, this.duration, this.exception, this.errorMessage});
 

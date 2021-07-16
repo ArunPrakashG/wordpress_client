@@ -1,4 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
+import 'package:wordpress_client/src/responses/post_response.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
 import '../../requests/builders/request_builder_base.dart';
@@ -7,7 +9,7 @@ import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
 
-class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Request> {
+class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Post> {
   @override
   WordpressAuthorization authorization;
 
@@ -24,7 +26,10 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Request>
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(Map<String, dynamic> p1) responseValidationDelegate;
+  bool Function(Post) responseValidationDelegate;
+
+  @override
+  Callback callback;
 
   int _postId;
   String _context;
@@ -58,10 +63,10 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Request>
   }
 
   @override
-  Request build() {
-    return Request(
+  Request<Post> build() {
+    return Request<Post>(
       endpoint,
-      callback: null,
+      callback: callback,
       httpMethod: HttpMethod.GET,
       validationDelegate: responseValidationDelegate,
       cancelToken: cancelToken,
@@ -121,8 +126,14 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Request>
   }
 
   @override
-  PostRetriveBuilder withResponseValidationOverride(bool Function(Map<String, dynamic> p1) responseDelegate) {
+  PostRetriveBuilder withResponseValidationOverride(bool Function(Post) responseDelegate) {
     responseValidationDelegate = responseDelegate;
+    return this;
+  }
+
+  @override
+  PostRetriveBuilder withCallback(Callback requestCallback) {
+    callback = requestCallback;
     return this;
   }
 }

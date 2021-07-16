@@ -1,10 +1,9 @@
-import 'package:wordpress_client/src/operations/list.dart';
-
+import '../internal_requester.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
+import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../internal_requester.dart';
 import '../requests/request.dart';
 import '../responses/response_container.dart';
 import '../utilities/serializable_instance.dart';
@@ -12,27 +11,27 @@ import '../utilities/serializable_instance.dart';
 class PostsInterface<T extends ISerializable<T>>
     implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
   @override
-  Future<ResponseContainer<T>> create<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.createRequest<T>(request);
+  Future<ResponseContainer<T>> create<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient}) {
+    return requesterClient.createRequest<T>(typeResolver, request);
   }
 
   @override
-  Future<ResponseContainer<T>> delete<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.deleteRequest<T>(request);
+  Future<ResponseContainer<T>> delete<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient}) {
+    return requesterClient.deleteRequest<T>(typeResolver, request);
   }
 
   @override
-  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T resolver, Request request, InternalRequester requesterClient}) {
+  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T resolver, Request<List<T>> request, InternalRequester requesterClient}) {
     return requesterClient.listRequest<T>(resolver, request);
   }
 
   @override
-  Future<ResponseContainer<T>> retrive<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.requestAsync<T>(request);
+  Future<ResponseContainer<T>> retrive<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient}) {
+    return requesterClient.retriveRequest<T>(typeResolver, request);
   }
 
   @override
-  Future<ResponseContainer<T>> update<T>({Request request, InternalRequester requesterClient}) {
-    return requesterClient.requestAsync<T>(request);
+  Future<ResponseContainer<T>> update<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient}) {
+    return requesterClient.updateRequest<T>(typeResolver, request);
   }
 }

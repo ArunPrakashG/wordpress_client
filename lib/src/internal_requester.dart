@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/utilities/serializable_instance.dart';
+import 'package:wordpress_client/src/client_configuration.dart';
 
 import 'enums.dart';
 import 'exceptions/authorization_failed_exception.dart';
@@ -12,6 +10,7 @@ import 'responses/response_container.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
 import 'utilities/pair.dart';
+import 'utilities/serializable_instance.dart';
 import 'wordpress_authorization.dart';
 
 const int defaultRequestTimeout = 60 * 1000;
@@ -22,7 +21,7 @@ class InternalRequester {
   WordpressAuthorization _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
 
-  InternalRequester(String baseUrl, String path, {CookieContainer cookieContainer}) {
+  InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
     if (baseUrl == null) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -31,31 +30,51 @@ class InternalRequester {
       throw NullReferenceException('Endpoint is invalid.');
     }
 
+    if (configuration == null) {
+      configuration = new BootstrapConfiguration(
+        cookieContainer: CookieContainer(),
+        requestTimeout: defaultRequestTimeout,
+        shouldFollowRedirects: true,
+        maxRedirects: 5,
+      );
+    }
+
     _baseUrl = parseUrl(baseUrl, path);
+
+    // TODO: configuration.cookieContainer
+
+    _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
+    _defaultAuthorization = configuration.defaultAuthorization;
+    _handleDefaultAuthorization(configuration.defaultAuthorization);
+
+    if (configuration.defaultUserAgent != null) {
+      _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
+    }
+
+    if (configuration.defaultHeaders != null && configuration.defaultHeaders.isNotEmpty) {
+      for (final header in configuration.defaultHeaders) {
+        _client.options.headers[header.key] = header.value;
+      }
+    }
 
     _client = Dio(
       BaseOptions(
-        connectTimeout: defaultRequestTimeout,
-        receiveTimeout: defaultRequestTimeout,
-        followRedirects: true,
-        maxRedirects: 5,
+        connectTimeout: configuration.requestTimeout,
+        receiveTimeout: configuration.requestTimeout,
+        followRedirects: configuration.shouldFollowRedirects,
+        maxRedirects: configuration.maxRedirects,
         baseUrl: _baseUrl,
       ),
     );
   }
 
-  InternalRequester withDefaultUserAgent(String userAgent) {
-    _client.options.headers['User-Agent'] = userAgent;
-    return this;
-  }
-
-  Future<InternalRequester> withDefaultAuthorization(WordpressAuthorization auth) async {
+  void _handleDefaultAuthorization(WordpressAuthorization auth) async {
     if (auth == null || auth.isDefault) {
-      return this;
+      return;
     }
 
     if (_defaultAuthorization != null && !_defaultAuthorization.isDefault) {
-      return this;
+      return;
     }
 
     _defaultAuthorization = auth;
@@ -65,33 +84,18 @@ class InternalRequester {
         !await _defaultAuthorization.handleJwtAuthentication(_client, (token) {
           encryptedAccessToken = token;
         })) {
-      return this;
+      return;
     }
 
     if (!isNullOrEmpty(encryptedAccessToken)) {
       _client.options.headers['Authorization'] = '${_defaultAuthorization.scheme} $encryptedAccessToken';
     }
-
-    return this;
-  }
-
-  InternalRequester withGlobalResponsePreprocessorDelegate(bool Function(dynamic) delgate) {
-    _responsePreprocessorDelegate = delgate;
-    return this;
-  }
-
-  InternalRequester withDefaultRequestHeaders(List<Pair<String, String>> headers) {
-    for (final header in headers) {
-      _client.options.headers[header.key] = header.value;
-    }
-
-    return this;
   }
 
   // Always POST
-  Future<ResponseContainer<T>> createRequest<T>(Request request) async {
-    if (request == null) {
-      throw NullReferenceException('Request is invalid.');
+  Future<ResponseContainer<T>> createRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     var watch = Stopwatch()..start();
@@ -109,7 +113,9 @@ class InternalRequester {
         );
       }
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
+      final responseDataContainer = typeResolver.fromJson(response.data);
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
@@ -120,10 +126,10 @@ class InternalRequester {
       }
 
       if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(response.data);
+        request.callback.responseCallback(responseDataContainer);
       }
 
-      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
@@ -134,7 +140,7 @@ class InternalRequester {
       }
 
       return ResponseContainer<T>(
-        response.data as T,
+        responseDataContainer,
         responseCode: response.statusCode,
         status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
@@ -158,9 +164,9 @@ class InternalRequester {
 
   // always DELETE
   // No validator
-  Future<ResponseContainer<T>> deleteRequest<T>(Request request) async {
-    if (request == null) {
-      throw NullReferenceException('Request is invalid.');
+  Future<ResponseContainer<T>> deleteRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+    if (request == null || !request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     var watch = Stopwatch()..start();
@@ -205,11 +211,11 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<List<T>>> listRequest<T extends ISerializable<T>>(T resolver, Request request) async {
-    if (request == null) {
-      throw NullReferenceException('Request is invalid.');
+  Future<ResponseContainer<List<T>>> listRequest<T extends ISerializable<T>>(T typeResolver, Request<List<T>> request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
-    
+
     var watch = Stopwatch()..start();
     try {
       final response = await _client.fetch(await _parseAsDioRequest(request));
@@ -225,7 +231,9 @@ class InternalRequester {
         );
       }
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
+      final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
         return ResponseContainer<List<T>>.failed(
           null,
           duration: watch.elapsed,
@@ -236,10 +244,10 @@ class InternalRequester {
       }
 
       if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(response.data);
+        request.callback.responseCallback(responseDataContainer);
       }
 
-      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
         return ResponseContainer<List<T>>.failed(
           null,
           duration: watch.elapsed,
@@ -249,9 +257,8 @@ class InternalRequester {
         );
       }
 
-      var test = (response.data as Iterable<dynamic>).map<T>((e) => resolver.fromJson(e)).toList();
       return ResponseContainer<List<T>>(
-        test,
+        responseDataContainer,
         responseCode: response.statusCode,
         status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
@@ -273,9 +280,9 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T>> requestAsync<T>(Request request) async {
-    if (request == null || isNullOrEmpty(request.generatedRequestPath)) {
-      return null;
+  Future<ResponseContainer<T>> retriveRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     var watch = Stopwatch()..start();
@@ -293,7 +300,78 @@ class InternalRequester {
         );
       }
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(response.data)) {
+      final responseDataContainer = typeResolver.fromJson(response.data);
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      if (request.callback?.responseCallback != null) {
+        request.callback.responseCallback(responseDataContainer);
+      }
+
+      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: 'Request aborted by user in validationDelegate()',
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      return ResponseContainer<T>(
+        responseDataContainer,
+        responseCode: response.statusCode,
+        status: true,
+        responseHeaders: _parseResponseHeaders(response.headers.map),
+        duration: watch.elapsed,
+      );
+    } on Exception catch (e) {
+      if (request.callback?.unhandledExceptionCallback != null) {
+        request.callback.unhandledExceptionCallback(e);
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        errorMessage: 'Exception occured.',
+        status: false,
+        exception: e,
+        responseCode: 400,
+      );
+    }
+  }
+
+  Future<ResponseContainer<T>> updateRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
+    }
+
+    var watch = Stopwatch()..start();
+    try {
+      final response = await _client.fetch(await _parseAsDioRequest(request));
+      watch.stop();
+
+      if (response == null || response.statusCode != 200) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          errorMessage: response.statusMessage,
+          status: false,
+          responseCode: response.statusCode,
+        );
+      }
+
+      final responseDataContainer = typeResolver.fromJson(response.data);
+
+      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
@@ -307,7 +385,7 @@ class InternalRequester {
         request.callback.responseCallback(response.data);
       }
 
-      if (request.validationDelegate != null && !request.validationDelegate(jsonDecode(response.data))) {
+      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
@@ -318,7 +396,7 @@ class InternalRequester {
       }
 
       return ResponseContainer<T>(
-        request.isListRequest ? (response.data as Iterable<T>) : response.data as T,
+        responseDataContainer,
         responseCode: response.statusCode,
         status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),

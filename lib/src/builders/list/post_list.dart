@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/responses/post_response.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
 import '../../exceptions/null_reference_exception.dart';
@@ -8,7 +10,7 @@ import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
 
-class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
+class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
   PostListBuilder.withEndpoint(String endpoint) {
     if (endpoint == null) {
       throw NullReferenceException('Invalid parameters.');
@@ -60,7 +62,10 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(Map<String, dynamic>) responseValidationDelegate;
+  bool Function(List<Post>) responseValidationDelegate;
+
+  @override
+  Callback callback;
 
   PostListBuilder withAuthorization(WordpressAuthorization auth) {
     if (auth == null || auth.isDefault) {
@@ -96,7 +101,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
   }
 
   @override
-  PostListBuilder withResponseValidationOverride(bool Function(Map<String, dynamic>) responseDelegate) {
+  PostListBuilder withResponseValidationOverride(bool Function(List<Post>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
@@ -341,11 +346,11 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
   }
 
   @override
-  Request build() {
-    var req = Request(
+  Request<List<Post>> build() {
+    var req = Request<List<Post>>(
       endpoint,
       isListRequest: true,
-      callback: null,
+      callback: callback,
       httpMethod: HttpMethod.GET,
       validationDelegate: responseValidationDelegate,
       cancelToken: cancelToken,
@@ -362,6 +367,12 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, Request> {
   @override
   PostListBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
+    return this;
+  }
+
+  @override
+  PostListBuilder withCallback(Callback requestCallback) {
+    callback = requestCallback;
     return this;
   }
 }

@@ -1,8 +1,9 @@
 import 'package:wordpress_client/src/requests/request.dart';
 import 'package:wordpress_client/src/responses/response_container.dart';
+import 'package:wordpress_client/src/utilities/serializable_instance.dart';
 
 import '../internal_requester.dart';
 
 abstract class IRetriveOperation<T> {
-  Future<ResponseContainer<T>> retrive<T>({Request request, InternalRequester requesterClient});
+  Future<ResponseContainer<T>> retrive<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient});
 }

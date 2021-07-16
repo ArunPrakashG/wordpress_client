@@ -1,14 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
+import '../request.dart';
 
-abstract class IRequestBuilder<TRequestType, YReturnType> {
-  bool Function(Map<String, dynamic>) responseValidationDelegate;
+abstract class IRequestBuilder<TRequestType, XResponseType> {
+  bool Function(XResponseType) responseValidationDelegate;
   WordpressAuthorization authorization;
   List<Pair<String, String>> headers;
   List<Pair<String, String>> queryParameters;
   CancelToken cancelToken;
+  Callback callback;
   String endpoint;
 
   TRequestType initializeWithDefaultValues();
@@ -23,7 +26,9 @@ abstract class IRequestBuilder<TRequestType, YReturnType> {
 
   TRequestType withEndpoint(String newEndpoint);
 
-  TRequestType withResponseValidationOverride(bool Function(Map<String, dynamic>) responseDelegate);
+  TRequestType withCallback(Callback requestCallback);
 
-  YReturnType build();
+  TRequestType withResponseValidationOverride(bool Function(XResponseType) responseDelegate);
+
+  Request<XResponseType> build();
 }

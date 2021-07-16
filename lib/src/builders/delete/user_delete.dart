@@ -1,4 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
+import 'package:wordpress_client/src/responses/user_response.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
 import '../../requests/builders/request_builder_base.dart';
@@ -6,7 +8,7 @@ import '../../requests/request.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
 
-class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, Request> {
+class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   @override
   WordpressAuthorization authorization;
 
@@ -23,7 +25,10 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, Request> {
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(Map<String, dynamic> p1) responseValidationDelegate;
+  bool Function(User) responseValidationDelegate;
+
+  @override
+  Callback callback;
 
   int _id;
   bool _force;
@@ -46,11 +51,11 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, Request> {
   }
 
   @override
-  Request build() {
-    return new Request(
+  Request<User> build() {
+    return new Request<User>(
       endpoint,
       queryParams: _parseQueryParameters(),
-      callback: null,
+      callback: callback,
       headers: headers,
       formBody: null,
       authorization: authorization,
@@ -106,8 +111,14 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, Request> {
   }
 
   @override
-  UserDeleteBuilder withResponseValidationOverride(bool Function(Map<String, dynamic> p1) responseDelegate) {
+  UserDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
+    return this;
+  }
+
+  @override
+  UserDeleteBuilder withCallback(Callback requestCallback) {
+    callback = requestCallback;
     return this;
   }
 }

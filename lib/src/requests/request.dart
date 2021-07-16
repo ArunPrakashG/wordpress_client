@@ -6,10 +6,10 @@ import '../utilities/helpers.dart';
 import '../utilities/pair.dart';
 import '../wordpress_authorization.dart';
 
-class Request {
+class Request<TResponseType> {
   final String endpoint;
   final Callback callback;
-  final bool Function(Map<String, dynamic>) validationDelegate;
+  final bool Function(TResponseType) validationDelegate;
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
   final WordpressAuthorization authorization;
@@ -34,6 +34,19 @@ class Request {
     generatedRequestPath = _buildUrlQueryString();
   }
 
+  bool _hasIdInUrlAlready(String requestQueryUrl, MapEntry<String, String> currentEntry) {
+    if (!requestQueryUrl.contains('/')) {
+      return false;
+    }
+
+    if (currentEntry.key != 'id') {
+      return false;
+    }
+
+    final id = requestQueryUrl.split('/')[1];
+    return currentEntry.value == id;
+  }
+
   String _buildUrlQueryString() {
     if (queryParams == null || queryParams.isEmpty) {
       return '';
@@ -42,6 +55,10 @@ class Request {
     var requestQueryUrl = endpoint;
 
     for (var param in queryParams.entries) {
+      if(_hasIdInUrlAlready(requestQueryUrl, param)){
+        continue;
+      }
+
       requestQueryUrl += getJoiningChar(requestQueryUrl) + param.key + '=' + param.value;
     }
 
