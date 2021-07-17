@@ -128,11 +128,11 @@ class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      queryParams: _parseQueryParameters(),
+      formBody: _parseParameters(),
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String> _parseParameters() {
     return {
       if (!isNullOrEmpty(_title)) 'title': _title,
       if (!isNullOrEmpty(_content)) 'content': _content,

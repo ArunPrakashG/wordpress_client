@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/wordpress_client_base.dart';
 
 import 'enums.dart';
 import 'responses/jwt_token_response.dart';
@@ -54,81 +55,105 @@ class WordpressAuthorization {
       return true;
     }
 
-    if (!isNullOrEmpty(_encryptedAccessToken) && await validateExistingToken(client)) {
+    if (!isNullOrEmpty(_encryptedAccessToken) && await validateExistingToken(client, callback: callback)) {
       return true;
     }
 
-    final response = await client.post(
-      'jwt-auth/v1/token',
-      data: {
-        'username': _userName,
-        'password': _password,
-      },
-      options: Options(
-        method: 'POST',
-        contentType: 'application/x-www-form-urlencoded',
-      ),
-    );
+    try {
+      final response = await client.post(
+        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token'),
+        data: {
+          'username': _userName,
+          'password': _password,
+        },
+        options: Options(
+          method: 'POST',
+          contentType: 'application/x-www-form-urlencoded',
+        ),
+      );
 
-    if (response == null || response.statusCode != 200) {
+      if (response == null || response.statusCode != 200) {
+        return false;
+      }
+
+      final token = JwtToken.fromMap(response.data);
+      _encryptedAccessToken = token.token;
+      tokenCallback(_encryptedAccessToken);
+      return true;
+    } on DioError catch (e) {
+      if (callback != null && callback.unhandledExceptionCallback != null) {
+        callback.unhandledExceptionCallback(e);
+      }
+
       return false;
     }
-
-    final token = JwtToken.fromMap(jsonDecode(response.data));
-    _encryptedAccessToken = token.token;
-    tokenCallback(_encryptedAccessToken);
-    return true;
   }
 
-  Future<bool> validateExistingToken(Dio client) async {
+  Future<bool> validateExistingToken(Dio client, {Callback callback}) async {
     if (authType != AuthorizationType.JWT || client == null || isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
 
-    final response = await client.post(
-      'jwt-auth/v1/token/validate',
-      options: Options(
-        method: 'POST',
-        headers: {'Authorization': '$scheme $_encryptedAccessToken'},
-      ),
-    );
+    try {
+      final response = await client.post(
+        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token/validate'),
+        options: Options(
+          method: 'POST',
+          headers: {'Authorization': '$scheme $_encryptedAccessToken'},
+        ),
+      );
 
-    if (response == null || response.statusCode != 200) {
+      if (response == null || response.statusCode != 200) {
+        return false;
+      }
+
+      final validationResult = JwtValidate.fromMap(response.data);
+      if (validationResult == null || isNullOrEmpty(validationResult.code)) {
+        return false;
+      }
+
+      return _hasValidatedOnce = validationResult.code == 'jwt_auth_valid_token';
+    } on DioError catch (e) {
+      if (callback != null && callback.unhandledExceptionCallback != null) {
+        callback.unhandledExceptionCallback(e);
+      }
+
       return false;
     }
-
-    final validationResult = JwtValidate.fromMap(jsonDecode(response.data));
-    if (validationResult == null || isNullOrEmpty(validationResult.code)) {
-      return false;
-    }
-
-    return _hasValidatedOnce = validationResult.code == 'jwt_auth_valid_token';
   }
 
-  Future<bool> validateJwtToken(String baseUrl, String accessToken, Dio client) async {
-    if (isNullOrEmpty(baseUrl) || isNullOrEmpty(accessToken) || client == null) {
+  Future<bool> validateJwtToken(String accessToken, Dio client, {Callback callback}) async {
+    if (isNullOrEmpty(accessToken) || client == null) {
       return false;
     }
 
-    final response = await client.post(
-      parseUrl(baseUrl, 'jwt-auth/v1/token/validate'),
-      options: Options(
-        method: 'POST',
-        headers: {'Authorization': 'Bearer $accessToken'},
-      ),
-    );
+    try {
+      final response = await client.post(
+        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token/validate'),
+        options: Options(
+          method: 'POST',
+          headers: {'Authorization': 'Bearer $accessToken'},
+        ),
+      );
 
-    if (response == null || response.statusCode != 200) {
+      if (response == null || response.statusCode != 200) {
+        return false;
+      }
+
+      final validationResult = JwtValidate.fromMap(response.data);
+
+      if (validationResult == null || isNullOrEmpty(validationResult.code)) {
+        return false;
+      }
+
+      return validationResult.success;
+    } on DioError catch (e) {
+      if (callback != null && callback.unhandledExceptionCallback != null) {
+        callback.unhandledExceptionCallback(e);
+      }
+
       return false;
     }
-
-    final validationResult = JwtValidate.fromMap(jsonDecode(response.data));
-
-    if (validationResult == null || isNullOrEmpty(validationResult.code)) {
-      return false;
-    }
-
-    return validationResult.success;
   }
 
   static Future<RequestOptions> authorizeRequest(RequestOptions requestOptions, Dio client, WordpressAuthorization auth, {Callback callback}) async {
@@ -136,7 +161,7 @@ class WordpressAuthorization {
       return requestOptions;
     }
 
-    if (auth.authType == AuthorizationType.JWT && !await auth.handleJwtAuthentication(client, (accessToken) {})) {
+    if (auth.authType == AuthorizationType.JWT && !await auth.handleJwtAuthentication(client, (accessToken) {}, callback: callback)) {
       return null;
     }
 

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/utilities/callback.dart';
 
 import 'builders/request.dart';
 import 'client_configuration.dart';
@@ -92,26 +93,30 @@ class InternalRequester {
     }
   }
 
-  // Always POST
   Future<ResponseContainer<T>> createRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
+    final options = await _parseAsDioRequest(request);
+    if (options == null) {
+      if (request.callback != null && request.callback.requestCallback != null) {
+        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: null,
+        errorMessage: 'Authorization failed.',
+        status: false,
+        responseCode: -1,
+      );
+    }
+
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
+      final response = await _client.fetch(options);
       watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
@@ -146,43 +151,40 @@ class InternalRequester {
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
-    } on Exception catch (e) {
+    } on DioError catch (e) {
       if (request.callback?.unhandledExceptionCallback != null) {
         request.callback.unhandledExceptionCallback(e);
       }
 
-      return ResponseContainer<T>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
+      return ResponseContainer<T>.failed(null,
+          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
     }
   }
 
-  // always DELETE
-  // No validator
   Future<ResponseContainer<T>> deleteRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
     if (request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
+    final options = await _parseAsDioRequest(request);
+    if (options == null) {
+      if (request.callback != null && request.callback.requestCallback != null) {
+        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: null,
+        errorMessage: 'Authorization failed.',
+        status: false,
+        responseCode: -1,
+      );
+    }
+
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
+      final response = await _client.fetch(options);
       watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
 
       if (request.callback?.responseCallback != null) {
         request.callback.responseCallback(response.data);
@@ -195,19 +197,13 @@ class InternalRequester {
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
-    } on Exception catch (e) {
+    } on DioError catch (e) {
       if (request.callback?.unhandledExceptionCallback != null) {
         request.callback.unhandledExceptionCallback(e);
       }
 
-      return ResponseContainer<T>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
+      return ResponseContainer<T>.failed(null,
+          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
     }
   }
 
@@ -216,20 +212,25 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
+    final options = await _parseAsDioRequest(request);
+    if (options == null) {
+      if (request.callback != null && request.callback.requestCallback != null) {
+        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
+      }
+
+      return ResponseContainer<List<T>>.failed(
+        null,
+        duration: null,
+        errorMessage: 'Authorization failed.',
+        status: false,
+        responseCode: -1,
+      );
+    }
+
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
+      final response = await _client.fetch(options);
       watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<List<T>>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
 
       final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
 
@@ -264,19 +265,13 @@ class InternalRequester {
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
-    } on Exception catch (e) {
+    } on DioError catch (e) {
       if (request.callback?.unhandledExceptionCallback != null) {
         request.callback.unhandledExceptionCallback(e);
       }
 
-      return ResponseContainer<List<T>>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
+      return ResponseContainer<List<T>>.failed(null,
+          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
     }
   }
 
@@ -285,20 +280,25 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
+    final options = await _parseAsDioRequest(request);
+    if (options == null) {
+      if (request.callback != null && request.callback.requestCallback != null) {
+        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: null,
+        errorMessage: 'Authorization failed.',
+        status: false,
+        responseCode: -1,
+      );
+    }
+
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
+      final response = await _client.fetch(options);
       watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
@@ -333,19 +333,13 @@ class InternalRequester {
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
-    } on Exception catch (e) {
+    } on DioError catch (e) {
       if (request.callback?.unhandledExceptionCallback != null) {
         request.callback.unhandledExceptionCallback(e);
       }
 
-      return ResponseContainer<T>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
+      return ResponseContainer<T>.failed(null,
+          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
     }
   }
 
@@ -354,20 +348,25 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
+    final options = await _parseAsDioRequest(request);
+    if (options == null) {
+      if (request.callback != null && request.callback.requestCallback != null) {
+        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
+      }
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: null,
+        errorMessage: 'Authorization failed.',
+        status: false,
+        responseCode: -1,
+      );
+    }
+
     var watch = Stopwatch()..start();
     try {
-      final response = await _client.fetch(await _parseAsDioRequest(request));
+      final response = await _client.fetch(options);
       watch.stop();
-
-      if (response == null || response.statusCode != 200) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: response.statusMessage,
-          status: false,
-          responseCode: response.statusCode,
-        );
-      }
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
@@ -402,19 +401,13 @@ class InternalRequester {
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
-    } on Exception catch (e) {
+    } on DioError catch (e) {
       if (request.callback?.unhandledExceptionCallback != null) {
         request.callback.unhandledExceptionCallback(e);
       }
 
-      return ResponseContainer<T>.failed(
-        null,
-        duration: watch.elapsed,
-        errorMessage: 'Exception occured.',
-        status: false,
-        exception: e,
-        responseCode: 400,
-      );
+      return ResponseContainer<T>.failed(null,
+          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
     }
   }
 
@@ -436,7 +429,10 @@ class InternalRequester {
       throw NullReferenceException('Request object is null');
     }
 
-    Uri requestUri = Uri.tryParse(parseUrl(_baseUrl, request.generatedRequestPath));
+    Uri requestUri = Uri.tryParse(parseUrl(
+      _baseUrl,
+      request.httpMethod == HttpMethod.POST ? request.endpoint : request.generatedRequestPath,
+    ));
 
     if (requestUri == null) {
       throw RequestUriParsingFailedException('Request path is invalid.');
@@ -451,13 +447,14 @@ class InternalRequester {
       connectTimeout: defaultRequestTimeout,
       followRedirects: true,
       maxRedirects: 5,
+      data: request.formBody,
     );
 
     if (request.shouldAuthorize) {
-      options = await WordpressAuthorization.authorizeRequest(options, _client, request.authorization);
+      options = await WordpressAuthorization.authorizeRequest(options, _client, request.authorization, callback: request.callback);
 
       if (options == null) {
-        throw AuthorizationFailedException();
+        return null;
       }
     }
 
@@ -469,6 +466,7 @@ class InternalRequester {
       }
     }
 
+    /*
     if (request.httpMethod != HttpMethod.GET && request.formBody != null) {
       switch (request.formBody['REQUEST_TYPE']) {
         case 'media_request':
@@ -480,7 +478,7 @@ class InternalRequester {
           break;
       }
     }
-
+    */
     return options;
   }
 }

@@ -1,12 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/enums.dart';
-import 'package:wordpress_client/src/responses/post_response.dart';
+import 'package:wordpress_client/src/responses/response_container.dart';
 import 'package:wordpress_client/src/responses/user_response.dart';
 import 'package:wordpress_client/src/utilities/callback.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
   WordpressClient client = WordpressClient(
-    'https://www.pathanamthittamedia.com/wp-json',
+    'https://localhost/wp-json',
     'wp/v2',
     bootstrapper: (builder) => builder.withDefaultMaxRedirects(5).withFollowRedirects(true).withRequestTimeout(60).build(),
   );
@@ -75,7 +76,7 @@ void main() async {
   print('ID: ' + retrivePostResponse.value.id.toString());
   print('Title: ' + retrivePostResponse.value.title.parsedText.substring(0, 40) + '...');
   print('Content: ' + retrivePostResponse.value.content.parsedText.substring(0, 40) + '...');
-*/
+
   var listUsersResponse = await client.listUsers(
     (builder) => builder
         .withPerPage(10)
@@ -104,4 +105,36 @@ void main() async {
     print('Username: ' + user.name);
     print('Slug: ${user.slug}');
   }
+*/
+
+  ResponseContainer<User> createUserResponse = await client.createUser(
+    (builder) => builder
+        .withAuthorization(WordpressAuthorization('username', 'password', AuthorizationType.JWT))
+        .withNickname('Test User NName')
+        .withPassword('testPasswordGenerated')
+        .withDisplayName('Test User DName')
+        .withEmail('xomifag205@nhmty.com')
+        .withFirstName('test_firstName')
+        .withLastName('test_lastName')
+        .withLocale(Locale.en_US)
+        .withSlug('testNewsDesk')
+        .withUserName('testNewsDesk')
+        .withCallback(
+          Callback(
+            unhandledExceptionCallback: (e) {
+              print('Unhandled exception: ${(e as DioError).type.toString()}');
+            },
+            responseCallback: (responseRaw) {
+              print('Response received in Callback');
+            },
+          ),
+        )
+        .build(),
+  );
+
+  print('Request completed in ${createUserResponse?.duration?.inSeconds} second(s)');
+  print('Status Code: ${createUserResponse.responseCode}');
+  print('Dio Error: ${createUserResponse.dioError?.message}');
+  print('Error Response: ${createUserResponse.dioError?.response?.data}');
+  print('User created with ID: ${createUserResponse.value?.id}');
 }

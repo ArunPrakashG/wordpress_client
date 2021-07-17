@@ -115,11 +115,11 @@ class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      queryParams: _parseQueryParameters(),
+      formBody: _parseParameters(),
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String> _parseParameters() {
     return {
       'username': _username,
       'email': _email,

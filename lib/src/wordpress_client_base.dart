@@ -1,18 +1,21 @@
 import 'builders/bootstrap_builder.dart';
 import 'builders/create/post_create.dart';
+import 'builders/create/user_create.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
 import 'builders/list/post_list.dart';
 import 'builders/list/user_list.dart';
+import 'builders/request.dart';
 import 'builders/retrive/post_retrive.dart';
 import 'builders/retrive/user_retrive.dart';
+import 'builders/update/post_update.dart';
+import 'builders/update/user_update.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'interface/posts.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
-import 'builders/request.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
 import 'responses/user_response.dart';
@@ -21,6 +24,7 @@ import 'utilities/helpers.dart';
 class WordpressClient {
   Map<String, dynamic> _interfaces;
   InternalRequester _requester;
+  static String baseUrl;
 
   WordpressClient(String baseUrl, String path, {BootstrapConfiguration Function(BootstrapBuilder) bootstrapper}) {
     if (isNullOrEmpty(baseUrl)) {
@@ -28,8 +32,10 @@ class WordpressClient {
     }
 
     if (isNullOrEmpty(path)) {
-      throw NullReferenceException('Endpoint is invalid.');
+      throw NullReferenceException('Path is invalid.');
     }
+
+    WordpressClient.baseUrl = baseUrl;
 
     _requester = InternalRequester(baseUrl, path, bootstrapper(BootstrapBuilder()));
     _initializeInterfaces();
@@ -79,14 +85,38 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> deleteUser(Request Function(UserDeleteBuilder) builder) async {
-    return getInterfaceByName<UsersInterface<User>>('users').retrive<User>(
+    return getInterfaceByName<UsersInterface<User>>('users').delete<User>(
       typeResolver: User(),
       request: builder(UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Post>>> listPosts(Request Function(PostListBuilder) builder) async {
+  Future<ResponseContainer<User>> updateUser(Request Function(UserUpdateBuilder) builder) async {
+    return getInterfaceByName<UsersInterface<User>>('users').update<User>(
+      typeResolver: User(),
+      request: builder(UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<User>> createUser(Request Function(UserCreateBuilder) builder) async {
+    return getInterfaceByName<UsersInterface<User>>('users').create<User>(
+      typeResolver: User(),
+      request: builder(UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Post>> updatePost(Request Function(PostUpdateBuilder) builder) async {
+    return getInterfaceByName<PostsInterface<Post>>('posts').update<Post>(
+      typeResolver: Post(),
+      request: builder(PostUpdateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<List<Post>>> listPost(Request Function(PostListBuilder) builder) async {
     return getInterfaceByName<PostsInterface<Post>>('posts').list<Post>(
       resolver: Post(),
       request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()),
@@ -103,7 +133,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Post>> deletePost(Request Function(PostDeleteBuilder) builder) async {
-    return getInterfaceByName<PostsInterface<Post>>('posts').retrive<Post>(
+    return getInterfaceByName<PostsInterface<Post>>('posts').delete<Post>(
       typeResolver: Post(),
       request: builder(PostDeleteBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,

@@ -5,14 +5,12 @@ class Callback {
   final void Function(dynamic) responseCallback;
   final void Function(RequestStatus) requestCallback;
   final void Function(int, int) progressCallback;
-  final void Function(ErrorResponse) errorCallback;
 
   Callback({
     this.unhandledExceptionCallback,
     this.responseCallback,
     this.requestCallback,
     this.progressCallback,
-    this.errorCallback,
   });
 }
 
