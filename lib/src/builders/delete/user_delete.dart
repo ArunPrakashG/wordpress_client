@@ -1,12 +1,12 @@
 import 'package:dio/src/cancel_token.dart';
-import 'package:wordpress_client/src/responses/user_response.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
-import '../request_builder_base.dart';
-import '../request.dart';
+import '../../responses/user_response.dart';
+import '../../utilities/callback.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
+import '../request.dart';
+import '../request_builder_base.dart';
 
 class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   @override
