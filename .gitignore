@@ -12,4 +12,4 @@ build/
 # Directory created by dartdoc
 doc/api/
 
-wordpress_client_example.dart
+example/*
