@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
+import '../internal_requester.dart';
 import '../utilities/callback.dart';
 import '../utilities/pair.dart';
-import '../wordpress_authorization.dart';
 import 'request.dart';
 
 abstract class IRequestBuilder<TRequestType, XResponseType> {

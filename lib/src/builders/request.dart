@@ -4,7 +4,7 @@ import '../enums.dart';
 import '../utilities/callback.dart';
 import '../utilities/helpers.dart';
 import '../utilities/pair.dart';
-import '../wordpress_authorization.dart';
+import '../internal_requester.dart';
 
 class Request<TResponseType> {
   final String endpoint;

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/enums.dart';
+import 'package:wordpress_client/src/internal_requester.dart';
 import 'package:wordpress_client/src/responses/response_container.dart';
 import 'package:wordpress_client/src/responses/user_response.dart';
 import 'package:wordpress_client/src/utilities/callback.dart';

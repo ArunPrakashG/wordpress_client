@@ -5,7 +5,7 @@ import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
-import '../../wordpress_authorization.dart';
+import '../../internal_requester.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 

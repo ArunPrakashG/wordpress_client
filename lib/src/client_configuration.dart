@@ -1,6 +1,5 @@
 import 'package:wordpress_client/src/utilities/cookie_container.dart';
-import 'package:wordpress_client/src/wordpress_authorization.dart';
-
+import 'internal_requester.dart';
 import 'utilities/pair.dart';
 
 class BootstrapConfiguration {

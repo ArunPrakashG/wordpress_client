@@ -1,7 +1,7 @@
 import '../client_configuration.dart';
+import '../internal_requester.dart';
 import '../utilities/cookie_container.dart';
 import '../utilities/pair.dart';
-import '../wordpress_authorization.dart';
 
 class BootstrapBuilder {
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds

@@ -7,7 +7,7 @@ import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
-import '../../wordpress_authorization.dart';
+import '../../internal_requester.dart';
 
 class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
   @override
