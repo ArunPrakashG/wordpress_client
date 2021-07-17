@@ -1,3 +1,4 @@
+/*
 import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/exceptions/null_reference_exception.dart';
 import 'package:wordpress_client/src/requests/builders/media_builder.dart';
@@ -208,11 +209,11 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
     if (_queryParameters != null && _queryParameters.isNotEmpty) {
       for (final pair in _queryParameters) {
-        if (isNullOrEmpty(pair.a) || isNullOrEmpty(pair.b)) {
+        if (isNullOrEmpty(pair.key) || isNullOrEmpty(pair.value)) {
           continue;
         }
 
-        baseUrl += '${_getJoiningChar(baseUrl)}${pair.a}=${pair.b}';
+        baseUrl += '${_getJoiningChar(baseUrl)}${pair.key}=${pair.value}';
       }
     }
 
@@ -256,14 +257,6 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
 
   RequestBuilder withHttpBody<T1 extends IRequestBuilder<T1, T2>, T2 extends Map<String, dynamic>>(T1 instance, T2 Function(T1) builder) {
     _formBody = builder(instance.initializeWithDefaultValues());
-    return this;
-  }
-
-  RequestBuilder withQueryParameters<T1 extends IRequestBuilder<T1, T2>, T2 extends Iterable<Pair<String, String>>>(
-      T1 instance, T2 Function(T1) builder) {
-    _queryParameters ??= [];
-    _queryParameters.addAll(builder(instance.initializeWithDefaultValues()));
-
     return this;
   }
 
@@ -387,44 +380,44 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
     return this;
   }
 
-  RequestBuilder sortResultsBy(FilterSortOrder sortOrder) {
+  RequestBuilder sortResultsBy(FilterPostSortOrder sortOrder) {
     var url = _baseUri.toString();
     url = url.endsWith('/') ? url.substring(0, url.length - 1) : url;
     final endPoint = _baseUri.toString().substring(url.lastIndexOf('/'));
 
-    if (sortOrder == FilterSortOrder.DATE && endPoint.toLowerCase() == 'users') {
+    if (sortOrder == FilterPostSortOrder.DATE && endPoint.toLowerCase() == 'users') {
       _sortOrder = 'registered_date';
       return this;
     }
 
     switch (sortOrder) {
-      case FilterSortOrder.DATE:
-      case FilterSortOrder.AUTHOR:
-      case FilterSortOrder.ID:
-      case FilterSortOrder.INCLUDE:
-      case FilterSortOrder.MODIFIED:
-      case FilterSortOrder.PARENT:
-      case FilterSortOrder.RELEVANCE:
-      case FilterSortOrder.SLUG:
-      case FilterSortOrder.TITLE:
+      case FilterPostSortOrder.DATE:
+      case FilterPostSortOrder.AUTHOR:
+      case FilterPostSortOrder.ID:
+      case FilterPostSortOrder.INCLUDE:
+      case FilterPostSortOrder.MODIFIED:
+      case FilterPostSortOrder.PARENT:
+      case FilterPostSortOrder.RELEVANCE:
+      case FilterPostSortOrder.SLUG:
+      case FilterPostSortOrder.TITLE:
         _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         break;
-      case FilterSortOrder.EMAIL:
+      case FilterPostSortOrder.EMAIL:
         if (endPoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.URL:
+      case FilterPostSortOrder.URL:
         if (endPoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.NAME:
+      case FilterPostSortOrder.NAME:
         if (endPoint.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
-      case FilterSortOrder.INCLUDESLUGS:
+      case FilterPostSortOrder.INCLUDESLUGS:
         _sortOrder = 'include_slugs';
         break;
     }
@@ -510,15 +503,13 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   Request build() {
     if (_createUri()) {
       return Request(
-        _requestUri,
-        endpoint: _endpoint,
+        _endpoint,
         callback: null,
         validationDelegate: _responseValidationDelegate,
         cancelToken: _cancelToken,
         httpMethod: _httpMethod,
         formBody: _formBody,
         authorization: _authorization,
-        perPageCount: _perPageCount,
         headers: _headers,
       );
     }
@@ -537,7 +528,6 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
         httpMethod: _httpMethod,
         formBody: _formBody,
         authorization: _authorization,
-        perPageCount: _perPageCount,
         headers: _headers,
       );
     }
@@ -548,3 +538,4 @@ class RequestBuilder implements IRequestBuilder<RequestBuilder, Request> {
   @override
   RequestBuilder initializeWithDefaultValues() => this;
 }
+*/

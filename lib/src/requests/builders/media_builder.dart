@@ -10,9 +10,8 @@ import '../../exceptions/null_reference_exception.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import 'query_builder.dart';
-import 'request_builder_base.dart';
 
-class MediaBuilder extends QueryBuilder<MediaBuilder> implements IRequestBuilder<MediaBuilder, Map<String, dynamic>> {
+class MediaBuilder extends QueryBuilder<MediaBuilder> {
   MultipartFile _multipartFile;
   String _altText;
   String _caption;
@@ -115,15 +114,15 @@ class MediaBuilder extends QueryBuilder<MediaBuilder> implements IRequestBuilder
       'comment_status': _commandStatus.toString().split('.').last,
       'ping_status': _pingStatus.toString().split('.').last,
       'status': _mediaStatus.toString().split('.').last,
-      if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(0) != null) 'Content-Type': _contentHeaders.elementAt(0).b,
+      if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(0) != null) 'Content-Type': _contentHeaders.elementAt(0).value,
       if (_contentHeaders.isNotEmpty && _contentHeaders.elementAt(1) != null)
-        'Content-Disposition': 'attachment; filename=${_contentHeaders.elementAt(1).b}',
+        'Content-Disposition': 'attachment; filename=${_contentHeaders.elementAt(1).value}',
       'file': _multipartFile,
     };
   }
 
   @override
-  MediaBuilder initializeWithDefaultValues() {
+  MediaBuilder withDefaultValues() {
     _associatedPostId = -1;
     _commandStatus = Status.OPEN;
     _pingStatus = Status.OPEN;

@@ -1,9 +1,8 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
 import 'query_builder.dart';
-import 'request_builder_base.dart';
 
-class PostBuilder extends QueryBuilder<PostBuilder> implements IRequestBuilder<PostBuilder, Map<String, dynamic>> {
+class PostBuilder extends QueryBuilder<PostBuilder> {
   String _content;
   String _title;
   DateTime _postDate;
@@ -119,7 +118,7 @@ class PostBuilder extends QueryBuilder<PostBuilder> implements IRequestBuilder<P
       };
 
   @override
-  PostBuilder initializeWithDefaultValues() {
+  PostBuilder withDefaultValues() {
     _commandStatus = Status.OPEN;
     _pingStatus = Status.OPEN;
     _postFormat = PostFormat.STANDARD;

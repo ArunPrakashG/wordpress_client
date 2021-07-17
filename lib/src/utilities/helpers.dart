@@ -26,6 +26,26 @@ String parseUrl(String baseUrl, String path) {
   return '$baseUrl$path';
 }
 
+String getJoiningChar(String baseUrl) {
+  if (baseUrl == null || baseUrl.isEmpty) {
+    return '';
+  }
+
+  if ((baseUrl.contains('?') && !baseUrl.contains('&')) || baseUrl.contains('?') && baseUrl.contains('&')) {
+    return '&';
+  }
+
+  if (baseUrl.contains('?') && baseUrl.contains('&')) {
+    return '&';
+  }
+
+  if (!baseUrl.contains('?')) {
+    return '?';
+  }
+
+  return '&';
+}
+
 String base64Encode(String text) {
   if (isNullOrEmpty(text)) {
     return '';
