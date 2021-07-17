@@ -4,7 +4,7 @@ import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../requests/request.dart';
+import '../builders/request.dart';
 import '../responses/response_container.dart';
 import '../utilities/serializable_instance.dart';
 

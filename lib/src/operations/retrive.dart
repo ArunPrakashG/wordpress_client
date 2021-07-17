@@ -1,4 +1,4 @@
-import 'package:wordpress_client/src/requests/request.dart';
+import 'package:wordpress_client/src/builders/request.dart';
 import 'package:wordpress_client/src/responses/response_container.dart';
 import 'package:wordpress_client/src/utilities/serializable_instance.dart';
 

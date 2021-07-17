@@ -4,8 +4,8 @@ import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
 import '../../exceptions/null_reference_exception.dart';
-import '../../requests/builders/request_builder_base.dart';
-import '../../requests/request.dart';
+import '../request_builder_base.dart';
+import '../request.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';

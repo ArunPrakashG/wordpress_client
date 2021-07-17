@@ -1,7 +1,3 @@
-enum Taxonomy { CATEGORY, POST_TAG }
-enum Name { WP }
-enum Href { HTTPS_API_W_ORG_REL }
-enum PostType { POST }
 enum Status { OPEN, CLOSED }
 enum HttpMethod { PUT, POST, GET, DELETE, UPDATE, HEAD, OPTIONS, PATCH, TRACE }
 enum FilterOrder { ASCENDING, DESCENDING }

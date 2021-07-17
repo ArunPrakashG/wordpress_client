@@ -1,4 +1,5 @@
-import 'builders/client_builder.dart';
+import 'builders/bootstrap_builder.dart';
+import 'builders/create/post_create.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
 import 'builders/list/post_list.dart';
@@ -11,7 +12,7 @@ import 'exceptions/null_reference_exception.dart';
 import 'interface/posts.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
-import 'requests/request.dart';
+import 'builders/request.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
 import 'responses/user_response.dart';
@@ -105,6 +106,14 @@ class WordpressClient {
     return getInterfaceByName<PostsInterface<Post>>('posts').retrive<Post>(
       typeResolver: Post(),
       request: builder(PostDeleteBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Post>> createPost(Request Function(PostCreateBuilder) builder) async {
+    return getInterfaceByName<PostsInterface<Post>>('posts').create<Post>(
+      typeResolver: Post(),
+      request: builder(PostCreateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

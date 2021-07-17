@@ -5,7 +5,7 @@ import 'enums.dart';
 import 'exceptions/authorization_failed_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
-import 'requests/request.dart';
+import 'builders/request.dart';
 import 'responses/response_container.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';

@@ -1,7 +1,7 @@
 import 'package:dio/src/cancel_token.dart';
 import 'package:wordpress_client/src/enums.dart';
-import 'package:wordpress_client/src/requests/builders/request_builder_base.dart';
-import 'package:wordpress_client/src/requests/request.dart';
+import 'package:wordpress_client/src/builders/request_builder_base.dart';
+import 'package:wordpress_client/src/builders/request.dart';
 import 'package:wordpress_client/src/responses/user_response.dart';
 import 'package:wordpress_client/src/utilities/callback.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';

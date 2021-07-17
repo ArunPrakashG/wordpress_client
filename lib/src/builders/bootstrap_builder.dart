@@ -1,6 +1,5 @@
-import 'package:wordpress_client/src/utilities/cookie_container.dart';
-
 import '../client_configuration.dart';
+import '../utilities/cookie_container.dart';
 import '../utilities/pair.dart';
 import '../wordpress_authorization.dart';
 

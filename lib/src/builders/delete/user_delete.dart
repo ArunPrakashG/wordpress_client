@@ -3,8 +3,8 @@ import 'package:wordpress_client/src/responses/user_response.dart';
 import 'package:wordpress_client/src/utilities/callback.dart';
 
 import '../../enums.dart';
-import '../../requests/builders/request_builder_base.dart';
-import '../../requests/request.dart';
+import '../request_builder_base.dart';
+import '../request.dart';
 import '../../utilities/pair.dart';
 import '../../wordpress_authorization.dart';
 
