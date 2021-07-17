@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/client_configuration.dart';
 
+import 'builders/request.dart';
+import 'client_configuration.dart';
 import 'enums.dart';
 import 'exceptions/authorization_failed_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
-import 'builders/request.dart';
 import 'responses/response_container.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
