@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:wordpress_client/src/authorization_container.dart';
 import 'package:wordpress_client/src/enums.dart';
 import 'package:wordpress_client/src/responses/response_container.dart';
@@ -141,6 +140,8 @@ void main() async {
             print('Request error: ${dioError.response.data.toString()}');
           }, onSendProgress: (current, max) {
             print('onSendProgress: ' + current.toString() + ' - ' + max.toString());
+          }, onReceiveProgress: (current, max) {
+            print('onReceiveProgress: ' + current.toString() + ' - ' + max.toString());
           }),
         )
         .build(),
