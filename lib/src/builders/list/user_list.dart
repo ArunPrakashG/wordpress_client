@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -24,7 +24,7 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
   bool _limitToAuthors = false;
 
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   CancelToken cancelToken;
@@ -145,7 +145,7 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
   UserListBuilder initializeWithDefaultValues() => this;
 
   @override
-  UserListBuilder withAuthorization(AuthorizationContainer auth) {
+  UserListBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

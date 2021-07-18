@@ -1,4 +1,4 @@
-import '../authorization_container.dart';
+import '../authorization.dart';
 import '../client_configuration.dart';
 import '../utilities/cookie_container.dart';
 import '../utilities/pair.dart';
@@ -6,7 +6,7 @@ import '../utilities/pair.dart';
 class BootstrapBuilder {
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds
   bool Function(dynamic) _responsePreprocessorDelegate;
-  AuthorizationContainer _defaultAuthorization;
+  Authorization _defaultAuthorization;
   String _defaultUserAgent;
   List<Pair<String, String>> _defaultHeaders;
   bool _followRedirects = true;
@@ -28,7 +28,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorization(AuthorizationContainer defaultAuthorization) {
+  BootstrapBuilder withDefaultAuthorization(Authorization defaultAuthorization) {
     _defaultAuthorization = defaultAuthorization;
     return this;
   }

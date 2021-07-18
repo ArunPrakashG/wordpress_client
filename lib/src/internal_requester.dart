@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
-import 'authorization_container.dart';
+import 'authorization.dart';
 import 'builders/request.dart';
 import 'client_configuration.dart';
 import 'enums.dart';
@@ -19,12 +19,14 @@ import 'utilities/pair.dart';
 import 'utilities/serializable_instance.dart';
 import 'wordpress_client_base.dart';
 
+part 'authorization_handler.dart';
+
 const int defaultRequestTimeout = 60 * 1000;
 
 class InternalRequester {
   Dio _client;
   String _baseUrl;
-  _AuthorizationHandler _defaultAuthorization;
+  AuthorizationHandler _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
@@ -52,7 +54,7 @@ class InternalRequester {
     _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
 
     if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
-      _defaultAuthorization = _AuthorizationHandler(
+      _defaultAuthorization = AuthorizationHandler(
         configuration.defaultAuthorization.userName,
         configuration.defaultAuthorization.password,
         configuration.defaultAuthorization.authType,
@@ -83,9 +85,15 @@ class InternalRequester {
     );
   }
 
-  void removedDefaultAuthorization() => _defaultAuthorization = null;
+  void removeDefaultAuthorization() {
+    if (_defaultAuthorization != null) {
+      _defaultAuthorization.logout();
+    }
 
-  void _handleDefaultAuthorization(_AuthorizationHandler auth) async {
+    _defaultAuthorization = null;
+  }
+
+  void _handleDefaultAuthorization(AuthorizationHandler auth) async {
     if (auth == null || auth.isDefault) {
       return;
     }
@@ -102,7 +110,7 @@ class InternalRequester {
 
     switch (auth._authType) {
       case AuthorizationType.JWT:
-        auth._handleJwtAuthentication(_client);
+        auth.handleJwtAuthentication(_client);
 
         if (!auth.isValidAuth) {
           throw AuthorizationFailedException();
@@ -456,7 +464,7 @@ class InternalRequester {
     bool hasAuthorizedAlready = false;
 
     if (request.shouldAuthorize) {
-      options = await _AuthorizationHandler._authorizeRequest(options, _client, request.authorization, callback: request.callback);
+      options = await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback);
 
       if (options == null) {
         return null;
@@ -466,10 +474,10 @@ class InternalRequester {
     }
 
     if (_defaultAuthorization != null && _defaultAuthorization.isValidAuth && !hasAuthorizedAlready) {
-      options = await _AuthorizationHandler._authorizeRequest(
+      options = await AuthorizationHandler.authorizeRequest(
           options,
           _client,
-          AuthorizationContainer(
+          Authorization(
             userName: _defaultAuthorization._userName,
             password: _defaultAuthorization._password,
             authType: _defaultAuthorization._authType,
@@ -506,151 +514,5 @@ class InternalRequester {
     }
     */
     return options;
-  }
-}
-
-class _AuthorizationHandler {
-  _AuthorizationHandler(this._userName, this._password, this._authType, [this._jwtToken = null]) {
-    _scheme = '';
-    _encryptedAccessToken = '';
-    _hasValidatedOnce = false;
-
-    if (isDefault) {
-      return;
-    }
-
-    switch (_authType) {
-      case AuthorizationType.JWT:
-        _scheme = 'Bearer';
-        _encryptedAccessToken = _jwtToken;
-        break;
-      case AuthorizationType.BASIC:
-        _scheme = 'Basic';
-        _encryptedAccessToken = base64Encode('$_userName:$_password');
-        break;
-    }
-  }
-
-  String _userName;
-  String _password;
-  String _jwtToken;
-  AuthorizationType _authType;
-  String _scheme;
-  String _encryptedAccessToken;
-  bool _hasValidatedOnce;
-
-  bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
-
-  bool get isDefault => isNullOrEmpty(_userName) || isNullOrEmpty(_password);
-
-  bool logout() {
-    _encryptedAccessToken = null;
-    return true;
-  }
-
-  void _handleJwtAuthentication(Dio client, {Callback callback}) async {
-    if (_authType != AuthorizationType.JWT || client == null) {
-      return;
-    }
-
-    if (_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
-      return;
-    }
-
-    if (!isNullOrEmpty(_encryptedAccessToken)) {
-      bool valid = false;
-      _validateExistingJwtToken(client, (isValid) => valid = isValid, callback: callback);
-
-      if (valid) {
-        return;
-      }
-    }
-
-    try {
-      final response = await client.post(
-        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token'),
-        data: {
-          'username': _userName,
-          'password': _password,
-        },
-        options: Options(
-          method: 'POST',
-          contentType: 'application/x-www-form-urlencoded',
-        ),
-      );
-
-      if (response == null || response.statusCode != 200) {
-        return;
-      }
-
-      _encryptedAccessToken = JwtToken.fromMap(response.data).token;
-    } on DioError catch (e) {
-      if (callback != null && callback.unhandledExceptionCallback != null) {
-        callback.unhandledExceptionCallback(e);
-      }
-    }
-  }
-
-  void _validateExistingJwtToken(Dio client, void Function(bool) isValid, {Callback callback}) async {
-    return await _validateJwtToken(client, _encryptedAccessToken, isValid, callback: callback);
-  }
-
-  void _validateJwtToken(Dio client, String jwtToken, void Function(bool) isValid, {Callback callback}) async {
-    if (_authType != AuthorizationType.JWT || client == null || isNullOrEmpty(jwtToken)) {
-      return isValid(false);
-    }
-
-    try {
-      final response = await client.post(
-        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token/validate'),
-        options: Options(
-          method: 'POST',
-          headers: {'Authorization': '$_scheme $jwtToken'},
-        ),
-      );
-
-      if (response == null || response.statusCode != 200) {
-        return isValid(false);
-      }
-
-      final validationResult = JwtValidate.fromMap(response.data);
-      if (validationResult == null || isNullOrEmpty(validationResult.code)) {
-        return isValid(false);
-      }
-
-      return isValid(_hasValidatedOnce = validationResult.code == 'jwt_auth_valid_token');
-    } on DioError catch (e) {
-      if (callback != null && callback.unhandledExceptionCallback != null) {
-        callback.unhandledExceptionCallback(e);
-      }
-
-      return isValid(false);
-    }
-  }
-
-  static Future<RequestOptions> _authorizeRequest(RequestOptions requestOptions, Dio client, AuthorizationContainer auth, {Callback callback}) async {
-    if (auth == null || auth.isDefault) {
-      return requestOptions;
-    }
-
-    _AuthorizationHandler handler = _AuthorizationHandler(auth.userName, auth.password, auth.authType, auth.jwtToken);
-
-    if (handler._authType == AuthorizationType.JWT) {
-      if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
-        requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
-        return requestOptions;
-      }
-
-      handler._handleJwtAuthentication(client, callback: callback);
-
-      if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
-        requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
-      }
-
-      return requestOptions;
-    }
-
-    requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
-    return requestOptions;
   }
 }

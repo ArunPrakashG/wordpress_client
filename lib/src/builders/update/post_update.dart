@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class PostUpdateBuilder implements IRequestBuilder<PostUpdateBuilder, Post> {
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   Callback callback;
@@ -135,7 +135,7 @@ class PostUpdateBuilder implements IRequestBuilder<PostUpdateBuilder, Post> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      queryParams: _parseQueryParameters(),
+      formBody: _parseQueryParameters(),
     );
   }
 
@@ -165,7 +165,7 @@ class PostUpdateBuilder implements IRequestBuilder<PostUpdateBuilder, Post> {
   }
 
   @override
-  PostUpdateBuilder withAuthorization(AuthorizationContainer auth) {
+  PostUpdateBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

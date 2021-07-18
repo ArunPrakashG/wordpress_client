@@ -1,12 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:wordpress_client/src/authorization_container.dart';
-import 'package:wordpress_client/src/enums.dart';
-import 'package:wordpress_client/src/responses/post_response.dart';
-import 'package:wordpress_client/src/responses/response_container.dart';
 import 'package:wordpress_client/src/responses/user_response.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
@@ -21,7 +16,7 @@ void main() async {
         .withFollowRedirects(true)
         .withRequestTimeout(60)
         .withDefaultAuthorization(
-          AuthorizationContainer(userName: json['username'], password: json['password'], authType: AuthorizationType.JWT),
+          Authorization(userName: json['username'], password: json['password'], authType: AuthorizationType.JWT),
         )
         .build(),
   );
@@ -120,38 +115,6 @@ void main() async {
     print('Slug: ${user.slug}');
   }
 */
-
-  final listPostsResponse = await client.listPost(
-    (builder) => builder
-        .orderResultsBy(FilterOrder.ASCENDING)
-        .withPerPage(20)
-        .withPageNumber(1)
-        .withCallback(
-          Callback(
-            unhandledExceptionCallback: (e) {
-              print('Unhandled exception: ${e.toString()}');
-            },
-            responseCallback: (responseRaw) {
-              if (responseRaw == null) {
-                return;
-              }
-
-              final responseObj = responseRaw as List<Post>;
-              print('Response received in Callback. (${responseObj.length} posts)');
-            },
-            requestErrorCallback: (dioError) {
-              print('Request error: ${dioError.response.data.toString()}');
-            },
-            onSendProgress: (current, max) {
-              print('onSendProgress: ' + current.toString() + ' - ' + max.toString());
-            },
-            onReceiveProgress: (current, max) {
-              print('onReceiveProgress: ' + current.toString() + ' - ' + max.toString());
-            },
-          ),
-        )
-        .build(),
-  );
 
   ResponseContainer<User> createUserResponse = await client.createUser(
     (builder) => builder

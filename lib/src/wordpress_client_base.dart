@@ -1,18 +1,22 @@
 import 'builders/bootstrap_builder.dart';
 import 'builders/create/post_create.dart';
 import 'builders/create/user_create.dart';
+import 'builders/delete/me_delete.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
 import 'builders/list/post_list.dart';
 import 'builders/list/user_list.dart';
 import 'builders/request.dart';
+import 'builders/retrive/me_retrive.dart';
 import 'builders/retrive/post_retrive.dart';
 import 'builders/retrive/user_retrive.dart';
+import 'builders/update/me_update.dart';
 import 'builders/update/post_update.dart';
 import 'builders/update/user_update.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/null_reference_exception.dart';
+import 'interface/me.dart';
 import 'interface/posts.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
@@ -45,6 +49,7 @@ class WordpressClient {
     _interfaces ??= new Map<String, dynamic>();
     _interfaces['posts'] = PostsInterface<Post>();
     _interfaces['users'] = UsersInterface<User>();
+    _interfaces['me'] = MeInterface<User>();    
     //_interfaces['media'] = MediaInterface<Media>();
   }
 
@@ -66,6 +71,30 @@ class WordpressClient {
     }
 
     return _interfaces.entries.singleWhere((i) => i.value is T).value;
+  }
+
+  Future<ResponseContainer<User>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
+    return getInterfaceByName<MeInterface<User>>('me').retrive<User>(
+      typeResolver: User(),
+      request: builder(MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<User>> deleteMe(Request Function(MeDeleteBuilder) builder) async {
+    return getInterfaceByName<MeInterface<User>>('me').delete<User>(
+      typeResolver: User(),
+      request: builder(MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<User>> updateMe(Request Function(MeUpdateBuilder) builder) async {
+    return getInterfaceByName<MeInterface<User>>('me').update<User>(
+      typeResolver: User(),
+      request: builder(MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
   }
 
   Future<ResponseContainer<List<User>>> listUsers(Request Function(UserListBuilder) builder) async {

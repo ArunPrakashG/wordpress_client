@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../authorization_container.dart';
+import '../authorization.dart';
 import '../enums.dart';
 import '../utilities/callback.dart';
 import '../utilities/helpers.dart';
@@ -12,7 +12,7 @@ class Request<TResponseType> {
   final bool Function(TResponseType) validationDelegate;
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
-  final AuthorizationContainer authorization;
+  final Authorization authorization;
   final Map<String, dynamic> formBody;
   final List<Pair<String, String>> headers;
   final Map<String, String> queryParams;

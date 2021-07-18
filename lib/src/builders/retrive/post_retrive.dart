@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Post> {
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   CancelToken cancelToken;
@@ -31,8 +31,8 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Post> {
   @override
   Callback callback;
 
-  int _postId;
-  String _context;
+  int _postId = -1;
+  String _context = '';
   String _password;
 
   PostRetriveBuilder withPostId(int postId) {
@@ -94,7 +94,7 @@ class PostRetriveBuilder implements IRequestBuilder<PostRetriveBuilder, Post> {
   }
 
   @override
-  PostRetriveBuilder withAuthorization(AuthorizationContainer auth) {
+  PostRetriveBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

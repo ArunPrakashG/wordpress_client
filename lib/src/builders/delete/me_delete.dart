@@ -2,15 +2,18 @@ import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
 import '../../enums.dart';
-import '../../responses/post_response.dart';
+import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class PostDeleteBuilder implements IRequestBuilder<PostDeleteBuilder, Post> {
+class MeDeleteBuilder implements IRequestBuilder<MeDeleteBuilder, User> {
   @override
   Authorization authorization;
+
+  @override
+  Callback callback;
 
   @override
   CancelToken cancelToken;
@@ -25,28 +28,25 @@ class PostDeleteBuilder implements IRequestBuilder<PostDeleteBuilder, Post> {
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(Post) responseValidationDelegate;
+  bool Function(User) responseValidationDelegate;
 
-  @override
-  Callback callback;
-
-  int _id = -1;
   bool _force = false;
+  int _reassign = -1;
 
-  PostDeleteBuilder withId(int id) {
-    _id = id;
-    endpoint += '/$_id';
-    return this;
-  }
-
-  PostDeleteBuilder withForce(bool force) {
+  MeDeleteBuilder withForce(bool force) {
     _force = force;
     return this;
   }
 
+  MeDeleteBuilder withReassign(int newUserId) {
+    _reassign = newUserId;
+    return this;
+  }
+
   @override
-  Request<Post> build() {
-    return new Request<Post>(
+  Request<User> build() {
+    endpoint += '/me';
+    return new Request<User>(
       endpoint,
       queryParams: _parseQueryParameters(),
       callback: callback,
@@ -61,57 +61,57 @@ class PostDeleteBuilder implements IRequestBuilder<PostDeleteBuilder, Post> {
 
   Map<String, String> _parseQueryParameters() {
     return {
-      'id': _id.toString(),
       if (_force) 'force': 'true',
+      if (_reassign > 0) 'reassign': _reassign.toString(),
     };
   }
 
   @override
-  PostDeleteBuilder initializeWithDefaultValues() {
+  MeDeleteBuilder initializeWithDefaultValues() {
     return this;
   }
 
   @override
-  PostDeleteBuilder withAuthorization(Authorization auth) {
+  MeDeleteBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }
 
   @override
-  PostDeleteBuilder withCancellationToken(CancelToken token) {
+  MeDeleteBuilder withCallback(Callback requestCallback) {
+    callback = requestCallback;
+    return this;
+  }
+
+  @override
+  MeDeleteBuilder withCancellationToken(CancelToken token) {
     cancelToken = token;
     return this;
   }
 
   @override
-  PostDeleteBuilder withEndpoint(String newEndpoint) {
+  MeDeleteBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
     return this;
   }
 
   @override
-  PostDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  MeDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers.addAll(customHeaders);
     return this;
   }
 
   @override
-  PostDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MeDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  PostDeleteBuilder withResponseValidationOverride(bool Function(Post) responseDelegate) {
+  MeDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
-    return this;
-  }
-
-  @override
-  PostDeleteBuilder withCallback(Callback requestCallback) {
-    callback = requestCallback;
     return this;
   }
 }

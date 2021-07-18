@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../exceptions/null_reference_exception.dart';
 import '../../responses/post_response.dart';
@@ -47,7 +47,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
   bool _emdeded = false;
 
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   CancelToken cancelToken;
@@ -67,7 +67,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
   @override
   Callback callback;
 
-  PostListBuilder withAuthorization(AuthorizationContainer auth) {
+  PostListBuilder withAuthorization(Authorization auth) {
     if (auth == null || auth.isDefault) {
       return this;
     }

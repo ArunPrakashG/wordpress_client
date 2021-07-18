@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../request_builder_base.dart';
 import '../request.dart';
@@ -11,7 +11,7 @@ import '../../utilities/pair.dart';
 
 class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   Callback callback;
@@ -157,7 +157,7 @@ class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
   }
 
   @override
-  PostCreateBuilder withAuthorization(AuthorizationContainer auth) {
+  PostCreateBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

@@ -1,11 +1,11 @@
-import 'authorization_container.dart';
+import 'authorization.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/pair.dart';
 
 class BootstrapConfiguration {
   final int requestTimeout;
   final bool Function(dynamic) responsePreprocessorDelegate;
-  final AuthorizationContainer defaultAuthorization;
+  final Authorization defaultAuthorization;
   final String defaultUserAgent;
   final List<Pair<String, String>> defaultHeaders;
   final bool shouldFollowRedirects;

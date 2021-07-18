@@ -1,13 +1,13 @@
 import 'enums.dart';
 import 'utilities/helpers.dart';
 
-class AuthorizationContainer {
+class Authorization {
   final String userName;
   final String password;
   final String jwtToken;
   final AuthorizationType authType;
 
-  AuthorizationContainer({
+  Authorization({
     this.userName,
     this.password,
     this.jwtToken,

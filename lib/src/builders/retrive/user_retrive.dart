@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class UserRetriveBuilder implements IRequestBuilder<UserRetriveBuilder, User> {
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   CancelToken cancelToken;
@@ -71,7 +71,7 @@ class UserRetriveBuilder implements IRequestBuilder<UserRetriveBuilder, User> {
   UserRetriveBuilder initializeWithDefaultValues() => this;
 
   @override
-  UserRetriveBuilder withAuthorization(AuthorizationContainer auth) {
+  UserRetriveBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

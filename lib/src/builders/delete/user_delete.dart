@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization_container.dart';
+import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -10,7 +10,7 @@ import '../request_builder_base.dart';
 
 class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   @override
-  AuthorizationContainer authorization;
+  Authorization authorization;
 
   @override
   CancelToken cancelToken;
@@ -30,9 +30,9 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   @override
   Callback callback;
 
-  int _id;
-  bool _force;
-  int _reassign;
+  int _id = -1;
+  bool _force = false;
+  int _reassign = -1;
 
   UserDeleteBuilder withId(int id) {
     _id = id;
@@ -79,7 +79,7 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   }
 
   @override
-  UserDeleteBuilder withAuthorization(AuthorizationContainer auth) {
+  UserDeleteBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }

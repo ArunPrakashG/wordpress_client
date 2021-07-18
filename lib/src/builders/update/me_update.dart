@@ -9,7 +9,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
+class MeUpdateBuilder implements IRequestBuilder<MeUpdateBuilder, User> {
   @override
   Authorization authorization;
 
@@ -44,62 +44,62 @@ class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
   String _slug;
   List<int> _roles;
 
-  UserCreateBuilder withUserName(String username) {
+  MeUpdateBuilder withUserName(String username) {
     _username = username;
     return this;
   }
 
-  UserCreateBuilder withDisplayName(String displayName) {
+  MeUpdateBuilder withDisplayName(String displayName) {
     _displayName = displayName;
     return this;
   }
 
-  UserCreateBuilder withFirstName(String firstName) {
+  MeUpdateBuilder withFirstName(String firstName) {
     _firstName = firstName;
     return this;
   }
 
-  UserCreateBuilder withLastName(String lastName) {
+  MeUpdateBuilder withLastName(String lastName) {
     _lastName = lastName;
     return this;
   }
 
-  UserCreateBuilder withEmail(String email) {
+  MeUpdateBuilder withEmail(String email) {
     _email = email;
     return this;
   }
 
-  UserCreateBuilder withPassword(String password) {
+  MeUpdateBuilder withPassword(String password) {
     _password = password;
     return this;
   }
 
-  UserCreateBuilder withUrl(String url) {
+  MeUpdateBuilder withUrl(String url) {
     _url = url;
     return this;
   }
 
-  UserCreateBuilder withDescription(String description) {
+  MeUpdateBuilder withDescription(String description) {
     _description = description;
     return this;
   }
 
-  UserCreateBuilder withLocale(Locale locale) {
+  MeUpdateBuilder withLocale(Locale locale) {
     _locale = locale.toString().split('.').last;
     return this;
   }
 
-  UserCreateBuilder withNickname(String nickname) {
+  MeUpdateBuilder withNickname(String nickname) {
     _nickname = nickname;
     return this;
   }
 
-  UserCreateBuilder withSlug(String slug) {
+  MeUpdateBuilder withSlug(String slug) {
     _slug = slug;
     return this;
   }
 
-  UserCreateBuilder withRoles(Iterable<int> roles) {
+  MeUpdateBuilder withRoles(Iterable<int> roles) {
     _roles ??= [];
     _roles.addAll(roles);
     return this;
@@ -107,6 +107,7 @@ class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
 
   @override
   Request<User> build() {
+    endpoint += '/me';
     return Request<User>(
       endpoint,
       callback: callback,
@@ -115,11 +116,11 @@ class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      formBody: _parseParameters(),
+      formBody: _parseQueryParameters(),
     );
   }
 
-  Map<String, String> _parseParameters() {
+  Map<String, String> _parseQueryParameters() {
     return {
       'username': _username,
       'email': _email,
@@ -137,50 +138,50 @@ class UserCreateBuilder implements IRequestBuilder<UserCreateBuilder, User> {
   }
 
   @override
-  UserCreateBuilder initializeWithDefaultValues() {
+  MeUpdateBuilder initializeWithDefaultValues() {
     return this;
   }
 
   @override
-  UserCreateBuilder withAuthorization(Authorization auth) {
+  MeUpdateBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }
 
   @override
-  UserCreateBuilder withCallback(Callback requestCallback) {
+  MeUpdateBuilder withCallback(Callback requestCallback) {
     callback = requestCallback;
     return this;
   }
 
   @override
-  UserCreateBuilder withCancellationToken(CancelToken token) {
+  MeUpdateBuilder withCancellationToken(CancelToken token) {
     cancelToken = token;
     return this;
   }
 
   @override
-  UserCreateBuilder withEndpoint(String newEndpoint) {
+  MeUpdateBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
     return this;
   }
 
   @override
-  UserCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  MeUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers.addAll(customHeaders);
     return this;
   }
 
   @override
-  UserCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MeUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserCreateBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  MeUpdateBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
