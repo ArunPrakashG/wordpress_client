@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 
+import 'authorization_container.dart';
 import 'builders/request.dart';
 import 'client_configuration.dart';
 import 'enums.dart';
@@ -23,7 +24,7 @@ const int defaultRequestTimeout = 60 * 1000;
 class InternalRequester {
   Dio _client;
   String _baseUrl;
-  WordpressAuthorization _defaultAuthorization;
+  _AuthorizationHandler _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
@@ -49,8 +50,17 @@ class InternalRequester {
     // TODO: configuration.cookieContainer
 
     _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
-    _defaultAuthorization = configuration.defaultAuthorization;
-    _handleDefaultAuthorization(configuration.defaultAuthorization);
+
+    if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
+      _defaultAuthorization = _AuthorizationHandler(
+        configuration.defaultAuthorization.userName,
+        configuration.defaultAuthorization.password,
+        configuration.defaultAuthorization.authType,
+        configuration.defaultAuthorization.jwtToken,
+      );
+
+      _handleDefaultAuthorization(_defaultAuthorization);
+    }
 
     if (configuration.defaultUserAgent != null) {
       _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
@@ -73,7 +83,9 @@ class InternalRequester {
     );
   }
 
-  void _handleDefaultAuthorization(WordpressAuthorization auth) async {
+  void removedDefaultAuthorization() => _defaultAuthorization = null;
+
+  void _handleDefaultAuthorization(_AuthorizationHandler auth) async {
     if (auth == null || auth.isDefault) {
       return;
     }
@@ -106,6 +118,20 @@ class InternalRequester {
     _client.options.headers['Authorization'] = '${_defaultAuthorization._scheme} ${_defaultAuthorization._encryptedAccessToken}';
   }
 
+  bool _handleResponse<T>(Request<T> request, T responseContainer) {
+    request.callback?.invokeResponseCallback(responseContainer);
+
+    if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseContainer)) {
+      return false;
+    }
+
+    if (request.validationDelegate != null && !request.validationDelegate(responseContainer)) {
+      return false;
+    }
+
+    return true;
+  }
+
   Future<ResponseContainer<T>> createRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
@@ -113,16 +139,11 @@ class InternalRequester {
 
     final options = await _parseAsDioRequest(request);
     if (options == null) {
-      if (request.callback != null && request.callback.requestCallback != null) {
-        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
-      }
-
       return ResponseContainer<T>.failed(
         null,
         duration: null,
-        errorMessage: 'Authorization failed.',
-        status: false,
         responseCode: -1,
+        message: 'Authorization might have failed internally.',
       );
     }
 
@@ -133,44 +154,40 @@ class InternalRequester {
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
+      if (!_handleResponse<T>(request, responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
-          status: false,
           responseCode: response.statusCode,
-        );
-      }
-
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(responseDataContainer);
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in validationDelegate()',
-          status: false,
-          responseCode: response.statusCode,
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
       return ResponseContainer<T>(
         responseDataContainer,
         responseCode: response.statusCode,
-        status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
+        message: response.statusMessage,
       );
     } on DioError catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
+      request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(null,
-          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+        responseCode: -1,
+      );
+    } on Exception catch (ex) {
+      request.callback?.invokeUnhandledExceptionCallback(ex);
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${ex.toString()})',
+        responseCode: -1,
+      );
     }
   }
 
@@ -181,16 +198,11 @@ class InternalRequester {
 
     final options = await _parseAsDioRequest(request);
     if (options == null) {
-      if (request.callback != null && request.callback.requestCallback != null) {
-        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
-      }
-
       return ResponseContainer<T>.failed(
         null,
         duration: null,
-        errorMessage: 'Authorization failed.',
-        status: false,
         responseCode: -1,
+        message: 'Authorization might have failed internally.',
       );
     }
 
@@ -199,24 +211,30 @@ class InternalRequester {
       final response = await _client.fetch(options);
       watch.stop();
 
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(response.data);
-      }
-
       return ResponseContainer<T>(
         null,
         responseCode: response.statusCode,
-        status: response.statusCode == 200,
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
     } on DioError catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
+      request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(null,
-          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+        responseCode: -1,
+      );
+    } on Exception catch (ex) {
+      request.callback?.invokeUnhandledExceptionCallback(ex);
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${ex.toString()})',
+        responseCode: -1,
+      );
     }
   }
 
@@ -227,16 +245,11 @@ class InternalRequester {
 
     final options = await _parseAsDioRequest(request);
     if (options == null) {
-      if (request.callback != null && request.callback.requestCallback != null) {
-        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
-      }
-
       return ResponseContainer<List<T>>.failed(
         null,
         duration: null,
-        errorMessage: 'Authorization failed.',
-        status: false,
         responseCode: -1,
+        message: 'Authorization might have failed internally.',
       );
     }
 
@@ -247,44 +260,39 @@ class InternalRequester {
 
       final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
+      if (!_handleResponse<List<T>>(request, responseDataContainer)) {
         return ResponseContainer<List<T>>.failed(
           null,
           duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
-          status: false,
           responseCode: response.statusCode,
-        );
-      }
-
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(responseDataContainer);
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
-        return ResponseContainer<List<T>>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in validationDelegate()',
-          status: false,
-          responseCode: response.statusCode,
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
       return ResponseContainer<List<T>>(
         responseDataContainer,
         responseCode: response.statusCode,
-        status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
     } on DioError catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
+      request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<List<T>>.failed(null,
-          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
+      return ResponseContainer<List<T>>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+        responseCode: -1,
+      );
+    } on Exception catch (ex) {
+      request.callback?.invokeUnhandledExceptionCallback(ex);
+
+      return ResponseContainer<List<T>>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${ex.toString()})',
+        responseCode: -1,
+      );
     }
   }
 
@@ -295,16 +303,11 @@ class InternalRequester {
 
     final options = await _parseAsDioRequest(request);
     if (options == null) {
-      if (request.callback != null && request.callback.requestCallback != null) {
-        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
-      }
-
       return ResponseContainer<T>.failed(
         null,
         duration: null,
-        errorMessage: 'Authorization failed.',
-        status: false,
         responseCode: -1,
+        message: 'Authorization might have failed internally.',
       );
     }
 
@@ -315,44 +318,39 @@ class InternalRequester {
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
+      if (!_handleResponse<T>(request, responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
-          status: false,
           responseCode: response.statusCode,
-        );
-      }
-
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(responseDataContainer);
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in validationDelegate()',
-          status: false,
-          responseCode: response.statusCode,
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
       return ResponseContainer<T>(
         responseDataContainer,
         responseCode: response.statusCode,
-        status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
     } on DioError catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
+      request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(null,
-          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+        responseCode: -1,
+      );
+    } on Exception catch (ex) {
+      request.callback?.invokeUnhandledExceptionCallback(ex);
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${ex.toString()})',
+        responseCode: -1,
+      );
     }
   }
 
@@ -363,16 +361,11 @@ class InternalRequester {
 
     final options = await _parseAsDioRequest(request);
     if (options == null) {
-      if (request.callback != null && request.callback.requestCallback != null) {
-        request.callback.requestCallback(RequestStatus(false, 'Authorization failed.'));
-      }
-
       return ResponseContainer<T>.failed(
         null,
         duration: null,
-        errorMessage: 'Authorization failed.',
-        status: false,
         responseCode: -1,
+        message: 'Authorization might have failed internally.',
       );
     }
 
@@ -383,44 +376,39 @@ class InternalRequester {
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
-      if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseDataContainer)) {
+      if (!_handleResponse<T>(request, responseDataContainer)) {
         return ResponseContainer<T>.failed(
           null,
           duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in responsePreprocessorDelegate()',
-          status: false,
           responseCode: response.statusCode,
-        );
-      }
-
-      if (request.callback?.responseCallback != null) {
-        request.callback.responseCallback(response.data);
-      }
-
-      if (request.validationDelegate != null && !request.validationDelegate(responseDataContainer)) {
-        return ResponseContainer<T>.failed(
-          null,
-          duration: watch.elapsed,
-          errorMessage: 'Request aborted by user in validationDelegate()',
-          status: false,
-          responseCode: response.statusCode,
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
       return ResponseContainer<T>(
         responseDataContainer,
         responseCode: response.statusCode,
-        status: true,
         responseHeaders: _parseResponseHeaders(response.headers.map),
         duration: watch.elapsed,
       );
     } on DioError catch (e) {
-      if (request.callback?.unhandledExceptionCallback != null) {
-        request.callback.unhandledExceptionCallback(e);
-      }
+      request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(null,
-          duration: watch.elapsed, errorMessage: 'Exception occured. (${e.toString()})', status: false, responseCode: -1, dioError: e);
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+        responseCode: -1,
+      );
+    } on Exception catch (ex) {
+      request.callback?.invokeUnhandledExceptionCallback(ex);
+
+      return ResponseContainer<T>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${ex.toString()})',
+        responseCode: -1,
+      );
     }
   }
 
@@ -461,14 +449,39 @@ class InternalRequester {
       followRedirects: true,
       maxRedirects: 5,
       data: request.formBody,
+      onReceiveProgress: request.callback.onReceiveProgress,
+      onSendProgress: request.callback.onSendProgress,
     );
 
+    bool hasAuthorizedAlready = false;
+
     if (request.shouldAuthorize) {
-      options = await WordpressAuthorization._authorizeRequest(options, _client, request.authorization, callback: request.callback);
+      options = await _AuthorizationHandler._authorizeRequest(options, _client, request.authorization, callback: request.callback);
 
       if (options == null) {
         return null;
       }
+
+      hasAuthorizedAlready = true;
+    }
+
+    if (_defaultAuthorization != null && _defaultAuthorization.isValidAuth && !hasAuthorizedAlready) {
+      options = await _AuthorizationHandler._authorizeRequest(
+          options,
+          _client,
+          AuthorizationContainer(
+            userName: _defaultAuthorization._userName,
+            password: _defaultAuthorization._password,
+            authType: _defaultAuthorization._authType,
+            jwtToken: _defaultAuthorization._jwtToken,
+          ),
+          callback: request.callback);
+
+      if (options == null) {
+        return null;
+      }
+
+      hasAuthorizedAlready = true;
     }
 
     print('Request URL: ${options.path}');
@@ -496,8 +509,8 @@ class InternalRequester {
   }
 }
 
-class WordpressAuthorization {
-  WordpressAuthorization(this._userName, this._password, this._authType, [this._jwtToken = null]) {
+class _AuthorizationHandler {
+  _AuthorizationHandler(this._userName, this._password, this._authType, [this._jwtToken = null]) {
     _scheme = '';
     _encryptedAccessToken = '';
     _hasValidatedOnce = false;
@@ -615,27 +628,29 @@ class WordpressAuthorization {
     }
   }
 
-  static Future<RequestOptions> _authorizeRequest(RequestOptions requestOptions, Dio client, WordpressAuthorization auth, {Callback callback}) async {
+  static Future<RequestOptions> _authorizeRequest(RequestOptions requestOptions, Dio client, AuthorizationContainer auth, {Callback callback}) async {
     if (auth == null || auth.isDefault) {
       return requestOptions;
     }
 
-    if (auth._authType == AuthorizationType.JWT) {
-      if (auth._hasValidatedOnce && !isNullOrEmpty(auth._encryptedAccessToken)) {
-        requestOptions.headers['Authorization'] = '${auth._scheme} ${auth._encryptedAccessToken}';
+    _AuthorizationHandler handler = _AuthorizationHandler(auth.userName, auth.password, auth.authType, auth.jwtToken);
+
+    if (handler._authType == AuthorizationType.JWT) {
+      if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
+        requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
         return requestOptions;
       }
 
-      auth._handleJwtAuthentication(client, callback: callback);
+      handler._handleJwtAuthentication(client, callback: callback);
 
-      if (auth._hasValidatedOnce && !isNullOrEmpty(auth._encryptedAccessToken)) {
-        requestOptions.headers['Authorization'] = '${auth._scheme} ${auth._encryptedAccessToken}';
+      if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
+        requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
       }
 
       return requestOptions;
     }
 
-    requestOptions.headers['Authorization'] = '${auth._scheme} ${auth._encryptedAccessToken}';
+    requestOptions.headers['Authorization'] = '${handler._scheme} ${handler._encryptedAccessToken}';
     return requestOptions;
   }
 }

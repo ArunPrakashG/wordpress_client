@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 
-import '../internal_requester.dart';
+import '../authorization_container.dart';
 import '../utilities/callback.dart';
 import '../utilities/pair.dart';
 import 'request.dart';
 
 abstract class IRequestBuilder<TRequestType, XResponseType> {
   bool Function(XResponseType) responseValidationDelegate;
-  WordpressAuthorization authorization;
+  AuthorizationContainer authorization;
   List<Pair<String, String>> headers;
   List<Pair<String, String>> queryParameters;
   CancelToken cancelToken;
@@ -16,7 +16,7 @@ abstract class IRequestBuilder<TRequestType, XResponseType> {
 
   TRequestType initializeWithDefaultValues();
 
-  TRequestType withAuthorization(WordpressAuthorization auth);
+  TRequestType withAuthorization(AuthorizationContainer auth);
 
   TRequestType withHeaders(Iterable<Pair<String, String>> customHeaders);
 

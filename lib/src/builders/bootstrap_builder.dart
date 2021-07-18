@@ -1,12 +1,12 @@
+import '../authorization_container.dart';
 import '../client_configuration.dart';
-import '../internal_requester.dart';
 import '../utilities/cookie_container.dart';
 import '../utilities/pair.dart';
 
 class BootstrapBuilder {
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds
   bool Function(dynamic) _responsePreprocessorDelegate;
-  WordpressAuthorization _defaultAuthorization;
+  AuthorizationContainer _defaultAuthorization;
   String _defaultUserAgent;
   List<Pair<String, String>> _defaultHeaders;
   bool _followRedirects = true;
@@ -28,7 +28,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorization(WordpressAuthorization defaultAuthorization) {
+  BootstrapBuilder withDefaultAuthorization(AuthorizationContainer defaultAuthorization) {
     _defaultAuthorization = defaultAuthorization;
     return this;
   }

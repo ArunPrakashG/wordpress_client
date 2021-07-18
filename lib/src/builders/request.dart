@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 
+import '../authorization_container.dart';
 import '../enums.dart';
 import '../utilities/callback.dart';
 import '../utilities/helpers.dart';
 import '../utilities/pair.dart';
-import '../internal_requester.dart';
 
 class Request<TResponseType> {
   final String endpoint;
@@ -12,7 +12,7 @@ class Request<TResponseType> {
   final bool Function(TResponseType) validationDelegate;
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
-  final WordpressAuthorization authorization;
+  final AuthorizationContainer authorization;
   final Map<String, dynamic> formBody;
   final List<Pair<String, String>> headers;
   final Map<String, String> queryParams;
@@ -75,7 +75,7 @@ class Request<TResponseType> {
 
   bool get hasValidExceptionCallback => callback != null && callback.unhandledExceptionCallback != null;
 
-  bool get hasValidCallbacks => hasValidExceptionCallback && callback.requestCallback != null && callback.responseCallback != null;
+  bool get hasValidCallbacks => hasValidExceptionCallback && callback.responseCallback != null && callback.onReceiveProgress != null && callback.onSendProgress != null;
 
   bool get isRequestExecutable => !isNullOrEmpty(endpoint) || httpMethod != null;
 }

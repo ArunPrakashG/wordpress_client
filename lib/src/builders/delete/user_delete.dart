@@ -1,16 +1,16 @@
 import 'package:dio/src/cancel_token.dart';
 
+import '../../authorization_container.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/pair.dart';
-import '../../internal_requester.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
 class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   @override
-  WordpressAuthorization authorization;
+  AuthorizationContainer authorization;
 
   @override
   CancelToken cancelToken;
@@ -79,7 +79,7 @@ class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
   }
 
   @override
-  UserDeleteBuilder withAuthorization(WordpressAuthorization auth) {
+  UserDeleteBuilder withAuthorization(AuthorizationContainer auth) {
     authorization = auth;
     return this;
   }

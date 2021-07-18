@@ -1,11 +1,11 @@
 import 'package:dio/src/cancel_token.dart';
 
+import '../../authorization_container.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
-import '../../internal_requester.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
@@ -24,7 +24,7 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
   bool _limitToAuthors = false;
 
   @override
-  WordpressAuthorization authorization;
+  AuthorizationContainer authorization;
 
   @override
   CancelToken cancelToken;
@@ -145,7 +145,7 @@ class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
   UserListBuilder initializeWithDefaultValues() => this;
 
   @override
-  UserListBuilder withAuthorization(WordpressAuthorization auth) {
+  UserListBuilder withAuthorization(AuthorizationContainer auth) {
     authorization = auth;
     return this;
   }

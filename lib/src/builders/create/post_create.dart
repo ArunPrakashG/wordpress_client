@@ -1,5 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
+import '../../authorization_container.dart';
 import '../../enums.dart';
 import '../request_builder_base.dart';
 import '../request.dart';
@@ -7,11 +8,10 @@ import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
-import '../../internal_requester.dart';
 
 class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
   @override
-  WordpressAuthorization authorization;
+  AuthorizationContainer authorization;
 
   @override
   Callback callback;
@@ -157,7 +157,7 @@ class PostCreateBuilder implements IRequestBuilder<PostCreateBuilder, Post> {
   }
 
   @override
-  PostCreateBuilder withAuthorization(WordpressAuthorization auth) {
+  PostCreateBuilder withAuthorization(AuthorizationContainer auth) {
     authorization = auth;
     return this;
   }

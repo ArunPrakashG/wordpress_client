@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 
+import '../../authorization_container.dart';
 import '../../enums.dart';
 import '../../exceptions/null_reference_exception.dart';
 import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
-import '../../internal_requester.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
@@ -47,7 +47,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
   bool _emdeded = false;
 
   @override
-  WordpressAuthorization authorization;
+  AuthorizationContainer authorization;
 
   @override
   CancelToken cancelToken;
@@ -67,7 +67,7 @@ class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
   @override
   Callback callback;
 
-  PostListBuilder withAuthorization(WordpressAuthorization auth) {
+  PostListBuilder withAuthorization(AuthorizationContainer auth) {
     if (auth == null || auth.isDefault) {
       return this;
     }

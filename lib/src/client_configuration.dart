@@ -1,11 +1,11 @@
-import 'package:wordpress_client/src/utilities/cookie_container.dart';
-import 'internal_requester.dart';
+import 'authorization_container.dart';
+import 'utilities/cookie_container.dart';
 import 'utilities/pair.dart';
 
 class BootstrapConfiguration {
   final int requestTimeout;
   final bool Function(dynamic) responsePreprocessorDelegate;
-  final WordpressAuthorization defaultAuthorization;
+  final AuthorizationContainer defaultAuthorization;
   final String defaultUserAgent;
   final List<Pair<String, String>> defaultHeaders;
   final bool shouldFollowRedirects;
