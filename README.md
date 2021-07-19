@@ -35,6 +35,11 @@ each response is wrapped inside `ResponseContainer< >` instance. ResponseContain
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
+## TODO
+* Implement Media operations & interface
+* Implement Tag operations & interface
+* Implement Comment operations & interface
+
 ## NOTE
 
 This library is in no way complete. It has many bugs & it has many pending interfaces to implement. It was initially written to fix authorization and few endpoint support which is non-existent in existing Wordpress libraries.
