@@ -1,4 +1,5 @@
 import 'builders/bootstrap_builder.dart';
+import 'builders/create/media_create.dart';
 import 'builders/create/post_create.dart';
 import 'builders/create/user_create.dart';
 import 'builders/delete/me_delete.dart';
@@ -17,9 +18,11 @@ import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'interface/me.dart';
+import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
+import 'responses/media_response.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
 import 'responses/user_response.dart';
@@ -49,8 +52,8 @@ class WordpressClient {
     _interfaces ??= new Map<String, dynamic>();
     _interfaces['posts'] = PostsInterface<Post>();
     _interfaces['users'] = UsersInterface<User>();
-    _interfaces['me'] = MeInterface<User>();    
-    //_interfaces['media'] = MediaInterface<Media>();
+    _interfaces['me'] = MeInterface<User>();
+    _interfaces['media'] = MediaInterface<Media>();
   }
 
   T getInterfaceByName<T>(String name) {
@@ -173,6 +176,22 @@ class WordpressClient {
     return getInterfaceByName<PostsInterface<Post>>('posts').create<Post>(
       typeResolver: Post(),
       request: builder(PostCreateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Media>> createMedia(Request Function(MediaCreateBuilder) builder) async {
+    return getInterfaceByName<MediaInterface<Media>>('media').create<Media>(
+      typeResolver: Media(),
+      request: builder(MediaCreateBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Media>> deleteMedia(Request Function(MediaDeleteBuilder) builder) async {
+    return getInterfaceByName<MediaInterface<Media>>('media').delete<Media>(
+      typeResolver: Media(),
+      request: builder(MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

@@ -156,7 +156,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
-    try {
+    try {    
       final response = await _client.fetch(options);
       watch.stop();
 

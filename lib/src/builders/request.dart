@@ -13,7 +13,7 @@ class Request<TResponseType> {
   final CancelToken cancelToken;
   final HttpMethod httpMethod;
   final Authorization authorization;
-  final Map<String, dynamic> formBody;
+  final dynamic formBody;
   final List<Pair<String, String>> headers;
   final Map<String, String> queryParams;
   String generatedRequestPath;
