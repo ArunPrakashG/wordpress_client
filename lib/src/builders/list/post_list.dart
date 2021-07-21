@@ -347,7 +347,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   @override
   Request<List<Post>> build() {
-    var req = Request<List<Post>>(
+    return Request<List<Post>>(
       endpoint,
       isListRequest: true,
       callback: callback,
@@ -358,7 +358,6 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
       headers: headers,
       queryParams: _parseQueryParameters(),
     );
-    return req;
   }
 
   @override

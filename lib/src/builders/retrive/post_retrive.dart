@@ -31,13 +31,11 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   @override
   Callback callback;
 
-  int _postId = -1;
   String _context = '';
   String _password;
 
   PostRetriveBuilder withPostId(int postId) {
-    _postId = postId;
-    endpoint += '/$_postId';
+    endpoint += '/$postId';
     return this;
   }
 
@@ -78,7 +76,6 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
 
   Map<String, String> _parseQueryParameters() {
     return {
-      if (_postId >= 0) 'id': _postId.toString(),
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (!isNullOrEmpty(_password)) 'password': _password,
       if (queryParameters != null && queryParameters.isNotEmpty)
@@ -89,7 +86,6 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
 
   @override
   PostRetriveBuilder initializeWithDefaultValues() {
-    _postId = 0;
     return this;
   }
 

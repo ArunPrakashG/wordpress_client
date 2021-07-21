@@ -56,13 +56,14 @@ class BootstrapBuilder {
 
   BootstrapConfiguration build() {
     return BootstrapConfiguration(
-        cookieContainer: _cookieContainer,
-        requestTimeout: _defaultRequestTimeout,
-        responsePreprocessorDelegate: _responsePreprocessorDelegate,
-        defaultAuthorization: _defaultAuthorization,
-        defaultUserAgent: _defaultUserAgent,
-        defaultHeaders: _defaultHeaders,
-        shouldFollowRedirects: _followRedirects,
-        maxRedirects: _defaultMaxRedirects);
+      cookieContainer: _cookieContainer,
+      requestTimeout: _defaultRequestTimeout,
+      responsePreprocessorDelegate: _responsePreprocessorDelegate,
+      defaultAuthorization: _defaultAuthorization,
+      defaultUserAgent: _defaultUserAgent,
+      defaultHeaders: _defaultHeaders,
+      shouldFollowRedirects: _followRedirects,
+      maxRedirects: _defaultMaxRedirects,
+    );
   }
 }

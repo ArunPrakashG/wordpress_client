@@ -4,12 +4,14 @@ enum FilterOrder { ASCENDING, DESCENDING }
 enum FilterPostSortOrder { DATE, AUTHOR, ID, INCLUDE, MODIFIED, PARENT, RELEVANCE, SLUG, INCLUDESLUGS, TITLE, EMAIL, URL, NAME }
 enum FilterUserSortOrder { ID, INCLUDE, NAME, REGISTERED_DATE, SLUG, INCLUDE_SLUGS, EMAIL, URL }
 enum FilterScope { VIEW, EMBED, EDIT }
+enum MediaFilterStatus { INHERIT }
 enum TaxonomyRelation { AND, OR }
 enum ContentStatus { PUBLISH, FUTURE, DRAFT, PENDING, PRIVATE }
 enum PostAvailabilityStatus { PUBLISHED, DRAFT, TRASH }
 enum PostFormat { STANDARD, ASIDE, CHAT, GALLERY, LINK, IMAGE, QUOTE, STATUS, VIDEO, AUDIO }
 enum AuthorizationType { JWT, BASIC }
 enum Locale { en_US }
+enum FilterMediaType { IMAGE, VIDEO, TEXT, APPLICATION, AUDIO }
 
 extension ParseToString on HttpMethod {
   String toShortString() {

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
@@ -31,7 +32,6 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
   @override
   bool Function(User) responseValidationDelegate;
 
-  int _id;
   String _username;
   String _displayName;
   String _firstName;
@@ -45,9 +45,8 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
   String _slug;
   List<int> _roles;
 
-  UserUpdateBuilder withId(int id){
-    _id = id;
-    endpoint += '/$_id';
+  UserUpdateBuilder withId(int id) {
+    endpoint += '/$id';
     return this;
   }
 
@@ -122,13 +121,12 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      queryParams: _parseQueryParameters(),
+      formBody: FormData.fromMap(_parseParameters()),
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String> _parseParameters() {
     return {
-      'id': _id.toString(),
       'username': _username,
       'email': _email,
       if (!isNullOrEmpty(_displayName)) 'name': _displayName,

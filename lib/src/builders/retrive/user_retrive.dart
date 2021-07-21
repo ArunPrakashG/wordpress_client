@@ -31,12 +31,10 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   @override
   Callback callback;
 
-  int _id;
   String _context;
 
   UserRetriveBuilder withPostId(int id) {
-    _id = id;
-    endpoint += '/$_id';
+    endpoint += '/$id';
     return this;
   }
 
@@ -62,7 +60,6 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
 
   Map<String, dynamic> _parseQueryParameters() {
     return {
-      'id': _id,
       if (!isNullOrEmpty(_context)) 'context': _context,
     };
   }

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
@@ -31,7 +32,6 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   @override
   bool Function(Post) responseValidationDelegate;
 
-  int _id;
   String _slug;
   String _title;
   String _content;
@@ -48,8 +48,7 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   List<int> _tags;
 
   PostUpdateBuilder withId(int id) {
-    _id = id;
-    endpoint += '/$_id';
+    endpoint += '/$id';
     return this;
   }
 
@@ -135,13 +134,12 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      formBody: _parseQueryParameters(),
+      formBody: FormData.fromMap(_parseParameters()),
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, dynamic> _parseParameters() {
     return {
-      'id': _id?.toString() ?? 0,
       if (!isNullOrEmpty(_title)) 'title': _title,
       if (!isNullOrEmpty(_content)) 'content': _content,
       if (!isNullOrEmpty(_excerpt)) 'excerpt': _excerpt,

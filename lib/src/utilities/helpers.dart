@@ -62,7 +62,7 @@ String getMIMETypeFromExtension(String extension) {
     case 'jpg':
     case 'jpeg':
     case 'jpe':
-      return "image/jpeg";
+      return 'image/jpeg';
     case 'gif':
       return 'image/gif';
     case 'png':
