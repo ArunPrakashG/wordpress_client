@@ -22,7 +22,7 @@ class Request<TResponseType> {
   Request(
     this.endpoint, {
     this.isListRequest = false,
-    this.callback,
+    this.callback = const Callback(),
     this.validationDelegate,
     this.cancelToken,
     this.httpMethod,
@@ -49,7 +49,7 @@ class Request<TResponseType> {
 
   String _buildUrlQueryString() {
     if (queryParams == null || queryParams.isEmpty) {
-      return '';
+      return endpoint;
     }
 
     var requestQueryUrl = endpoint;

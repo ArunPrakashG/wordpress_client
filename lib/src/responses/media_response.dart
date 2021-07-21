@@ -43,7 +43,7 @@ class Media implements ISerializable<Media> {
   final DateTime modified;
   final DateTime modifiedGmt;
   final String slug;
-  final Status status;
+  final MediaFilterStatus status;
   final String type;
   final String link;
   final Content title;
@@ -73,7 +73,7 @@ class Media implements ISerializable<Media> {
         modified: json["modified"] == null ? null : DateTime.parse(json["modified"]),
         modifiedGmt: json["modified_gmt"] == null ? null : DateTime.parse(json["modified_gmt"]),
         slug: json["slug"] == null ? null : json["slug"],
-        status: json["status"] == null ? null : getStatusFromValue(json["status"]),
+        status: json["status"] == null ? null : getMediaFilterStatusFromValue(json["status"]),
         type: json["type"] == null ? null : json["type"],
         link: json["link"] == null ? null : json["link"],
         title: json["title"] == null ? null : Content.fromMap(json["title"]),

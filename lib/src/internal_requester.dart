@@ -440,7 +440,7 @@ class InternalRequester {
 
     Uri requestUri = Uri.tryParse(parseUrl(
       _baseUrl,
-      request.httpMethod == HttpMethod.POST ? request.endpoint : request.generatedRequestPath,
+      request.generatedRequestPath,
     ));
 
     if (requestUri == null) {
@@ -457,8 +457,8 @@ class InternalRequester {
       followRedirects: true,
       maxRedirects: 5,
       data: request.formBody,
-      onReceiveProgress: request.callback.onReceiveProgress,
-      onSendProgress: request.callback.onSendProgress,
+      onReceiveProgress: (current, max) => request.callback?.invokeReceiveProgressCallback(max, current),
+      onSendProgress: (current, max) => request.callback?.invokeSendProgressCallback(max, current),
     );
 
     bool hasAuthorizedAlready = false;

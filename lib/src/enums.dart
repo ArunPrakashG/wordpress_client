@@ -27,6 +27,14 @@ ContentStatus getContentStatusFromValue(String value) {
   return ContentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
+MediaFilterStatus getMediaFilterStatusFromValue(String value) {
+  if (value == null) {
+    return MediaFilterStatus.INHERIT;
+  }
+
+  return MediaFilterStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
+}
+
 PostFormat getFormatFromValue(String value) {
   if (value == null) {
     return PostFormat.STANDARD;

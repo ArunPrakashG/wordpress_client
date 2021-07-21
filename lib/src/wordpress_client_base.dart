@@ -6,13 +6,16 @@ import 'builders/delete/me_delete.dart';
 import 'builders/delete/media_delete.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
+import 'builders/list/media_list.dart';
 import 'builders/list/post_list.dart';
 import 'builders/list/user_list.dart';
 import 'builders/request.dart';
 import 'builders/retrive/me_retrive.dart';
+import 'builders/retrive/media_retrive.dart';
 import 'builders/retrive/post_retrive.dart';
 import 'builders/retrive/user_retrive.dart';
 import 'builders/update/me_update.dart';
+import 'builders/update/media_update.dart';
 import 'builders/update/post_update.dart';
 import 'builders/update/user_update.dart';
 import 'client_configuration.dart';
@@ -193,6 +196,30 @@ class WordpressClient {
     return getInterfaceByName<MediaInterface<Media>>('media').delete<Media>(
       typeResolver: Media(),
       request: builder(MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<List<Media>>> listMedia(Request Function(MediaListBuilder) builder) async {
+    return getInterfaceByName<MediaInterface<Media>>('media').list<Media>(
+      resolver: Media(),
+      request: builder(MediaListBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Media>> retriveMedia(Request Function(MediaRetriveBuilder) builder) async {
+    return getInterfaceByName<MediaInterface<Media>>('media').retrive<Media>(
+      typeResolver: Media(),
+      request: builder(MediaRetriveBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Media>> updateMedia(Request Function(MediaUpdateBuilder) builder) async {
+    return getInterfaceByName<MediaInterface<Media>>('media').update<Media>(
+      typeResolver: Media(),
+      request: builder(MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

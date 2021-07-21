@@ -1,13 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/responses/error_container.dart';
+import 'package:wordpress_client/src/responses/error_response.dart';
 
 class Callback {
   final void Function(Exception) unhandledExceptionCallback;
-  final void Function(DioError) requestErrorCallback;
+  final void Function(ErrorContainer) requestErrorCallback;
   final void Function(dynamic) responseCallback;
   final void Function(int, int) onReceiveProgress;
   final void Function(int, int) onSendProgress;
 
-  Callback({
+  const Callback({
     this.unhandledExceptionCallback,
     this.responseCallback,
     this.onReceiveProgress,
@@ -28,7 +30,12 @@ class Callback {
       return;
     }
 
-    requestErrorCallback(error);
+    requestErrorCallback(
+      ErrorContainer(
+        errorResponse: ErrorResponse.fromMap(error.response.data),
+        internalError: error,
+      ),
+    );
   }
 
   void invokeResponseCallback(dynamic response) {

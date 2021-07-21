@@ -34,7 +34,7 @@ class MediaRetriveBuilder implements IQueryBuilder<MediaRetriveBuilder, Media> {
   String _context;
 
   MediaRetriveBuilder withId(int id) {
-    endpoint = '/$id';
+    endpoint += '/$id';
     return this;
   }
 
