@@ -3,6 +3,7 @@ import 'builders/create/media_create.dart';
 import 'builders/create/post_create.dart';
 import 'builders/create/user_create.dart';
 import 'builders/delete/me_delete.dart';
+import 'builders/delete/media_delete.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
 import 'builders/list/post_list.dart';

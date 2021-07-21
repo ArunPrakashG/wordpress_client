@@ -8,7 +8,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class PostDeleteBuilder implements IRequestBuilder<PostDeleteBuilder, Post> {
+class PostDeleteBuilder implements IQueryBuilder<PostDeleteBuilder, Post> {
   @override
   Authorization authorization;
 

@@ -9,7 +9,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class UserListBuilder implements IRequestBuilder<UserListBuilder, List<User>> {
+class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
   String _context;
   int _page = 1;
   int _perPage = 10;

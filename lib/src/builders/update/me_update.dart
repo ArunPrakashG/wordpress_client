@@ -9,7 +9,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class MeUpdateBuilder implements IRequestBuilder<MeUpdateBuilder, User> {
+class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
   @override
   Authorization authorization;
 

@@ -9,7 +9,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class UserRetriveBuilder implements IRequestBuilder<UserRetriveBuilder, User> {
+class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   @override
   Authorization authorization;
 

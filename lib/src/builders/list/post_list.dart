@@ -10,7 +10,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class PostListBuilder implements IRequestBuilder<PostListBuilder, List<Post>> {
+class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
   PostListBuilder.withEndpoint(String endpoint) {
     if (endpoint == null) {
       throw NullReferenceException('Invalid parameters.');

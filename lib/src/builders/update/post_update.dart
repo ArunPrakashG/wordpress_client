@@ -9,7 +9,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class PostUpdateBuilder implements IRequestBuilder<PostUpdateBuilder, Post> {
+class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   @override
   Authorization authorization;
 

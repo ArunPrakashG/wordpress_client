@@ -16,7 +16,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class MediaCreateBuilder implements IRequestBuilder<MediaCreateBuilder, Media> {
+class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   @override
   Authorization authorization;
 

@@ -8,7 +8,7 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class UserDeleteBuilder implements IRequestBuilder<UserDeleteBuilder, User> {
+class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   @override
   Authorization authorization;
 

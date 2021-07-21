@@ -5,7 +5,7 @@ import '../utilities/callback.dart';
 import '../utilities/pair.dart';
 import 'request.dart';
 
-abstract class IRequestBuilder<TRequestType, XResponseType> {
+abstract class IQueryBuilder<TRequestType, XResponseType> {
   bool Function(XResponseType) responseValidationDelegate;
   Authorization authorization;
   List<Pair<String, String>> headers;
