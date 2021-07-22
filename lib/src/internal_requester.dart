@@ -156,7 +156,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
-    try {    
+    try {
       final response = await _client.fetch(options);
       watch.stop();
 
@@ -420,17 +420,12 @@ class InternalRequester {
     }
   }
 
-  List<Pair<String, String>> _parseResponseHeaders(Map<String, List<String>> headers) {
+  Map<String, dynamic> _parseResponseHeaders(Map<String, List<String>> headers) {
     if (headers == null) {
-      return [];
+      return null;
     }
 
-    var headerPairs = <Pair<String, String>>[];
-    for (final header in headers.entries) {
-      headerPairs.add(Pair(header.key, header.value.join(';')));
-    }
-
-    return headerPairs;
+    return headers.map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
   }
 
   Future<RequestOptions> _parseAsDioRequest(Request request) async {
@@ -500,19 +495,6 @@ class InternalRequester {
       }
     }
 
-    /*
-    if (request.httpMethod != HttpMethod.GET && request.formBody != null) {
-      switch (request.formBody['REQUEST_TYPE']) {
-        case 'media_request':
-          options.headers.addEntries(request.formBody.entries.where((element) => element.key != 'file'));
-          options.data = request.formBody['file'];
-          break;
-        case 'post_request':
-          options.data = request.formBody;
-          break;
-      }
-    }
-    */
     return options;
   }
 }
