@@ -145,7 +145,7 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
       if (!isNullOrEmpty(_commentStatus)) 'comment_status': _commentStatus,
       if (!isNullOrEmpty(_pingStatus)) 'ping_status': _pingStatus,
       if (!isNullOrEmpty(_format)) 'format': _format,
-      if (_asSticky) 'sticky': '1',
+      if (_asSticky != null && _asSticky) 'sticky': '1',
       if (_categories != null && _categories.isNotEmpty) 'categories': _categories.join(','),
       if (_tags != null && _tags.isNotEmpty) 'tags': _tags.join(','),
       if (!isNullOrEmpty(_slug)) 'slug': _slug,

@@ -54,7 +54,7 @@ class TagListBuilder implements IQueryBuilder<TagListBuilder, List<Tag>> {
     return this;
   }
 
-  TagListBuilder withPage(int page) {
+  TagListBuilder withPageNumber(int page) {
     _page = page;
     return this;
   }

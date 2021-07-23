@@ -49,7 +49,7 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
     return this;
   }
 
-  CategoryListBuilder withPage(int page) {
+  CategoryListBuilder withPageNumber(int page) {
     _page = page;
     return this;
   }
