@@ -2,13 +2,13 @@ import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
 import '../../enums.dart';
-import '../../responses/user_response.dart';
+import '../../responses/category_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
+class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Category>{
   @override
   Authorization authorization;
 
@@ -25,32 +25,26 @@ class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(Category) responseValidationDelegate;
 
   @override
   Callback callback;
 
   bool _force = false;
-  int _reassign = -1;
 
-  UserDeleteBuilder withId(int id) {
+  CategoryDeleteBuilder withId(int id) {
     endpoint += '/$id';
     return this;
   }
 
-  UserDeleteBuilder withForce(bool force) {
+  CategoryDeleteBuilder withForce(bool force) {
     _force = force;
     return this;
   }
 
-  UserDeleteBuilder withReassign(int newUserId) {
-    _reassign = newUserId;
-    return this;
-  }
-
   @override
-  Request<User> build() {
-    return new Request<User>(
+  Request<Category> build() {
+    return new Request<Category>(
       endpoint,
       queryParams: _parseQueryParameters(),
       callback: callback,
@@ -66,55 +60,54 @@ class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   Map<String, String> _parseQueryParameters() {
     return {
       if (_force) 'force': 'true',
-      if (_reassign > 0) 'reassign': _reassign.toString(),
     };
   }
 
   @override
-  UserDeleteBuilder initializeWithDefaultValues() {
+  CategoryDeleteBuilder initializeWithDefaultValues() {
     return this;
   }
 
   @override
-  UserDeleteBuilder withAuthorization(Authorization auth) {
+  CategoryDeleteBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }
 
   @override
-  UserDeleteBuilder withCancellationToken(CancelToken token) {
+  CategoryDeleteBuilder withCancellationToken(CancelToken token) {
     cancelToken = token;
     return this;
   }
 
   @override
-  UserDeleteBuilder withEndpoint(String newEndpoint) {
+  CategoryDeleteBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
     return this;
   }
 
   @override
-  UserDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers = [];
     headers.addAll(customHeaders);
     return this;
   }
 
   @override
-  UserDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  CategoryDeleteBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
 
   @override
-  UserDeleteBuilder withCallback(Callback requestCallback) {
+  CategoryDeleteBuilder withCallback(Callback requestCallback) {
     callback = requestCallback;
     return this;
   }

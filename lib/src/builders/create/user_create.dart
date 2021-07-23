@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
@@ -115,7 +116,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
       cancelToken: cancelToken,
       authorization: authorization,
       headers: headers,
-      formBody: _parseParameters(),
+      formBody: FormData.fromMap(_parseParameters()),
     );
   }
 

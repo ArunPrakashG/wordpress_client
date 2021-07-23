@@ -5,8 +5,8 @@ import '../utilities/callback.dart';
 import '../utilities/pair.dart';
 import 'request.dart';
 
-abstract class IQueryBuilder<TRequestType, XResponseType> {
-  bool Function(XResponseType) responseValidationDelegate;
+abstract class IQueryBuilder<TRequestType, YResponseType> {
+  bool Function(YResponseType) responseValidationDelegate;
   Authorization authorization;
   List<Pair<String, String>> headers;
   List<Pair<String, String>> queryParameters;
@@ -28,7 +28,7 @@ abstract class IQueryBuilder<TRequestType, XResponseType> {
 
   TRequestType withCallback(Callback requestCallback);
 
-  TRequestType withResponseValidationOverride(bool Function(XResponseType) responseDelegate);
+  TRequestType withResponseValidationOverride(bool Function(YResponseType) responseDelegate);
 
-  Request<XResponseType> build();
+  Request<YResponseType> build();
 }

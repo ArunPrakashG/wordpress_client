@@ -1,7 +1,9 @@
 import 'builders/bootstrap_builder.dart';
+import 'builders/create/category_create.dart';
 import 'builders/create/media_create.dart';
 import 'builders/create/post_create.dart';
 import 'builders/create/user_create.dart';
+import 'builders/delete/category_delete.dart';
 import 'builders/delete/me_delete.dart';
 import 'builders/delete/media_delete.dart';
 import 'builders/delete/post_delete.dart';
@@ -11,16 +13,19 @@ import 'builders/list/media_list.dart';
 import 'builders/list/post_list.dart';
 import 'builders/list/user_list.dart';
 import 'builders/request.dart';
+import 'builders/retrive/category_retrive.dart';
 import 'builders/retrive/me_retrive.dart';
 import 'builders/retrive/media_retrive.dart';
 import 'builders/retrive/post_retrive.dart';
 import 'builders/retrive/user_retrive.dart';
+import 'builders/update/category_update.dart';
 import 'builders/update/me_update.dart';
 import 'builders/update/media_update.dart';
 import 'builders/update/post_update.dart';
 import 'builders/update/user_update.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
+import 'exceptions/interface_do_not_exist_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'interface/category.dart';
 import 'interface/me.dart';
@@ -73,6 +78,10 @@ class WordpressClient {
       throw NullReferenceException('Interface name is invalid.');
     }
 
+    if (_interfaces[name] == null) {
+      throw InterfaceDoNotExistException('$name interface do not exist.');
+    }
+
     return _interfaces[name];
   }
 
@@ -110,7 +119,7 @@ class WordpressClient {
 
   Future<ResponseContainer<List<User>>> listUsers(Request Function(UserListBuilder) builder) async {
     return getInterfaceByName<UsersInterface<User>>('users').list<User>(
-      resolver: User(),
+      typeResolver: User(),
       request: builder(UserListBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
@@ -158,7 +167,7 @@ class WordpressClient {
 
   Future<ResponseContainer<List<Post>>> listPost(Request Function(PostListBuilder) builder) async {
     return getInterfaceByName<PostsInterface<Post>>('posts').list<Post>(
-      resolver: Post(),
+      typeResolver: Post(),
       request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
@@ -206,7 +215,7 @@ class WordpressClient {
 
   Future<ResponseContainer<List<Media>>> listMedia(Request Function(MediaListBuilder) builder) async {
     return getInterfaceByName<MediaInterface<Media>>('media').list<Media>(
-      resolver: Media(),
+      typeResolver: Media(),
       request: builder(MediaListBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
@@ -230,8 +239,40 @@ class WordpressClient {
 
   Future<ResponseContainer<List<Category>>> listCategory(Request Function(CategoryListBuilder) builder) async {
     return getInterfaceByName<CategoryInterface<Category>>('category').list<Category>(
-      resolver: Category(),
+      typeResolver: Category(),
       request: builder(CategoryListBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Category>> retriveCategory(Request Function(CategoryRetriveBuilder) builder) async {
+    return getInterfaceByName<CategoryInterface<Category>>('category').retrive<Category>(
+      typeResolver: Category(),
+      request: builder(CategoryRetriveBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Category>> deleteCategory(Request Function(CategoryDeleteBuilder) builder) async {
+    return getInterfaceByName<CategoryInterface<Category>>('category').delete<Category>(
+      typeResolver: Category(),
+      request: builder(CategoryDeleteBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Category>> updateCategory(Request Function(CategoryUpdateBuilder) builder) async {
+    return getInterfaceByName<CategoryInterface<Category>>('category').update<Category>(
+      typeResolver: Category(),
+      request: builder(CategoryUpdateBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Category>> createCategory(Request Function(CategoryCreateBuilder) builder) async {
+    return getInterfaceByName<CategoryInterface<Category>>('category').create<Category>(
+      typeResolver: Category(),
+      request: builder(CategoryCreateBuilder().withEndpoint('category').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

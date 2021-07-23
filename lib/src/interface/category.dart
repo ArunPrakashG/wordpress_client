@@ -21,8 +21,8 @@ class CategoryInterface<T extends ISerializable<T>>
   }
 
   @override
-  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T resolver, Request<List<T>> request, InternalRequester requesterClient}) {
-    return requesterClient.listRequest<T>(resolver, request);
+  Future<ResponseContainer<List<T>>> list<T extends ISerializable<T>>({T typeResolver, Request<List<T>> request, InternalRequester requesterClient}) {
+    return requesterClient.listRequest<T>(typeResolver, request);
   }
 
   @override

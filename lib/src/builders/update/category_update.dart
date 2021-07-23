@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/builders/request.dart';
-import 'package:wordpress_client/src/authorization.dart';
 import 'package:dio/src/cancel_token.dart';
-import 'package:wordpress_client/src/responses/category_response.dart';
-import 'package:wordpress_client/src/utilities/helpers.dart';
-import 'package:wordpress_client/src/utilities/pair.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
 
+import '../../authorization.dart';
 import '../../enums.dart';
+import '../../responses/category_response.dart';
+import '../../utilities/callback.dart';
+import '../../utilities/helpers.dart';
+import '../../utilities/pair.dart';
+import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Category> {
+class CategoryUpdateBuilder implements IQueryBuilder<CategoryUpdateBuilder, Category> {
   @override
   Authorization authorization;
 
@@ -37,22 +37,27 @@ class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Cate
   String _slug;
   int _parent = 0;
 
-  CategoryCreateBuilder withDescription(String description) {
+  CategoryUpdateBuilder withId(int id) {
+    endpoint += '/$id';
+    return this;
+  }
+
+  CategoryUpdateBuilder withDescription(String description) {
     _description = description;
     return this;
   }
 
-  CategoryCreateBuilder withName(String name) {
+  CategoryUpdateBuilder withName(String name) {
     _name = name;
     return this;
   }
 
-  CategoryCreateBuilder withSlug(String slug) {
+  CategoryUpdateBuilder withSlug(String slug) {
     _slug = slug;
     return this;
   }
 
-  CategoryCreateBuilder withParent(int parent) {
+  CategoryUpdateBuilder withParent(int parent) {
     _parent = parent;
     return this;
   }
@@ -81,50 +86,50 @@ class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Cate
   }
 
   @override
-  CategoryCreateBuilder initializeWithDefaultValues() {
+  CategoryUpdateBuilder initializeWithDefaultValues() {
     return this;
   }
 
   @override
-  CategoryCreateBuilder withAuthorization(Authorization auth) {
+  CategoryUpdateBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }
 
   @override
-  CategoryCreateBuilder withCallback(Callback requestCallback) {
+  CategoryUpdateBuilder withCallback(Callback requestCallback) {
     callback = requestCallback;
     return this;
   }
 
   @override
-  CategoryCreateBuilder withCancellationToken(CancelToken token) {
+  CategoryUpdateBuilder withCancellationToken(CancelToken token) {
     cancelToken = token;
     return this;
   }
 
   @override
-  CategoryCreateBuilder withEndpoint(String newEndpoint) {
+  CategoryUpdateBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
     return this;
   }
 
   @override
-  CategoryCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryCreateBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
+  CategoryUpdateBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
