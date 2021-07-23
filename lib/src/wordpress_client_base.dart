@@ -6,6 +6,7 @@ import 'builders/delete/me_delete.dart';
 import 'builders/delete/media_delete.dart';
 import 'builders/delete/post_delete.dart';
 import 'builders/delete/user_delete.dart';
+import 'builders/list/category_list.dart';
 import 'builders/list/media_list.dart';
 import 'builders/list/post_list.dart';
 import 'builders/list/user_list.dart';
@@ -21,11 +22,13 @@ import 'builders/update/user_update.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/null_reference_exception.dart';
+import 'interface/category.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
+import 'responses/category_response.dart';
 import 'responses/media_response.dart';
 import 'responses/post_response.dart';
 import 'responses/response_container.dart';
@@ -58,6 +61,7 @@ class WordpressClient {
     _interfaces['users'] = UsersInterface<User>();
     _interfaces['me'] = MeInterface<User>();
     _interfaces['media'] = MediaInterface<Media>();
+    _interfaces['category'] = CategoryInterface<Category>();
   }
 
   T getInterfaceByName<T>(String name) {
@@ -220,6 +224,14 @@ class WordpressClient {
     return getInterfaceByName<MediaInterface<Media>>('media').update<Media>(
       typeResolver: Media(),
       request: builder(MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<List<Category>>> listCategory(Request Function(CategoryListBuilder) builder) async {
+    return getInterfaceByName<CategoryInterface<Category>>('category').list<Category>(
+      resolver: Category(),
+      request: builder(CategoryListBuilder().withEndpoint('category').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

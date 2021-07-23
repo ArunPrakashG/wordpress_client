@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/responses/error_container.dart';
-import 'package:wordpress_client/src/responses/error_response.dart';
+
+import '../responses/error_container.dart';
+import '../responses/error_response.dart';
 
 class Callback {
   final void Function(Exception) unhandledExceptionCallback;

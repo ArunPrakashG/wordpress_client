@@ -3,7 +3,8 @@ enum HttpMethod { PUT, POST, GET, DELETE, UPDATE, HEAD, OPTIONS, PATCH, TRACE }
 enum FilterOrder { ASCENDING, DESCENDING }
 enum FilterPostSortOrder { DATE, AUTHOR, ID, INCLUDE, MODIFIED, PARENT, RELEVANCE, SLUG, INCLUDESLUGS, TITLE, EMAIL, URL, NAME }
 enum FilterUserSortOrder { ID, INCLUDE, NAME, REGISTERED_DATE, SLUG, INCLUDE_SLUGS, EMAIL, URL }
-enum FilterScope { VIEW, EMBED, EDIT }
+enum FilterContext { VIEW, EMBED, EDIT }
+enum FilterCategorySortOrder { ID, INCLUDE, NAME, SLUG, INCLUDE_SLUGS, TERM_GROUP, DESCRIPTION, COUNT }
 enum MediaFilterStatus { INHERIT }
 enum TaxonomyRelation { AND, OR }
 enum ContentStatus { PUBLISH, FUTURE, DRAFT, PENDING, PRIVATE }

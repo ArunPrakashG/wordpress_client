@@ -48,7 +48,7 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
 
   UserListBuilder();
 
-  UserListBuilder withContext(FilterScope context) {
+  UserListBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }

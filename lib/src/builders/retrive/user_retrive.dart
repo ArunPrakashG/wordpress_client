@@ -38,7 +38,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
     return this;
   }
 
-  UserRetriveBuilder withContext(FilterScope context) {
+  UserRetriveBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }

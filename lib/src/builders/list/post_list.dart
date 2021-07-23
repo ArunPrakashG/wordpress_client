@@ -240,15 +240,15 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
     return this;
   }
 
-  PostListBuilder withScope(FilterScope scope) {
+  PostListBuilder withScope(FilterContext scope) {
     switch (scope) {
-      case FilterScope.VIEW:
+      case FilterContext.VIEW:
         _context = 'view';
         break;
-      case FilterScope.EMBED:
+      case FilterContext.EMBED:
         _context = 'embed';
         break;
-      case FilterScope.EDIT:
+      case FilterContext.EDIT:
         _context = 'edit';
         break;
     }

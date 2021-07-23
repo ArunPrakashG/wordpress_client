@@ -32,7 +32,7 @@ class MeRetriveBuilder implements IQueryBuilder<MeRetriveBuilder, User> {
 
   String _context = 'view';
 
-  MeRetriveBuilder withContext(FilterScope context) {
+  MeRetriveBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }

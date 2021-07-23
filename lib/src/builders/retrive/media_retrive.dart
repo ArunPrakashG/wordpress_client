@@ -38,7 +38,7 @@ class MediaRetriveBuilder implements IQueryBuilder<MediaRetriveBuilder, Media> {
     return this;
   }
 
-  MediaRetriveBuilder withContext(FilterScope context) {
+  MediaRetriveBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }

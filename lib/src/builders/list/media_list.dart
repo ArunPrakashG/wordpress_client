@@ -183,7 +183,7 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
     return this;
   }
 
-  MediaListBuilder withContext(FilterScope context) {
+  MediaListBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }

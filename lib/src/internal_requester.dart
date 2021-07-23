@@ -15,7 +15,6 @@ import 'responses/response_container.dart';
 import 'utilities/callback.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
-import 'utilities/pair.dart';
 import 'utilities/serializable_instance.dart';
 import 'wordpress_client_base.dart';
 

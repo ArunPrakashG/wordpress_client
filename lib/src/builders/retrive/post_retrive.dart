@@ -39,15 +39,15 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
     return this;
   }
 
-  PostRetriveBuilder withScope(FilterScope scope) {
+  PostRetriveBuilder withScope(FilterContext scope) {
     switch (scope) {
-      case FilterScope.VIEW:
+      case FilterContext.VIEW:
         _context = 'view';
         break;
-      case FilterScope.EMBED:
+      case FilterContext.EMBED:
         _context = 'embed';
         break;
-      case FilterScope.EDIT:
+      case FilterContext.EDIT:
         _context = 'edit';
         break;
     }
