@@ -1,4 +1,5 @@
 enum Status { OPEN, CLOSED }
+enum CommentStatus { APPROVED, PENDING }
 enum HttpMethod { PUT, POST, GET, DELETE, UPDATE, HEAD, OPTIONS, PATCH, TRACE }
 enum FilterOrder { ASCENDING, DESCENDING }
 enum FilterPostSortOrder { DATE, AUTHOR, ID, INCLUDE, MODIFIED, PARENT, RELEVANCE, SLUG, INCLUDESLUGS, TITLE, EMAIL, URL, NAME }
@@ -26,6 +27,14 @@ ContentStatus getContentStatusFromValue(String value) {
   }
 
   return ContentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
+}
+
+CommentStatus getCommentStatusFromValue(String value) {
+  if (value == null) {
+    return CommentStatus.PENDING;
+  }
+
+  return CommentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
 MediaFilterStatus getMediaFilterStatusFromValue(String value) {
