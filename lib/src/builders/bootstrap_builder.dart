@@ -1,3 +1,5 @@
+import 'package:wordpress_client/src/authorization_builder.dart';
+
 import '../authorization.dart';
 import '../client_configuration.dart';
 import '../utilities/cookie_container.dart';
@@ -28,8 +30,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorization(Authorization defaultAuthorization) {
-    _defaultAuthorization = defaultAuthorization;
+  BootstrapBuilder withDefaultAuthorization(Authorization Function(AuthorizationBuilder) authorizationBuilder) {
+    _defaultAuthorization = authorizationBuilder(AuthorizationBuilder());
     return this;
   }
 

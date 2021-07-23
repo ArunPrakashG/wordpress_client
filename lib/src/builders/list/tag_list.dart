@@ -2,14 +2,14 @@ import 'package:dio/src/cancel_token.dart';
 
 import '../../authorization.dart';
 import '../../enums.dart';
-import '../../responses/category_response.dart';
+import '../../responses/tag_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Category>> {
+class TagListBuilder implements IQueryBuilder<TagListBuilder, List<Tag>> {
   @override
   Authorization authorization;
 
@@ -29,7 +29,7 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
   List<Pair<String, String>> queryParameters;
 
   @override
-  bool Function(List<Category>) responseValidationDelegate;
+  bool Function(List<Tag>) responseValidationDelegate;
 
   String _context;
   int _page = 1;
@@ -40,73 +40,73 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
   String _orderBy;
   String _order;
   List<String> _slug;
-  int _parent;
   int _post;
+  int _offset;
   bool _hideEmpty;
 
-  CategoryListBuilder withContext(FilterContext context) {
+  TagListBuilder withResultOffset(int offset) {
+    _offset = offset;
+    return this;
+  }
+
+  TagListBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
     return this;
   }
 
-  CategoryListBuilder withPage(int page) {
+  TagListBuilder withPage(int page) {
     _page = page;
     return this;
   }
 
-  CategoryListBuilder withPerPage(int perPage) {
+  TagListBuilder withPerPage(int perPage) {
     _perPage = perPage;
     return this;
   }
 
-  CategoryListBuilder withSearchQuery(String search) {
+  TagListBuilder withSearchQuery(String search) {
     _search = search;
     return this;
   }
 
-  CategoryListBuilder withExcludedIds(List<int> exclude) {
+  TagListBuilder withExcludedIds(List<int> exclude) {
     _exclude = exclude;
     return this;
   }
 
-  CategoryListBuilder withIncludedIds(List<int> include) {
+  TagListBuilder withIncludedIds(List<int> include) {
     _include = include;
     return this;
   }
 
-  CategoryListBuilder withOrderBy(FilterCategoryTagSortOrder orderBy) {
+  TagListBuilder withOrderBy(FilterCategoryTagSortOrder orderBy) {
     _orderBy = orderBy.toString().split('.').last.toLowerCase();
     return this;
   }
 
-  CategoryListBuilder withOrder(FilterOrder order) {
+  TagListBuilder withOrder(FilterOrder order) {
     _order = order == FilterOrder.ASCENDING ? 'asc' : 'desc';
     return this;
   }
 
-  CategoryListBuilder withSlug(List<String> slug) {
+  TagListBuilder withSlug(List<String> slug) {
     _slug = slug;
     return this;
   }
 
-  CategoryListBuilder withParent(int parent) {
-    _parent = parent;
-    return this;
-  }
-
-  CategoryListBuilder withPost(int post) {
+  TagListBuilder withPost(int post) {
     _post = post;
     return this;
   }
 
-  CategoryListBuilder withHideEmptyStatus(bool hideEmpty) {
+  TagListBuilder withHideEmptyStatus(bool hideEmpty) {
     _hideEmpty = hideEmpty;
     return this;
   }
 
   @override
-  Request<List<Category>> build() {
-    return Request<List<Category>>(
+  Request<List<Tag>> build() {
+    return Request<List<Tag>>(
       endpoint,
       isListRequest: true,
       callback: callback,
@@ -125,62 +125,62 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
       if (_page != null) 'page': _page.toString(),
       if (_perPage != null) 'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
+      if (_offset != null && _offset > 0) 'offset': _offset.toString(),
       if (_exclude != null && _exclude.isNotEmpty) 'exclude': _exclude.join(','),
       if (_include != null && _include.isNotEmpty) 'include': _include.join(','),
       if (!isNullOrEmpty(_orderBy)) 'orderby': _orderBy,
       if (!isNullOrEmpty(_order)) 'order': _order,
       if (_slug != null && _slug.isNotEmpty) 'slug': _slug.join(','),
-      if (_parent != null) 'parent': _parent.toString(),
       if (_post != null) 'post': _post.toString(),
       if (_hideEmpty != null && _hideEmpty) 'hide_empty': 'true',
     };
   }
 
   @override
-  CategoryListBuilder initializeWithDefaultValues() {
+  TagListBuilder initializeWithDefaultValues() {
     return this;
   }
 
   @override
-  CategoryListBuilder withAuthorization(Authorization auth) {
+  TagListBuilder withAuthorization(Authorization auth) {
     authorization = auth;
     return this;
   }
 
   @override
-  CategoryListBuilder withCallback(Callback requestCallback) {
+  TagListBuilder withCallback(Callback requestCallback) {
     callback = requestCallback;
     return this;
   }
 
   @override
-  CategoryListBuilder withCancellationToken(CancelToken token) {
+  TagListBuilder withCancellationToken(CancelToken token) {
     cancelToken = token;
     return this;
   }
 
   @override
-  CategoryListBuilder withEndpoint(String newEndpoint) {
+  TagListBuilder withEndpoint(String newEndpoint) {
     endpoint = newEndpoint;
     return this;
   }
 
   @override
-  CategoryListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  TagListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryListBuilder withResponseValidationOverride(bool Function(List<Category>) responseDelegate) {
+  TagListBuilder withResponseValidationOverride(bool Function(List<Tag>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

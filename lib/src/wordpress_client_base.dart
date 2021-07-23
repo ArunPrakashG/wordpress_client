@@ -1,28 +1,4 @@
-import 'builders/bootstrap_builder.dart';
-import 'builders/create/category_create.dart';
-import 'builders/create/media_create.dart';
-import 'builders/create/post_create.dart';
-import 'builders/create/user_create.dart';
-import 'builders/delete/category_delete.dart';
-import 'builders/delete/me_delete.dart';
-import 'builders/delete/media_delete.dart';
-import 'builders/delete/post_delete.dart';
-import 'builders/delete/user_delete.dart';
-import 'builders/list/category_list.dart';
-import 'builders/list/media_list.dart';
-import 'builders/list/post_list.dart';
-import 'builders/list/user_list.dart';
-import 'builders/request.dart';
-import 'builders/retrive/category_retrive.dart';
-import 'builders/retrive/me_retrive.dart';
-import 'builders/retrive/media_retrive.dart';
-import 'builders/retrive/post_retrive.dart';
-import 'builders/retrive/user_retrive.dart';
-import 'builders/update/category_update.dart';
-import 'builders/update/me_update.dart';
-import 'builders/update/media_update.dart';
-import 'builders/update/post_update.dart';
-import 'builders/update/user_update.dart';
+import 'builders_import.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/interface_do_not_exist_exception.dart';
@@ -31,13 +7,10 @@ import 'interface/category.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
+import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
-import 'responses/category_response.dart';
-import 'responses/media_response.dart';
-import 'responses/post_response.dart';
-import 'responses/response_container.dart';
-import 'responses/user_response.dart';
+import 'responses_import.dart';
 import 'utilities/helpers.dart';
 
 class WordpressClient {
@@ -66,7 +39,8 @@ class WordpressClient {
     _interfaces['users'] = UsersInterface<User>();
     _interfaces['me'] = MeInterface<User>();
     _interfaces['media'] = MediaInterface<Media>();
-    _interfaces['category'] = CategoryInterface<Category>();
+    _interfaces['categories'] = CategoryInterface<Category>();
+    _interfaces['tags'] = TagInterface<Tag>();
   }
 
   T getInterfaceByName<T>(String name) {
@@ -238,41 +212,81 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Category>>> listCategory(Request Function(CategoryListBuilder) builder) async {
-    return getInterfaceByName<CategoryInterface<Category>>('category').list<Category>(
+    return getInterfaceByName<CategoryInterface<Category>>('categories').list<Category>(
       typeResolver: Category(),
-      request: builder(CategoryListBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      request: builder(CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
 
   Future<ResponseContainer<Category>> retriveCategory(Request Function(CategoryRetriveBuilder) builder) async {
-    return getInterfaceByName<CategoryInterface<Category>>('category').retrive<Category>(
+    return getInterfaceByName<CategoryInterface<Category>>('categories').retrive<Category>(
       typeResolver: Category(),
-      request: builder(CategoryRetriveBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      request: builder(CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
 
   Future<ResponseContainer<Category>> deleteCategory(Request Function(CategoryDeleteBuilder) builder) async {
-    return getInterfaceByName<CategoryInterface<Category>>('category').delete<Category>(
+    return getInterfaceByName<CategoryInterface<Category>>('categories').delete<Category>(
       typeResolver: Category(),
-      request: builder(CategoryDeleteBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      request: builder(CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
 
   Future<ResponseContainer<Category>> updateCategory(Request Function(CategoryUpdateBuilder) builder) async {
-    return getInterfaceByName<CategoryInterface<Category>>('category').update<Category>(
+    return getInterfaceByName<CategoryInterface<Category>>('categories').update<Category>(
       typeResolver: Category(),
-      request: builder(CategoryUpdateBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      request: builder(CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
 
   Future<ResponseContainer<Category>> createCategory(Request Function(CategoryCreateBuilder) builder) async {
-    return getInterfaceByName<CategoryInterface<Category>>('category').create<Category>(
+    return getInterfaceByName<CategoryInterface<Category>>('categories').create<Category>(
       typeResolver: Category(),
-      request: builder(CategoryCreateBuilder().withEndpoint('category').initializeWithDefaultValues()),
+      request: builder(CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Tag>> createTag(Request Function(TagCreateBuilder) builder) async {
+    return getInterfaceByName<TagInterface<Tag>>('tags').create<Tag>(
+      typeResolver: Tag(),
+      request: builder(TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Tag>> updateTag(Request Function(TagUpdateBuilder) builder) async {
+    return getInterfaceByName<TagInterface<Tag>>('tags').update<Tag>(
+      typeResolver: Tag(),
+      request: builder(TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Tag>> retriveTag(Request Function(TagRetriveBuilder) builder) async {
+    return getInterfaceByName<TagInterface<Tag>>('tags').retrive<Tag>(
+      typeResolver: Tag(),
+      request: builder(TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<List<Tag>>> listTag(Request Function(TagListBuilder) builder) async {
+    return getInterfaceByName<TagInterface<Tag>>('tags').list<Tag>(
+      typeResolver: Tag(),
+      request: builder(TagListBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Tag>> deleteTag(Request Function(TagDeleteBuilder) builder) async {
+    return getInterfaceByName<TagInterface<Tag>>('tags').delete<Tag>(
+      typeResolver: Tag(),
+      request: builder(TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }

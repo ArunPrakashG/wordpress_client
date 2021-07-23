@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../wordpress_client.dart';
+import '../enums.dart';
 import '../utilities/serializable_instance.dart';
 import 'partial_responses/content.dart';
 import 'partial_responses/links.dart';
