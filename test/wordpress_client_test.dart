@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:wordpress_client/src/authorization_builder.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
@@ -78,6 +77,19 @@ void main() async {
   });
   */
 
+  test('Get Current User', () async {
+    final response = await client.retriveMe(
+      (builder) => builder.withCallback(Callback(
+        requestErrorCallback: (error) {
+          print('Error: ' + error.errorResponse.message);
+        },
+      )).build(),
+    );
+
+    expect(200, response.responseCode);
+    expect('arunprakash', response.value.slug);
+  });
+
   test(
     'Create Post',
     () async {
@@ -91,16 +103,16 @@ void main() async {
             .withExcerpt('A test post!')
             .withTitle('Generated Sample Post')
             .withSlug('generated-post-slug')
-            .withStatus(ContentStatus.PUBLISH)
+            .withStatus(ContentStatus.PENDING)
             .withFeaturedMedia(468930)
             .withAuthor(3)
-            .withAuthorization(
+            /*.withAuthorization(
               AuthorizationBuilder()
                   .withUserName(json['username'])
                   .withPassword(json['application_password'])
                   .withType(AuthorizationType.BASIC)
                   .build(),
-            )
+            )*/
             .withCallback(Callback(
           requestErrorCallback: (error) {
             print('Error: ' + error.errorResponse.message);
@@ -108,7 +120,7 @@ void main() async {
         )).build(),
       );
 
-      expect(200, response.responseCode);
+      expect(201, response.responseCode);
       expect('Generated Sample Post', response.value.title.parsedText);
       expect('generated-post-slug', response.value.slug);
     },

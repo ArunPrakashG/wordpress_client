@@ -54,6 +54,9 @@ String base64Encode(String text) {
   return base64.encode(utf8.encode(text));
 }
 
+// check if the number is within the specified range
+bool isInRange(int value, int min, int max) => value >= min && value <= max;
+
 String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
 String getMIMETypeFromExtension(String extension) {

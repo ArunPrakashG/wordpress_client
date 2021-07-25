@@ -106,6 +106,15 @@ class InternalRequester {
       final response = await _client.fetch(options);
       watch.stop();
 
+      if (response == null || !isInRange(response.statusCode, 200, 299)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
+
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
@@ -165,6 +174,15 @@ class InternalRequester {
       final response = await _client.fetch(options);
       watch.stop();
 
+      if (response == null || !isInRange(response.statusCode, 200, 299)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
+
       return ResponseContainer<T>(
         null,
         responseCode: response.statusCode,
@@ -211,6 +229,15 @@ class InternalRequester {
     try {
       final response = await _client.fetch(options);
       watch.stop();
+
+      if (response == null || !isInRange(response.statusCode, 200, 299)) {
+        return ResponseContainer<List<T>>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
 
       final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
 
@@ -270,6 +297,15 @@ class InternalRequester {
       final response = await _client.fetch(options);
       watch.stop();
 
+      if (response == null || !isInRange(response.statusCode, 200, 299)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
+
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
@@ -327,6 +363,15 @@ class InternalRequester {
     try {
       final response = await _client.fetch(options);
       watch.stop();
+
+      if (response == null || !isInRange(response.statusCode, 200, 299)) {
+        return ResponseContainer<T>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
@@ -404,23 +449,18 @@ class InternalRequester {
 
     bool hasAuthorizedAlready = false;
 
-    if (request.shouldAuthorize && !hasAuthorizedAlready) {
-      options = await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback);
-
-      if (options == null) {
-        return null;
-      }
-
+    if (request.shouldAuthorize &&
+        !hasAuthorizedAlready &&
+        await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback)) {
+      options.headers['Authorization'] = request.authorization.authString;
       hasAuthorizedAlready = true;
     }
 
-    if (_defaultAuthorization != null && !_defaultAuthorization.isDefault && !hasAuthorizedAlready) {
-      options = await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback);
-
-      if (options == null) {
-        return null;
-      }
-
+    if (_defaultAuthorization != null &&
+        !_defaultAuthorization.isDefault &&
+        !hasAuthorizedAlready &&
+        await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback)) {
+      options.headers['Authorization'] = _defaultAuthorization.authString;
       hasAuthorizedAlready = true;
     }
 

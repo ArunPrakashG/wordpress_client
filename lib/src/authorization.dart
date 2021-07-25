@@ -4,9 +4,10 @@ import 'utilities/helpers.dart';
 class Authorization {
   final String userName;
   final String password;
-  final String jwtToken;
+  String jwtToken;
   final AuthorizationType authType;
   bool isValidatedOnce;
+  String authString;
 
   Authorization({
     this.userName,
