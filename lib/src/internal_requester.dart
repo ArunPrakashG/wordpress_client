@@ -1,31 +1,22 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 
 import 'authorization.dart';
+import 'authorization_handler.dart';
 import 'builders/request.dart';
 import 'client_configuration.dart';
-import 'enums.dart';
-import 'exceptions/authorization_failed_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
-import 'responses/jwt_token_response.dart';
-import 'responses/jwt_validate_response.dart';
 import 'responses/response_container.dart';
-import 'utilities/callback.dart';
 import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
-import 'wordpress_client_base.dart';
-
-part 'authorization_handler.dart';
 
 const int defaultRequestTimeout = 60 * 1000;
 
 class InternalRequester {
   Dio _client;
   String _baseUrl;
-  AuthorizationHandler _defaultAuthorization;
+  Authorization _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
@@ -53,14 +44,7 @@ class InternalRequester {
     _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
 
     if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
-      _defaultAuthorization = AuthorizationHandler(
-        configuration.defaultAuthorization.userName,
-        configuration.defaultAuthorization.password,
-        configuration.defaultAuthorization.authType,
-        configuration.defaultAuthorization.jwtToken,
-      );
-
-      _handleDefaultAuthorization(_defaultAuthorization);
+      _defaultAuthorization = configuration.defaultAuthorization;
     }
 
     if (configuration.defaultUserAgent != null) {
@@ -85,44 +69,7 @@ class InternalRequester {
   }
 
   void removeDefaultAuthorization() {
-    if (_defaultAuthorization != null) {
-      _defaultAuthorization.logout();
-    }
-
     _defaultAuthorization = null;
-  }
-
-  void _handleDefaultAuthorization(AuthorizationHandler auth) async {
-    if (auth == null || auth.isDefault) {
-      return;
-    }
-
-    if (_defaultAuthorization != null && !_defaultAuthorization.isDefault) {
-      return;
-    }
-
-    if (auth.isValidAuth) {
-      _defaultAuthorization = auth;
-      _client.options.headers['Authorization'] = '${_defaultAuthorization._scheme} ${_defaultAuthorization._encryptedAccessToken}';
-      return;
-    }
-
-    switch (auth._authType) {
-      case AuthorizationType.JWT:
-        auth.handleJwtAuthentication(_client);
-
-        if (!auth.isValidAuth) {
-          throw AuthorizationFailedException();
-        }
-
-        break;
-      case AuthorizationType.BASIC:
-        // already handled in constructor
-        break;
-    }
-
-    _defaultAuthorization = auth;
-    _client.options.headers['Authorization'] = '${_defaultAuthorization._scheme} ${_defaultAuthorization._encryptedAccessToken}';
   }
 
   bool _handleResponse<T>(Request<T> request, T responseContainer) {
@@ -457,7 +404,7 @@ class InternalRequester {
 
     bool hasAuthorizedAlready = false;
 
-    if (request.shouldAuthorize) {
+    if (request.shouldAuthorize && !hasAuthorizedAlready) {
       options = await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback);
 
       if (options == null) {
@@ -467,17 +414,8 @@ class InternalRequester {
       hasAuthorizedAlready = true;
     }
 
-    if (_defaultAuthorization != null && _defaultAuthorization.isValidAuth && !hasAuthorizedAlready) {
-      options = await AuthorizationHandler.authorizeRequest(
-          options,
-          _client,
-          Authorization(
-            userName: _defaultAuthorization._userName,
-            password: _defaultAuthorization._password,
-            authType: _defaultAuthorization._authType,
-            jwtToken: _defaultAuthorization._jwtToken,
-          ),
-          callback: request.callback);
+    if (_defaultAuthorization != null && !_defaultAuthorization.isDefault && !hasAuthorizedAlready) {
+      options = await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback);
 
       if (options == null) {
         return null;

@@ -6,11 +6,12 @@ class Authorization {
   final String password;
   final String jwtToken;
   final AuthorizationType authType;
+  bool isValidatedOnce;
 
   Authorization({
     this.userName,
     this.password,
-    this.jwtToken,
+    this.jwtToken = null,
     this.authType,
   });
 
