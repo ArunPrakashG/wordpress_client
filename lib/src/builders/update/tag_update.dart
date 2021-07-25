@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
-import 'package:wordpress_client/src/responses/tag_response.dart';
 
 import '../../authorization.dart';
 import '../../enums.dart';
-import '../../responses/category_response.dart';
+import '../../responses/tag_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';

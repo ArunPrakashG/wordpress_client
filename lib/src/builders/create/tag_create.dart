@@ -1,14 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:wordpress_client/src/builders/request.dart';
-import 'package:wordpress_client/src/authorization.dart';
 import 'package:dio/src/cancel_token.dart';
-import 'package:wordpress_client/src/responses/category_response.dart';
-import 'package:wordpress_client/src/responses/tag_response.dart';
-import 'package:wordpress_client/src/utilities/helpers.dart';
-import 'package:wordpress_client/src/utilities/pair.dart';
-import 'package:wordpress_client/src/utilities/callback.dart';
 
+import '../../authorization.dart';
 import '../../enums.dart';
+import '../../responses/tag_response.dart';
+import '../../utilities/callback.dart';
+import '../../utilities/helpers.dart';
+import '../../utilities/pair.dart';
+import '../request.dart';
 import '../request_builder_base.dart';
 
 class TagCreateBuilder implements IQueryBuilder<TagCreateBuilder, Tag> {

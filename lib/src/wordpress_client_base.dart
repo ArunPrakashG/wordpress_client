@@ -1,15 +1,20 @@
+import 'builders/create/comment_create.dart';
+import 'builders/delete/comment_delete.dart';
+import 'builders/list/comment_list.dart';
 import 'builders_import.dart';
 import 'client_configuration.dart';
 import 'exceptions/client_not_initialized_exception.dart';
 import 'exceptions/interface_do_not_exist_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'interface/category.dart';
+import 'interface/comments.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
+import 'responses/comment_response.dart';
 import 'responses_import.dart';
 import 'utilities/helpers.dart';
 
@@ -41,6 +46,7 @@ class WordpressClient {
     _interfaces['media'] = MediaInterface<Media>();
     _interfaces['categories'] = CategoryInterface<Category>();
     _interfaces['tags'] = TagInterface<Tag>();
+    _interfaces['comments'] = CommentInterface<Comment>();
   }
 
   T getInterfaceByName<T>(String name) {
@@ -287,6 +293,30 @@ class WordpressClient {
     return getInterfaceByName<TagInterface<Tag>>('tags').delete<Tag>(
       typeResolver: Tag(),
       request: builder(TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<List<Comment>>> listComment(Request Function(CommentListBuilder) builder) async {
+    return getInterfaceByName<CommentInterface<Comment>>('comments').list<Comment>(
+      typeResolver: Comment(),
+      request: builder(CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Comment>> deleteComment(Request Function(CommentDeleteBuilder) builder) async {
+    return getInterfaceByName<CommentInterface<Comment>>('comments').delete<Comment>(
+      typeResolver: Comment(),
+      request: builder(CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues()),
+      requesterClient: _requester,
+    );
+  }
+
+  Future<ResponseContainer<Comment>> createComment(Request Function(CommentCreateBuilder) builder) async {
+    return getInterfaceByName<CommentInterface<Comment>>('comments').create<Comment>(
+      typeResolver: Comment(),
+      request: builder(CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues()),
       requesterClient: _requester,
     );
   }
