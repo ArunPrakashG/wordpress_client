@@ -33,7 +33,7 @@ class PostDeleteBuilder implements IQueryBuilder<PostDeleteBuilder, Post> {
   int _id = -1;
   bool _force = false;
 
-  PostDeleteBuilder withId(int id) {
+  PostDeleteBuilder withPostId(int id) {
     _id = id;
     endpoint += '/$_id';
     return this;

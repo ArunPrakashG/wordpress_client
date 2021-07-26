@@ -91,7 +91,7 @@ void main() async {
   });
 
   test(
-    'Create Post',
+    'Create Post & Delete Post',
     () async {
       final response = await client.createPost(
         (builder) => builder
@@ -106,13 +106,6 @@ void main() async {
             .withStatus(ContentStatus.PENDING)
             .withFeaturedMedia(468930)
             .withAuthor(3)
-            /*.withAuthorization(
-              AuthorizationBuilder()
-                  .withUserName(json['username'])
-                  .withPassword(json['application_password'])
-                  .withType(AuthorizationType.BASIC)
-                  .build(),
-            )*/
             .withCallback(Callback(
           requestErrorCallback: (error) {
             print('Error: ' + error.errorResponse.message);
@@ -123,6 +116,20 @@ void main() async {
       expect(201, response.responseCode);
       expect('Generated Sample Post', response.value.title.parsedText);
       expect('generated-post-slug', response.value.slug);
+
+      final postId = response.value.id;
+
+      final deleteResponse = await client.deletePost(
+        (builder) => builder.withPostId(postId).withCallback(
+          Callback(
+            requestErrorCallback: (error) {
+              print('Error: ' + error.errorResponse.message);
+            },
+          ),
+        ).build(),
+      );
+
+      expect(200, deleteResponse.responseCode);
     },
   );
 }
