@@ -27,5 +27,5 @@ class AuthorizationBuilder {
     return this;
   }
 
-  Authorization build() => Authorization(userName: _userName, password: _password, jwtToken: _jwtToken, authType: _type);
+  Authorization build() => Authorization(userName: _userName, password: _password, encryptedToken: _jwtToken, authType: _type);
 }

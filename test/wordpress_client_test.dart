@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
+import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
   WordpressClient client;
+  TempMailClient tempMailClient;
   Map<String, dynamic> json;
 
   json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
@@ -16,12 +19,19 @@ void main() async {
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(60)
+        .withStatisticDelegate((requestUrl, endpoint, count) {
+          print('Request URL: $requestUrl');
+          print('Endpoint: $endpoint');
+          print('Endpoint called count: $count');
+        })
         .withDefaultAuthorization(
           (authBuilder) => authBuilder.withUserName(json['username']).withPassword(json['password']).withType(AuthorizationType.JWT).build(),
         )
         .build(),
   );
-/*
+
+  tempMailClient = TempMailClient();
+
   test('List Posts', () async {
     final response = await client.listPost(
       (builder) => builder.withPerPage(20).withPageNumber(1).build(),
@@ -75,7 +85,6 @@ void main() async {
     expect(200, response.responseCode);
     expect(468894, response.value.id);
   });
-  */
 
   test('Get Current User', () async {
     final response = await client.retriveMe(
@@ -132,4 +141,41 @@ void main() async {
       expect(200, deleteResponse.responseCode);
     },
   );
+
+  test('Create User & Delete User', () async {
+    final mailResponse = await tempMailClient.getEmails(1);
+    final email = mailResponse[0];
+
+    final response = await client.createUser(
+      (builder) => builder
+          .withEmail(email)
+          .withDescription('Generate User')
+          .withDisplayName('gen_user')
+          .withUserName('generated_user_test')
+          .withPassword(getRandString(13))
+          .withSlug('gen_user_slug')
+          .withCallback(
+        Callback(
+          requestErrorCallback: (error) {
+            print('Error: ' + error.errorResponse.message);
+          },
+        ),
+      ).build(),
+    );
+
+    expect(201, response.responseCode);
+    expect('gen_user_slug', response.value.slug);
+
+    final deleteUserResponse = await client.deleteUser(
+      (builder) => builder.withUserId(response.value.id).withForce(true).withReassign(3).withCallback(
+        Callback(
+          requestErrorCallback: (error) {
+            print('Error: ' + error.errorResponse.message);
+          },
+        ),
+      ).build(),
+    );
+
+    expect(200, deleteUserResponse.responseCode);
+  });
 }

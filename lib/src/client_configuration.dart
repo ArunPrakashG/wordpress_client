@@ -11,6 +11,7 @@ class BootstrapConfiguration {
   final bool shouldFollowRedirects;
   final int maxRedirects;
   final CookieContainer cookieContainer;
+  final void Function(String, String, int) statisticsDelegate;
 
   BootstrapConfiguration({
     this.cookieContainer,
@@ -21,5 +22,6 @@ class BootstrapConfiguration {
     this.defaultHeaders,
     this.shouldFollowRedirects,
     this.maxRedirects,
+    this.statisticsDelegate,
   });
 }

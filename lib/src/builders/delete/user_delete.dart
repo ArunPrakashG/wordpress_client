@@ -33,7 +33,7 @@ class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   bool _force = false;
   int _reassign = -1;
 
-  UserDeleteBuilder withId(int id) {
+  UserDeleteBuilder withUserId(int id) {
     endpoint += '/$id';
     return this;
   }

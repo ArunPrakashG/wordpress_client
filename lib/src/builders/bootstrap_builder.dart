@@ -14,6 +14,12 @@ class BootstrapBuilder {
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
   CookieContainer _cookieContainer;
+  void Function(String, String, int) _statisticsDelegate;
+
+  BootstrapBuilder withStatisticDelegate(void Function(String, String, int) delegate){
+    _statisticsDelegate = delegate;
+    return this;
+  }
 
   BootstrapBuilder withCookieContainer(CookieContainer container) {
     _cookieContainer = container;
@@ -66,6 +72,7 @@ class BootstrapBuilder {
       defaultHeaders: _defaultHeaders,
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
+      statisticsDelegate: _statisticsDelegate
     );
   }
 }

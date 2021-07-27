@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:html/parser.dart';
 
@@ -52,6 +53,12 @@ String base64Encode(String text) {
   }
 
   return base64.encode(utf8.encode(text));
+}
+
+String getRandString(int len) {
+  var random = Random.secure();
+  var values = List<int>.generate(len, (i) => random.nextInt(255));
+  return base64UrlEncode(values);
 }
 
 // check if the number is within the specified range

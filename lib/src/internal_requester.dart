@@ -18,6 +18,8 @@ class InternalRequester {
   String _baseUrl;
   Authorization _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
+  static final Map<String, int> _endPointStatistics = Map<String, int>();
+  static void Function(String, String, int) _statisticsDelegate;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
     if (baseUrl == null) {
@@ -46,6 +48,8 @@ class InternalRequester {
     if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
       _defaultAuthorization = configuration.defaultAuthorization;
     }
+
+    _statisticsDelegate = configuration.statisticsDelegate;
 
     if (configuration.defaultUserAgent != null) {
       _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
@@ -433,6 +437,8 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request path is invalid.');
     }
 
+    _invokeStatisticsCallback(requestUri.toString(), request.endpoint);
+
     RequestOptions options = RequestOptions(
       path: requestUri.toString(),
       method: request.httpMethod.toString().split('.').last,
@@ -464,8 +470,6 @@ class InternalRequester {
       hasAuthorizedAlready = true;
     }
 
-    print('Request URL: ${options.path}');
-
     if (request.headers != null && request.headers.isNotEmpty) {
       for (final pair in request.headers) {
         options.headers[pair.key] = pair.value;
@@ -473,5 +477,17 @@ class InternalRequester {
     }
 
     return options;
+  }
+
+  void _invokeStatisticsCallback(String requestUrl, String endpoint) {
+    if (_endPointStatistics[endpoint] == null) {
+      _endPointStatistics[endpoint] = 1;
+    } else {
+      _endPointStatistics[endpoint]++;
+    }
+
+    if (_statisticsDelegate != null) {
+      _statisticsDelegate(requestUrl, endpoint, _endPointStatistics[endpoint]);
+    }
   }
 }

@@ -11,7 +11,7 @@ import 'utilities/helpers.dart';
 import 'wordpress_client_base.dart';
 
 class AuthorizationHandler {
-  AuthorizationHandler(this._userName, this._password, this._authType, this._hasValidatedOnce, [this._jwtToken = null]) {
+  AuthorizationHandler(this._userName, this._password, this._authType, [this._hasValidatedOnce = false, this._jwtToken = null]) {
     _scheme = '';
     _encryptedAccessToken = '';
     _hasValidatedOnce = false;
@@ -38,7 +38,7 @@ class AuthorizationHandler {
   AuthorizationType _authType;
   String _scheme;
   String _encryptedAccessToken;
-  bool _hasValidatedOnce = false;
+  bool _hasValidatedOnce;
 
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
 
@@ -81,6 +81,7 @@ class AuthorizationHandler {
       }
 
       _encryptedAccessToken = JwtToken.fromMap(response.data).token;
+      print('JWT Token received');
       _hasValidatedOnce = !isNullOrEmpty(_encryptedAccessToken);
       return _hasValidatedOnce;
     } catch (e) {
@@ -115,6 +116,7 @@ class AuthorizationHandler {
         return false;
       }
 
+      print('JWT token validated');
       return _hasValidatedOnce = validationResult.code == 'jwt_auth_valid_token';
     } catch (e) {
       if (callback != null && callback.unhandledExceptionCallback != null) {
@@ -130,7 +132,11 @@ class AuthorizationHandler {
       return false;
     }
 
-    AuthorizationHandler handler = AuthorizationHandler(auth.userName, auth.password, auth.authType, auth.isValidatedOnce, auth.jwtToken);
+    if (auth.isValidatedOnce && auth.encryptedToken != null) {
+      return true;
+    }
+
+    AuthorizationHandler handler = AuthorizationHandler(auth.userName, auth.password, auth.authType, auth.isValidatedOnce, auth.encryptedToken);
 
     if (handler._authType == AuthorizationType.JWT) {
       if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
@@ -147,7 +153,7 @@ class AuthorizationHandler {
 
     auth.authString = '${handler._scheme} ${handler._encryptedAccessToken}';
     auth.isValidatedOnce = true;
-    auth.jwtToken = handler._encryptedAccessToken;
-    return !isNullOrEmpty(auth.jwtToken);
+    auth.encryptedToken = handler._encryptedAccessToken;
+    return !isNullOrEmpty(auth.encryptedToken);
   }
 }
