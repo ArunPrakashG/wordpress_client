@@ -11,6 +11,7 @@ class Post implements ISerializable<Post> {
     this.id,
     this.date,
     this.dateGmt,
+    this.password,
     this.guid,
     this.modified,
     this.modifiedGmt,
@@ -41,6 +42,7 @@ class Post implements ISerializable<Post> {
   final DateTime date;
   final DateTime dateGmt;
   final Content guid;
+  final String password;
   final DateTime modified;
   final DateTime modifiedGmt;
   final String slug;
@@ -75,6 +77,7 @@ class Post implements ISerializable<Post> {
         date: json['date'] == null ? null : DateTime.parse(json['date']),
         dateGmt: json['date_gmt'] == null ? null : DateTime.parse(json['date_gmt']),
         guid: json['guid'] == null ? null : Content.fromMap(json['guid']),
+        password: json["password"] == null ? null : json["password"],
         modified: json['modified'] == null ? null : DateTime.parse(json['modified']),
         modifiedGmt: json['modified_gmt'] == null ? null : DateTime.parse(json['modified_gmt']),
         slug: json['slug'] ?? '',
@@ -105,6 +108,7 @@ class Post implements ISerializable<Post> {
         'date': date == null ? null : date.toIso8601String(),
         'date_gmt': dateGmt == null ? null : dateGmt.toIso8601String(),
         'guid': guid == null ? null : guid.toMap(),
+        'password': password,
         'modified': modified == null ? null : modified.toIso8601String(),
         'modified_gmt': modifiedGmt == null ? null : modifiedGmt.toIso8601String(),
         'slug': slug ?? '',
