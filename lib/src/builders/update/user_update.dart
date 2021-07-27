@@ -43,7 +43,7 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
   String _locale;
   String _nickname;
   String _slug;
-  List<int> _roles;
+  List<String> _roles;
 
   UserUpdateBuilder withId(int id) {
     endpoint += '/$id';
@@ -105,7 +105,7 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
     return this;
   }
 
-  UserUpdateBuilder withRoles(Iterable<int> roles) {
+  UserUpdateBuilder withRoles(Iterable<String> roles) {
     _roles ??= [];
     _roles.addAll(roles);
     return this;

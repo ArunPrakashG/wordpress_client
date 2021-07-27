@@ -43,7 +43,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
   String _locale;
   String _nickname;
   String _slug;
-  List<int> _roles;
+  List<String> _roles;
 
   UserCreateBuilder withUserName(String username) {
     _username = username;
@@ -100,7 +100,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
     return this;
   }
 
-  UserCreateBuilder withRoles(Iterable<int> roles) {
+  UserCreateBuilder withRoles(Iterable<String> roles) {
     _roles ??= [];
     _roles.addAll(roles);
     return this;
