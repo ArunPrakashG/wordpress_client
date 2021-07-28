@@ -29,7 +29,7 @@ void main() async {
         )
         .build(),
   );
-
+    
   tempMailClient = TempMailClient();
 
   test('List Posts', () async {

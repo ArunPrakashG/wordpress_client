@@ -10,6 +10,7 @@ import '../utilities/serializable_instance.dart';
 
 class CustomInterface<T extends ISerializable<T>>
     implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
+
   @override
   Future<ResponseContainer<T>> create<T extends ISerializable<T>>({T typeResolver, Request<T> request, InternalRequester requesterClient}) {
     return requesterClient.createRequest<T>(typeResolver, request);
