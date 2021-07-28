@@ -1,8 +1,6 @@
-import 'package:wordpress_client/src/authorization_builder.dart';
-
 import '../authorization.dart';
+import '../authorization_builder.dart';
 import '../client_configuration.dart';
-import '../utilities/cookie_container.dart';
 import '../utilities/pair.dart';
 
 class BootstrapBuilder {
@@ -13,7 +11,7 @@ class BootstrapBuilder {
   List<Pair<String, String>> _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  CookieContainer _cookieContainer;
+  bool _useCookies;
   void Function(String, String, int) _statisticsDelegate;
 
   BootstrapBuilder withStatisticDelegate(void Function(String, String, int) delegate){
@@ -21,8 +19,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withCookieContainer(CookieContainer container) {
-    _cookieContainer = container;
+  BootstrapBuilder withCookies(bool value) {
+    _useCookies = value;
     return this;
   }
 
@@ -64,7 +62,7 @@ class BootstrapBuilder {
 
   BootstrapConfiguration build() {
     return BootstrapConfiguration(
-      cookieContainer: _cookieContainer,
+      useCookies: _useCookies,
       requestTimeout: _defaultRequestTimeout,
       responsePreprocessorDelegate: _responsePreprocessorDelegate,
       defaultAuthorization: _defaultAuthorization,

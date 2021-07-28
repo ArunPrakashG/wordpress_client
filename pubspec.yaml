@@ -7,11 +7,12 @@ environment:
 
 dev_dependencies:
   pedantic: ^1.9.0
-  test: ^1.14.4
   temp_mail_gen: ^1.0.0
+  test: ^1.14.4
 
 dependencies:
   dio: ^4.0.0
+  dio_cookie_manager: ^2.0.0
   html: ^0.15.0
   http_parser: ^4.0.0
   path: ^1.8.0

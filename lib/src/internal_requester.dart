@@ -1,4 +1,6 @@
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import 'authorization.dart';
 import 'authorization_handler.dart';
@@ -7,7 +9,6 @@ import 'client_configuration.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
 import 'responses/response_container.dart';
-import 'utilities/cookie_container.dart';
 import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
 
@@ -18,7 +19,7 @@ class InternalRequester {
   String _baseUrl;
   Authorization _defaultAuthorization;
   bool Function(dynamic) _responsePreprocessorDelegate;
-  static final Map<String, int> _endPointStatistics = Map<String, int>();
+  static final Map<String, int> endPointStatistics = Map<String, int>();
   static void Function(String, String, int) _statisticsDelegate;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
@@ -32,7 +33,7 @@ class InternalRequester {
 
     if (configuration == null) {
       configuration = new BootstrapConfiguration(
-        cookieContainer: CookieContainer(),
+        useCookies: false,
         requestTimeout: defaultRequestTimeout,
         shouldFollowRedirects: true,
         maxRedirects: 5,
@@ -40,8 +41,6 @@ class InternalRequester {
     }
 
     _baseUrl = parseUrl(baseUrl, path);
-
-    // TODO: configuration.cookieContainer
 
     _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
 
@@ -63,13 +62,16 @@ class InternalRequester {
 
     _client = Dio(
       BaseOptions(
-        connectTimeout: configuration.requestTimeout,
-        receiveTimeout: configuration.requestTimeout,
-        followRedirects: configuration.shouldFollowRedirects,
-        maxRedirects: configuration.maxRedirects,
-        baseUrl: _baseUrl,
-      ),
+          connectTimeout: configuration.requestTimeout,
+          receiveTimeout: configuration.requestTimeout,
+          followRedirects: configuration.shouldFollowRedirects,
+          maxRedirects: configuration.maxRedirects,
+          baseUrl: _baseUrl),
     );
+
+    if (configuration.useCookies ?? false) {
+      _client.interceptors.add(CookieManager(CookieJar()));
+    }
   }
 
   void removeDefaultAuthorization() {
@@ -480,14 +482,14 @@ class InternalRequester {
   }
 
   void _invokeStatisticsCallback(String requestUrl, String endpoint) {
-    if (_endPointStatistics[endpoint] == null) {
-      _endPointStatistics[endpoint] = 1;
+    if (endPointStatistics[endpoint] == null) {
+      endPointStatistics[endpoint] = 1;
     } else {
-      _endPointStatistics[endpoint]++;
+      endPointStatistics[endpoint]++;
     }
 
     if (_statisticsDelegate != null) {
-      _statisticsDelegate(requestUrl, endpoint, _endPointStatistics[endpoint]);
+      _statisticsDelegate(requestUrl, endpoint, endPointStatistics[endpoint]);
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'authorization.dart';
-import 'utilities/cookie_container.dart';
 import 'utilities/pair.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
 class BootstrapConfiguration {
   final int requestTimeout;
@@ -10,11 +10,11 @@ class BootstrapConfiguration {
   final List<Pair<String, String>> defaultHeaders;
   final bool shouldFollowRedirects;
   final int maxRedirects;
-  final CookieContainer cookieContainer;
+  final bool useCookies;
   final void Function(String, String, int) statisticsDelegate;
 
   BootstrapConfiguration({
-    this.cookieContainer,
+    this.useCookies,
     this.requestTimeout,
     this.responsePreprocessorDelegate,
     this.defaultAuthorization,
