@@ -1,3 +1,5 @@
+import 'package:wordpress_client/src/builders_import.dart';
+
 import '../authorization.dart';
 import '../authorization_builder.dart';
 import '../client_configuration.dart';
@@ -12,9 +14,15 @@ class BootstrapBuilder {
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
   bool _useCookies;
+  bool _waitWhileBusy;
   void Function(String, String, int) _statisticsDelegate;
 
-  BootstrapBuilder withStatisticDelegate(void Function(String, String, int) delegate){
+  BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
+    _waitWhileBusy = value;
+    return this;
+  }
+
+  BootstrapBuilder withStatisticDelegate(void Function(String, String, int) delegate) {
     _statisticsDelegate = delegate;
     return this;
   }
@@ -70,7 +78,8 @@ class BootstrapBuilder {
       defaultHeaders: _defaultHeaders,
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
-      statisticsDelegate: _statisticsDelegate
+      statisticsDelegate: _statisticsDelegate,
+      waitWhileBusy: _waitWhileBusy,
     );
   }
 }

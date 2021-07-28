@@ -40,6 +40,8 @@ class WordpressClient {
     _initializeInterfaces();
   }
 
+  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper)=> _requester.configure(bootstrapper(BootstrapBuilder()));
+
   void _initializeInterfaces() {
     _interfaces ??= new Map<String, dynamic>();
     _interfaces['posts'] = PostsInterface<Post>();

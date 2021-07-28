@@ -31,7 +31,7 @@ void main() async {
   );
 
   tempMailClient = TempMailClient();
-
+  
   group('List Requests', () {
     test('List Posts', () async {
       final response = await client.listPost(

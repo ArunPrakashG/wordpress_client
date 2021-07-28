@@ -22,6 +22,7 @@ class InternalRequester {
   static final Map<String, int> endPointStatistics = Map<String, int>();
   static void Function(String, String, int) _statisticsDelegate;
   bool _isBusy;
+  bool _singleRequestAtATimeMode = false;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
     if (baseUrl == null) {
@@ -42,14 +43,23 @@ class InternalRequester {
     }
 
     _baseUrl = parseUrl(baseUrl, path);
+    configure(configuration);
+  }
 
-    _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
+  void configure(BootstrapConfiguration configuration) {
+    _singleRequestAtATimeMode = configuration.waitWhileBusy ?? false;
+
+    if (configuration.responsePreprocessorDelegate != null) {
+      _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
+    }
 
     if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
       _defaultAuthorization = configuration.defaultAuthorization;
     }
 
-    _statisticsDelegate = configuration.statisticsDelegate;
+    if (configuration.statisticsDelegate != null) {
+      _statisticsDelegate = configuration.statisticsDelegate;
+    }
 
     if (configuration.defaultUserAgent != null) {
       _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
@@ -61,17 +71,36 @@ class InternalRequester {
       }
     }
 
-    _client = Dio(
-      BaseOptions(
+    if (_client == null) {
+      _client = Dio(
+        BaseOptions(
           connectTimeout: configuration.requestTimeout,
           receiveTimeout: configuration.requestTimeout,
           followRedirects: configuration.shouldFollowRedirects,
           maxRedirects: configuration.maxRedirects,
-          baseUrl: _baseUrl),
-    );
+          baseUrl: _baseUrl,
+        ),
+      );
+    } else {
+      _client.options.connectTimeout = configuration.requestTimeout;
+      _client.options.receiveTimeout = configuration.requestTimeout;
+      _client.options.followRedirects = configuration.shouldFollowRedirects;
+      _client.options.maxRedirects = configuration.maxRedirects;
+      _client.options.baseUrl = _baseUrl;
+    }
 
     if (configuration.useCookies ?? false) {
       _client.interceptors.add(CookieManager(CookieJar()));
+    }
+  }
+
+  Future<void> waitWhileBusy() async {
+    if (!_singleRequestAtATimeMode) {
+      return;
+    }
+
+    while (_isBusy) {
+      await Future.delayed(Duration(milliseconds: 500));
     }
   }
 
@@ -109,6 +138,8 @@ class InternalRequester {
         message: 'Authorization might have failed internally.',
       );
     }
+
+    await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
@@ -181,6 +212,8 @@ class InternalRequester {
       );
     }
 
+    await waitWhileBusy();
+
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
@@ -239,6 +272,8 @@ class InternalRequester {
         message: 'Authorization might have failed internally.',
       );
     }
+
+    await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
@@ -310,6 +345,8 @@ class InternalRequester {
       );
     }
 
+    await waitWhileBusy();
+
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
@@ -379,6 +416,8 @@ class InternalRequester {
         message: 'Authorization might have failed internally.',
       );
     }
+
+    await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;

@@ -10,6 +10,7 @@ class BootstrapConfiguration {
   final bool shouldFollowRedirects;
   final int maxRedirects;
   final bool useCookies;
+  final bool waitWhileBusy;
   final void Function(String, String, int) statisticsDelegate;
 
   BootstrapConfiguration({
@@ -21,6 +22,7 @@ class BootstrapConfiguration {
     this.defaultHeaders,
     this.shouldFollowRedirects,
     this.maxRedirects,
+    this.waitWhileBusy,
     this.statisticsDelegate,
   });
 }
