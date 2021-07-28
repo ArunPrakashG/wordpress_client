@@ -33,7 +33,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
 
   String _context;
 
-  UserRetriveBuilder withPostId(int id) {
+  UserRetriveBuilder withUserId(int id) {
     endpoint += '/$id';
     return this;
   }
