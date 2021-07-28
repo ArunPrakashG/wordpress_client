@@ -21,6 +21,7 @@ class InternalRequester {
   bool Function(dynamic) _responsePreprocessorDelegate;
   static final Map<String, int> endPointStatistics = Map<String, int>();
   static void Function(String, String, int) _statisticsDelegate;
+  bool _isBusy;
 
   InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
     if (baseUrl == null) {
@@ -74,6 +75,8 @@ class InternalRequester {
     }
   }
 
+  bool getBusyStatus() => _isBusy;
+
   void removeDefaultAuthorization() {
     _defaultAuthorization = null;
   }
@@ -108,6 +111,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
+    _isBusy = true;
     try {
       final response = await _client.fetch(options);
       watch.stop();
@@ -157,6 +161,8 @@ class InternalRequester {
         message: 'Exception occured. (${ex.toString()})',
         responseCode: -1,
       );
+    } finally {
+      _isBusy = false;
     }
   }
 
@@ -176,6 +182,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
+    _isBusy = true;
     try {
       final response = await _client.fetch(options);
       watch.stop();
@@ -213,6 +220,8 @@ class InternalRequester {
         message: 'Exception occured. (${ex.toString()})',
         responseCode: -1,
       );
+    } finally {
+      _isBusy = false;
     }
   }
 
@@ -232,6 +241,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
+    _isBusy = true;
     try {
       final response = await _client.fetch(options);
       watch.stop();
@@ -280,6 +290,8 @@ class InternalRequester {
         message: 'Exception occured. (${ex.toString()})',
         responseCode: -1,
       );
+    } finally {
+      _isBusy = false;
     }
   }
 
@@ -299,6 +311,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
+    _isBusy = true;
     try {
       final response = await _client.fetch(options);
       watch.stop();
@@ -347,6 +360,8 @@ class InternalRequester {
         message: 'Exception occured. (${ex.toString()})',
         responseCode: -1,
       );
+    } finally {
+      _isBusy = false;
     }
   }
 
@@ -366,6 +381,7 @@ class InternalRequester {
     }
 
     var watch = Stopwatch()..start();
+    _isBusy = true;
     try {
       final response = await _client.fetch(options);
       watch.stop();
@@ -414,6 +430,8 @@ class InternalRequester {
         message: 'Exception occured. (${ex.toString()})',
         responseCode: -1,
       );
+    } finally {
+      _isBusy = false;
     }
   }
 
