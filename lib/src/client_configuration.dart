@@ -1,6 +1,5 @@
 import 'authorization.dart';
 import 'utilities/pair.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 
 class BootstrapConfiguration {
   final int requestTimeout;

@@ -14,6 +14,9 @@ class Comment extends ISerializable<Comment> {
     this.authorName,
     this.authorUrl,
     this.date,
+    this.authorEmail,
+    this.authorIp,
+    this.authorUserAgent,
     this.dateGmt,
     this.content,
     this.link,
@@ -29,7 +32,10 @@ class Comment extends ISerializable<Comment> {
   final int parent;
   final int author;
   final String authorName;
+  final String authorEmail;
   final String authorUrl;
+  final String authorIp;
+  final String authorUserAgent;
   final DateTime date;
   final DateTime dateGmt;
   final Content content;
@@ -48,7 +54,10 @@ class Comment extends ISerializable<Comment> {
         parent: json["parent"] == null ? null : json["parent"],
         author: json["author"] == null ? null : json["author"],
         authorName: json["author_name"] == null ? null : json["author_name"],
+        authorEmail: json["author_email"] == null ? null : json["author_email"],
         authorUrl: json["author_url"] == null ? null : json["author_url"],
+        authorIp: json["author_ip"] == null ? null : json["author_ip"],
+        authorUserAgent: json["author_user_agent"] == null ? null : json["author_user_agent"],
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
         dateGmt: json["date_gmt"] == null ? null : DateTime.parse(json["date_gmt"]),
         content: json["content"] == null ? null : Content.fromMap(json["content"]),
@@ -67,7 +76,10 @@ class Comment extends ISerializable<Comment> {
         "parent": parent == null ? null : parent,
         "author": author == null ? null : author,
         "author_name": authorName == null ? null : authorName,
+        "author_email": authorEmail == null ? null : authorEmail,
         "author_url": authorUrl == null ? null : authorUrl,
+        "author_ip": authorIp == null ? null : authorIp,
+        "author_user_agent": authorUserAgent == null ? null : authorUserAgent,
         "date": date == null ? null : date.toIso8601String(),
         "date_gmt": dateGmt == null ? null : dateGmt.toIso8601String(),
         "content": content == null ? null : content.toMap(),
