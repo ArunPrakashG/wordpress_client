@@ -4,29 +4,82 @@
 
 ## Usage
 
-A simple usage example:
-
-initializing the client is simple...
+First of all import the library
 
 ```dart
 import 'package:wordpress_client/wordpress_client.dart';
-
-WordpressClient client = WordpressClient(
-    'https://www.example.com/wp-json',
-    'wp/v2',
-);
 ```
 
-and to send a list posts requests ( get all posts in your website )
+Initializing the client is simple...
 
 ```dart
-final listPostsResponse = await client.listPost(
+  // Simple Usage
+  client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
+  ResponseContainer<List<Post>> posts = await client.listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
+  print(posts.value.first.id);
+```
+
+### or
+
+```dart
+client = new WordpressClient(
+    'https://www.example.com/wp-json',
+    'wp/v2',
+    bootstrapper: (bootstrapper) => bootstrapper
+        .withCookies(true)
+        .withDefaultUserAgent('wordpress_client/4.0.0')
+        .withDefaultMaxRedirects(5)
+        .withFollowRedirects(true)
+        .withDefaultAuthorization(
+          // You can use this to pass a custom authorization header on all requests
+          (builder) => builder.withUserName('test_user').withPassword('super_secret_password').withType(AuthorizationType.JWT).build(),
+        )
+        .withStatisticDelegate(
+      (baseUrl, endpoint, count) {
+        print('Request send to: $baseUrl ($count times)');
+      },
+    ).build(),
+  );
+
+  ResponseContainer<List<Post>> response = await client.listPost(
     (builder) => builder
-        .orderResultsBy(FilterOrder.ASCENDING)
         .withPerPage(20)
         .withPageNumber(1)
-        .build(),
+        .orderResultsBy(FilterOrder.DESCENDING)
+        .sortResultsBy(FilterPostSortOrder.DATE)
+        .withAuthorization( // You can also use this to pass a custom authorization header on this particular request
+          Authorization(
+            userName: 'test_user',
+            password: 'super_secret_password',
+            authType: AuthorizationType.JWT,
+          ),
+        )
+        .withCallback(
+          Callback(
+            unhandledExceptionCallback: (ex) {
+              print('Unhandled Exception: $ex');
+            },
+            requestErrorCallback: (errorContainer) {
+              print('Request Error: ${errorContainer.errorResponse.message}');
+            },
+            onSendProgress: (current, total) {
+              print('Send Progress: $current/$total');
+            },
+            onReceiveProgress: (current, total) {
+              print('Receive Progress: $current/$total');
+            },
+          ),
+        )
+        .withResponseValidationOverride((rawResponse) {
+      if (rawResponse.any((element) => element.content.parsedText == null)) {
+        return false;
+      }
+
+      return true;
+    }).build(),
   );
+
+  print(response.value.first.id);
 ```
 
 each response is wrapped inside `ResponseContainer< >` instance. ResponseContainer contains the actual value (List< Post > here), response status code, error message (if any), Time taken for the request to complete as `Duration()`, The headers received in the response, total posts count, total pages count.
@@ -34,11 +87,6 @@ each response is wrapped inside `ResponseContainer< >` instance. ResponseContain
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].
-
-## TODO
-* Implement Media operations & interface
-* Implement Tag operations & interface
-* Implement Comment operations & interface
 
 ## NOTE
 

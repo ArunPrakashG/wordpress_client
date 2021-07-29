@@ -61,7 +61,7 @@ class WordpressClient {
     _interfaces[interfaceId] = CustomInterface<T>();
   }
 
-  T getInterfaceById<T>(String id) {
+  T _getInterfaceById<T>(String id) {
     if (_interfaces == null || _interfaces.isEmpty) {
       throw ClientNotInitializedException('Please correctly initialize WordpressClient before retriving the available interfaces.');
     }
@@ -76,21 +76,7 @@ class WordpressClient {
 
     return _interfaces[id];
   }
-
-  T getInterfaceByType<T>() {
-    if (_interfaces == null || _interfaces.isEmpty) {
-      throw ClientNotInitializedException('Please correctly initialize WordpressClient before retriving the available interfaces.');
-    }
-
-    final interface = _interfaces.entries.singleWhere((i) => i.value is T).value;
-
-    if (interface == null) {
-      throw InterfaceDoNotExistException('${T.runtimeType} type interface do not exist.');
-    }
-
-    return interface;
-  }
-
+  
   Future<InternalRequester> getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
     while (_requester.getBusyStatus()) {
       await Future.delayed(Duration(milliseconds: 800));
@@ -100,10 +86,10 @@ class WordpressClient {
   }
 
   CustomInterface<TBase> getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) =>
-      getInterfaceById<CustomInterface<TBase>>(interfaceId);
+      _getInterfaceById<CustomInterface<TBase>>(interfaceId);
 
   Future<ResponseContainer<User>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
-    return getInterfaceById<MeInterface<User>>('me').retrive<User>(
+    return _getInterfaceById<MeInterface<User>>('me').retrive<User>(
       typeResolver: User(),
       request: builder(MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -111,7 +97,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> deleteMe(Request Function(MeDeleteBuilder) builder) async {
-    return getInterfaceById<MeInterface<User>>('me').delete<User>(
+    return _getInterfaceById<MeInterface<User>>('me').delete<User>(
       typeResolver: User(),
       request: builder(MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -119,7 +105,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> updateMe(Request Function(MeUpdateBuilder) builder) async {
-    return getInterfaceById<MeInterface<User>>('me').update<User>(
+    return _getInterfaceById<MeInterface<User>>('me').update<User>(
       typeResolver: User(),
       request: builder(MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -127,7 +113,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<User>>> listUsers(Request Function(UserListBuilder) builder) async {
-    return getInterfaceById<UsersInterface<User>>('users').list<User>(
+    return _getInterfaceById<UsersInterface<User>>('users').list<User>(
       typeResolver: User(),
       request: builder(UserListBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -135,7 +121,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> retriveUser(Request Function(UserRetriveBuilder) builder) async {
-    return getInterfaceById<UsersInterface<User>>('users').retrive<User>(
+    return _getInterfaceById<UsersInterface<User>>('users').retrive<User>(
       typeResolver: User(),
       request: builder(UserRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -143,7 +129,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> deleteUser(Request Function(UserDeleteBuilder) builder) async {
-    return getInterfaceById<UsersInterface<User>>('users').delete<User>(
+    return _getInterfaceById<UsersInterface<User>>('users').delete<User>(
       typeResolver: User(),
       request: builder(UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -151,7 +137,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> updateUser(Request Function(UserUpdateBuilder) builder) async {
-    return getInterfaceById<UsersInterface<User>>('users').update<User>(
+    return _getInterfaceById<UsersInterface<User>>('users').update<User>(
       typeResolver: User(),
       request: builder(UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -159,7 +145,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<User>> createUser(Request Function(UserCreateBuilder) builder) async {
-    return getInterfaceById<UsersInterface<User>>('users').create<User>(
+    return _getInterfaceById<UsersInterface<User>>('users').create<User>(
       typeResolver: User(),
       request: builder(UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -167,7 +153,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Post>> updatePost(Request Function(PostUpdateBuilder) builder) async {
-    return getInterfaceById<PostsInterface<Post>>('posts').update<Post>(
+    return _getInterfaceById<PostsInterface<Post>>('posts').update<Post>(
       typeResolver: Post(),
       request: builder(PostUpdateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -175,7 +161,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Post>>> listPost(Request Function(PostListBuilder) builder) async {
-    return getInterfaceById<PostsInterface<Post>>('posts').list<Post>(
+    return _getInterfaceById<PostsInterface<Post>>('posts').list<Post>(
       typeResolver: Post(),
       request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -183,7 +169,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Post>> retrivePost(Request Function(PostRetriveBuilder) builder) async {
-    return getInterfaceById<PostsInterface<Post>>('posts').retrive<Post>(
+    return _getInterfaceById<PostsInterface<Post>>('posts').retrive<Post>(
       typeResolver: Post(),
       request: builder(PostRetriveBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -191,7 +177,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Post>> deletePost(Request Function(PostDeleteBuilder) builder) async {
-    return getInterfaceById<PostsInterface<Post>>('posts').delete<Post>(
+    return _getInterfaceById<PostsInterface<Post>>('posts').delete<Post>(
       typeResolver: Post(),
       request: builder(PostDeleteBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -199,7 +185,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Post>> createPost(Request Function(PostCreateBuilder) builder) async {
-    return getInterfaceById<PostsInterface<Post>>('posts').create<Post>(
+    return _getInterfaceById<PostsInterface<Post>>('posts').create<Post>(
       typeResolver: Post(),
       request: builder(PostCreateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -207,7 +193,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Media>> createMedia(Request Function(MediaCreateBuilder) builder) async {
-    return getInterfaceById<MediaInterface<Media>>('media').create<Media>(
+    return _getInterfaceById<MediaInterface<Media>>('media').create<Media>(
       typeResolver: Media(),
       request: builder(MediaCreateBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -215,7 +201,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Media>> deleteMedia(Request Function(MediaDeleteBuilder) builder) async {
-    return getInterfaceById<MediaInterface<Media>>('media').delete<Media>(
+    return _getInterfaceById<MediaInterface<Media>>('media').delete<Media>(
       typeResolver: Media(),
       request: builder(MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -223,7 +209,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Media>>> listMedia(Request Function(MediaListBuilder) builder) async {
-    return getInterfaceById<MediaInterface<Media>>('media').list<Media>(
+    return _getInterfaceById<MediaInterface<Media>>('media').list<Media>(
       typeResolver: Media(),
       request: builder(MediaListBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -231,7 +217,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Media>> retriveMedia(Request Function(MediaRetriveBuilder) builder) async {
-    return getInterfaceById<MediaInterface<Media>>('media').retrive<Media>(
+    return _getInterfaceById<MediaInterface<Media>>('media').retrive<Media>(
       typeResolver: Media(),
       request: builder(MediaRetriveBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -239,7 +225,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Media>> updateMedia(Request Function(MediaUpdateBuilder) builder) async {
-    return getInterfaceById<MediaInterface<Media>>('media').update<Media>(
+    return _getInterfaceById<MediaInterface<Media>>('media').update<Media>(
       typeResolver: Media(),
       request: builder(MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -247,7 +233,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Category>>> listCategory(Request Function(CategoryListBuilder) builder) async {
-    return getInterfaceById<CategoryInterface<Category>>('categories').list<Category>(
+    return _getInterfaceById<CategoryInterface<Category>>('categories').list<Category>(
       typeResolver: Category(),
       request: builder(CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -255,7 +241,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Category>> retriveCategory(Request Function(CategoryRetriveBuilder) builder) async {
-    return getInterfaceById<CategoryInterface<Category>>('categories').retrive<Category>(
+    return _getInterfaceById<CategoryInterface<Category>>('categories').retrive<Category>(
       typeResolver: Category(),
       request: builder(CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -263,7 +249,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Category>> deleteCategory(Request Function(CategoryDeleteBuilder) builder) async {
-    return getInterfaceById<CategoryInterface<Category>>('categories').delete<Category>(
+    return _getInterfaceById<CategoryInterface<Category>>('categories').delete<Category>(
       typeResolver: Category(),
       request: builder(CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -271,7 +257,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Category>> updateCategory(Request Function(CategoryUpdateBuilder) builder) async {
-    return getInterfaceById<CategoryInterface<Category>>('categories').update<Category>(
+    return _getInterfaceById<CategoryInterface<Category>>('categories').update<Category>(
       typeResolver: Category(),
       request: builder(CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -279,7 +265,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Category>> createCategory(Request Function(CategoryCreateBuilder) builder) async {
-    return getInterfaceById<CategoryInterface<Category>>('categories').create<Category>(
+    return _getInterfaceById<CategoryInterface<Category>>('categories').create<Category>(
       typeResolver: Category(),
       request: builder(CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -287,7 +273,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Tag>> createTag(Request Function(TagCreateBuilder) builder) async {
-    return getInterfaceById<TagInterface<Tag>>('tags').create<Tag>(
+    return _getInterfaceById<TagInterface<Tag>>('tags').create<Tag>(
       typeResolver: Tag(),
       request: builder(TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -295,7 +281,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Tag>> updateTag(Request Function(TagUpdateBuilder) builder) async {
-    return getInterfaceById<TagInterface<Tag>>('tags').update<Tag>(
+    return _getInterfaceById<TagInterface<Tag>>('tags').update<Tag>(
       typeResolver: Tag(),
       request: builder(TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -303,7 +289,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Tag>> retriveTag(Request Function(TagRetriveBuilder) builder) async {
-    return getInterfaceById<TagInterface<Tag>>('tags').retrive<Tag>(
+    return _getInterfaceById<TagInterface<Tag>>('tags').retrive<Tag>(
       typeResolver: Tag(),
       request: builder(TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -311,7 +297,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Tag>>> listTag(Request Function(TagListBuilder) builder) async {
-    return getInterfaceById<TagInterface<Tag>>('tags').list<Tag>(
+    return _getInterfaceById<TagInterface<Tag>>('tags').list<Tag>(
       typeResolver: Tag(),
       request: builder(TagListBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -319,7 +305,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Tag>> deleteTag(Request Function(TagDeleteBuilder) builder) async {
-    return getInterfaceById<TagInterface<Tag>>('tags').delete<Tag>(
+    return _getInterfaceById<TagInterface<Tag>>('tags').delete<Tag>(
       typeResolver: Tag(),
       request: builder(TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -327,7 +313,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<List<Comment>>> listComment(Request Function(CommentListBuilder) builder) async {
-    return getInterfaceById<CommentInterface<Comment>>('comments').list<Comment>(
+    return _getInterfaceById<CommentInterface<Comment>>('comments').list<Comment>(
       typeResolver: Comment(),
       request: builder(CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -335,7 +321,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Comment>> deleteComment(Request Function(CommentDeleteBuilder) builder) async {
-    return getInterfaceById<CommentInterface<Comment>>('comments').delete<Comment>(
+    return _getInterfaceById<CommentInterface<Comment>>('comments').delete<Comment>(
       typeResolver: Comment(),
       request: builder(CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues()),
       requesterClient: _requester,
@@ -343,7 +329,7 @@ class WordpressClient {
   }
 
   Future<ResponseContainer<Comment>> createComment(Request Function(CommentCreateBuilder) builder) async {
-    return getInterfaceById<CommentInterface<Comment>>('comments').create<Comment>(
+    return _getInterfaceById<CommentInterface<Comment>>('comments').create<Comment>(
       typeResolver: Comment(),
       request: builder(CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues()),
       requesterClient: _requester,
