@@ -84,6 +84,23 @@ client = new WordpressClient(
 
 each response is wrapped inside `ResponseContainer< >` instance. ResponseContainer contains the actual value (List< Post > here), response status code, error message (if any), Time taken for the request to complete as `Duration()`, The headers received in the response, total posts count, total pages count.
 
+## Supported REST Methods
+
+|                    | Create  | Read    | Update  | Delete  |
+|--------------------|---------|---------|---------|---------|
+| **Posts**          | yes     | yes     | yes     | yes     |
+| **Pages**          | ---     | ---     | ---     | ---     |
+| **Comments**       | yes     | yes     | yes     | yes     |
+| **Categories**     | yes     | yes     | yes     | yes     |
+| **Tags**           | yes     | yes     | yes     | yes     |
+| **Users**          | yes     | yes     | yes     | yes     |
+| **Media**          | yes     | yes     | yes     | yes     |
+| **Post Revisions** | ---     | ---     | ---     | ---     |
+| **Taxonomies**     | ---     | ---     | ---     | ---     |
+| **Post Types**     | ---     | ---     | ---     | ---     |
+| **Post Statuses**  | ---     | ---     | ---     | ---     |
+| **Settings**       | ---     | ---     | ---     | ---     |
+
 ## Features and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].

@@ -1,5 +1,3 @@
-import 'package:wordpress_client/src/builders_import.dart';
-
 import '../authorization.dart';
 import '../authorization_builder.dart';
 import '../client_configuration.dart';
