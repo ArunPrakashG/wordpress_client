@@ -84,8 +84,10 @@ class WordpressClient {
   }
 
   Future<InternalRequester> getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
-    while (_requester.getBusyStatus()) {
-      await Future.delayed(Duration(milliseconds: 800));
+    if (shouldWaitIfBusy) {
+      while (_requester.getBusyStatus()) {
+        await Future.delayed(Duration(milliseconds: 800));
+      }
     }
 
     return _requester;
