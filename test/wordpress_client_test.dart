@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
+import 'package:wordpress_client/src/builders/create/post_create.dart';
+import 'package:wordpress_client/src/builders_import.dart';
 import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
@@ -30,8 +32,27 @@ void main() async {
         .build(),
   );
 
+  client.initializeCustomInterface<Post>('posts');
+  client.getCustomInterface<Post>('posts').create(
+        typeResolver: Post(),
+        request: PostCreateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+
+  client.getCustomInterface<Post>('posts').update(
+        typeResolver: Post(),
+        request: PostUpdateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+
+  client.getCustomInterface<Post>('posts').retrive(
+        typeResolver: Post(),
+        request: PostRetriveBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+
   tempMailClient = TempMailClient();
-  
+
   group('List Requests', () {
     test('List Posts', () async {
       final response = await client.listPost(

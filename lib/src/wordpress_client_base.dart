@@ -1,3 +1,5 @@
+import 'package:wordpress_client/src/exceptions/interface_exist_exception.dart';
+
 import 'builders/create/comment_create.dart';
 import 'builders/delete/comment_delete.dart';
 import 'builders/list/comment_list.dart';
@@ -40,7 +42,7 @@ class WordpressClient {
     _initializeInterfaces();
   }
 
-  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper)=> _requester.configure(bootstrapper(BootstrapBuilder()));
+  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) => _requester.configure(bootstrapper(BootstrapBuilder()));
 
   void _initializeInterfaces() {
     _interfaces ??= new Map<String, dynamic>();
@@ -56,6 +58,10 @@ class WordpressClient {
   void initializeCustomInterface<T extends ISerializable<T>>(String interfaceId) {
     if (isNullOrEmpty(interfaceId)) {
       throw NullReferenceException('Interface ID is invalid.');
+    }
+
+    if (_interfaces[interfaceId] != null) {
+      throw InterfaceExistException('$interfaceId interface already exists!');
     }
 
     _interfaces[interfaceId] = CustomInterface<T>();
@@ -76,7 +82,7 @@ class WordpressClient {
 
     return _interfaces[id];
   }
-  
+
   Future<InternalRequester> getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
     while (_requester.getBusyStatus()) {
       await Future.delayed(Duration(milliseconds: 800));

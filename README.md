@@ -86,20 +86,60 @@ each response is wrapped inside `ResponseContainer< >` instance. ResponseContain
 
 ## Supported REST Methods
 
-|                    | Create  | Read    | Update  | Delete  |
-|--------------------|---------|---------|---------|---------|
-| **Posts**          | yes     | yes     | yes     | yes     |
-| **Pages**          | ---     | ---     | ---     | ---     |
-| **Comments**       | yes     | yes     | yes     | yes     |
-| **Categories**     | yes     | yes     | yes     | yes     |
-| **Tags**           | yes     | yes     | yes     | yes     |
-| **Users**          | yes     | yes     | yes     | yes     |
-| **Media**          | yes     | yes     | yes     | yes     |
-| **Post Revisions** | ---     | ---     | ---     | ---     |
-| **Taxonomies**     | ---     | ---     | ---     | ---     |
-| **Post Types**     | ---     | ---     | ---     | ---     |
-| **Post Statuses**  | ---     | ---     | ---     | ---     |
-| **Settings**       | ---     | ---     | ---     | ---     |
+|                    | Create | Read | Update | Delete |
+| ------------------ | ------ | ---- | ------ | ------ |
+| **Posts**          | yes    | yes  | yes    | yes    |
+| **Pages**          | ---    | ---  | ---    | ---    |
+| **Comments**       | yes    | yes  | yes    | yes    |
+| **Categories**     | yes    | yes  | yes    | yes    |
+| **Tags**           | yes    | yes  | yes    | yes    |
+| **Users**          | yes    | yes  | yes    | yes    |
+| **Me**             | yes    | yes  | yes    | yes    |
+| **Media**          | yes    | yes  | yes    | yes    |
+| **Post Revisions** | ---    | ---  | ---    | ---    |
+| **Taxonomies**     | ---    | ---  | ---    | ---    |
+| **Post Types**     | ---    | ---  | ---    | ---    |
+| **Post Statuses**  | ---    | ---  | ---    | ---    |
+| **Settings**       | ---    | ---  | ---    | ---    |
+
+More endpoint support will be added as the time goes by. also it is easy to use a custom json model as return type and query an interface through the library. First you have to initialize and interface with a unique interface id and its type. then u can call the interface directly for the requests.
+
+Sample to query `posts` endpoint if it wasn't implemented:
+
+```dart
+
+// Initialize the interface with its name and json return type model
+// The model must implement ISerializable<T> interface to work
+client.initializeCustomInterface<Post>('posts');
+
+// Then you can call available methods such as
+// * Create
+// * Delete
+// * Retrive
+// * Update
+// * List
+// with parameters as the type resolver, which is an instance of the specified return object
+// the request, which is request object build using a builder, all builders must inherit from IQueryBuilder<TBuilderType, YReturnType> interface
+// the requester client, it is the internal client which handles all the request in and out of this instance.
+// you can fetch the instance of by using the provided function in wordpress_client
+ client.getCustomInterface<Post>('posts').create(
+        typeResolver: Post(),
+        request: PostCreateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+
+  client.getCustomInterface<Post>('posts').update(
+        typeResolver: Post(),
+        request: PostUpdateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+
+  client.getCustomInterface<Post>('posts').retrive(
+        typeResolver: Post(),
+        request: PostRetriveBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
+        requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
+      );
+```
 
 ## Features and bugs
 
