@@ -1,5 +1,5 @@
 # WordpressClient
-
+[Pubspec Download](https://pub.dev/packages/wordpress_client) </br> </br>
 <b>wordpress_client</b> is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern. This library is a port of <b>WordpressCore</b> library written in C#
 
 ## Usage
