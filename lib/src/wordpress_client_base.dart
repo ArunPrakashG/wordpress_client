@@ -38,7 +38,11 @@ class WordpressClient {
 
     WordpressClient.baseUrl = baseUrl;
 
-    _requester = InternalRequester(baseUrl, path, bootstrapper(BootstrapBuilder()));
+    _requester = InternalRequester(
+      baseUrl,
+      path,
+      bootstrapper == null ? null : bootstrapper(BootstrapBuilder()),
+    );
     _initializeInterfaces();
   }
 
@@ -93,8 +97,7 @@ class WordpressClient {
     return _requester;
   }
 
-  CustomInterface<TBase> getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) =>
-      _getInterfaceById<CustomInterface<TBase>>(interfaceId);
+  CustomInterface<TBase> getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) => _getInterfaceById<CustomInterface<TBase>>(interfaceId);
 
   Future<ResponseContainer<User>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
     return _getInterfaceById<MeInterface<User>>('me').retrive<User>(
