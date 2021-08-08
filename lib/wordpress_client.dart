@@ -7,6 +7,7 @@ library wordpress_client;
 // Core files
 export 'src/wordpress_client_base.dart' show WordpressClient;
 export 'src/authorization.dart' show Authorization;
+export 'src/utilities/serializable_instance.dart';
 
 // Responses
 export 'src/responses_import.dart';
@@ -18,5 +19,5 @@ export 'src/enums.dart';
 export 'src/utilities/callback.dart';
 
 // Requests
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/builders/request.dart';
+export 'src/builders/request_builder_base.dart';
