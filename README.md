@@ -118,7 +118,7 @@ Structure of `ResponseContainer<T>`:
   String message; // any messages regarding the request (errors/info, etc)
 ```
 
-## Support Authorization methods
+## Supported Authorization methods
 
 This library has two authorization methods currently supported:
 
