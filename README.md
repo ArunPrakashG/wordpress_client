@@ -108,7 +108,7 @@ ResponseContainer<List<Post>> response = await client.listPost(
   To get the first element, which is of type `Post`
   `Post post = response.value.first;`
 
-Struture of `ResponseContainer<T>`:
+Structure of `ResponseContainer<T>`:
 
 ```dart
   T value; // the actual response object
