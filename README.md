@@ -172,7 +172,9 @@ with parameters:
 - `request` - which is request object build using a builder, all builders must inherit from `IQueryBuilder<TBuilderType, YReturnType>` interface
 - `requesterClient` - it is the internal client which handles all the request in and out of this `WordpressClient` instance.
   you can fetch the instance of by using the provided function in wordpress_client
-  `InternalRequester req = await client.getInternalRequesterClient(shouldWaitIfBusy: false);`
+  ```dart
+  InternalRequester req = await client.getInternalRequesterClient(shouldWaitIfBusy: false);
+  ```
   Here, `shouldWaitIfBusy` bool value indicates if it should wait until all requests in the current `WordpressClient` instance finishes processing.
 
 Below are sample requests for some of the request methods
