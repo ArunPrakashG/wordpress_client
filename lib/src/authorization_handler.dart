@@ -74,7 +74,7 @@ class AuthorizationHandler {
         ),
       );
 
-      if (response == null || response.statusCode != 200) {
+      if (response.statusCode != 200) {
         return false;
       }
 

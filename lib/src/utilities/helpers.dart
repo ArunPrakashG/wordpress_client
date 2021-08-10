@@ -70,7 +70,7 @@ String parseHtmlString(String htmlString) => htmlString.replaceAll(RegExp(r'<[^>
 
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types
-  switch (extension?.toLowerCase()) {
+  switch (extension.toLowerCase()) {
     case 'jpg':
     case 'jpeg':
     case 'jpe':

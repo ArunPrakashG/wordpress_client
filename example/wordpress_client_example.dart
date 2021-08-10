@@ -36,7 +36,8 @@ void main() async {
         .withPageNumber(1)
         .orderResultsBy(FilterOrder.DESCENDING)
         .sortResultsBy(FilterPostSortOrder.DATE)
-        .withAuthorization( // You can also use this to pass a custom authorization header on this particular request
+        .withAuthorization(
+          // You can also use this to pass a custom authorization header on this particular request
           Authorization(
             userName: 'test_user',
             password: 'super_secret_password',
@@ -60,6 +61,7 @@ void main() async {
           ),
         )
         .withResponseValidationOverride((rawResponse) {
+      // ignore: unnecessary_null_comparison
       if (rawResponse.any((element) => element.content!.parsedText == null)) {
         return false;
       }
