@@ -222,10 +222,6 @@ client.getCustomInterface<Post>('posts').create(
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 
-## NOTE
-
-This library is in no way complete. It has many bugs & it has many pending interfaces to implement. It was initially written to fix authorization and few endpoint support which is non-existent in existing Wordpress libraries.
-
 ## Contributions
 
 Contributions are always welcome! If you find any bugs/errors, open an issue describing about it and how to reproduce it. :D
