@@ -7,16 +7,16 @@ import '../utilities/helpers.dart';
 import '../utilities/pair.dart';
 
 class Request<TResponseType> {
-  final String endpoint;
-  final Callback callback;
-  final bool Function(TResponseType) validationDelegate;
-  final CancelToken cancelToken;
-  final HttpMethod httpMethod;
-  final Authorization authorization;
+  final String? endpoint;
+  final Callback? callback;
+  final bool Function(TResponseType)? validationDelegate;
+  final CancelToken? cancelToken;
+  final HttpMethod? httpMethod;
+  final Authorization? authorization;
   final dynamic formBody;
-  final List<Pair<String, String>> headers;
-  final Map<String, String> queryParams;
-  String generatedRequestPath;
+  final List<Pair<String, String>>? headers;
+  final Map<String, String?>? queryParams;
+  String? generatedRequestPath;
   final bool isListRequest;
 
   Request(
@@ -34,7 +34,7 @@ class Request<TResponseType> {
     generatedRequestPath = _buildUrlQueryString();
   }
 
-  bool _hasIdInUrlAlready(String requestQueryUrl, MapEntry<String, String> currentEntry) {
+  bool _hasIdInUrlAlready(String requestQueryUrl, MapEntry<String, String?> currentEntry) {
     if (!requestQueryUrl.contains('/')) {
       return false;
     }
@@ -47,35 +47,35 @@ class Request<TResponseType> {
     return currentEntry.value == id;
   }
 
-  String _buildUrlQueryString() {
-    if (queryParams == null || queryParams.isEmpty) {
+  String? _buildUrlQueryString() {
+    if (queryParams == null || queryParams!.isEmpty) {
       return endpoint;
     }
 
     var requestQueryUrl = endpoint;
 
-    for (var param in queryParams.entries) {
-      if(_hasIdInUrlAlready(requestQueryUrl, param)){
+    for (var param in queryParams!.entries) {
+      if(_hasIdInUrlAlready(requestQueryUrl!, param)){
         continue;
       }
 
-      requestQueryUrl += getJoiningChar(requestQueryUrl) + param.key + '=' + param.value;
+      requestQueryUrl += getJoiningChar(requestQueryUrl) + param.key + '=' + param.value!;
     }
 
     return requestQueryUrl;
   }
 
-  bool get hasHeaders => headers != null && headers.isNotEmpty;
+  bool get hasHeaders => headers != null && headers!.isNotEmpty;
 
   bool get hasFormContent => formBody != null;
 
-  bool get shouldAuthorize => authorization != null && !authorization.isDefault;
+  bool get shouldAuthorize => authorization != null && !authorization!.isDefault;
 
   bool get shouldValidateResponse => validationDelegate != null;
 
-  bool get hasValidExceptionCallback => callback != null && callback.unhandledExceptionCallback != null;
+  bool get hasValidExceptionCallback => callback != null && callback!.unhandledExceptionCallback != null;
 
-  bool get hasValidCallbacks => hasValidExceptionCallback && callback.responseCallback != null && callback.onReceiveProgress != null && callback.onSendProgress != null;
+  bool get hasValidCallbacks => hasValidExceptionCallback && callback!.responseCallback != null && callback!.onReceiveProgress != null && callback!.onSendProgress != null;
 
   bool get isRequestExecutable => !isNullOrEmpty(endpoint) || httpMethod != null;
 }

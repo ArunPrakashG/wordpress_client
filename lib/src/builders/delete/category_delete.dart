@@ -8,32 +8,32 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Category>{
+class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Category> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Category) responseValidationDelegate;
+  bool Function(Category)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   bool _force = false;
 
   CategoryDeleteBuilder withId(int id) {
-    endpoint += '/$id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -89,14 +89,14 @@ class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Cate
   @override
   CategoryDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers = [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CategoryDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

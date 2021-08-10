@@ -5,22 +5,22 @@ import '../utilities/pair.dart';
 
 class BootstrapBuilder {
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds
-  bool Function(dynamic) _responsePreprocessorDelegate;
-  Authorization _defaultAuthorization;
-  String _defaultUserAgent;
-  List<Pair<String, String>> _defaultHeaders;
+  bool Function(dynamic)? _responsePreprocessorDelegate;
+  Authorization? _defaultAuthorization;
+  String? _defaultUserAgent;
+  List<Pair<String, String>>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  bool _useCookies;
-  bool _waitWhileBusy;
-  void Function(String, String, int) _statisticsDelegate;
+  bool? _useCookies;
+  bool? _waitWhileBusy;
+  void Function(String?, String?, int?)? _statisticsDelegate;
 
   BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
     _waitWhileBusy = value;
     return this;
   }
 
-  BootstrapBuilder withStatisticDelegate(void Function(String, String, int) delegate) {
+  BootstrapBuilder withStatisticDelegate(void Function(String?, String?, int?) delegate) {
     _statisticsDelegate = delegate;
     return this;
   }
@@ -52,7 +52,7 @@ class BootstrapBuilder {
 
   BootstrapBuilder withDefaultHeaders(List<Pair<String, String>> headers) {
     _defaultHeaders ??= [];
-    _defaultHeaders.addAll(headers);
+    _defaultHeaders!.addAll(headers);
     return this;
   }
 

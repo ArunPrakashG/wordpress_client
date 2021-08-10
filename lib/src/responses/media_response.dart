@@ -36,32 +36,32 @@ class Media implements ISerializable<Media> {
     this.links,
   });
 
-  final int id;
-  final DateTime date;
-  final DateTime dateGmt;
-  final Content guid;
-  final DateTime modified;
-  final DateTime modifiedGmt;
-  final String slug;
-  final MediaFilterStatus status;
-  final String type;
-  final String link;
-  final Content title;
-  final int author;
-  final Status commentStatus;
-  final Status pingStatus;
-  final String template;
-  final List<dynamic> meta;
-  final String yoastHead;
-  final Content description;
-  final Content caption;
-  final String altText;
-  final String mediaType;
-  final String mimeType;
-  final MediaDetails mediaDetails;
-  final int post;
-  final String sourceUrl;
-  final Links links;
+  final int? id;
+  final DateTime? date;
+  final DateTime? dateGmt;
+  final Content? guid;
+  final DateTime? modified;
+  final DateTime? modifiedGmt;
+  final String? slug;
+  final MediaFilterStatus? status;
+  final String? type;
+  final String? link;
+  final Content? title;
+  final int? author;
+  final Status? commentStatus;
+  final Status? pingStatus;
+  final String? template;
+  final List<dynamic>? meta;
+  final String? yoastHead;
+  final Content? description;
+  final Content? caption;
+  final String? altText;
+  final String? mediaType;
+  final String? mimeType;
+  final MediaDetails? mediaDetails;
+  final int? post;
+  final String? sourceUrl;
+  final Links? links;
 
   factory Media.fromJson(String str) => Media.fromMap(json.decode(str));
 
@@ -96,35 +96,35 @@ class Media implements ISerializable<Media> {
 
   Map<String, dynamic> toMap() => {
         "id": id == null ? null : id,
-        "date": date == null ? null : date.toIso8601String(),
-        "date_gmt": dateGmt == null ? null : dateGmt.toIso8601String(),
-        "guid": guid == null ? null : guid.toMap(),
-        "modified": modified == null ? null : modified.toIso8601String(),
-        "modified_gmt": modifiedGmt == null ? null : modifiedGmt.toIso8601String(),
+        "date": date == null ? null : date!.toIso8601String(),
+        "date_gmt": dateGmt == null ? null : dateGmt!.toIso8601String(),
+        "guid": guid == null ? null : guid!.toMap(),
+        "modified": modified == null ? null : modified!.toIso8601String(),
+        "modified_gmt": modifiedGmt == null ? null : modifiedGmt!.toIso8601String(),
         "slug": slug == null ? null : slug,
         "status": status == null ? null : status.toString().split('.').last.toLowerCase(),
         "type": type == null ? null : type,
         "link": link == null ? null : link,
-        "title": title == null ? null : title.toMap(),
+        "title": title == null ? null : title!.toMap(),
         "author": author == null ? null : author,
         "comment_status": commentStatus == null ? null : commentStatus.toString().split('.').last.toLowerCase(),
         "ping_status": pingStatus == null ? null : pingStatus.toString().split('.').last.toLowerCase(),
         "template": template == null ? null : template,
-        "meta": meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
+        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
         "yoast_head": yoastHead == null ? null : yoastHead,
-        "description": description == null ? null : description.toMap(),
-        "caption": caption == null ? null : caption.toMap(),
+        "description": description == null ? null : description!.toMap(),
+        "caption": caption == null ? null : caption!.toMap(),
         "alt_text": altText == null ? null : altText,
         "media_type": mediaType == null ? null : mediaType,
         "mime_type": mimeType == null ? null : mimeType,
-        "media_details": mediaDetails == null ? null : mediaDetails.toMap(),
+        "media_details": mediaDetails == null ? null : mediaDetails!.toMap(),
         "post": post == null ? null : post,
         "source_url": sourceUrl == null ? null : sourceUrl,
-        "_links": links == null ? null : links.toMap(),
+        "_links": links == null ? null : links!.toMap(),
       };
 
   @override
-  Media fromJson(Map<String, dynamic> json) => Media.fromMap(json);
+  Media fromJson(Map<String, dynamic>? json) => Media.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 class JwtValidate {
-  bool success;
-  int statusCode;
-  String message;
-  String code;
-  Data data;
+  bool? success;
+  int? statusCode;
+  String? message;
+  String? code;
+  Data? data;
   JwtValidate({
     this.success,
     this.statusCode,
@@ -20,7 +20,7 @@ class JwtValidate {
       'statusCode': statusCode,
       'message': message,
       'code': code,
-      'data': data.toMap(),
+      'data': data!.toMap(),
     };
   }
 
@@ -40,7 +40,7 @@ class JwtValidate {
 }
 
 class Data {
-  int status;
+  int? status;
   
   Data({
     this.status,

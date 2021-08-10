@@ -11,38 +11,38 @@ import '../request_builder_base.dart';
 
 class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Category>> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(List<Category>) responseValidationDelegate;
+  bool Function(List<Category>)? responseValidationDelegate;
 
-  String _context;
+  String? _context;
   int _page = 1;
   int _perPage = 10;
-  String _search;
-  List<int> _exclude;
-  List<int> _include;
-  String _orderBy;
-  String _order;
-  List<String> _slug;
-  int _parent;
-  int _post;
-  bool _hideEmpty;
+  String? _search;
+  List<int>? _exclude;
+  List<int>? _include;
+  String? _orderBy;
+  String? _order;
+  List<String>? _slug;
+  int? _parent;
+  int? _post;
+  bool? _hideEmpty;
 
   CategoryListBuilder withContext(FilterContext context) {
     _context = context.toString().split('.').last.toLowerCase();
@@ -119,20 +119,20 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (_page != null) 'page': _page.toString(),
       if (_perPage != null) 'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
-      if (_exclude != null && _exclude.isNotEmpty) 'exclude': _exclude.join(','),
-      if (_include != null && _include.isNotEmpty) 'include': _include.join(','),
+      if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),
+      if (_include != null && _include!.isNotEmpty) 'include': _include!.join(','),
       if (!isNullOrEmpty(_orderBy)) 'orderby': _orderBy,
       if (!isNullOrEmpty(_order)) 'order': _order,
-      if (_slug != null && _slug.isNotEmpty) 'slug': _slug.join(','),
+      if (_slug != null && _slug!.isNotEmpty) 'slug': _slug!.join(','),
       if (_parent != null) 'parent': _parent.toString(),
       if (_post != null) 'post': _post.toString(),
-      if (_hideEmpty != null && _hideEmpty) 'hide_empty': 'true',
+      if (_hideEmpty != null && _hideEmpty!) 'hide_empty': 'true',
     };
   }
 
@@ -168,14 +168,14 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
   @override
   CategoryListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CategoryListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

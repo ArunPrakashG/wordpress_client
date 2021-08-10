@@ -16,18 +16,18 @@ class ImageMeta {
     this.keywords,
   });
 
-  final String aperture;
-  final String credit;
-  final String camera;
-  final String caption;
-  final String createdTimestamp;
-  final String copyright;
-  final String focalLength;
-  final String iso;
-  final String shutterSpeed;
-  final String title;
-  final String orientation;
-  final List<dynamic> keywords;
+  final String? aperture;
+  final String? credit;
+  final String? camera;
+  final String? caption;
+  final String? createdTimestamp;
+  final String? copyright;
+  final String? focalLength;
+  final String? iso;
+  final String? shutterSpeed;
+  final String? title;
+  final String? orientation;
+  final List<dynamic>? keywords;
 
   factory ImageMeta.fromJson(String str) => ImageMeta.fromMap(json.decode(str));
 
@@ -60,6 +60,6 @@ class ImageMeta {
         "shutter_speed": shutterSpeed == null ? null : shutterSpeed,
         "title": title == null ? null : title,
         "orientation": orientation == null ? null : orientation,
-        "keywords": keywords == null ? null : List<dynamic>.from(keywords.map((x) => x)),
+        "keywords": keywords == null ? null : List<dynamic>.from(keywords!.map((x) => x)),
       };
 }

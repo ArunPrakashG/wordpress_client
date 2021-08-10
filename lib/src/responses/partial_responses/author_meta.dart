@@ -8,10 +8,10 @@ class AuthorMeta {
     this.displayName,
   });
 
-  final String id;
-  final String userNicename;
-  final DateTime userRegistered;
-  final String displayName;
+  final String? id;
+  final String? userNicename;
+  final DateTime? userRegistered;
+  final String? displayName;
 
   factory AuthorMeta.fromJson(String str) => AuthorMeta.fromMap(json.decode(str));
 
@@ -27,7 +27,7 @@ class AuthorMeta {
   Map<String, dynamic> toMap() => {
         'ID': id ?? '',
         'user_nicename': userNicename ?? '',
-        'user_registered': userRegistered == null ? null : userRegistered.toIso8601String(),
+        'user_registered': userRegistered == null ? null : userRegistered!.toIso8601String(),
         'display_name': displayName ?? '',
       };
 }

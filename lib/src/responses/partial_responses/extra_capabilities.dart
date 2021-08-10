@@ -5,7 +5,7 @@ class ExtraCapabilities {
     this.administrator,
   });
 
-  final bool administrator;
+  final bool? administrator;
 
   factory ExtraCapabilities.fromJson(String str) => ExtraCapabilities.fromMap(json.decode(str));
 

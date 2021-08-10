@@ -18,36 +18,36 @@ import '../request_builder_base.dart';
 
 class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Media) responseValidationDelegate;
+  bool Function(Media)? responseValidationDelegate;
 
-  MultipartFile _multipartFile;
-  String _altText;
-  String _caption;
-  String _description;
-  ContentStatus _mediaStatus;
-  int _associatedPostId;
-  String _title;
-  int _authorId;
-  Status _commandStatus;
-  Status _pingStatus;
+  MultipartFile? _multipartFile;
+  String? _altText;
+  String? _caption;
+  String? _description;
+  ContentStatus? _mediaStatus;
+  int? _associatedPostId;
+  String? _title;
+  int? _authorId;
+  Status? _commandStatus;
+  Status? _pingStatus;
 
   MediaCreateBuilder withAltText(String altText) {
     _altText = altText;
@@ -141,13 +141,13 @@ class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
       if (!isNullOrEmpty(_title)) 'title': _title,
       if (!isNullOrEmpty(_caption)) 'caption': _caption,
       if (!isNullOrEmpty(_description)) 'description': _description,
-      if (_associatedPostId >= 0) 'post': _associatedPostId,
-      if (_authorId >= 0) 'author': _authorId,
+      if (_associatedPostId! >= 0) 'post': _associatedPostId,
+      if (_authorId! >= 0) 'author': _authorId,
       'comment_status': _commandStatus.toString().split('.').last,
       'ping_status': _pingStatus.toString().split('.').last,
       'status': _mediaStatus.toString().split('.').last,
-      'Content-Type': _multipartFile.contentType.mimeType,
-      'Content-Disposition': 'attachment; filename=${_multipartFile.filename}',
+      'Content-Type': _multipartFile!.contentType!.mimeType,
+      'Content-Disposition': 'attachment; filename=${_multipartFile!.filename}',
       'file': _multipartFile,
     };
   }
@@ -189,14 +189,14 @@ class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   @override
   MediaCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MediaCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

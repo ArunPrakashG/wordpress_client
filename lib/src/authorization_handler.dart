@@ -18,7 +18,7 @@ class AuthorizationHandler {
       return;
     }
 
-    switch (_authType) {
+    switch (_authType!) {
       case AuthorizationType.JWT:
         _scheme = 'Bearer';
         _encryptedAccessToken = _jwtToken;
@@ -30,12 +30,12 @@ class AuthorizationHandler {
     }
   }
 
-  String _userName;
-  String _password;
-  String _jwtToken;
-  AuthorizationType _authType;
-  String _scheme;
-  String _encryptedAccessToken;
+  String? _userName;
+  String? _password;
+  String? _jwtToken;
+  AuthorizationType? _authType;
+  String? _scheme;
+  String? _encryptedAccessToken;
   bool _hasValidatedOnce;
 
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
@@ -48,7 +48,7 @@ class AuthorizationHandler {
     return true;
   }
 
-  Future<bool> _handleJwtAuthentication(Dio client, {Callback callback}) async {
+  Future<bool> _handleJwtAuthentication(Dio? client, {Callback? callback}) async {
     if (_authType != AuthorizationType.JWT || client == null) {
       return false;
     }
@@ -84,15 +84,15 @@ class AuthorizationHandler {
       return _hasValidatedOnce;
     } catch (e) {
       if (callback != null && callback.unhandledExceptionCallback != null) {
-        callback.unhandledExceptionCallback(e);
+        callback.unhandledExceptionCallback!(e as Exception);
       }
 
       return false;
     }
   }
 
-  Future<bool> _validateJwtToken(Dio client, String jwtToken, {Callback callback}) async {
-    if (_authType != AuthorizationType.JWT || client == null || isNullOrEmpty(jwtToken)) {
+  Future<bool> _validateJwtToken(Dio client, String? jwtToken, {Callback? callback}) async {
+    if (_authType != AuthorizationType.JWT || isNullOrEmpty(jwtToken)) {
       return false;
     }
 
@@ -105,12 +105,12 @@ class AuthorizationHandler {
         ),
       );
 
-      if (response == null || response.statusCode != 200) {
+      if (response.statusCode != 200) {
         return false;
       }
 
       final validationResult = JwtValidate.fromMap(response.data);
-      if (validationResult == null || isNullOrEmpty(validationResult.code)) {
+      if (isNullOrEmpty(validationResult.code)) {
         return false;
       }
 
@@ -118,14 +118,14 @@ class AuthorizationHandler {
       return _hasValidatedOnce = validationResult.code == 'jwt_auth_valid_token';
     } catch (e) {
       if (callback != null && callback.unhandledExceptionCallback != null) {
-        callback.unhandledExceptionCallback(e);
+        callback.unhandledExceptionCallback!(e as Exception);
       }
 
       return false;
     }
   }
 
-  static Future<bool> authorizeRequest(RequestOptions requestOptions, Dio client, Authorization auth, {Callback callback}) async {
+  static Future<bool> authorizeRequest(RequestOptions requestOptions, Dio? client, Authorization? auth, {Callback? callback}) async {
     if (auth == null || auth.isDefault) {
       return false;
     }
@@ -139,7 +139,6 @@ class AuthorizationHandler {
     if (handler._authType == AuthorizationType.JWT) {
       if (handler._hasValidatedOnce && !isNullOrEmpty(handler._encryptedAccessToken)) {
         auth.authString = '${handler._scheme} ${handler._encryptedAccessToken}';
-        print('VALIDATED 1: ${auth.authString}');
         return true;
       }
 

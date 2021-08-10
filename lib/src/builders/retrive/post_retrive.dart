@@ -11,31 +11,31 @@ import '../request_builder_base.dart';
 
 class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Post) responseValidationDelegate;
+  bool Function(Post)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   String _context = '';
-  String _password;
+  String? _password;
 
-  PostRetriveBuilder withPostId(int postId) {
-    endpoint += '/$postId';
+  PostRetriveBuilder withPostId(int? id) {
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -74,12 +74,12 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (!isNullOrEmpty(_password)) 'password': _password,
-      if (queryParameters != null && queryParameters.isNotEmpty)
-        for (var pair in queryParameters)
+      if (queryParameters != null && queryParameters!.isNotEmpty)
+        for (var pair in queryParameters!)
           if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value)) pair.key: pair.value
     };
   }
@@ -110,14 +110,14 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   @override
   PostRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   PostRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

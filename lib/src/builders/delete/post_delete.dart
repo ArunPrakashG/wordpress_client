@@ -10,32 +10,32 @@ import '../request_builder_base.dart';
 
 class PostDeleteBuilder implements IQueryBuilder<PostDeleteBuilder, Post> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Post) responseValidationDelegate;
+  bool Function(Post)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
-  int _id = -1;
+  int? _id = -1;
   bool _force = false;
 
-  PostDeleteBuilder withPostId(int id) {
+  PostDeleteBuilder withPostId(int? id) {
     _id = id;
-    endpoint += '/$_id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -92,14 +92,14 @@ class PostDeleteBuilder implements IQueryBuilder<PostDeleteBuilder, Post> {
   @override
   PostDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   PostDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

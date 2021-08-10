@@ -38,34 +38,34 @@ class Post implements ISerializable<Post> {
     this.yoastHead,
   });
 
-  final int id;
-  final DateTime date;
-  final DateTime dateGmt;
-  final Content guid;
-  final String password;
-  final DateTime modified;
-  final DateTime modifiedGmt;
-  final String slug;
-  final ContentStatus status;
-  final String type;
-  final String link;
-  final Content title;
-  final Content content;
-  final Content excerpt;
-  final int author;
-  final int featuredMedia;
-  final Status commentStatus;
-  final Status pingStatus;
-  final bool sticky;
-  final String template;
-  final PostFormat format;
-  final List<dynamic> meta;
-  final List<int> categories;
-  final List<int> tags;
-  final AuthorMeta authorMeta;
-  final String featuredImageUrl;
-  final String yoastHead;
-  final Links links;
+  final int? id;
+  final DateTime? date;
+  final DateTime? dateGmt;
+  final Content? guid;
+  final String? password;
+  final DateTime? modified;
+  final DateTime? modifiedGmt;
+  final String? slug;
+  final ContentStatus? status;
+  final String? type;
+  final String? link;
+  final Content? title;
+  final Content? content;
+  final Content? excerpt;
+  final int? author;
+  final int? featuredMedia;
+  final Status? commentStatus;
+  final Status? pingStatus;
+  final bool? sticky;
+  final String? template;
+  final PostFormat? format;
+  final List<dynamic>? meta;
+  final List<int>? categories;
+  final List<int>? tags;
+  final AuthorMeta? authorMeta;
+  final String? featuredImageUrl;
+  final String? yoastHead;
+  final Links? links;
 
   factory Post.fromJson(String str) => Post.fromMap(json.decode(str));
 
@@ -87,8 +87,8 @@ class Post implements ISerializable<Post> {
         title: json['title'] == null ? null : Content.fromMap(json['title']),
         content: json['content'] == null ? null : Content.fromMap(json['content']),
         excerpt: json['excerpt'] == null ? null : Content.fromMap(json['excerpt']),
-        author: json['author'] ?? '',
-        featuredMedia: json['featured_media'] ?? '',
+        author: json['author'] ?? '' as int?,
+        featuredMedia: json['featured_media'] ?? '' as int?,
         commentStatus: getStatusFromValue(json['comment_status']) ?? Status.CLOSED,
         pingStatus: getStatusFromValue(json['ping_status']) ?? Status.CLOSED,
         sticky: json['sticky'] ?? false,
@@ -105,19 +105,19 @@ class Post implements ISerializable<Post> {
 
   Map<String, dynamic> toMap() => {
         'id': id ?? -1,
-        'date': date == null ? null : date.toIso8601String(),
-        'date_gmt': dateGmt == null ? null : dateGmt.toIso8601String(),
-        'guid': guid == null ? null : guid.toMap(),
+        'date': date == null ? null : date!.toIso8601String(),
+        'date_gmt': dateGmt == null ? null : dateGmt!.toIso8601String(),
+        'guid': guid == null ? null : guid!.toMap(),
         'password': password,
-        'modified': modified == null ? null : modified.toIso8601String(),
-        'modified_gmt': modifiedGmt == null ? null : modifiedGmt.toIso8601String(),
+        'modified': modified == null ? null : modified!.toIso8601String(),
+        'modified_gmt': modifiedGmt == null ? null : modifiedGmt!.toIso8601String(),
         'slug': slug ?? '',
         'status': status.toString().split('.').last ?? '',
         'type': type ?? type.toString().split('.').last,
         'link': link ?? '',
-        'title': title == null ? null : title.toMap(),
-        'content': content == null ? null : content.toMap(),
-        'excerpt': excerpt == null ? null : excerpt.toMap(),
+        'title': title == null ? null : title!.toMap(),
+        'content': content == null ? null : content!.toMap(),
+        'excerpt': excerpt == null ? null : excerpt!.toMap(),
         'author': author ?? '',
         'featured_media': featuredMedia ?? '',
         'comment_status': commentStatus ?? commentStatus.toString().split('.').last,
@@ -125,15 +125,15 @@ class Post implements ISerializable<Post> {
         'sticky': sticky ?? false,
         'template': template ?? '',
         'format': format ?? format.toString().split('.').last,
-        'meta': meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
-        'categories': categories == null ? null : List<dynamic>.from(categories.map((x) => x)),
-        'tags': tags == null ? null : List<dynamic>.from(tags.map((x) => x)),
+        'meta': meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        'categories': categories == null ? null : List<dynamic>.from(categories!.map((x) => x)),
+        'tags': tags == null ? null : List<dynamic>.from(tags!.map((x) => x)),
         'yoast_head': yoastHead ?? '',
-        'author_meta': authorMeta == null ? null : authorMeta.toMap(),
+        'author_meta': authorMeta == null ? null : authorMeta!.toMap(),
         'featured_image_url': featuredImageUrl ?? '',
-        '_links': links == null ? null : links.toMap(),
+        '_links': links == null ? null : links!.toMap(),
       };
 
   @override
-  Post fromJson(Map<String, dynamic> json) => Post.fromMap(json);
+  Post fromJson(Map<String, dynamic>? json) => Post.fromMap(json!);
 }

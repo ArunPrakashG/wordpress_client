@@ -12,43 +12,43 @@ import '../request_builder_base.dart';
 
 class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Post) responseValidationDelegate;
+  bool Function(Post)? responseValidationDelegate;
 
-  String _slug;
-  String _title;
-  String _content;
-  String _excerpt;
-  String _password;
-  String _status;
-  int _authorId;
-  int _featuredMediaId;
-  String _commentStatus;
-  String _pingStatus;
-  String _format;
-  bool _asSticky;
-  List<int> _categories;
-  List<int> _tags;
+  String? _slug;
+  String? _title;
+  String? _content;
+  String? _excerpt;
+  String? _password;
+  String? _status;
+  int? _authorId;
+  int? _featuredMediaId;
+  String? _commentStatus;
+  String? _pingStatus;
+  String? _format;
+  late bool _asSticky;
+  List<int>? _categories;
+  List<int>? _tags;
 
-  PostUpdateBuilder withId(int id) {
-    endpoint += '/$id';
+  PostUpdateBuilder withId(int? id) {
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -109,13 +109,13 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
 
   PostUpdateBuilder withCategories(Iterable<int> categories) {
     _categories ??= [];
-    _categories.addAll(categories);
+    _categories!.addAll(categories);
     return this;
   }
 
   PostUpdateBuilder withTags(Iterable<int> tags) {
     _tags ??= [];
-    _tags.addAll(tags);
+    _tags!.addAll(tags);
     return this;
   }
 
@@ -151,8 +151,8 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
       if (!isNullOrEmpty(_pingStatus)) 'ping_status': _pingStatus,
       if (!isNullOrEmpty(_format)) 'format': _format,
       if (_asSticky) 'sticky': '1',
-      if (_categories != null && _categories.isNotEmpty) 'categories': _categories.join(','),
-      if (_tags != null && _tags.isNotEmpty) 'tags': _tags.join(','),
+      if (_categories != null && _categories!.isNotEmpty) 'categories': _categories!.join(','),
+      if (_tags != null && _tags!.isNotEmpty) 'tags': _tags!.join(','),
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
     };
   }
@@ -189,14 +189,14 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   @override
   PostUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   PostUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

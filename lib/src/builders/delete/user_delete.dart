@@ -10,31 +10,31 @@ import '../request_builder_base.dart';
 
 class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   bool _force = false;
   int _reassign = -1;
 
-  UserDeleteBuilder withUserId(int id) {
-    endpoint += '/$id';
+  UserDeleteBuilder withUserId(int? id) {
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -96,14 +96,14 @@ class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   @override
   UserDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers = [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   UserDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

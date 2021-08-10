@@ -8,10 +8,10 @@ class Content {
     this.blockVersion,
   });
 
-  final String rendered;
-  final bool protected;
-  final int blockVersion;
-  String get parsedText => parseHtmlString(rendered);
+  final String? rendered;
+  final bool? protected;
+  final int? blockVersion;
+  String get parsedText => parseHtmlString(rendered!);
 
   factory Content.fromJson(String str) => Content.fromMap(json.decode(str));
 

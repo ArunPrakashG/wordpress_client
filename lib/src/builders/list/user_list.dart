@@ -10,39 +10,39 @@ import '../request.dart';
 import '../request_builder_base.dart';
 
 class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
-  String _context;
+  String? _context;
   int _page = 1;
   int _perPage = 10;
-  String _search;
-  List<int> _excludedIds;
-  List<int> _allowedIds;
+  String? _search;
+  List<int>? _excludedIds;
+  List<int>? _allowedIds;
   int _resultOffset = 0;
-  String _resultOrder;
-  String _sortOrder;
-  String _slug;
-  List<String> _sortRoles;
+  String? _resultOrder;
+  String? _sortOrder;
+  String? _slug;
+  List<String>? _sortRoles;
   bool _limitToAuthors = false;
 
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(List<User>) responseValidationDelegate;
+  bool Function(List<User>)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   static UserListBuilder create() => UserListBuilder();
 
@@ -124,20 +124,20 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (_page > 0) 'page': _page.toString(),
       if (_perPage > 0) 'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
-      if (_excludedIds != null && _excludedIds.isNotEmpty) 'exclude': _excludedIds.toString(),
-      if (_allowedIds != null && _allowedIds.isNotEmpty) 'include': _allowedIds.toString(),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds.toString(),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds.toString(),
       if (_resultOffset > 0) 'offset': _resultOffset.toString(),
       if (!isNullOrEmpty(_resultOrder)) 'order': _resultOrder,
       if (!isNullOrEmpty(_sortOrder)) 'orderby': _sortOrder,
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
       if (_limitToAuthors) 'who': 'authors',
-      if (_sortRoles != null && _sortRoles.isNotEmpty) 'roles': _sortRoles.toString(),
+      if (_sortRoles != null && _sortRoles!.isNotEmpty) 'roles': _sortRoles.toString(),
     };
   }
 
@@ -165,14 +165,14 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
   @override
   UserListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   UserListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

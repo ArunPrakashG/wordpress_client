@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,11 +12,11 @@ import 'package:wordpress_client/wordpress_client.dart';
 void main() async {
   WordpressClient client;
   TempMailClient tempMailClient;
-  Map<String, dynamic> json;
+  Map<String, dynamic>? json;
 
   json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
   client = WordpressClient(
-    json['base_url'],
+    json!['base_url'],
     json['path'],
     bootstrapper: (builder) => builder
         .withDefaultMaxRedirects(5)
@@ -27,25 +28,25 @@ void main() async {
           print('Endpoint called count: $count');
         })
         .withDefaultAuthorization(
-          (authBuilder) => authBuilder.withUserName(json['username']).withPassword(json['password']).withType(AuthorizationType.JWT).build(),
+          (authBuilder) => authBuilder.withUserName(json!['username']).withPassword(json['password']).withType(AuthorizationType.JWT).build(),
         )
         .build(),
   );
 
   client.initializeCustomInterface<Post>('posts');
-  client.getCustomInterface<Post>('posts').create(
+  client.getCustomInterface<Post>('posts')!.create(
         typeResolver: Post(),
         request: PostCreateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
         requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
       );
 
-  client.getCustomInterface<Post>('posts').update(
+  client.getCustomInterface<Post>('posts')!.update(
         typeResolver: Post(),
         request: PostUpdateBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
         requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
       );
 
-  client.getCustomInterface<Post>('posts').retrive(
+  client.getCustomInterface<Post>('posts')!.retrive(
         typeResolver: Post(),
         request: PostRetriveBuilder().initializeWithDefaultValues().withEndpoint('posts').build(),
         requesterClient: await client.getInternalRequesterClient(shouldWaitIfBusy: false),
@@ -60,7 +61,7 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(20, response.value.length);
+      expect(20, response.value!.length);
     });
 
     test('List Tags', () async {
@@ -69,7 +70,7 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(20, response.value.length);
+      expect(20, response.value!.length);
     });
 
     test('List Category', () async {
@@ -78,7 +79,7 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(2, response.value.length);
+      expect(2, response.value!.length);
     });
 
     test('List Media', () async {
@@ -87,7 +88,7 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(19, response.value.length, reason: 'For some reason, WP API is only returning PER_PAGE - 1 values.');
+      expect(19, response.value!.length, reason: 'For some reason, WP API is only returning PER_PAGE - 1 values.');
     });
 
     test('List Users', () async {
@@ -96,12 +97,12 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(10, response.value.length);
+      expect(10, response.value!.length);
     });
   });
 
   group('[POST] Create/Update/Retrive/Delete', () {
-    int postId = 0;
+    int? postId = 0;
 
     test(
       'Create Post',
@@ -121,16 +122,16 @@ void main() async {
               .withAuthor(3)
               .withCallback(Callback(
             requestErrorCallback: (error) {
-              print('Error: ' + error.errorResponse.message);
+              print('Error: ' + error.errorResponse!.message!);
             },
           )).build(),
         );
 
         expect(201, response.responseCode);
-        expect('Generated Sample Post', response.value.title.parsedText);
-        expect('generated-post-slug', response.value.slug);
+        expect('Generated Sample Post', response.value!.title!.parsedText);
+        expect('generated-post-slug', response.value!.slug);
 
-        postId = response.value.id;
+        postId = response.value!.id;
       },
     );
 
@@ -140,8 +141,8 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect('Generated Sample Post Edited', response.value.title.parsedText);
-      expect('generated-post-slug', response.value.slug);
+      expect('Generated Sample Post Edited', response.value!.title!.parsedText);
+      expect('generated-post-slug', response.value!.slug);
     });
 
     test('Retrive Post', () async {
@@ -150,7 +151,7 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(postId, response.value.id);
+      expect(postId, response.value!.id);
     });
 
     test('Delete Post', () async {
@@ -158,7 +159,7 @@ void main() async {
         (builder) => builder.withPostId(postId).withCallback(
           Callback(
             requestErrorCallback: (error) {
-              print('Error: ' + error.errorResponse.message);
+              print('Error: ' + error.errorResponse!.message!);
             },
           ),
         ).build(),
@@ -173,20 +174,20 @@ void main() async {
       final response = await client.retriveMe(
         (builder) => builder.withCallback(Callback(
           requestErrorCallback: (error) {
-            print('Error: ' + error.errorResponse.message);
+            print('Error: ' + error.errorResponse!.message!);
           },
         )).build(),
       );
 
       expect(200, response.responseCode);
-      expect('arunprakash', response.value.slug);
+      expect('arunprakash', response.value!.slug);
     });
   });
 
   group('[USER] Create/Update/Retrive/Delete', () async {
-    final mailResponse = await tempMailClient.getEmails(1);
+    final mailResponse = await (tempMailClient.getEmails(1) as FutureOr<List<String>>);
     final email = mailResponse[0];
-    int userId = 0;
+    int? userId = 0;
 
     test('Create User', () async {
       final response = await client.createUser(
@@ -200,29 +201,29 @@ void main() async {
             .withCallback(
           Callback(
             requestErrorCallback: (error) {
-              print('Error: ' + error.errorResponse.message);
+              print('Error: ' + error.errorResponse!.message!);
             },
           ),
         ).build(),
       );
 
       expect(201, response.responseCode);
-      expect('gen_user_slug', response.value.slug);
-      userId = response.value.id;
+      expect('gen_user_slug', response.value!.slug);
+      userId = response.value!.id;
     });
 
     test('Update User', () async {
       final response = await client.updateUser((builder) => builder.withId(userId).withFirstName('updated first name').build());
 
       expect(200, response.responseCode);
-      expect('updated first name', response.value.firstName);
+      expect('updated first name', response.value!.firstName);
     });
 
     test('Retrive User', () async {
       final response = await client.retriveUser((builder) => builder.withUserId(userId).build());
 
       expect(200, response.responseCode);
-      expect(userId, response.value.id);
+      expect(userId, response.value!.id);
     });
 
     test('Delete User', () async {
@@ -230,7 +231,7 @@ void main() async {
         (builder) => builder.withUserId(userId).withForce(true).withReassign(3).withCallback(
           Callback(
             requestErrorCallback: (error) {
-              print('Error: ' + error.errorResponse.message);
+              print('Error: ' + error.errorResponse!.message!);
             },
           ),
         ).build(),

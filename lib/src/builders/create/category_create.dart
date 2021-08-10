@@ -12,29 +12,29 @@ import '../request_builder_base.dart';
 
 class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Category> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Category) responseValidationDelegate;
+  bool Function(Category)? responseValidationDelegate;
 
-  String _description;
-  String _name;
-  String _slug;
+  String? _description;
+  String? _name;
+  String? _slug;
   int _parent = 0;
 
   CategoryCreateBuilder withDescription(String description) {
@@ -112,14 +112,14 @@ class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Cate
   @override
   CategoryCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CategoryCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

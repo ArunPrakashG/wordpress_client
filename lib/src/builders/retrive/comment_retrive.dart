@@ -11,31 +11,31 @@ import '../request_builder_base.dart';
 
 class CommentRetriveBuilder implements IQueryBuilder<CommentRetriveBuilder, Comment> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Comment) responseValidationDelegate;
+  bool Function(Comment)? responseValidationDelegate;
 
-  String _context;
-  String _password;
+  String? _context;
+  String? _password;
 
   CommentRetriveBuilder withId(int id) {
-    endpoint += '/$id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -63,7 +63,7 @@ class CommentRetriveBuilder implements IQueryBuilder<CommentRetriveBuilder, Comm
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (!isNullOrEmpty(_password)) 'password': _password,
@@ -94,14 +94,14 @@ class CommentRetriveBuilder implements IQueryBuilder<CommentRetriveBuilder, Comm
   @override
   CommentRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CommentRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

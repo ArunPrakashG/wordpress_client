@@ -5,8 +5,8 @@ void main() async {
 
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
-  ResponseContainer<List<Post>> posts = await client.listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
-  print(posts.value.first.id);
+  ResponseContainer<List<Post?>?> posts = await client.listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
+  print(posts.value!.first!.id);
 
   // Or
 
@@ -30,7 +30,7 @@ void main() async {
     ).build(),
   );
 
-  ResponseContainer<List<Post>> response = await client.listPost(
+  ResponseContainer<List<Post?>?> response = await client.listPost(
     (builder) => builder
         .withPerPage(20)
         .withPageNumber(1)
@@ -49,7 +49,7 @@ void main() async {
               print('Unhandled Exception: $ex');
             },
             requestErrorCallback: (errorContainer) {
-              print('Request Error: ${errorContainer.errorResponse.message}');
+              print('Request Error: ${errorContainer.errorResponse!.message}');
             },
             onSendProgress: (current, total) {
               print('Send Progress: $current/$total');
@@ -60,7 +60,7 @@ void main() async {
           ),
         )
         .withResponseValidationOverride((rawResponse) {
-      if (rawResponse.any((element) => element.content.parsedText == null)) {
+      if (rawResponse.any((element) => element.content!.parsedText == null)) {
         return false;
       }
 
@@ -68,5 +68,5 @@ void main() async {
     }).build(),
   );
 
-  print(response.value.first.id);
+  print(response.value!.first!.id);
 }

@@ -12,11 +12,11 @@ class MediaDetails {
     this.imageMeta,
   });
 
-  final int width;
-  final int height;
-  final String file;
-  final Map<String, SizeValue> sizes;
-  final ImageMeta imageMeta;
+  final int? width;
+  final int? height;
+  final String? file;
+  final Map<String, SizeValue>? sizes;
+  final ImageMeta? imageMeta;
 
   factory MediaDetails.fromJson(String str) => MediaDetails.fromMap(json.decode(str));
 
@@ -34,7 +34,7 @@ class MediaDetails {
         "width": width == null ? null : width,
         "height": height == null ? null : height,
         "file": file == null ? null : file,
-        "sizes": sizes == null ? null : Map.from(sizes).map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
-        "image_meta": imageMeta == null ? null : imageMeta.toMap(),
+        "sizes": sizes == null ? null : Map.from(sizes!).map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
+        "image_meta": imageMeta == null ? null : imageMeta!.toMap(),
       };
 }

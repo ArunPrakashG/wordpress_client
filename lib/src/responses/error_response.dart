@@ -3,9 +3,9 @@ import 'dart:convert';
 import '../utilities/serializable_instance.dart';
 
 class ErrorResponse implements ISerializable<ErrorResponse> {
-  final String code;
-  final String message;
-  final Map<String, dynamic> data;
+  final String? code;
+  final String? message;
+  final Map<String, dynamic>? data;
 
   ErrorResponse({
     this.code,
@@ -32,7 +32,7 @@ class ErrorResponse implements ISerializable<ErrorResponse> {
   factory ErrorResponse.fromJson(String source) => ErrorResponse.fromMap(json.decode(source));
 
   @override
-  ErrorResponse fromJson(Map<String, dynamic> json) => ErrorResponse.fromMap(json);
+  ErrorResponse fromJson(Map<String, dynamic>? json) => ErrorResponse.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

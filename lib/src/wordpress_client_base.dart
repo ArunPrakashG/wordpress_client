@@ -23,11 +23,11 @@ import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
 
 class WordpressClient {
-  Map<String, dynamic> _interfaces;
-  InternalRequester _requester;
-  static String baseUrl;
+  Map<String, dynamic>? _interfaces;
+  InternalRequester? _requester;
+  static String? baseUrl;
 
-  WordpressClient(String baseUrl, String path, {BootstrapConfiguration Function(BootstrapBuilder) bootstrapper}) {
+  WordpressClient(String? baseUrl, String? path, {BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper}) {
     if (isNullOrEmpty(baseUrl)) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -46,17 +46,17 @@ class WordpressClient {
     _initializeInterfaces();
   }
 
-  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) => _requester.configure(bootstrapper(BootstrapBuilder()));
+  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) => _requester!.configure(bootstrapper(BootstrapBuilder()));
 
   void _initializeInterfaces() {
     _interfaces ??= new Map<String, dynamic>();
-    _interfaces['posts'] = PostsInterface<Post>();
-    _interfaces['users'] = UsersInterface<User>();
-    _interfaces['me'] = MeInterface<User>();
-    _interfaces['media'] = MediaInterface<Media>();
-    _interfaces['categories'] = CategoryInterface<Category>();
-    _interfaces['tags'] = TagInterface<Tag>();
-    _interfaces['comments'] = CommentInterface<Comment>();
+    _interfaces!['posts'] = PostsInterface<Post>();
+    _interfaces!['users'] = UsersInterface<User>();
+    _interfaces!['me'] = MeInterface<User>();
+    _interfaces!['media'] = MediaInterface<Media>();
+    _interfaces!['categories'] = CategoryInterface<Category>();
+    _interfaces!['tags'] = TagInterface<Tag>();
+    _interfaces!['comments'] = CommentInterface<Comment>();
   }
 
   void initializeCustomInterface<T extends ISerializable<T>>(String interfaceId) {
@@ -64,15 +64,15 @@ class WordpressClient {
       throw NullReferenceException('Interface ID is invalid.');
     }
 
-    if (_interfaces[interfaceId] != null) {
+    if (_interfaces![interfaceId] != null) {
       throw InterfaceExistException('$interfaceId interface already exists!');
     }
 
-    _interfaces[interfaceId] = CustomInterface<T>();
+    _interfaces![interfaceId] = CustomInterface<T>();
   }
 
-  T _getInterfaceById<T>(String id) {
-    if (_interfaces == null || _interfaces.isEmpty) {
+  T? _getInterfaceById<T>(String id) {
+    if (_interfaces == null || _interfaces!.isEmpty) {
       throw ClientNotInitializedException('Please correctly initialize WordpressClient before retriving the available interfaces.');
     }
 
@@ -80,16 +80,16 @@ class WordpressClient {
       throw NullReferenceException('Interface ID is invalid.');
     }
 
-    if (_interfaces[id] == null) {
+    if (_interfaces![id] == null) {
       throw InterfaceDoNotExistException('$id interface do not exist.');
     }
 
-    return _interfaces[id];
+    return _interfaces![id];
   }
 
-  Future<InternalRequester> getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
+  Future<InternalRequester?> getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
     if (shouldWaitIfBusy) {
-      while (_requester.getBusyStatus()) {
+      while (_requester!.getBusyStatus()!) {
         await Future.delayed(Duration(milliseconds: 800));
       }
     }
@@ -97,252 +97,252 @@ class WordpressClient {
     return _requester;
   }
 
-  CustomInterface<TBase> getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) => _getInterfaceById<CustomInterface<TBase>>(interfaceId);
+  CustomInterface<TBase>? getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) => _getInterfaceById<CustomInterface<TBase>>(interfaceId);
 
-  Future<ResponseContainer<User>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me').retrive<User>(
+  Future<ResponseContainer<User?>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
+    return _getInterfaceById<MeInterface<User>>('me')!.retrive<User>(
       typeResolver: User(),
-      request: builder(MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> deleteMe(Request Function(MeDeleteBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me').delete<User>(
+  Future<ResponseContainer<User?>> deleteMe(Request Function(MeDeleteBuilder) builder) async {
+    return _getInterfaceById<MeInterface<User>>('me')!.delete<User>(
       typeResolver: User(),
-      request: builder(MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> updateMe(Request Function(MeUpdateBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me').update<User>(
+  Future<ResponseContainer<User?>> updateMe(Request Function(MeUpdateBuilder) builder) async {
+    return _getInterfaceById<MeInterface<User>>('me')!.update<User>(
       typeResolver: User(),
-      request: builder(MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<User>>> listUsers(Request Function(UserListBuilder) builder) async {
-    return _getInterfaceById<UsersInterface<User>>('users').list<User>(
+  Future<ResponseContainer<List<User?>?>> listUsers(Request Function(UserListBuilder) builder) async {
+    return _getInterfaceById<UsersInterface<User>>('users')!.list<User>(
       typeResolver: User(),
-      request: builder(UserListBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(UserListBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<List<User>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> retriveUser(Request Function(UserRetriveBuilder) builder) async {
-    return _getInterfaceById<UsersInterface<User>>('users').retrive<User>(
+  Future<ResponseContainer<User?>> retriveUser(Request Function(UserRetriveBuilder) builder) async {
+    return _getInterfaceById<UsersInterface<User>>('users')!.retrive<User>(
       typeResolver: User(),
-      request: builder(UserRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(UserRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> deleteUser(Request Function(UserDeleteBuilder) builder) async {
-    return _getInterfaceById<UsersInterface<User>>('users').delete<User>(
+  Future<ResponseContainer<User?>> deleteUser(Request Function(UserDeleteBuilder) builder) async {
+    return _getInterfaceById<UsersInterface<User>>('users')!.delete<User>(
       typeResolver: User(),
-      request: builder(UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> updateUser(Request Function(UserUpdateBuilder) builder) async {
-    return _getInterfaceById<UsersInterface<User>>('users').update<User>(
+  Future<ResponseContainer<User?>> updateUser(Request Function(UserUpdateBuilder) builder) async {
+    return _getInterfaceById<UsersInterface<User>>('users')!.update<User>(
       typeResolver: User(),
-      request: builder(UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<User>> createUser(Request Function(UserCreateBuilder) builder) async {
-    return _getInterfaceById<UsersInterface<User>>('users').create<User>(
+  Future<ResponseContainer<User?>> createUser(Request Function(UserCreateBuilder) builder) async {
+    return _getInterfaceById<UsersInterface<User>>('users')!.create<User>(
       typeResolver: User(),
-      request: builder(UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues()),
+      request: builder(UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Post>> updatePost(Request Function(PostUpdateBuilder) builder) async {
-    return _getInterfaceById<PostsInterface<Post>>('posts').update<Post>(
+  Future<ResponseContainer<Post?>> updatePost(Request Function(PostUpdateBuilder) builder) async {
+    return _getInterfaceById<PostsInterface<Post>>('posts')!.update<Post>(
       typeResolver: Post(),
-      request: builder(PostUpdateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostUpdateBuilder().withEndpoint('posts').initializeWithDefaultValues()) as Request<Post>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Post>>> listPost(Request Function(PostListBuilder) builder) async {
-    return _getInterfaceById<PostsInterface<Post>>('posts').list<Post>(
+  Future<ResponseContainer<List<Post?>?>> listPost(Request Function(PostListBuilder) builder) async {
+    return _getInterfaceById<PostsInterface<Post>>('posts')!.list<Post>(
       typeResolver: Post(),
-      request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostListBuilder().withEndpoint('posts').initializeWithDefaultValues()) as Request<List<Post>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Post>> retrivePost(Request Function(PostRetriveBuilder) builder) async {
-    return _getInterfaceById<PostsInterface<Post>>('posts').retrive<Post>(
+  Future<ResponseContainer<Post?>> retrivePost(Request Function(PostRetriveBuilder) builder) async {
+    return _getInterfaceById<PostsInterface<Post>>('posts')!.retrive<Post>(
       typeResolver: Post(),
-      request: builder(PostRetriveBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostRetriveBuilder().withEndpoint('posts').initializeWithDefaultValues()) as Request<Post>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Post>> deletePost(Request Function(PostDeleteBuilder) builder) async {
-    return _getInterfaceById<PostsInterface<Post>>('posts').delete<Post>(
+  Future<ResponseContainer<Post?>> deletePost(Request Function(PostDeleteBuilder) builder) async {
+    return _getInterfaceById<PostsInterface<Post>>('posts')!.delete<Post>(
       typeResolver: Post(),
-      request: builder(PostDeleteBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostDeleteBuilder().withEndpoint('posts').initializeWithDefaultValues()) as Request<Post>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Post>> createPost(Request Function(PostCreateBuilder) builder) async {
-    return _getInterfaceById<PostsInterface<Post>>('posts').create<Post>(
+  Future<ResponseContainer<Post?>> createPost(Request Function(PostCreateBuilder) builder) async {
+    return _getInterfaceById<PostsInterface<Post>>('posts')!.create<Post>(
       typeResolver: Post(),
-      request: builder(PostCreateBuilder().withEndpoint('posts').initializeWithDefaultValues()),
+      request: builder(PostCreateBuilder().withEndpoint('posts').initializeWithDefaultValues()) as Request<Post>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Media>> createMedia(Request Function(MediaCreateBuilder) builder) async {
-    return _getInterfaceById<MediaInterface<Media>>('media').create<Media>(
+  Future<ResponseContainer<Media?>> createMedia(Request Function(MediaCreateBuilder) builder) async {
+    return _getInterfaceById<MediaInterface<Media>>('media')!.create<Media>(
       typeResolver: Media(),
-      request: builder(MediaCreateBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      request: builder(MediaCreateBuilder().withEndpoint('media').initializeWithDefaultValues()) as Request<Media>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Media>> deleteMedia(Request Function(MediaDeleteBuilder) builder) async {
-    return _getInterfaceById<MediaInterface<Media>>('media').delete<Media>(
+  Future<ResponseContainer<Media?>> deleteMedia(Request Function(MediaDeleteBuilder) builder) async {
+    return _getInterfaceById<MediaInterface<Media>>('media')!.delete<Media>(
       typeResolver: Media(),
-      request: builder(MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      request: builder(MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues()) as Request<Media>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Media>>> listMedia(Request Function(MediaListBuilder) builder) async {
-    return _getInterfaceById<MediaInterface<Media>>('media').list<Media>(
+  Future<ResponseContainer<List<Media?>?>> listMedia(Request Function(MediaListBuilder) builder) async {
+    return _getInterfaceById<MediaInterface<Media>>('media')!.list<Media>(
       typeResolver: Media(),
-      request: builder(MediaListBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      request: builder(MediaListBuilder().withEndpoint('media').initializeWithDefaultValues()) as Request<List<Media>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Media>> retriveMedia(Request Function(MediaRetriveBuilder) builder) async {
-    return _getInterfaceById<MediaInterface<Media>>('media').retrive<Media>(
+  Future<ResponseContainer<Media?>> retriveMedia(Request Function(MediaRetriveBuilder) builder) async {
+    return _getInterfaceById<MediaInterface<Media>>('media')!.retrive<Media>(
       typeResolver: Media(),
-      request: builder(MediaRetriveBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      request: builder(MediaRetriveBuilder().withEndpoint('media').initializeWithDefaultValues()) as Request<Media>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Media>> updateMedia(Request Function(MediaUpdateBuilder) builder) async {
-    return _getInterfaceById<MediaInterface<Media>>('media').update<Media>(
+  Future<ResponseContainer<Media?>> updateMedia(Request Function(MediaUpdateBuilder) builder) async {
+    return _getInterfaceById<MediaInterface<Media>>('media')!.update<Media>(
       typeResolver: Media(),
-      request: builder(MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues()),
+      request: builder(MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues()) as Request<Media>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Category>>> listCategory(Request Function(CategoryListBuilder) builder) async {
-    return _getInterfaceById<CategoryInterface<Category>>('categories').list<Category>(
+  Future<ResponseContainer<List<Category?>?>> listCategory(Request Function(CategoryListBuilder) builder) async {
+    return _getInterfaceById<CategoryInterface<Category>>('categories')!.list<Category>(
       typeResolver: Category(),
-      request: builder(CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      request: builder(CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues()) as Request<List<Category>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Category>> retriveCategory(Request Function(CategoryRetriveBuilder) builder) async {
-    return _getInterfaceById<CategoryInterface<Category>>('categories').retrive<Category>(
+  Future<ResponseContainer<Category?>> retriveCategory(Request Function(CategoryRetriveBuilder) builder) async {
+    return _getInterfaceById<CategoryInterface<Category>>('categories')!.retrive<Category>(
       typeResolver: Category(),
-      request: builder(CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      request: builder(CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues()) as Request<Category>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Category>> deleteCategory(Request Function(CategoryDeleteBuilder) builder) async {
-    return _getInterfaceById<CategoryInterface<Category>>('categories').delete<Category>(
+  Future<ResponseContainer<Category?>> deleteCategory(Request Function(CategoryDeleteBuilder) builder) async {
+    return _getInterfaceById<CategoryInterface<Category>>('categories')!.delete<Category>(
       typeResolver: Category(),
-      request: builder(CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      request: builder(CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues()) as Request<Category>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Category>> updateCategory(Request Function(CategoryUpdateBuilder) builder) async {
-    return _getInterfaceById<CategoryInterface<Category>>('categories').update<Category>(
+  Future<ResponseContainer<Category?>> updateCategory(Request Function(CategoryUpdateBuilder) builder) async {
+    return _getInterfaceById<CategoryInterface<Category>>('categories')!.update<Category>(
       typeResolver: Category(),
-      request: builder(CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      request: builder(CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues()) as Request<Category>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Category>> createCategory(Request Function(CategoryCreateBuilder) builder) async {
-    return _getInterfaceById<CategoryInterface<Category>>('categories').create<Category>(
+  Future<ResponseContainer<Category?>> createCategory(Request Function(CategoryCreateBuilder) builder) async {
+    return _getInterfaceById<CategoryInterface<Category>>('categories')!.create<Category>(
       typeResolver: Category(),
-      request: builder(CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues()),
+      request: builder(CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues()) as Request<Category>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Tag>> createTag(Request Function(TagCreateBuilder) builder) async {
-    return _getInterfaceById<TagInterface<Tag>>('tags').create<Tag>(
+  Future<ResponseContainer<Tag?>> createTag(Request Function(TagCreateBuilder) builder) async {
+    return _getInterfaceById<TagInterface<Tag>>('tags')!.create<Tag>(
       typeResolver: Tag(),
-      request: builder(TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      request: builder(TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues()) as Request<Tag>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Tag>> updateTag(Request Function(TagUpdateBuilder) builder) async {
-    return _getInterfaceById<TagInterface<Tag>>('tags').update<Tag>(
+  Future<ResponseContainer<Tag?>> updateTag(Request Function(TagUpdateBuilder) builder) async {
+    return _getInterfaceById<TagInterface<Tag>>('tags')!.update<Tag>(
       typeResolver: Tag(),
-      request: builder(TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      request: builder(TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues()) as Request<Tag>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Tag>> retriveTag(Request Function(TagRetriveBuilder) builder) async {
-    return _getInterfaceById<TagInterface<Tag>>('tags').retrive<Tag>(
+  Future<ResponseContainer<Tag?>> retriveTag(Request Function(TagRetriveBuilder) builder) async {
+    return _getInterfaceById<TagInterface<Tag>>('tags')!.retrive<Tag>(
       typeResolver: Tag(),
-      request: builder(TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      request: builder(TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues()) as Request<Tag>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Tag>>> listTag(Request Function(TagListBuilder) builder) async {
-    return _getInterfaceById<TagInterface<Tag>>('tags').list<Tag>(
+  Future<ResponseContainer<List<Tag?>?>> listTag(Request Function(TagListBuilder) builder) async {
+    return _getInterfaceById<TagInterface<Tag>>('tags')!.list<Tag>(
       typeResolver: Tag(),
-      request: builder(TagListBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      request: builder(TagListBuilder().withEndpoint('tags').initializeWithDefaultValues()) as Request<List<Tag>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Tag>> deleteTag(Request Function(TagDeleteBuilder) builder) async {
-    return _getInterfaceById<TagInterface<Tag>>('tags').delete<Tag>(
+  Future<ResponseContainer<Tag?>> deleteTag(Request Function(TagDeleteBuilder) builder) async {
+    return _getInterfaceById<TagInterface<Tag>>('tags')!.delete<Tag>(
       typeResolver: Tag(),
-      request: builder(TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues()),
+      request: builder(TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues()) as Request<Tag>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<List<Comment>>> listComment(Request Function(CommentListBuilder) builder) async {
-    return _getInterfaceById<CommentInterface<Comment>>('comments').list<Comment>(
+  Future<ResponseContainer<List<Comment?>?>> listComment(Request Function(CommentListBuilder) builder) async {
+    return _getInterfaceById<CommentInterface<Comment>>('comments')!.list<Comment>(
       typeResolver: Comment(),
-      request: builder(CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues()),
+      request: builder(CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues()) as Request<List<Comment>>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Comment>> deleteComment(Request Function(CommentDeleteBuilder) builder) async {
-    return _getInterfaceById<CommentInterface<Comment>>('comments').delete<Comment>(
+  Future<ResponseContainer<Comment?>> deleteComment(Request Function(CommentDeleteBuilder) builder) async {
+    return _getInterfaceById<CommentInterface<Comment>>('comments')!.delete<Comment>(
       typeResolver: Comment(),
-      request: builder(CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues()),
+      request: builder(CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues()) as Request<Comment>?,
       requesterClient: _requester,
     );
   }
 
-  Future<ResponseContainer<Comment>> createComment(Request Function(CommentCreateBuilder) builder) async {
-    return _getInterfaceById<CommentInterface<Comment>>('comments').create<Comment>(
+  Future<ResponseContainer<Comment?>> createComment(Request Function(CommentCreateBuilder) builder) async {
+    return _getInterfaceById<CommentInterface<Comment>>('comments')!.create<Comment>(
       typeResolver: Comment(),
-      request: builder(CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues()),
+      request: builder(CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues()) as Request<Comment>?,
       requesterClient: _requester,
     );
   }

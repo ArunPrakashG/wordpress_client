@@ -9,11 +9,11 @@ class SizeValue {
     this.sourceUrl,
   });
 
-  final String file;
-  final int width;
-  final int height;
-  final String mimeType;
-  final String sourceUrl;
+  final String? file;
+  final int? width;
+  final int? height;
+  final String? mimeType;
+  final String? sourceUrl;
 
   factory SizeValue.fromJson(String str) => SizeValue.fromMap(json.decode(str));
 

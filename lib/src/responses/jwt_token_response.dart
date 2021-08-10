@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 class JwtToken {
-  bool success;
-  int statusCode;
-  String code;
-  String message;
-  String token;
-  String user_email;
-  String user_nicename;
-  String user_display_name;
+  bool? success;
+  int? statusCode;
+  String? code;
+  String? message;
+  String? token;
+  String? user_email;
+  String? user_nicename;
+  String? user_display_name;
   
   JwtToken({
     this.success,

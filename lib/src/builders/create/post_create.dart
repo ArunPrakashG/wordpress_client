@@ -12,40 +12,40 @@ import '../../utilities/pair.dart';
 
 class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Post) responseValidationDelegate;
+  bool Function(Post)? responseValidationDelegate;
 
-  String _slug;
-  String _title;
-  String _content;
-  String _excerpt;
-  String _password;
-  String _status;
-  int _authorId;
-  int _featuredMediaId;
-  String _commentStatus;
-  String _pingStatus;
-  String _format;
-  bool _asSticky;
-  List<int> _categories;
-  List<int> _tags;
+  String? _slug;
+  String? _title;
+  String? _content;
+  String? _excerpt;
+  String? _password;
+  String? _status;
+  int? _authorId;
+  int? _featuredMediaId;
+  String? _commentStatus;
+  String? _pingStatus;
+  String? _format;
+  bool? _asSticky;
+  List<int>? _categories;
+  List<int>? _tags;
 
   PostCreateBuilder withTitle(String title) {
     _title = title;
@@ -104,13 +104,13 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
 
   PostCreateBuilder withCategories(Iterable<int> categories) {
     _categories ??= [];
-    _categories.addAll(categories);
+    _categories!.addAll(categories);
     return this;
   }
 
   PostCreateBuilder withTags(Iterable<int> tags) {
     _tags ??= [];
-    _tags.addAll(tags);
+    _tags!.addAll(tags);
     return this;
   }
 
@@ -133,7 +133,7 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
     );
   }
 
-  Map<String, String> _parseParameters() {
+  Map<String, String?> _parseParameters() {
     return {
       if (!isNullOrEmpty(_title)) 'title': _title,
       if (!isNullOrEmpty(_content)) 'content': _content,
@@ -145,9 +145,9 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
       if (!isNullOrEmpty(_commentStatus)) 'comment_status': _commentStatus,
       if (!isNullOrEmpty(_pingStatus)) 'ping_status': _pingStatus,
       if (!isNullOrEmpty(_format)) 'format': _format,
-      if (_asSticky != null && _asSticky) 'sticky': '1',
-      if (_categories != null && _categories.isNotEmpty) 'categories': _categories.join(','),
-      if (_tags != null && _tags.isNotEmpty) 'tags': _tags.join(','),
+      if (_asSticky != null && _asSticky!) 'sticky': '1',
+      if (_categories != null && _categories!.isNotEmpty) 'categories': _categories!.join(','),
+      if (_tags != null && _tags!.isNotEmpty) 'tags': _tags!.join(','),
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
     };
   }
@@ -184,14 +184,14 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
   @override
   PostCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   PostCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

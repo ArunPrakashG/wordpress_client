@@ -12,38 +12,38 @@ import '../request_builder_base.dart';
 
 class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
-  String _username;
-  String _displayName;
-  String _firstName;
-  String _lastName;
-  String _email;
-  String _password;
-  String _url;
-  String _description;
-  String _locale;
-  String _nickname;
-  String _slug;
-  List<String> _roles;
+  String? _username;
+  String? _displayName;
+  String? _firstName;
+  String? _lastName;
+  String? _email;
+  String? _password;
+  String? _url;
+  String? _description;
+  String? _locale;
+  String? _nickname;
+  String? _slug;
+  List<String>? _roles;
 
   UserCreateBuilder withUserName(String username) {
     _username = username;
@@ -102,7 +102,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
 
   UserCreateBuilder withRoles(Iterable<String> roles) {
     _roles ??= [];
-    _roles.addAll(roles);
+    _roles!.addAll(roles);
     return this;
   }
 
@@ -120,7 +120,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
     );
   }
 
-  Map<String, String> _parseParameters() {
+  Map<String, String?> _parseParameters() {
     return {
       'username': _username,
       'email': _email,
@@ -133,7 +133,7 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
       if (!isNullOrEmpty(_nickname)) 'nickname': _nickname,
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
       if (!isNullOrEmpty(_password)) 'password': _password,
-      if (_roles != null && _roles.isNotEmpty) 'roles': _roles.join(','),
+      if (_roles != null && _roles!.isNotEmpty) 'roles': _roles!.join(','),
     };
   }
 
@@ -169,14 +169,14 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
   @override
   UserCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   UserCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

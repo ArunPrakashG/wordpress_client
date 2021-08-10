@@ -12,35 +12,35 @@ import '../request_builder_base.dart';
 
 class CommentCreateBuilder implements IQueryBuilder<CommentCreateBuilder, Comment> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Comment) responseValidationDelegate;
+  bool Function(Comment)? responseValidationDelegate;
 
-  int _author;
-  String _authorIp;
-  String _authorUrl;
-  String _authorEmail;
-  String _authorDisplayName;
-  String _authorUserAgent;
-  int _commentParent;
-  String _content;
-  int _postId;
+  int? _author;
+  String? _authorIp;
+  String? _authorUrl;
+  String? _authorEmail;
+  String? _authorDisplayName;
+  String? _authorUserAgent;
+  int? _commentParent;
+  String? _content;
+  int? _postId;
 
   CommentCreateBuilder withAuthor(int id) {
     _author = id;
@@ -147,14 +147,14 @@ class CommentCreateBuilder implements IQueryBuilder<CommentCreateBuilder, Commen
   @override
   CommentCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CommentCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

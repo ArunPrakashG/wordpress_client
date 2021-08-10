@@ -18,16 +18,16 @@ class Category extends ISerializable<Category> {
     this.links,
   });
 
-  final int id;
-  final int count;
-  final String description;
-  final String link;
-  final String name;
-  final String slug;
-  final String taxonomy;
-  final int parent;
-  final List<dynamic> meta;
-  final Links links;
+  final int? id;
+  final int? count;
+  final String? description;
+  final String? link;
+  final String? name;
+  final String? slug;
+  final String? taxonomy;
+  final int? parent;
+  final List<dynamic>? meta;
+  final Links? links;
 
   factory Category.fromJson(String str) => Category.fromMap(json.decode(str));  
 
@@ -53,12 +53,12 @@ class Category extends ISerializable<Category> {
         "slug": slug == null ? null : slug,
         "taxonomy": taxonomy == null ? null : taxonomy,
         "parent": parent == null ? null : parent,
-        "meta": meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
-        "_links": links == null ? null : links.toMap(),
+        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        "_links": links == null ? null : links!.toMap(),
       };
 
   @override
-  Category fromJson(Map<String, dynamic> json) => Category.fromMap(json);
+  Category fromJson(Map<String, dynamic>? json) => Category.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

@@ -15,16 +15,16 @@ import 'utilities/serializable_instance.dart';
 const int defaultRequestTimeout = 60 * 1000;
 
 class InternalRequester {
-  Dio _client;
-  String _baseUrl;
-  Authorization _defaultAuthorization;
-  bool Function(dynamic) _responsePreprocessorDelegate;
-  static final Map<String, int> endPointStatistics = Map<String, int>();
-  static void Function(String, String, int) _statisticsDelegate;
-  bool _isBusy;
+  Dio? _client;
+  String? _baseUrl;
+  Authorization? _defaultAuthorization;
+  bool Function(dynamic)? _responsePreprocessorDelegate;
+  static final Map<String?, int> endPointStatistics = Map<String?, int>();
+  static void Function(String, String?, int?)? _statisticsDelegate;
+  bool? _isBusy;
   bool _singleRequestAtATimeMode = false;
 
-  InternalRequester(String baseUrl, String path, BootstrapConfiguration configuration) {
+  InternalRequester(String? baseUrl, String? path, BootstrapConfiguration? configuration) {
     if (baseUrl == null) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -53,7 +53,7 @@ class InternalRequester {
       _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
     }
 
-    if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization.isDefault) {
+    if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization!.isDefault) {
       _defaultAuthorization = configuration.defaultAuthorization;
     }
 
@@ -62,12 +62,12 @@ class InternalRequester {
     }
 
     if (configuration.defaultUserAgent != null) {
-      _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
+      _client!.options.headers['User-Agent'] = configuration.defaultUserAgent;
     }
 
-    if (configuration.defaultHeaders != null && configuration.defaultHeaders.isNotEmpty) {
-      for (final header in configuration.defaultHeaders) {
-        _client.options.headers[header.key] = header.value;
+    if (configuration.defaultHeaders != null && configuration.defaultHeaders!.isNotEmpty) {
+      for (final header in configuration.defaultHeaders!) {
+        _client!.options.headers[header.key] = header.value;
       }
     }
 
@@ -78,19 +78,19 @@ class InternalRequester {
           receiveTimeout: configuration.requestTimeout,
           followRedirects: configuration.shouldFollowRedirects,
           maxRedirects: configuration.maxRedirects,
-          baseUrl: _baseUrl,
+          baseUrl: _baseUrl!,
         ),
       );
     } else {
-      _client.options.connectTimeout = configuration.requestTimeout;
-      _client.options.receiveTimeout = configuration.requestTimeout;
-      _client.options.followRedirects = configuration.shouldFollowRedirects;
-      _client.options.maxRedirects = configuration.maxRedirects;
-      _client.options.baseUrl = _baseUrl;
+      _client!.options.connectTimeout = configuration.requestTimeout!;
+      _client!.options.receiveTimeout = configuration.requestTimeout!;
+      _client!.options.followRedirects = configuration.shouldFollowRedirects!;
+      _client!.options.maxRedirects = configuration.maxRedirects!;
+      _client!.options.baseUrl = _baseUrl!;
     }
 
     if (configuration.useCookies ?? false) {
-      _client.interceptors.add(CookieManager(CookieJar()));
+      _client!.interceptors.add(CookieManager(CookieJar()));
     }
   }
 
@@ -99,12 +99,12 @@ class InternalRequester {
       return;
     }
 
-    while (_isBusy) {
+    while (_isBusy!) {
       await Future.delayed(Duration(milliseconds: 500));
     }
   }
 
-  bool getBusyStatus() => _isBusy;
+  bool? getBusyStatus() => _isBusy;
 
   void removeDefaultAuthorization() {
     _defaultAuthorization = null;
@@ -113,42 +113,34 @@ class InternalRequester {
   bool _handleResponse<T>(Request<T> request, T responseContainer) {
     request.callback?.invokeResponseCallback(responseContainer);
 
-    if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate(responseContainer)) {
+    if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate!(responseContainer)) {
       return false;
     }
 
-    if (request.validationDelegate != null && !request.validationDelegate(responseContainer)) {
+    if (request.validationDelegate != null && !request.validationDelegate!(responseContainer)) {
       return false;
     }
 
     return true;
   }
 
-  Future<ResponseContainer<T>> createRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+  Future<ResponseContainer<T?>> createRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     final options = await _parseAsDioRequest(request);
-    if (options == null) {
-      return ResponseContainer<T>.failed(
-        null,
-        duration: null,
-        responseCode: -1,
-        message: 'Authorization might have failed internally.',
-      );
-    }
 
     await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client.fetch(options);
+      final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode, 200, 299)) {
-        return ResponseContainer<T>.failed(
+      if (!isInRange(response.statusCode!, 200, 299)) {
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -159,7 +151,7 @@ class InternalRequester {
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
-        return ResponseContainer<T>.failed(
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -177,7 +169,7 @@ class InternalRequester {
     } on DioError catch (e) {
       request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -186,7 +178,7 @@ class InternalRequester {
     } on Exception catch (ex) {
       request.callback?.invokeUnhandledExceptionCallback(ex);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${ex.toString()})',
@@ -197,31 +189,23 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T>> deleteRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+  Future<ResponseContainer<T?>> deleteRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
     if (request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     final options = await _parseAsDioRequest(request);
-    if (options == null) {
-      return ResponseContainer<T>.failed(
-        null,
-        duration: null,
-        responseCode: -1,
-        message: 'Authorization might have failed internally.',
-      );
-    }
 
     await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client.fetch(options);
+      final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode, 200, 299)) {
-        return ResponseContainer<T>.failed(
+      if (!isInRange(response.statusCode!, 200, 299)) {
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -229,7 +213,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<T>(
+      return ResponseContainer<T?>(
         null,
         responseCode: response.statusCode,
         responseHeaders: _parseResponseHeaders(response.headers.map),
@@ -238,7 +222,7 @@ class InternalRequester {
     } on DioError catch (e) {
       request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -247,7 +231,7 @@ class InternalRequester {
     } on Exception catch (ex) {
       request.callback?.invokeUnhandledExceptionCallback(ex);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${ex.toString()})',
@@ -258,31 +242,22 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<List<T>>> listRequest<T extends ISerializable<T>>(T typeResolver, Request<List<T>> request) async {
+  Future<ResponseContainer<List<T>?>> listRequest<T extends ISerializable<T>?>(T typeResolver, Request<List<T>>? request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     final options = await _parseAsDioRequest(request);
-    if (options == null) {
-      return ResponseContainer<List<T>>.failed(
-        null,
-        duration: null,
-        responseCode: -1,
-        message: 'Authorization might have failed internally.',
-      );
-    }
-
     await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client.fetch(options);
+      final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode, 200, 299)) {
-        return ResponseContainer<List<T>>.failed(
+      if (!isInRange(response.statusCode!, 200, 299)) {
+        return ResponseContainer<List<T>?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -293,7 +268,7 @@ class InternalRequester {
       final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
 
       if (!_handleResponse<List<T>>(request, responseDataContainer)) {
-        return ResponseContainer<List<T>>.failed(
+        return ResponseContainer<List<T>?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -310,7 +285,7 @@ class InternalRequester {
     } on DioError catch (e) {
       request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<List<T>>.failed(
+      return ResponseContainer<List<T>?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -319,7 +294,7 @@ class InternalRequester {
     } on Exception catch (ex) {
       request.callback?.invokeUnhandledExceptionCallback(ex);
 
-      return ResponseContainer<List<T>>.failed(
+      return ResponseContainer<List<T>?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${ex.toString()})',
@@ -330,31 +305,23 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T>> retriveRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+  Future<ResponseContainer<T?>> retriveRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     final options = await _parseAsDioRequest(request);
-    if (options == null) {
-      return ResponseContainer<T>.failed(
-        null,
-        duration: null,
-        responseCode: -1,
-        message: 'Authorization might have failed internally.',
-      );
-    }
 
     await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client.fetch(options);
+      final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode, 200, 299)) {
-        return ResponseContainer<T>.failed(
+      if (response == null || !isInRange(response.statusCode!, 200, 299)) {
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -365,7 +332,7 @@ class InternalRequester {
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
-        return ResponseContainer<T>.failed(
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -382,7 +349,7 @@ class InternalRequester {
     } on DioError catch (e) {
       request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -391,7 +358,7 @@ class InternalRequester {
     } on Exception catch (ex) {
       request.callback?.invokeUnhandledExceptionCallback(ex);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${ex.toString()})',
@@ -402,31 +369,23 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T>> updateRequest<T extends ISerializable<T>>(T typeResolver, Request<T> request) async {
+  Future<ResponseContainer<T?>> updateRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
     if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     final options = await _parseAsDioRequest(request);
-    if (options == null) {
-      return ResponseContainer<T>.failed(
-        null,
-        duration: null,
-        responseCode: -1,
-        message: 'Authorization might have failed internally.',
-      );
-    }
 
     await waitWhileBusy();
 
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client.fetch(options);
+      final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode, 200, 299)) {
-        return ResponseContainer<T>.failed(
+      if (!isInRange(response.statusCode!, 200, 299)) {
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -437,7 +396,7 @@ class InternalRequester {
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
-        return ResponseContainer<T>.failed(
+        return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
@@ -454,7 +413,7 @@ class InternalRequester {
     } on DioError catch (e) {
       request.callback?.invokeRequestErrorCallback(e);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -463,7 +422,7 @@ class InternalRequester {
     } on Exception catch (ex) {
       request.callback?.invokeUnhandledExceptionCallback(ex);
 
-      return ResponseContainer<T>.failed(
+      return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${ex.toString()})',
@@ -474,20 +433,14 @@ class InternalRequester {
     }
   }
 
-  Map<String, dynamic> _parseResponseHeaders(Map<String, List<String>> headers) {
-    if (headers == null) {
-      return null;
-    }
-
-    return headers.map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
-  }
+  Map<String, dynamic> _parseResponseHeaders(Map<String, List<String>> headers) => headers.map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
 
   Future<RequestOptions> _parseAsDioRequest(Request request) async {
-    if (request == null || !request.isRequestExecutable) {
+    if (!request.isRequestExecutable) {
       throw NullReferenceException('Request object is null');
     }
 
-    Uri requestUri = Uri.tryParse(parseUrl(
+    Uri? requestUri = Uri.tryParse(parseUrl(
       _baseUrl,
       request.generatedRequestPath,
     ));
@@ -517,20 +470,20 @@ class InternalRequester {
     if (request.shouldAuthorize &&
         !hasAuthorizedAlready &&
         await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback)) {
-      options.headers['Authorization'] = request.authorization.authString;
+      options.headers['Authorization'] = request.authorization!.authString;
       hasAuthorizedAlready = true;
     }
 
     if (_defaultAuthorization != null &&
-        !_defaultAuthorization.isDefault &&
+        !_defaultAuthorization!.isDefault &&
         !hasAuthorizedAlready &&
         await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback)) {
-      options.headers['Authorization'] = _defaultAuthorization.authString;
+      options.headers['Authorization'] = _defaultAuthorization!.authString;
       hasAuthorizedAlready = true;
     }
 
-    if (request.headers != null && request.headers.isNotEmpty) {
-      for (final pair in request.headers) {
+    if (request.headers != null && request.headers!.isNotEmpty) {
+      for (final pair in request.headers!) {
         options.headers[pair.key] = pair.value;
       }
     }
@@ -538,15 +491,15 @@ class InternalRequester {
     return options;
   }
 
-  void _invokeStatisticsCallback(String requestUrl, String endpoint) {
+  void _invokeStatisticsCallback(String requestUrl, String? endpoint) {
     if (endPointStatistics[endpoint] == null) {
       endPointStatistics[endpoint] = 1;
     } else {
-      endPointStatistics[endpoint]++;
+      endPointStatistics[endpoint] = endPointStatistics[endpoint]! - 1;
     }
 
     if (_statisticsDelegate != null) {
-      _statisticsDelegate(requestUrl, endpoint, endPointStatistics[endpoint]);
+      _statisticsDelegate!(requestUrl, endpoint, endPointStatistics[endpoint]);
     }
   }
 }

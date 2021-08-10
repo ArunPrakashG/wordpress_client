@@ -27,24 +27,24 @@ class Comment extends ISerializable<Comment> {
     this.links,
   });
 
-  final int id;
-  final int post;
-  final int parent;
-  final int author;
-  final String authorName;
-  final String authorEmail;
-  final String authorUrl;
-  final String authorIp;
-  final String authorUserAgent;
-  final DateTime date;
-  final DateTime dateGmt;
-  final Content content;
-  final String link;
-  final CommentStatus status;
-  final Type type;
-  final Map<String, String> authorAvatarUrls;
-  final List<dynamic> meta;
-  final Links links;
+  final int? id;
+  final int? post;
+  final int? parent;
+  final int? author;
+  final String? authorName;
+  final String? authorEmail;
+  final String? authorUrl;
+  final String? authorIp;
+  final String? authorUserAgent;
+  final DateTime? date;
+  final DateTime? dateGmt;
+  final Content? content;
+  final String? link;
+  final CommentStatus? status;
+  final Type? type;
+  final Map<String, String>? authorAvatarUrls;
+  final List<dynamic>? meta;
+  final Links? links;
 
   factory Comment.fromJson(String str) => Comment.fromMap(json.decode(str));
 
@@ -80,19 +80,19 @@ class Comment extends ISerializable<Comment> {
         "author_url": authorUrl == null ? null : authorUrl,
         "author_ip": authorIp == null ? null : authorIp,
         "author_user_agent": authorUserAgent == null ? null : authorUserAgent,
-        "date": date == null ? null : date.toIso8601String(),
-        "date_gmt": dateGmt == null ? null : dateGmt.toIso8601String(),
-        "content": content == null ? null : content.toMap(),
+        "date": date == null ? null : date!.toIso8601String(),
+        "date_gmt": dateGmt == null ? null : dateGmt!.toIso8601String(),
+        "content": content == null ? null : content!.toMap(),
         "link": link == null ? null : link,
         "status": status == null ? null : status.toString().split('.').last.toLowerCase(),
         "type": type == null ? null : type,
-        "author_avatar_urls": authorAvatarUrls == null ? null : Map.from(authorAvatarUrls).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "meta": meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
-        "_links": links == null ? null : links.toMap(),
+        "author_avatar_urls": authorAvatarUrls == null ? null : Map.from(authorAvatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        "_links": links == null ? null : links!.toMap(),
       };
 
   @override
-  Comment fromJson(Map<String, dynamic> json) => Comment.fromMap(json);
+  Comment fromJson(Map<String, dynamic>? json) => Comment.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

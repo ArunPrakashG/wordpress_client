@@ -11,28 +11,28 @@ import '../request_builder_base.dart';
 
 class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Comment> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Comment) responseValidationDelegate;
+  bool Function(Comment)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   bool _force = false;
-  String _password;
+  String? _password;
 
   CommentDeleteBuilder withPassword(String password) {
     _password = password;
@@ -40,7 +40,7 @@ class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Commen
   }
 
   CommentDeleteBuilder withId(int id) {
-    endpoint += '/$id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -64,7 +64,7 @@ class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Commen
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (_force) 'force': 'true',
       if (!isNullOrEmpty(_password)) 'password': _password,
@@ -97,14 +97,14 @@ class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Commen
   @override
   CommentDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers = [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CommentDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

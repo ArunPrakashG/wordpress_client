@@ -6,13 +6,13 @@ import '../utilities/pair.dart';
 import 'request.dart';
 
 abstract class IQueryBuilder<TRequestType, YResponseType> {
-  bool Function(YResponseType) responseValidationDelegate;
-  Authorization authorization;
-  List<Pair<String, String>> headers;
-  List<Pair<String, String>> queryParameters;
-  CancelToken cancelToken;
-  Callback callback;
-  String endpoint;
+  bool Function(YResponseType)? responseValidationDelegate;
+  Authorization? authorization;
+  List<Pair<String, String>>? headers;
+  List<Pair<String, String>>? queryParameters;
+  CancelToken? cancelToken;
+  Callback? callback;
+  String? endpoint;
 
   TRequestType initializeWithDefaultValues();
 

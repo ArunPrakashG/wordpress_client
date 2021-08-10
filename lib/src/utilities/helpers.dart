@@ -3,11 +3,11 @@ import 'dart:math';
 
 // import 'package:html/parser.dart';
 
-bool isNullOrEmpty(String value) => value == null || value.isEmpty;
+bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
 bool isAlphaNumeric(String value) => RegExp(r"^[a-zA-Z0-9]*$").hasMatch(value);
 
-String parseUrl(String baseUrl, String path) {
+String parseUrl(String? baseUrl, String? path) {
   if (baseUrl == null || path == null) {
     return '';
   }
@@ -27,7 +27,7 @@ String parseUrl(String baseUrl, String path) {
   return '$baseUrl$path';
 }
 
-String getJoiningChar(String baseUrl) {
+String getJoiningChar(String? baseUrl) {
   if (baseUrl == null || baseUrl.isEmpty) {
     return '';
   }

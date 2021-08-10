@@ -32,25 +32,25 @@ class User implements ISerializable<User> {
     this.username,
   });
 
-  final int id;
-  final String username;
-  final String name;
-  final String firstName;
-  final String lastName;
-  final String nickname;
-  final String email;
-  final DateTime registeredDate;
-  final Map<String, bool> capabilities;
-  final ExtraCapabilities extraCapabilities;
-  final String url;
-  final String description;
-  final String link;
-  final String slug;
-  final List<String> roles;
-  final Map<String, String> avatarUrls;
-  final List<dynamic> meta;
-  final String yoastHead;
-  final Links links;
+  final int? id;
+  final String? username;
+  final String? name;
+  final String? firstName;
+  final String? lastName;
+  final String? nickname;
+  final String? email;
+  final DateTime? registeredDate;
+  final Map<String, bool>? capabilities;
+  final ExtraCapabilities? extraCapabilities;
+  final String? url;
+  final String? description;
+  final String? link;
+  final String? slug;
+  final List<String>? roles;
+  final Map<String, String>? avatarUrls;
+  final List<dynamic>? meta;
+  final String? yoastHead;
+  final Links? links;
 
   factory User.fromJson(String str) => User.fromMap(json.decode(str));
 
@@ -86,18 +86,18 @@ class User implements ISerializable<User> {
         "description": description == null ? null : description,
         "link": link == null ? null : link,
         "slug": slug == null ? null : slug,
-        "registered_date": registeredDate == null ? null : registeredDate.toIso8601String(),
-        "capabilities": capabilities == null ? null : Map.from(capabilities).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "extra_capabilities": extraCapabilities == null ? null : extraCapabilities.toMap(),
-        "roles": roles == null ? null : List<dynamic>.from(roles.map((x) => x)),
-        "avatar_urls": avatarUrls == null ? null : Map.from(avatarUrls).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "meta": meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
+        "registered_date": registeredDate == null ? null : registeredDate!.toIso8601String(),
+        "capabilities": capabilities == null ? null : Map.from(capabilities!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "extra_capabilities": extraCapabilities == null ? null : extraCapabilities!.toMap(),
+        "roles": roles == null ? null : List<dynamic>.from(roles!.map((x) => x)),
+        "avatar_urls": avatarUrls == null ? null : Map.from(avatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
         "yoast_head": yoastHead == null ? null : yoastHead,
-        "_links": links == null ? null : links.toMap(),
+        "_links": links == null ? null : links!.toMap(),
       };
 
   @override
-  User fromJson(Map<String, dynamic> json) => User.fromMap(json);
+  User fromJson(Map<String, dynamic>? json) => User.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

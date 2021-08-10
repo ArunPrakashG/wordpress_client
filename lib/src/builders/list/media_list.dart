@@ -11,45 +11,45 @@ import '../request_builder_base.dart';
 
 class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(List<Media>) responseValidationDelegate;
+  bool Function(List<Media>)? responseValidationDelegate;
 
-  String _context;
+  String? _context;
   int _page = 1;
   int _perPage = 10;
-  String _search;
-  DateTime _after;
-  DateTime _before;
-  List<int> _allowedAuthors;
-  List<int> _excludedAuthors;
-  List<int> _excludedIds;
-  List<int> _allowedIds;
-  String _resultOrder;
-  String _sortOrder;
-  int _offset;
-  List<int> _parentIds;
-  List<int> _parentExclude;
-  List<String> _slugs;
-  String _status;
-  String _mediaType;
-  String _mimeType;
+  String? _search;
+  DateTime? _after;
+  DateTime? _before;
+  List<int>? _allowedAuthors;
+  List<int>? _excludedAuthors;
+  List<int>? _excludedIds;
+  List<int>? _allowedIds;
+  String? _resultOrder;
+  String? _sortOrder;
+  int? _offset;
+  List<int>? _parentIds;
+  List<int>? _parentExclude;
+  List<String>? _slugs;
+  String? _status;
+  String? _mediaType;
+  String? _mimeType;
 
   @override
   Request<List<Media>> build() {
@@ -66,21 +66,21 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       'page': _page.toString(),
       'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
       if (_after != null) 'after': _after.toString(),
       if (_before != null) 'before': _before.toString(),
-      if (_allowedAuthors != null && _allowedAuthors.isNotEmpty) 'author': _allowedAuthors.join(','),
-      if (_excludedAuthors != null && _excludedAuthors.isNotEmpty) 'author_exclude': _excludedAuthors.join(','),
-      if (_excludedIds != null && _excludedIds.isNotEmpty) 'exclude': _excludedIds.join(','),
-      if (_allowedIds != null && _allowedIds.isNotEmpty) 'include': _allowedIds.join(','),
-      if (_offset != null && _offset > 0) 'offset': _offset.toString(),
-      if (_parentIds != null && _parentIds.isNotEmpty) 'parent': _parentIds.join(','),
-      if (_parentExclude != null && _parentExclude.isNotEmpty) 'parent_exclude': _parentExclude.join(','),
-      if (_slugs != null && _slugs.isNotEmpty) 'slug': _slugs.join(','),
+      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty) 'author': _allowedAuthors!.join(','),
+      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty) 'author_exclude': _excludedAuthors!.join(','),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds!.join(','),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds!.join(','),
+      if (_offset != null && _offset! > 0) 'offset': _offset.toString(),
+      if (_parentIds != null && _parentIds!.isNotEmpty) 'parent': _parentIds!.join(','),
+      if (_parentExclude != null && _parentExclude!.isNotEmpty) 'parent_exclude': _parentExclude!.join(','),
+      if (_slugs != null && _slugs!.isNotEmpty) 'slug': _slugs!.join(','),
       if (!isNullOrEmpty(_status)) 'status': _status,
       if (!isNullOrEmpty(_mediaType)) 'media_type': _mediaType,
       if (!isNullOrEmpty(_mimeType)) 'mime_type': _mimeType,
@@ -102,19 +102,19 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
 
   MediaListBuilder withSlug(List<String> slugs) {
     _slugs ??= [];
-    _slugs.addAll(slugs);
+    _slugs!.addAll(slugs);
     return this;
   }
 
   MediaListBuilder allowParents(Iterable<int> ids) {
     _parentIds ??= [];
-    _parentIds.addAll(ids);
+    _parentIds!.addAll(ids);
     return this;
   }
 
   MediaListBuilder excludeParents(Iterable<int> ids) {
     _parentExclude ??= [];
-    _parentExclude.addAll(ids);
+    _parentExclude!.addAll(ids);
     return this;
   }
 
@@ -146,25 +146,25 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
 
   MediaListBuilder allowAuthors(Iterable<int> ids) {
     _allowedAuthors ??= [];
-    _allowedAuthors.addAll(ids);
+    _allowedAuthors!.addAll(ids);
     return this;
   }
 
   MediaListBuilder excludeAuthors(Iterable<int> ids) {
     _excludedAuthors ??= [];
-    _excludedAuthors.addAll(ids);
+    _excludedAuthors!.addAll(ids);
     return this;
   }
 
   MediaListBuilder includeIds(Iterable<int> ids) {
     _allowedIds ??= [];
-    _allowedIds.addAll(ids);
+    _allowedIds!.addAll(ids);
     return this;
   }
 
   MediaListBuilder excludeIds(Iterable<int> ids) {
     _excludedIds ??= [];
-    _excludedIds.addAll(ids);
+    _excludedIds!.addAll(ids);
     return this;
   }
 
@@ -220,14 +220,14 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
   @override
   MediaListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MediaListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

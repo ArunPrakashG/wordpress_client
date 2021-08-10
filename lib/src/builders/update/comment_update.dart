@@ -12,36 +12,36 @@ import '../request_builder_base.dart';
 
 class CommentUpdateBuilder implements IQueryBuilder<CommentUpdateBuilder, Comment> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Comment) responseValidationDelegate;
+  bool Function(Comment)? responseValidationDelegate;
 
-  int _author;
-  String _authorIp;
-  String _authorUrl;
-  String _authorEmail;
-  String _authorDisplayName;
-  String _authorUserAgent;
-  int _commentParent;
-  String _content;
-  int _postId;
-  String _commentStatus;
+  int? _author;
+  String? _authorIp;
+  String? _authorUrl;
+  String? _authorEmail;
+  String? _authorDisplayName;
+  String? _authorUserAgent;
+  int? _commentParent;
+  String? _content;
+  int? _postId;
+  String? _commentStatus;
 
   CommentUpdateBuilder withCommentStatus(CommentStatus commentStatus) {
     _commentStatus = commentStatus.toString().split('.').last.toLowerCase();
@@ -49,7 +49,7 @@ class CommentUpdateBuilder implements IQueryBuilder<CommentUpdateBuilder, Commen
   }
 
   CommentUpdateBuilder withCommentId(int id) {
-    endpoint += '/$id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -159,14 +159,14 @@ class CommentUpdateBuilder implements IQueryBuilder<CommentUpdateBuilder, Commen
   @override
   CommentUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CommentUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

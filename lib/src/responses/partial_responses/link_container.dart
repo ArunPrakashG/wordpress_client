@@ -10,12 +10,12 @@ class LinkContainer {
     this.href,
   });
 
-  final int id;
-  final String name;
-  final String taxonomy;
-  final bool embeddable;
-  final int count;
-  final String href;
+  final int? id;
+  final String? name;
+  final String? taxonomy;
+  final bool? embeddable;
+  final int? count;
+  final String? href;
 
   factory LinkContainer.fromJson(String str) => LinkContainer.fromMap(json.decode(str));
 

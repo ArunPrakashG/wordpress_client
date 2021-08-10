@@ -12,36 +12,36 @@ import '../request_builder_base.dart';
 
 class MediaUpdateBuilder implements IQueryBuilder<MediaUpdateBuilder, Media> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Media) responseValidationDelegate;
+  bool Function(Media)? responseValidationDelegate;
 
-  String _slug;
-  String _status;
-  String _title;
-  int _author;
-  String _commentStatus;
-  String _pingStatus;
-  String _altText;
-  String _caption;
-  String _description;
-  int _postId;
+  String? _slug;
+  String? _status;
+  String? _title;
+  int? _author;
+  String? _commentStatus;
+  String? _pingStatus;
+  String? _altText;
+  String? _caption;
+  String? _description;
+  int? _postId;
 
   @override
   Request<Media> build() {
@@ -159,14 +159,14 @@ class MediaUpdateBuilder implements IQueryBuilder<MediaUpdateBuilder, Media> {
   @override
   MediaUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MediaUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

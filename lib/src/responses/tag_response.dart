@@ -16,15 +16,15 @@ class Tag extends ISerializable<Tag> {
     this.links,
   });
 
-  final int id;
-  final int count;
-  final String description;
-  final String link;
-  final String name;
-  final String slug;
-  final String taxonomy;
-  final List<dynamic> meta;
-  final Links links;
+  final int? id;
+  final int? count;
+  final String? description;
+  final String? link;
+  final String? name;
+  final String? slug;
+  final String? taxonomy;
+  final List<dynamic>? meta;
+  final Links? links;
 
   factory Tag.fromJson(String str) => Tag.fromMap(json.decode(str));
 
@@ -48,12 +48,12 @@ class Tag extends ISerializable<Tag> {
         "name": name == null ? null : name,
         "slug": slug == null ? null : slug,
         "taxonomy": taxonomy == null ? null : taxonomy,
-        "meta": meta == null ? null : List<dynamic>.from(meta.map((x) => x)),
-        "_links": links == null ? null : links.toMap(),
+        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        "_links": links == null ? null : links!.toMap(),
       };
 
   @override
-  Tag fromJson(Map<String, dynamic> json) => Tag.fromMap(json);
+  Tag fromJson(Map<String, dynamic>? json) => Tag.fromMap(json!);
 
   @override
   Map<String, dynamic> toJson() => toMap();

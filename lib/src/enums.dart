@@ -21,7 +21,7 @@ extension ParseToString on HttpMethod {
   }
 }
 
-ContentStatus getContentStatusFromValue(String value) {
+ContentStatus getContentStatusFromValue(String? value) {
   if (value == null) {
     return ContentStatus.PENDING;
   }
@@ -29,7 +29,7 @@ ContentStatus getContentStatusFromValue(String value) {
   return ContentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
-CommentStatus getCommentStatusFromValue(String value) {
+CommentStatus getCommentStatusFromValue(String? value) {
   if (value == null) {
     return CommentStatus.PENDING;
   }
@@ -37,7 +37,7 @@ CommentStatus getCommentStatusFromValue(String value) {
   return CommentStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
-MediaFilterStatus getMediaFilterStatusFromValue(String value) {
+MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
   if (value == null) {
     return MediaFilterStatus.INHERIT;
   }
@@ -45,7 +45,7 @@ MediaFilterStatus getMediaFilterStatusFromValue(String value) {
   return MediaFilterStatus.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
-PostFormat getFormatFromValue(String value) {
+PostFormat getFormatFromValue(String? value) {
   if (value == null) {
     return PostFormat.STANDARD;
   }
@@ -53,7 +53,7 @@ PostFormat getFormatFromValue(String value) {
   return PostFormat.values.where((element) => element.toString().split('.').last.toLowerCase() == value.toLowerCase()).first;
 }
 
-Status getStatusFromValue(String value) {
+Status getStatusFromValue(String? value) {
   if (value == null) {
     return Status.OPEN;
   }

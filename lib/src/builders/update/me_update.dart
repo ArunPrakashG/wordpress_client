@@ -11,38 +11,38 @@ import '../request_builder_base.dart';
 
 class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
-  String _username;
-  String _displayName;
-  String _firstName;
-  String _lastName;
-  String _email;
-  String _password;
-  String _url;
-  String _description;
-  String _locale;
-  String _nickname;
-  String _slug;
-  List<int> _roles;
+  String? _username;
+  String? _displayName;
+  String? _firstName;
+  String? _lastName;
+  String? _email;
+  String? _password;
+  String? _url;
+  String? _description;
+  String? _locale;
+  String? _nickname;
+  String? _slug;
+  List<int>? _roles;
 
   MeUpdateBuilder withUserName(String username) {
     _username = username;
@@ -101,13 +101,13 @@ class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
 
   MeUpdateBuilder withRoles(Iterable<int> roles) {
     _roles ??= [];
-    _roles.addAll(roles);
+    _roles!.addAll(roles);
     return this;
   }
 
   @override
   Request<User> build() {
-    endpoint += '/me';
+    endpoint = '$endpoint/me';
     return Request<User>(
       endpoint,
       callback: callback,
@@ -120,7 +120,7 @@ class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       'username': _username,
       'email': _email,
@@ -133,7 +133,7 @@ class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
       if (!isNullOrEmpty(_nickname)) 'nickname': _nickname,
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
       if (!isNullOrEmpty(_password)) 'password': _password,
-      if (_roles != null && _roles.isNotEmpty) 'roles': _roles.join(','),
+      if (_roles != null && _roles!.isNotEmpty) 'roles': _roles!.join(','),
     };
   }
 
@@ -169,14 +169,14 @@ class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
   @override
   MeUpdateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MeUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

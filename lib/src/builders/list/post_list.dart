@@ -23,49 +23,49 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   PostListBuilder() {}
 
-  String _context;
+  String? _context;
   int _pageNumber = 1;
   int _perPageCount = 10;
-  String _searchQuery;
-  DateTime _after;
-  DateTime _before;
-  List<int> _allowedAuthors;
-  List<int> _excludedAuthors;
-  List<int> _excludedIds;
-  List<int> _allowedIds;
+  String? _searchQuery;
+  DateTime? _after;
+  DateTime? _before;
+  List<int>? _allowedAuthors;
+  List<int>? _excludedAuthors;
+  List<int>? _excludedIds;
+  List<int>? _allowedIds;
   int _resultOffset = 0;
-  String _resultOrder;
-  String _sortOrder;
-  List<String> _limitBySlug;
-  String _limitByStatus;
-  String _limitByTaxonomyRelation;
-  List<int> _allowedTags;
-  List<int> _excludedTags;
-  List<int> _allowedCategories;
-  List<int> _excludedCategories;
+  String? _resultOrder;
+  String? _sortOrder;
+  List<String>? _limitBySlug;
+  String? _limitByStatus;
+  String? _limitByTaxonomyRelation;
+  List<int>? _allowedTags;
+  List<int>? _excludedTags;
+  List<int>? _allowedCategories;
+  List<int>? _excludedCategories;
   bool _onlySticky = false;
   bool _emdeded = false;
 
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(List<Post>) responseValidationDelegate;
+  bool Function(List<Post>)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   PostListBuilder withAuthorization(Authorization auth) {
     if (auth == null || auth.isDefault) {
@@ -78,25 +78,25 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   PostListBuilder withHeader(Pair<String, String> customHeader) {
     headers ??= [];
-    headers.add(customHeader);
+    headers!.add(customHeader);
     return this;
   }
 
   PostListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   PostListBuilder withQueryParameter(Pair<String, String> queryParameter) {
     queryParameters ??= [];
-    queryParameters.add(queryParameter);
+    queryParameters!.add(queryParameter);
     return this;
   }
 
   PostListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
@@ -149,25 +149,25 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   PostListBuilder allowAuthors(Iterable<int> ids) {
     _allowedAuthors ??= [];
-    _allowedAuthors.addAll(ids);
+    _allowedAuthors!.addAll(ids);
     return this;
   }
 
   PostListBuilder excludeAuthors(Iterable<int> ids) {
     _excludedAuthors ??= [];
-    _excludedAuthors.addAll(ids);
+    _excludedAuthors!.addAll(ids);
     return this;
   }
 
   PostListBuilder includeIds(Iterable<int> ids) {
     _allowedIds ??= [];
-    _allowedIds.addAll(ids);
+    _allowedIds!.addAll(ids);
     return this;
   }
 
   PostListBuilder excludeIds(Iterable<int> ids) {
     _excludedIds ??= [];
-    _excludedIds.addAll(ids);
+    _excludedIds!.addAll(ids);
     return this;
   }
 
@@ -178,7 +178,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   PostListBuilder allowSlugs(Iterable<String> slugs) {
     _limitBySlug ??= [];
-    _limitBySlug.addAll(slugs);
+    _limitBySlug!.addAll(slugs);
     return this;
   }
 
@@ -200,7 +200,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
       return this;
     }
 
-    if (sortOrder == FilterPostSortOrder.DATE && endpoint.toLowerCase() == 'users') {
+    if (sortOrder == FilterPostSortOrder.DATE && endpoint!.toLowerCase() == 'users') {
       _sortOrder = 'registered_date';
       return this;
     }
@@ -218,17 +218,17 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
         _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         break;
       case FilterPostSortOrder.EMAIL:
-        if (endpoint.toLowerCase() == 'users') {
+        if (endpoint!.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
       case FilterPostSortOrder.URL:
-        if (endpoint.toLowerCase() == 'users') {
+        if (endpoint!.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
       case FilterPostSortOrder.NAME:
-        if (endpoint.toLowerCase() == 'users') {
+        if (endpoint!.toLowerCase() == 'users') {
           _sortOrder = sortOrder.toString().split('.').last.toLowerCase();
         }
         break;
@@ -263,25 +263,25 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
 
   PostListBuilder allowTags(Iterable<int> tags) {
     _allowedTags ??= [];
-    _allowedTags.addAll(tags);
+    _allowedTags!.addAll(tags);
     return this;
   }
 
   PostListBuilder excludeTags(Iterable<int> tags) {
     _excludedTags ??= [];
-    _excludedTags.addAll(tags);
+    _excludedTags!.addAll(tags);
     return this;
   }
 
   PostListBuilder allowCategories(Iterable<int> categories) {
     _allowedCategories ??= [];
-    _allowedCategories.addAll(categories);
+    _allowedCategories!.addAll(categories);
     return this;
   }
 
   PostListBuilder excludeCategories(Iterable<int> categories) {
     _excludedCategories ??= [];
-    _excludedCategories.addAll(categories);
+    _excludedCategories!.addAll(categories);
     return this;
   }
 
@@ -314,7 +314,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
     return this;
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
       if (_pageNumber >= 1) 'page': _pageNumber.toString(),
@@ -322,25 +322,25 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
       if (_perPageCount <= 0) 'per_page': '10',
       if (!isNullOrEmpty(_searchQuery)) 'search': _searchQuery,
       if (_emdeded) '_embed': '1',
-      if (_after != null) 'after': _after.toIso8601String(),
-      if (_before != null) 'before': _before.toIso8601String(),
-      if (_allowedAuthors != null && _allowedAuthors.isNotEmpty) 'author': _allowedAuthors.join(','),
-      if (_excludedAuthors != null && _excludedAuthors.isNotEmpty) 'author_exclude': _excludedAuthors.join(','),
-      if (_allowedIds != null && _allowedIds.isNotEmpty) 'include': _allowedIds.join(','),
-      if (_excludedIds != null && _excludedIds.isNotEmpty) 'exclude': _excludedIds.join(','),
+      if (_after != null) 'after': _after!.toIso8601String(),
+      if (_before != null) 'before': _before!.toIso8601String(),
+      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty) 'author': _allowedAuthors!.join(','),
+      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty) 'author_exclude': _excludedAuthors!.join(','),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds!.join(','),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds!.join(','),
       if (_resultOffset > 0) 'offset': _resultOffset.toString(),
       if (!isNullOrEmpty(_sortOrder)) 'orderby': _sortOrder,
       if (!isNullOrEmpty(_resultOrder)) 'order': _resultOrder,
-      if (_limitBySlug != null && _limitBySlug.isNotEmpty) 'slug': _limitBySlug.join(','),
+      if (_limitBySlug != null && _limitBySlug!.isNotEmpty) 'slug': _limitBySlug!.join(','),
       if (!isNullOrEmpty(_limitByStatus)) 'status': _limitByStatus,
       if (!isNullOrEmpty(_limitByTaxonomyRelation)) 'tax_relation': _limitByTaxonomyRelation,
-      if (_allowedCategories != null && _allowedCategories.isNotEmpty) 'categories': _allowedCategories.join(','),
-      if (_excludedCategories != null && _excludedCategories.isNotEmpty) 'categories_exclude': _excludedCategories.join(','),
-      if (_allowedTags != null && _allowedTags.isNotEmpty) 'tags': _allowedTags.join(','),
-      if (_excludedTags != null && _excludedTags.isNotEmpty) 'tags_exclude': _excludedTags.join(','),
+      if (_allowedCategories != null && _allowedCategories!.isNotEmpty) 'categories': _allowedCategories!.join(','),
+      if (_excludedCategories != null && _excludedCategories!.isNotEmpty) 'categories_exclude': _excludedCategories!.join(','),
+      if (_allowedTags != null && _allowedTags!.isNotEmpty) 'tags': _allowedTags!.join(','),
+      if (_excludedTags != null && _excludedTags!.isNotEmpty) 'tags_exclude': _excludedTags!.join(','),
       if (_onlySticky) 'sticky': '1',
-      if (queryParameters != null && queryParameters.isNotEmpty)
-        for (var pair in queryParameters)
+      if (queryParameters != null && queryParameters!.isNotEmpty)
+        for (var pair in queryParameters!)
           if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value)) pair.key: pair.value
     };
   }

@@ -10,25 +10,25 @@ import '../request_builder_base.dart';
 
 class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
   bool _force = false;
   int _reassign = -1;
@@ -45,7 +45,7 @@ class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
 
   @override
   Request<User> build() {
-    endpoint += '/me';
+    endpoint = '$endpoint/me';
     return new Request<User>(
       endpoint,
       queryParams: _parseQueryParameters(),
@@ -98,14 +98,14 @@ class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   @override
   MeDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MeDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

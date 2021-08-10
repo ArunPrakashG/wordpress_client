@@ -10,25 +10,25 @@ import '../request_builder_base.dart';
 
 class MeRetriveBuilder implements IQueryBuilder<MeRetriveBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
   String _context = 'view';
 
@@ -39,7 +39,7 @@ class MeRetriveBuilder implements IQueryBuilder<MeRetriveBuilder, User> {
 
   @override
   Request<User> build() {
-    endpoint += '/me';
+    endpoint = '$endpoint/me';
     return new Request<User>(
       endpoint,
       queryParams: _parseQueryParameters(),
@@ -89,14 +89,14 @@ class MeRetriveBuilder implements IQueryBuilder<MeRetriveBuilder, User> {
   @override
   MeRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MeRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

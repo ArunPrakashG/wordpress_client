@@ -11,30 +11,30 @@ import '../request_builder_base.dart';
 
 class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Category> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Category) responseValidationDelegate;
+  bool Function(Category)? responseValidationDelegate;
 
-  String _context;
+  String? _context;
 
   CategoryRetriveBuilder withId(int id) {
-    endpoint += '/$id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -57,7 +57,7 @@ class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Ca
     );
   }
 
-  Map<String, String> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
     };
@@ -87,14 +87,14 @@ class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Ca
   @override
   CategoryRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   CategoryRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

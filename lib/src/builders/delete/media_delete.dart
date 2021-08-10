@@ -10,32 +10,32 @@ import '../request_builder_base.dart';
 
 class MediaDeleteBuilder implements IQueryBuilder<MediaDeleteBuilder, Media> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Media) responseValidationDelegate;
+  bool Function(Media)? responseValidationDelegate;
 
   int _id = -1;
   bool _force = false;
 
   MediaDeleteBuilder withId(int id) {
     _id = id;
-    endpoint += '/$_id';
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -92,14 +92,14 @@ class MediaDeleteBuilder implements IQueryBuilder<MediaDeleteBuilder, Media> {
   @override
   MediaDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   MediaDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

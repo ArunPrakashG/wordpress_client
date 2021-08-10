@@ -12,29 +12,29 @@ import '../request_builder_base.dart';
 
 class TagCreateBuilder implements IQueryBuilder<TagCreateBuilder, Tag> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  Callback callback;
+  Callback? callback;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(Tag) responseValidationDelegate;
+  bool Function(Tag)? responseValidationDelegate;
 
-  String _description;
-  String _name;
-  String _slug;
+  String? _description;
+  String? _name;
+  String? _slug;
 
   TagCreateBuilder withDescription(String description) {
     _description = description;
@@ -105,14 +105,14 @@ class TagCreateBuilder implements IQueryBuilder<TagCreateBuilder, Tag> {
   @override
   TagCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   TagCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 

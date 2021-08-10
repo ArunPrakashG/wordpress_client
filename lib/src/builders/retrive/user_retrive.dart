@@ -11,30 +11,30 @@ import '../request_builder_base.dart';
 
 class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   @override
-  Authorization authorization;
+  Authorization? authorization;
 
   @override
-  CancelToken cancelToken;
+  CancelToken? cancelToken;
 
   @override
-  String endpoint;
+  String? endpoint;
 
   @override
-  List<Pair<String, String>> headers;
+  List<Pair<String, String>>? headers;
 
   @override
-  List<Pair<String, String>> queryParameters;
+  List<Pair<String, String>>? queryParameters;
 
   @override
-  bool Function(User) responseValidationDelegate;
+  bool Function(User)? responseValidationDelegate;
 
   @override
-  Callback callback;
+  Callback? callback;
 
-  String _context;
+  String? _context;
 
-  UserRetriveBuilder withUserId(int id) {
-    endpoint += '/$id';
+  UserRetriveBuilder withUserId(int? id) {
+    endpoint = '$endpoint/$id';
     return this;
   }
 
@@ -47,7 +47,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   Request<User> build() {
     return new Request<User>(
       endpoint,
-      queryParams: _parseQueryParameters(),
+      queryParams: _parseQueryParameters() as Map<String, String?>?,
       callback: callback,
       headers: headers,
       formBody: null,
@@ -88,14 +88,14 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   @override
   UserRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
-    headers.addAll(customHeaders);
+    headers!.addAll(customHeaders);
     return this;
   }
 
   @override
   UserRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
-    queryParameters.addAll(extraQueryParameters);
+    queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
