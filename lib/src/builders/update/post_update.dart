@@ -43,7 +43,7 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   String? _commentStatus;
   String? _pingStatus;
   String? _format;
-  late bool _asSticky;
+  bool? _asSticky = false;
   List<int>? _categories;
   List<int>? _tags;
 
@@ -150,7 +150,7 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
       if (!isNullOrEmpty(_commentStatus)) 'comment_status': _commentStatus,
       if (!isNullOrEmpty(_pingStatus)) 'ping_status': _pingStatus,
       if (!isNullOrEmpty(_format)) 'format': _format,
-      if (_asSticky) 'sticky': '1',
+      if (_asSticky != null && _asSticky!) 'sticky': '1',
       if (_categories != null && _categories!.isNotEmpty) 'categories': _categories!.join(','),
       if (_tags != null && _tags!.isNotEmpty) 'tags': _tags!.join(','),
       if (!isNullOrEmpty(_slug)) 'slug': _slug,

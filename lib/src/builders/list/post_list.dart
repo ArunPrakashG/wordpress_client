@@ -11,7 +11,7 @@ import '../request.dart';
 import '../request_builder_base.dart';
 
 class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
-  PostListBuilder.withEndpoint(String endpoint) {
+  PostListBuilder.withEndpoint(String? endpoint) {
     if (endpoint == null) {
       throw NullReferenceException('Invalid parameters.');
     }
@@ -67,7 +67,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
   @override
   Callback? callback;
 
-  PostListBuilder withAuthorization(Authorization auth) {
+  PostListBuilder withAuthorization(Authorization? auth) {
     if (auth == null || auth.isDefault) {
       return this;
     }

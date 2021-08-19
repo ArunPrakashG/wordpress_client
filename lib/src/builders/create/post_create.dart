@@ -38,12 +38,12 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
   String? _excerpt;
   String? _password;
   String? _status;
-  int? _authorId;
-  int? _featuredMediaId;
+  int? _authorId = 0;
+  int? _featuredMediaId = 0;
   String? _commentStatus;
   String? _pingStatus;
   String? _format;
-  bool? _asSticky;
+  bool? _asSticky = false;
   List<int>? _categories;
   List<int>? _tags;
 

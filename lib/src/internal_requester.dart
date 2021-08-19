@@ -320,7 +320,7 @@ class InternalRequester {
       final response = await _client!.fetch(options);
       watch.stop();
 
-      if (response == null || !isInRange(response.statusCode!, 200, 299)) {
+      if (!isInRange(response.statusCode!, 200, 299)) {
         return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
@@ -467,19 +467,18 @@ class InternalRequester {
 
     bool hasAuthorizedAlready = false;
 
-    if (request.shouldAuthorize &&
-        !hasAuthorizedAlready &&
-        await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback)) {
-      options.headers['Authorization'] = request.authorization!.authString;
-      hasAuthorizedAlready = true;
+    if (request.shouldAuthorize && !hasAuthorizedAlready) {
+      if (await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback)) {
+        options.headers['Authorization'] = request.authorization!.authString;
+        hasAuthorizedAlready = true;
+      }
     }
 
-    if (_defaultAuthorization != null &&
-        !_defaultAuthorization!.isDefault &&
-        !hasAuthorizedAlready &&
-        await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback)) {
-      options.headers['Authorization'] = _defaultAuthorization!.authString;
-      hasAuthorizedAlready = true;
+    if (_defaultAuthorization != null && !_defaultAuthorization!.isDefault && !hasAuthorizedAlready) {
+      if (await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback)) {
+        options.headers['Authorization'] = _defaultAuthorization!.authString;
+        hasAuthorizedAlready = true;
+      }
     }
 
     if (request.headers != null && request.headers!.isNotEmpty) {

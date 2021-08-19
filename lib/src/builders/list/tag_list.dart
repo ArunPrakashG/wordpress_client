@@ -122,8 +122,8 @@ class TagListBuilder implements IQueryBuilder<TagListBuilder, List<Tag>> {
   Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
-      if (_page != null) 'page': _page.toString(),
-      if (_perPage != null) 'per_page': _perPage.toString(),
+      'page': _page.toString(),
+      'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
       if (_offset != null && _offset! > 0) 'offset': _offset.toString(),
       if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),

@@ -47,7 +47,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   Request<User> build() {
     return new Request<User>(
       endpoint,
-      queryParams: _parseQueryParameters() as Map<String, String?>?,
+      queryParams: _parseQueryParameters(),
       callback: callback,
       headers: headers,
       formBody: null,
@@ -58,7 +58,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
     );
   }
 
-  Map<String, dynamic> _parseQueryParameters() {
+  Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
     };

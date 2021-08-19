@@ -122,8 +122,8 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
   Map<String, String?> _parseQueryParameters() {
     return {
       if (!isNullOrEmpty(_context)) 'context': _context,
-      if (_page != null) 'page': _page.toString(),
-      if (_perPage != null) 'per_page': _perPage.toString(),
+      'page': _page.toString(),
+      'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
       if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),
       if (_include != null && _include!.isNotEmpty) 'include': _include!.join(','),
