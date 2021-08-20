@@ -33,13 +33,13 @@ class AuthorizationBuilder {
 
   IAuthorization build() {
     if (_type == null) {
-      _type = AuthorizationType.USEFULL_JWT;
+      _type = AuthorizationType.USEFUL_JWT;
     }
 
     switch (_type!) {
-      case AuthorizationType.JWT:
+      case AuthorizationType.BASIC_JWT:
         return BasicJwtAuth(_userName, _password, callback: _callback);
-      case AuthorizationType.USEFULL_JWT:
+      case AuthorizationType.USEFUL_JWT:
         return UsefulJwtAuth(_userName, _password, callback: _callback);
       case AuthorizationType.BASIC:
         return BasicAuth(_userName, _password, callback: _callback);

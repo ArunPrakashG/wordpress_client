@@ -26,7 +26,7 @@ void main() async {
           (authBuilder) => authBuilder
               .withUserName(json!['username'])
               .withPassword(json['password'])
-              .withType(AuthorizationType.USEFULL_JWT)
+              .withType(AuthorizationType.USEFUL_JWT)
               .withCallback(
                 Callback(
                   responseCallback: (response) {

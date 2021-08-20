@@ -148,6 +148,8 @@ class InternalRequester {
         );
       }
 
+      request.callback?.invokeResponseCallback(response.data);
+
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
@@ -213,6 +215,8 @@ class InternalRequester {
         );
       }
 
+      request.callback?.invokeResponseCallback(response.data);
+
       return ResponseContainer<T?>(
         null,
         responseCode: response.statusCode,
@@ -262,6 +266,17 @@ class InternalRequester {
           duration: watch.elapsed,
           responseCode: response.statusCode,
           message: 'Either response is null or status code is not in range of 200 ~ 300',
+        );
+      }
+
+      request.callback?.invokeResponseCallback(response.data);
+
+      if (!(response.data is Iterable<dynamic>)) {
+        return ResponseContainer<List<T>?>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: response.statusCode,
+          message: 'Invalid response object received.',
         );
       }
 
@@ -329,6 +344,8 @@ class InternalRequester {
         );
       }
 
+      request.callback?.invokeResponseCallback(response.data);
+
       final responseDataContainer = typeResolver.fromJson(response.data);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
@@ -392,6 +409,8 @@ class InternalRequester {
           message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
+
+      request.callback?.invokeResponseCallback(response.data);
 
       final responseDataContainer = typeResolver.fromJson(response.data);
 
