@@ -1,18 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
-import '../request_builder_base.dart';
-import '../request.dart';
 import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/pair.dart';
+import '../request.dart';
+import '../request_builder_base.dart';
 
 class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -158,7 +158,7 @@ class PostCreateBuilder implements IQueryBuilder<PostCreateBuilder, Post> {
   }
 
   @override
-  PostCreateBuilder withAuthorization(Authorization auth) {
+  PostCreateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

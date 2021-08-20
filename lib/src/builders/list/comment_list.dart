@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/comment_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class CommentListBuilder implements IQueryBuilder<CommentListBuilder, List<Comment>> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -186,7 +186,7 @@ class CommentListBuilder implements IQueryBuilder<CommentListBuilder, List<Comme
   }
 
   @override
-  CommentListBuilder withAuthorization(Authorization auth) {
+  CommentListBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -143,7 +143,7 @@ class MeUpdateBuilder implements IQueryBuilder<MeUpdateBuilder, User> {
   }
 
   @override
-  MeUpdateBuilder withAuthorization(Authorization auth) {
+  MeUpdateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

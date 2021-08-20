@@ -4,6 +4,11 @@
 
 <b>wordpress_client</b> is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern. This library is a port of <b>WordpressCore</b> library written in C# (also written by me)
 
+## NOTE
+
+Authorization API has been sligtly changed on 5.1.0 from previous 5.0.4 build.
+Checkout [Supported Authorization Methods](https://github.com/ArunPrakashG/wordpress_client/tree/authorization_rework#supported-authorization-methods) section below for the changed API usage.
+
 ## Usage
 
 - Import the library to your project
@@ -31,12 +36,12 @@ import 'package:wordpress_client/wordpress_client.dart';
         .withDefaultUserAgent('wordpress_client/4.0.0')
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
-        .withDefaultAuthorization(
+        .withDefaultAuthorizationBuilder(
           // You can use this to pass a custom authorization header on all requests
           (builder) => builder
           .withUserName('test_user')
           .withPassword('super_secret_password')
-          .withType(AuthorizationType.JWT) // authorization type
+          .withType(AuthorizationType.BASIC_JWT) // authorization type
           .build(),
         )
         .withStatisticDelegate(
@@ -60,14 +65,7 @@ ResponseContainer<List<Post>> response = await client.listPost(
         .withPageNumber(1)
         .orderResultsBy(FilterOrder.DESCENDING)
         .sortResultsBy(FilterPostSortOrder.DATE)
-        .withAuthorization(
-          // You can also use this to pass a custom authorization header on this particular request
-          Authorization(
-            userName: 'test_user',
-            password: 'super_secret_password',
-            authType: AuthorizationType.JWT,
-          ),
-        )
+        .withAuthorization(BasicJwtAuth('username', 'password'))
         .withCallback(
           Callback(
             unhandledExceptionCallback: (ex) {
@@ -120,12 +118,83 @@ Structure of `ResponseContainer<T>`:
 
 ## Supported Authorization methods
 
-This library has two authorization methods currently supported:
+This library has 3 authorization methods currently supported:
 
-- [Basic Auth](https://github.com/WP-API/Basic-Auth) by The Wordpress Team
-- [JWT Authentication](https://wordpress.org/plugins/jwt-authentication-for-wp-rest-api/) by Enrique Chavez
+- `BasicAuth` - [Basic Auth](https://github.com/WP-API/Basic-Auth) by The Wordpress Team
+- `BasicJwtAuth` - [Basic JWT Authentication](https://wordpress.org/plugins/jwt-authentication-for-wp-rest-api/) by Enrique Chavez
+- `UsefulJwtAuth` - [Useful JWT Authentication](https://github.com/usefulteam/jwt-auth) by Useful Team
 
-However, you can add custom authorization systems by passing the required headers globally using the bootstrapper. if the auth method requires requests, you can do so by implementing the custom requests, which you can read more about below.
+However, you can create custom authorization systems easily.
+Check out [UsefulJwtAuth](https://github.com/ArunPrakashG/wordpress_client/blob/255841ad90eff082f2dd8f82cfd89bc7578e2f1c/lib/src/authorization/authorization_methods/useful_jwt.dart) implementation of JWT Authentication for more details.
+
+- Extend your `CustomAuth` class from `IAuthorization` interface.
+- Implement the interface and its methods accordingly. An example is given below.
+
+```dart
+class CustomAuth extends IAuthorization {
+  CustomAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
+
+  @override
+  FutureOr<bool> authorize() {}
+
+  @override
+  FutureOr<String?> generateAuthUrl() {}
+
+  @override
+  FutureOr<bool> init(Dio? client) {}
+
+  @override
+  FutureOr<bool> isAuthenticated() {}
+
+  @override
+  bool get isValidAuth => throw UnimplementedError();
+
+  @override
+  FutureOr<bool> validate() {}
+}
+```
+
+- To use this authorization system with general requests, simply pass `CustomAuth` object as a parameter to `withAuthorization()` of the request builders like so:
+
+```dart
+...
+.withAuthorization(CustomAuth('username', 'password', callback: Callback(...)))
+...
+```
+
+To use this authorization with all the requests, you have to set default authorization on the client, or you have to pass `CustomAuth` on all requests manually.
+To set as default authorization, you have to use the bootstrap builder:
+
+```dart
+WordpressClient(
+    'your base url',
+    'api path',
+    bootstrapper: (builder) => builder
+        ...
+        .withDefaultAuthorizationBuilder(CustomAuth('username', 'password', callback: Callback(...)))
+        ...
+        .build(),
+  );
+```
+
+Sturucture of `IAuthorization` interface:
+
+```dart
+abstract class IAuthorization {
+  String? userName;
+  String? password;
+  Callback? callback;
+  bool get isValidAuth;
+  bool get isDefault => isNullOrEmpty(userName) || isNullOrEmpty(password);
+
+  IAuthorization(this.userName, this.password, {this.callback});
+  FutureOr<bool> init(Dio? client);
+  FutureOr<bool> validate();
+  FutureOr<bool> isAuthenticated();
+  FutureOr<bool> authorize();
+  FutureOr<String?> generateAuthUrl();
+}
+```
 
 ## Supported REST Methods
 

@@ -22,8 +22,22 @@ void main() async {
         .withStatisticDelegate((requestUrl, endpoint, count) {
           print('Request URL: $requestUrl');
         })
-        .withDefaultAuthorization(
-          (authBuilder) => authBuilder.withUserName(json!['username']).withPassword(json['password']).withType(AuthorizationType.USEFULL_JWT).build(),
+        .withDefaultAuthorizationBuilder(
+          (authBuilder) => authBuilder
+              .withUserName(json!['username'])
+              .withPassword(json['password'])
+              .withType(AuthorizationType.USEFUL_JWT)
+              .withCallback(
+                Callback(
+                  responseCallback: (response) {
+                    print(response);
+                  },
+                  requestErrorCallback: (error) {
+                    print('Error: ${error.errorResponse!.message}');
+                  },
+                ),
+              )
+              .build(),
         )
         .build(),
   );

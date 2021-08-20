@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/tag_response.dart';
 import '../../utilities/callback.dart';
@@ -12,7 +12,7 @@ import '../request_builder_base.dart';
 
 class TagUpdateBuilder implements IQueryBuilder<TagUpdateBuilder, Tag> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -84,7 +84,7 @@ class TagUpdateBuilder implements IQueryBuilder<TagUpdateBuilder, Tag> {
   }
 
   @override
-  TagUpdateBuilder withAuthorization(Authorization auth) {
+  TagUpdateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

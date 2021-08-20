@@ -5,7 +5,7 @@ import 'package:dio/src/cancel_token.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../exceptions/file_not_exist_exception.dart';
 import '../../exceptions/null_reference_exception.dart';
@@ -18,7 +18,7 @@ import '../request_builder_base.dart';
 
 class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -163,7 +163,7 @@ class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   }
 
   @override
-  MediaCreateBuilder withAuthorization(Authorization auth) {
+  MediaCreateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

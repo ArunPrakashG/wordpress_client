@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/media_response.dart';
 import '../../utilities/callback.dart';
@@ -10,7 +10,7 @@ import '../request_builder_base.dart';
 
 class MediaDeleteBuilder implements IQueryBuilder<MediaDeleteBuilder, Media> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -72,7 +72,7 @@ class MediaDeleteBuilder implements IQueryBuilder<MediaDeleteBuilder, Media> {
   }
 
   @override
-  MediaDeleteBuilder withAuthorization(Authorization auth) {
+  MediaDeleteBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

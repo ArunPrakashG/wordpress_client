@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
+import 'package:wordpress_client/src/authorization/authorization_base.dart';
 
-import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -10,7 +10,7 @@ import '../request_builder_base.dart';
 
 class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -72,7 +72,7 @@ class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   }
 
   @override
-  MeDeleteBuilder withAuthorization(Authorization auth) {
+  MeDeleteBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
+import 'package:wordpress_client/src/authorization/authorization_base.dart';
 
-import '../../authorization.dart';
 import '../../enums.dart';
 import '../../responses/category_response.dart';
 import '../../utilities/callback.dart';
@@ -12,7 +12,7 @@ import '../request_builder_base.dart';
 
 class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Category> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -86,7 +86,7 @@ class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Cate
   }
 
   @override
-  CategoryCreateBuilder withAuthorization(Authorization auth) {
+  CategoryCreateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

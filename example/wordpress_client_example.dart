@@ -1,3 +1,4 @@
+import 'package:wordpress_client/src/authorization/authorization_methods/useful_jwt.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 void main() async {
@@ -19,10 +20,7 @@ void main() async {
         .withDefaultUserAgent('wordpress_client/4.0.0')
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
-        .withDefaultAuthorization(
-          // You can use this to pass a custom authorization header on all requests
-          (builder) => builder.withUserName('test_user').withPassword('super_secret_password').withType(AuthorizationType.JWT).build(),
-        )
+        .withDefaultAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
         .withStatisticDelegate(
       (baseUrl, endpoint, count) {
         print('Request send to: $baseUrl ($count times)');
@@ -36,14 +34,7 @@ void main() async {
         .withPageNumber(1)
         .orderResultsBy(FilterOrder.DESCENDING)
         .sortResultsBy(FilterPostSortOrder.DATE)
-        .withAuthorization(
-          // You can also use this to pass a custom authorization header on this particular request
-          Authorization(
-            userName: 'test_user',
-            password: 'super_secret_password',
-            authType: AuthorizationType.JWT,
-          ),
-        )
+        .withAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
         .withCallback(
           Callback(
             unhandledExceptionCallback: (ex) {

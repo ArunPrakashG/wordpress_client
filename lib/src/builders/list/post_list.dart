@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../exceptions/null_reference_exception.dart';
 import '../../responses/post_response.dart';
@@ -47,7 +47,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
   bool _emdeded = false;
 
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -67,7 +67,7 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
   @override
   Callback? callback;
 
-  PostListBuilder withAuthorization(Authorization? auth) {
+  PostListBuilder withAuthorization(IAuthorization? auth) {
     if (auth == null || auth.isDefault) {
       return this;
     }

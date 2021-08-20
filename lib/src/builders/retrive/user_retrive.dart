@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -68,7 +68,7 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   UserRetriveBuilder initializeWithDefaultValues() => this;
 
   @override
-  UserRetriveBuilder withAuthorization(Authorization auth) {
+  UserRetriveBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }
