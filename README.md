@@ -4,6 +4,11 @@
 
 <b>wordpress_client</b> is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern. This library is a port of <b>WordpressCore</b> library written in C# (also written by me)
 
+## NOTE
+
+Authorization API has been sligtly changed on 5.1.0 from previous 5.0.4 build.
+Checkout Supported Authorization Methods section below for the changed API usage.
+
 ## Usage
 
 - Import the library to your project
