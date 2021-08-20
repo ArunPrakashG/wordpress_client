@@ -6,6 +6,13 @@ import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
 
+/// Most widely used authentication system, which is most easy to integrate and secure (when compared with basic auth)
+///
+/// Implemented on basis of https://github.com/Tmeister/wp-api-jwt-auth wordpress plugin.
+///
+/// ### NOTE
+///
+/// This plugin isn't in active development and may contain lots of bugs/issues. It is recommended to use [UsefulJwtAuth] instead.
 class BasicJwtAuth extends IAuthorization {
   BasicJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
 

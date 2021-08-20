@@ -7,6 +7,9 @@ import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
 
+/// Similar to [BasicJwtAuth], this plugin is in active development and has much more features than the previous one. It is recommended to use this plugin instead of the previous one.
+///
+/// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
 class UsefulJwtAuth extends IAuthorization {
   UsefulJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
 
