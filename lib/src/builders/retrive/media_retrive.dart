@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/media_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class MediaRetriveBuilder implements IQueryBuilder<MediaRetriveBuilder, Media> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -67,7 +67,7 @@ class MediaRetriveBuilder implements IQueryBuilder<MediaRetriveBuilder, Media> {
   MediaRetriveBuilder initializeWithDefaultValues() => this;
 
   @override
-  MediaRetriveBuilder withAuthorization(Authorization auth) {
+  MediaRetriveBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

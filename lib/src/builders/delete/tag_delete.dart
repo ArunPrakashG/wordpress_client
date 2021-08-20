@@ -1,6 +1,5 @@
 import 'package:dio/src/cancel_token.dart';
-
-import '../../authorization.dart';
+import 'package:wordpress_client/src/authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/tag_response.dart';
 import '../../utilities/callback.dart';
@@ -10,7 +9,7 @@ import '../request_builder_base.dart';
 
 class TagDeleteBuilder implements IQueryBuilder<TagDeleteBuilder, Tag> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -69,7 +68,7 @@ class TagDeleteBuilder implements IQueryBuilder<TagDeleteBuilder, Tag> {
   }
 
   @override
-  TagDeleteBuilder withAuthorization(Authorization auth) {
+  TagDeleteBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

@@ -2,13 +2,13 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
-import 'authorization.dart';
-import 'authorization_handler.dart';
+import 'authorization/authorization_base.dart';
 import 'builders/request.dart';
 import 'client_configuration.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
 import 'responses/response_container.dart';
+import 'utilities/callback.dart';
 import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
 
@@ -17,7 +17,7 @@ const int defaultRequestTimeout = 60 * 1000;
 class InternalRequester {
   Dio? _client;
   String? _baseUrl;
-  Authorization? _defaultAuthorization;
+  IAuthorization? _defaultAuthorization;
   bool Function(dynamic)? _responsePreprocessorDelegate;
   static final Map<String?, int> endPointStatistics = Map<String?, int>();
   static void Function(String, String?, int?)? _statisticsDelegate;
@@ -468,17 +468,11 @@ class InternalRequester {
     bool hasAuthorizedAlready = false;
 
     if (request.shouldAuthorize && !hasAuthorizedAlready) {
-      if (await AuthorizationHandler.authorizeRequest(options, _client, request.authorization, callback: request.callback)) {
-        options.headers['Authorization'] = request.authorization!.authString;
-        hasAuthorizedAlready = true;
-      }
+      hasAuthorizedAlready = await _authorizeRequest(options, _client, request.authorization, callback: request.callback);
     }
 
     if (_defaultAuthorization != null && !_defaultAuthorization!.isDefault && !hasAuthorizedAlready) {
-      if (await AuthorizationHandler.authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback)) {
-        options.headers['Authorization'] = _defaultAuthorization!.authString;
-        hasAuthorizedAlready = true;
-      }
+      hasAuthorizedAlready = await _authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback);
     }
 
     if (request.headers != null && request.headers!.isNotEmpty) {
@@ -488,6 +482,26 @@ class InternalRequester {
     }
 
     return options;
+  }
+
+  static Future<bool> _authorizeRequest(RequestOptions? requestOptions, Dio? client, IAuthorization? auth, {Callback? callback}) async {
+    if (auth == null || auth.isDefault || client == null || requestOptions == null) {
+      return false;
+    }
+
+    if (await auth.isAuthenticated()) {
+      requestOptions.headers['Authorization'] = await auth.generateAuthUrl();
+      return true;
+    }
+
+    await auth.init(client);
+
+    if (await auth.authorize()) {
+      requestOptions.headers['Authorization'] = await auth.generateAuthUrl();
+      return auth.isAuthenticated();
+    }
+
+    return false;
   }
 
   void _invokeStatisticsCallback(String requestUrl, String? endpoint) {

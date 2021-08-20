@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/category_response.dart';
 import '../../utilities/callback.dart';
@@ -12,7 +12,7 @@ import '../request_builder_base.dart';
 
 class CategoryUpdateBuilder implements IQueryBuilder<CategoryUpdateBuilder, Category> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -91,7 +91,7 @@ class CategoryUpdateBuilder implements IQueryBuilder<CategoryUpdateBuilder, Cate
   }
 
   @override
-  CategoryUpdateBuilder withAuthorization(Authorization auth) {
+  CategoryUpdateBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

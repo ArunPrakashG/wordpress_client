@@ -1,10 +1,10 @@
-import 'authorization.dart';
+import 'authorization/authorization_base.dart';
 import 'utilities/pair.dart';
 
 class BootstrapConfiguration {
   final int? requestTimeout;
   final bool Function(dynamic)? responsePreprocessorDelegate;
-  final Authorization? defaultAuthorization;
+  final IAuthorization? defaultAuthorization;
   final String? defaultUserAgent;
   final List<Pair<String, String>>? defaultHeaders;
   final bool? shouldFollowRedirects;

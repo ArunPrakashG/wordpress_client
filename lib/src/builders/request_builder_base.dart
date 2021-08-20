@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 
-import '../authorization.dart';
+import '../authorization/authorization_base.dart';
 import '../utilities/callback.dart';
 import '../utilities/pair.dart';
 import 'request.dart';
 
 abstract class IQueryBuilder<TRequestType, YResponseType> {
   bool Function(YResponseType)? responseValidationDelegate;
-  Authorization? authorization;
+  IAuthorization? authorization;
   List<Pair<String, String>>? headers;
   List<Pair<String, String>>? queryParameters;
   CancelToken? cancelToken;
@@ -16,7 +16,7 @@ abstract class IQueryBuilder<TRequestType, YResponseType> {
 
   TRequestType initializeWithDefaultValues();
 
-  TRequestType withAuthorization(Authorization auth);
+  TRequestType withAuthorization(IAuthorization auth);
 
   TRequestType withHeaders(Iterable<Pair<String, String>> customHeaders);
 

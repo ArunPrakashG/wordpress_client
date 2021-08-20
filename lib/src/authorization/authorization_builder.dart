@@ -1,0 +1,41 @@
+import '../enums.dart';
+import 'authorization_base.dart';
+import 'authorization_methods/basic_auth.dart';
+import 'authorization_methods/basic_jwt.dart';
+import 'authorization_methods/useful_jwt.dart';
+
+class AuthorizationBuilder {
+  String? _userName;
+  String? _password;
+  AuthorizationType? _type;
+
+  AuthorizationBuilder withUserName(String? userName) {
+    _userName = userName;
+    return this;
+  }
+
+  AuthorizationBuilder withPassword(String? password) {
+    _password = password;
+    return this;
+  }
+
+  AuthorizationBuilder withType(AuthorizationType type) {
+    _type = type;
+    return this;
+  }
+
+  IAuthorization build() {
+    if (_type == null) {
+      _type = AuthorizationType.USEFULL_JWT;
+    }
+
+    switch (_type!) {
+      case AuthorizationType.JWT:
+        return BasicJwtAuth(_userName, _password);
+      case AuthorizationType.USEFULL_JWT:
+        return UsefulJwtAuth(_userName, _password);
+      case AuthorizationType.BASIC:
+        return BasicAuth(_userName, _password);
+    }
+  }
+}

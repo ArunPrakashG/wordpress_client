@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -24,7 +24,7 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
   bool _limitToAuthors = false;
 
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -145,7 +145,7 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
   UserListBuilder initializeWithDefaultValues() => this;
 
   @override
-  UserListBuilder withAuthorization(Authorization auth) {
+  UserListBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

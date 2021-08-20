@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/category_response.dart';
 import '../../utilities/callback.dart';
@@ -10,7 +10,7 @@ import '../request_builder_base.dart';
 
 class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Category> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -69,7 +69,7 @@ class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Cate
   }
 
   @override
-  CategoryDeleteBuilder withAuthorization(Authorization auth) {
+  CategoryDeleteBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

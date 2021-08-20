@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/category_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Category> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   Callback? callback;
@@ -67,7 +67,7 @@ class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Ca
   CategoryRetriveBuilder initializeWithDefaultValues() => this;
 
   @override
-  CategoryRetriveBuilder withAuthorization(Authorization auth) {
+  CategoryRetriveBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }

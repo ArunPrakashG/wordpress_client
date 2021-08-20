@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../authorization.dart';
+import '../authorization/authorization_base.dart';
 import '../enums.dart';
 import '../utilities/callback.dart';
 import '../utilities/helpers.dart';
@@ -12,7 +12,7 @@ class Request<TResponseType> {
   final bool Function(TResponseType)? validationDelegate;
   final CancelToken? cancelToken;
   final HttpMethod? httpMethod;
-  final Authorization? authorization;
+  final IAuthorization? authorization;
   final dynamic formBody;
   final List<Pair<String, String>>? headers;
   final Map<String, String?>? queryParams;
@@ -55,7 +55,7 @@ class Request<TResponseType> {
     var requestQueryUrl = endpoint;
 
     for (var param in queryParams!.entries) {
-      if(_hasIdInUrlAlready(requestQueryUrl!, param)){
+      if (_hasIdInUrlAlready(requestQueryUrl!, param)) {
         continue;
       }
 
@@ -75,7 +75,8 @@ class Request<TResponseType> {
 
   bool get hasValidExceptionCallback => callback != null && callback!.unhandledExceptionCallback != null;
 
-  bool get hasValidCallbacks => hasValidExceptionCallback && callback!.responseCallback != null && callback!.onReceiveProgress != null && callback!.onSendProgress != null;
+  bool get hasValidCallbacks =>
+      hasValidExceptionCallback && callback!.responseCallback != null && callback!.onReceiveProgress != null && callback!.onSendProgress != null;
 
   bool get isRequestExecutable => !isNullOrEmpty(endpoint) || httpMethod != null;
 }

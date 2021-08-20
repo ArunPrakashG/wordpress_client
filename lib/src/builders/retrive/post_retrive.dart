@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
 
-import '../../authorization.dart';
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/post_response.dart';
 import '../../utilities/callback.dart';
@@ -11,7 +11,7 @@ import '../request_builder_base.dart';
 
 class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   @override
-  Authorization? authorization;
+  IAuthorization? authorization;
 
   @override
   CancelToken? cancelToken;
@@ -90,7 +90,7 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   }
 
   @override
-  PostRetriveBuilder withAuthorization(Authorization auth) {
+  PostRetriveBuilder withAuthorization(IAuthorization auth) {
     authorization = auth;
     return this;
   }
