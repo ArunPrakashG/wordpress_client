@@ -23,7 +23,21 @@ void main() async {
           print('Request URL: $requestUrl');
         })
         .withDefaultAuthorizationBuilder(
-          (authBuilder) => authBuilder.withUserName(json!['username']).withPassword(json['password']).withType(AuthorizationType.USEFULL_JWT).build(),
+          (authBuilder) => authBuilder
+              .withUserName(json!['username'])
+              .withPassword(json['password'])
+              .withType(AuthorizationType.USEFULL_JWT)
+              .withCallback(
+                Callback(
+                  responseCallback: (response) {
+                    print(response);
+                  },
+                  requestErrorCallback: (error) {
+                    print('Error: ${error.errorResponse!.message}');
+                  },
+                ),
+              )
+              .build(),
         )
         .build(),
   );

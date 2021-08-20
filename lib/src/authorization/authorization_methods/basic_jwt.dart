@@ -7,7 +7,7 @@ import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
 
 class BasicJwtAuth extends IAuthorization {
-  BasicJwtAuth(String? username, String? password) : super(username, password);
+  BasicJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;

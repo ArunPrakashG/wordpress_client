@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:dio/src/dio.dart';
 
+import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
 
 class BasicAuth extends IAuthorization {
-  BasicAuth(String? username, String? password) : super(username, password);
+  BasicAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
 
   bool _hasInit = false;
 

@@ -1,4 +1,5 @@
 import '../enums.dart';
+import '../utilities/callback.dart';
 import 'authorization_base.dart';
 import 'authorization_methods/basic_auth.dart';
 import 'authorization_methods/basic_jwt.dart';
@@ -8,6 +9,7 @@ class AuthorizationBuilder {
   String? _userName;
   String? _password;
   AuthorizationType? _type;
+  Callback? _callback;
 
   AuthorizationBuilder withUserName(String? userName) {
     _userName = userName;
@@ -24,6 +26,11 @@ class AuthorizationBuilder {
     return this;
   }
 
+  AuthorizationBuilder withCallback(Callback? callback) {
+    callback = callback;
+    return this;
+  }
+
   IAuthorization build() {
     if (_type == null) {
       _type = AuthorizationType.USEFULL_JWT;
@@ -31,11 +38,11 @@ class AuthorizationBuilder {
 
     switch (_type!) {
       case AuthorizationType.JWT:
-        return BasicJwtAuth(_userName, _password);
+        return BasicJwtAuth(_userName, _password, callback: _callback);
       case AuthorizationType.USEFULL_JWT:
-        return UsefulJwtAuth(_userName, _password);
+        return UsefulJwtAuth(_userName, _password, callback: _callback);
       case AuthorizationType.BASIC:
-        return BasicAuth(_userName, _password);
+        return BasicAuth(_userName, _password, callback: _callback);
     }
   }
 }
