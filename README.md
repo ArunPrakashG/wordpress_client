@@ -7,7 +7,7 @@
 ## NOTE
 
 Authorization API has been sligtly changed on 5.1.0 from previous 5.0.4 build.
-Checkout Supported Authorization Methods section below for the changed API usage.
+Checkout [Supported Authorization Methods](https://github.com/ArunPrakashG/wordpress_client/tree/authorization_rework#supported-authorization-methods) section below for the changed API usage.
 
 ## Usage
 
