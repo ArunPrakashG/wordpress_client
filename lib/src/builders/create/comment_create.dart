@@ -10,7 +10,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CommentCreateBuilder implements IQueryBuilder<CommentCreateBuilder, Comment> {
+class CommentCreateBuilder
+    implements IQueryBuilder<CommentCreateBuilder, Comment> {
   @override
   IAuthorization? authorization;
 
@@ -107,8 +108,10 @@ class CommentCreateBuilder implements IQueryBuilder<CommentCreateBuilder, Commen
       if (!isNullOrEmpty(_authorIp)) 'author_ip': _authorIp,
       if (!isNullOrEmpty(_authorUrl)) 'author_url': _authorUrl,
       if (!isNullOrEmpty(_authorEmail)) 'author_email': _authorEmail,
-      if (!isNullOrEmpty(_authorDisplayName)) 'author_display_name': _authorDisplayName,
-      if (!isNullOrEmpty(_authorUserAgent)) 'author_user_agent': _authorUserAgent,
+      if (!isNullOrEmpty(_authorDisplayName))
+        'author_display_name': _authorDisplayName,
+      if (!isNullOrEmpty(_authorUserAgent))
+        'author_user_agent': _authorUserAgent,
       if (_commentParent != null) 'parent': _commentParent,
       if (!isNullOrEmpty(_content)) 'content': _content,
       if (_postId != null) 'post': _postId,
@@ -145,21 +148,24 @@ class CommentCreateBuilder implements IQueryBuilder<CommentCreateBuilder, Commen
   }
 
   @override
-  CommentCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CommentCreateBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CommentCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CommentCreateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CommentCreateBuilder withResponseValidationOverride(bool Function(Comment) responseDelegate) {
+  CommentCreateBuilder withResponseValidationOverride(
+      bool Function(Comment) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

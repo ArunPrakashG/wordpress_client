@@ -179,14 +179,16 @@ class UserUpdateBuilder implements IQueryBuilder<UserUpdateBuilder, User> {
   }
 
   @override
-  UserUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  UserUpdateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserUpdateBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  UserUpdateBuilder withResponseValidationOverride(
+      bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

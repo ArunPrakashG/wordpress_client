@@ -92,14 +92,16 @@ class TagRetriveBuilder implements IQueryBuilder<TagRetriveBuilder, Tag> {
   }
 
   @override
-  TagRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  TagRetriveBuilder withResponseValidationOverride(bool Function(Tag) responseDelegate) {
+  TagRetriveBuilder withResponseValidationOverride(
+      bool Function(Tag) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

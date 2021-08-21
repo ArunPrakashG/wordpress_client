@@ -9,7 +9,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CommentListBuilder implements IQueryBuilder<CommentListBuilder, List<Comment>> {
+class CommentListBuilder
+    implements IQueryBuilder<CommentListBuilder, List<Comment>> {
   @override
   IAuthorization? authorization;
 
@@ -162,16 +163,23 @@ class CommentListBuilder implements IQueryBuilder<CommentListBuilder, List<Comme
       'page': _page.toString(),
       'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
-      if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),
-      if (_include != null && _include!.isNotEmpty) 'include': _include!.join(','),
+      if (_exclude != null && _exclude!.isNotEmpty)
+        'exclude': _exclude!.join(','),
+      if (_include != null && _include!.isNotEmpty)
+        'include': _include!.join(','),
       if (!isNullOrEmpty(_orderBy)) 'orderby': _orderBy,
       if (!isNullOrEmpty(_order)) 'order': _order,
-      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty) 'author': _allowedAuthors!.join(','),
-      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty) 'author_exclude': _excludedAuthors!.join(','),
+      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty)
+        'author': _allowedAuthors!.join(','),
+      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty)
+        'author_exclude': _excludedAuthors!.join(','),
       if (_offset != null) 'offset': _offset.toString(),
-      if (_allowedParents != null && _allowedParents!.isNotEmpty) 'parent': _allowedParents!.join(','),
-      if (_excludedParents != null && _excludedParents!.isNotEmpty) 'parent_exclude': _excludedParents!.join(','),
-      if (_allowedPosts != null && _allowedPosts!.isNotEmpty) 'post': _allowedPosts!.join(','),
+      if (_allowedParents != null && _allowedParents!.isNotEmpty)
+        'parent': _allowedParents!.join(','),
+      if (_excludedParents != null && _excludedParents!.isNotEmpty)
+        'parent_exclude': _excludedParents!.join(','),
+      if (_allowedPosts != null && _allowedPosts!.isNotEmpty)
+        'post': _allowedPosts!.join(','),
       if (!isNullOrEmpty(_status)) 'status': _status,
       if (!isNullOrEmpty(_type)) 'type': _type,
       if (!isNullOrEmpty(_password)) 'password': _password,
@@ -217,14 +225,16 @@ class CommentListBuilder implements IQueryBuilder<CommentListBuilder, List<Comme
   }
 
   @override
-  CommentListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CommentListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CommentListBuilder withResponseValidationOverride(bool Function(List<Comment>) responseDelegate) {
+  CommentListBuilder withResponseValidationOverride(
+      bool Function(List<Comment>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

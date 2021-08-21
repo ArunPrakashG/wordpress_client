@@ -103,14 +103,16 @@ class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   }
 
   @override
-  MeDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MeDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MeDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  MeDeleteBuilder withResponseValidationOverride(
+      bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

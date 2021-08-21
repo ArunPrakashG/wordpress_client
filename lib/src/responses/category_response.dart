@@ -29,7 +29,7 @@ class Category extends ISerializable<Category> {
   final List<dynamic>? meta;
   final Links? links;
 
-  factory Category.fromJson(String str) => Category.fromMap(json.decode(str));  
+  factory Category.fromJson(String str) => Category.fromMap(json.decode(str));
 
   factory Category.fromMap(Map<String, dynamic> json) => Category(
         id: json["id"] == null ? null : json["id"],
@@ -40,7 +40,9 @@ class Category extends ISerializable<Category> {
         slug: json["slug"] == null ? null : json["slug"],
         taxonomy: json["taxonomy"] == null ? null : json["taxonomy"],
         parent: json["parent"] == null ? null : json["parent"],
-        meta: json["meta"] == null ? null : List<dynamic>.from(json["meta"].map((x) => x)),
+        meta: json["meta"] == null
+            ? null
+            : List<dynamic>.from(json["meta"].map((x) => x)),
         links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
       );
 

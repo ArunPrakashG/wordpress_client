@@ -34,7 +34,8 @@ class Request<TResponseType> {
     generatedRequestPath = _buildUrlQueryString();
   }
 
-  bool _hasIdInUrlAlready(String requestQueryUrl, MapEntry<String, String?> currentEntry) {
+  bool _hasIdInUrlAlready(
+      String requestQueryUrl, MapEntry<String, String?> currentEntry) {
     if (!requestQueryUrl.contains('/')) {
       return false;
     }
@@ -59,7 +60,8 @@ class Request<TResponseType> {
         continue;
       }
 
-      requestQueryUrl += getJoiningChar(requestQueryUrl) + param.key + '=' + param.value!;
+      requestQueryUrl +=
+          getJoiningChar(requestQueryUrl) + param.key + '=' + param.value!;
     }
 
     return requestQueryUrl;
@@ -69,14 +71,20 @@ class Request<TResponseType> {
 
   bool get hasFormContent => formBody != null;
 
-  bool get shouldAuthorize => authorization != null && !authorization!.isDefault;
+  bool get shouldAuthorize =>
+      authorization != null && !authorization!.isDefault;
 
   bool get shouldValidateResponse => validationDelegate != null;
 
-  bool get hasValidExceptionCallback => callback != null && callback!.unhandledExceptionCallback != null;
+  bool get hasValidExceptionCallback =>
+      callback != null && callback!.unhandledExceptionCallback != null;
 
   bool get hasValidCallbacks =>
-      hasValidExceptionCallback && callback!.responseCallback != null && callback!.onReceiveProgress != null && callback!.onSendProgress != null;
+      hasValidExceptionCallback &&
+      callback!.responseCallback != null &&
+      callback!.onReceiveProgress != null &&
+      callback!.onSendProgress != null;
 
-  bool get isRequestExecutable => !isNullOrEmpty(endpoint) || httpMethod != null;
+  bool get isRequestExecutable =>
+      !isNullOrEmpty(endpoint) || httpMethod != null;
 }

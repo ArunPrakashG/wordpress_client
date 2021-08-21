@@ -32,7 +32,8 @@ String getJoiningChar(String? baseUrl) {
     return '';
   }
 
-  if ((baseUrl.contains('?') && !baseUrl.contains('&')) || baseUrl.contains('?') && baseUrl.contains('&')) {
+  if ((baseUrl.contains('?') && !baseUrl.contains('&')) ||
+      baseUrl.contains('?') && baseUrl.contains('&')) {
     return '&';
   }
 
@@ -66,7 +67,8 @@ bool isInRange(int value, int min, int max) => value >= min && value <= max;
 
 //String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
-String parseHtmlString(String htmlString) => htmlString.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+String parseHtmlString(String htmlString) =>
+    htmlString.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
 
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types

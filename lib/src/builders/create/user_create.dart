@@ -174,14 +174,16 @@ class UserCreateBuilder implements IQueryBuilder<UserCreateBuilder, User> {
   }
 
   @override
-  UserCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  UserCreateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserCreateBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  UserCreateBuilder withResponseValidationOverride(
+      bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

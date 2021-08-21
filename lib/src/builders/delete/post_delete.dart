@@ -97,14 +97,16 @@ class PostDeleteBuilder implements IQueryBuilder<PostDeleteBuilder, Post> {
   }
 
   @override
-  PostDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  PostDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  PostDeleteBuilder withResponseValidationOverride(bool Function(Post) responseDelegate) {
+  PostDeleteBuilder withResponseValidationOverride(
+      bool Function(Post) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

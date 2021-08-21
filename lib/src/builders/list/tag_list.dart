@@ -126,8 +126,10 @@ class TagListBuilder implements IQueryBuilder<TagListBuilder, List<Tag>> {
       'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
       if (_offset != null && _offset! > 0) 'offset': _offset.toString(),
-      if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),
-      if (_include != null && _include!.isNotEmpty) 'include': _include!.join(','),
+      if (_exclude != null && _exclude!.isNotEmpty)
+        'exclude': _exclude!.join(','),
+      if (_include != null && _include!.isNotEmpty)
+        'include': _include!.join(','),
       if (!isNullOrEmpty(_orderBy)) 'orderby': _orderBy,
       if (!isNullOrEmpty(_order)) 'order': _order,
       if (_slug != null && _slug!.isNotEmpty) 'slug': _slug!.join(','),
@@ -173,14 +175,16 @@ class TagListBuilder implements IQueryBuilder<TagListBuilder, List<Tag>> {
   }
 
   @override
-  TagListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  TagListBuilder withResponseValidationOverride(bool Function(List<Tag>) responseDelegate) {
+  TagListBuilder withResponseValidationOverride(
+      bool Function(List<Tag>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

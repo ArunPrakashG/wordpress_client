@@ -10,7 +10,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Category> {
+class CategoryCreateBuilder
+    implements IQueryBuilder<CategoryCreateBuilder, Category> {
   @override
   IAuthorization? authorization;
 
@@ -110,21 +111,24 @@ class CategoryCreateBuilder implements IQueryBuilder<CategoryCreateBuilder, Cate
   }
 
   @override
-  CategoryCreateBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryCreateBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryCreateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryCreateBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
+  CategoryCreateBuilder withResponseValidationOverride(
+      bool Function(Category) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

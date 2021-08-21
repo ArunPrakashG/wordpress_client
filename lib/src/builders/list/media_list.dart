@@ -73,13 +73,19 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
       if (!isNullOrEmpty(_search)) 'search': _search,
       if (_after != null) 'after': _after.toString(),
       if (_before != null) 'before': _before.toString(),
-      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty) 'author': _allowedAuthors!.join(','),
-      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty) 'author_exclude': _excludedAuthors!.join(','),
-      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds!.join(','),
-      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds!.join(','),
+      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty)
+        'author': _allowedAuthors!.join(','),
+      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty)
+        'author_exclude': _excludedAuthors!.join(','),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty)
+        'exclude': _excludedIds!.join(','),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty)
+        'include': _allowedIds!.join(','),
       if (_offset != null && _offset! > 0) 'offset': _offset.toString(),
-      if (_parentIds != null && _parentIds!.isNotEmpty) 'parent': _parentIds!.join(','),
-      if (_parentExclude != null && _parentExclude!.isNotEmpty) 'parent_exclude': _parentExclude!.join(','),
+      if (_parentIds != null && _parentIds!.isNotEmpty)
+        'parent': _parentIds!.join(','),
+      if (_parentExclude != null && _parentExclude!.isNotEmpty)
+        'parent_exclude': _parentExclude!.join(','),
       if (_slugs != null && _slugs!.isNotEmpty) 'slug': _slugs!.join(','),
       if (!isNullOrEmpty(_status)) 'status': _status,
       if (!isNullOrEmpty(_mediaType)) 'media_type': _mediaType,
@@ -225,14 +231,16 @@ class MediaListBuilder implements IQueryBuilder<MediaListBuilder, List<Media>> {
   }
 
   @override
-  MediaListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MediaListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MediaListBuilder withResponseValidationOverride(bool Function(List<Media>) responseDelegate) {
+  MediaListBuilder withResponseValidationOverride(
+      bool Function(List<Media>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

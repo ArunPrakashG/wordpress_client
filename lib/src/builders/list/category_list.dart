@@ -9,7 +9,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Category>> {
+class CategoryListBuilder
+    implements IQueryBuilder<CategoryListBuilder, List<Category>> {
   @override
   IAuthorization? authorization;
 
@@ -125,8 +126,10 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
       'page': _page.toString(),
       'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
-      if (_exclude != null && _exclude!.isNotEmpty) 'exclude': _exclude!.join(','),
-      if (_include != null && _include!.isNotEmpty) 'include': _include!.join(','),
+      if (_exclude != null && _exclude!.isNotEmpty)
+        'exclude': _exclude!.join(','),
+      if (_include != null && _include!.isNotEmpty)
+        'include': _include!.join(','),
       if (!isNullOrEmpty(_orderBy)) 'orderby': _orderBy,
       if (!isNullOrEmpty(_order)) 'order': _order,
       if (_slug != null && _slug!.isNotEmpty) 'slug': _slug!.join(','),
@@ -166,21 +169,24 @@ class CategoryListBuilder implements IQueryBuilder<CategoryListBuilder, List<Cat
   }
 
   @override
-  CategoryListBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryListBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryListBuilder withResponseValidationOverride(bool Function(List<Category>) responseDelegate) {
+  CategoryListBuilder withResponseValidationOverride(
+      bool Function(List<Category>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

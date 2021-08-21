@@ -130,14 +130,17 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
       if (_page > 0) 'page': _page.toString(),
       if (_perPage > 0) 'per_page': _perPage.toString(),
       if (!isNullOrEmpty(_search)) 'search': _search,
-      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds.toString(),
-      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds.toString(),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty)
+        'exclude': _excludedIds.toString(),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty)
+        'include': _allowedIds.toString(),
       if (_resultOffset > 0) 'offset': _resultOffset.toString(),
       if (!isNullOrEmpty(_resultOrder)) 'order': _resultOrder,
       if (!isNullOrEmpty(_sortOrder)) 'orderby': _sortOrder,
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
       if (_limitToAuthors) 'who': 'authors',
-      if (_sortRoles != null && _sortRoles!.isNotEmpty) 'roles': _sortRoles.toString(),
+      if (_sortRoles != null && _sortRoles!.isNotEmpty)
+        'roles': _sortRoles.toString(),
     };
   }
 
@@ -170,14 +173,16 @@ class UserListBuilder implements IQueryBuilder<UserListBuilder, List<User>> {
   }
 
   @override
-  UserListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  UserListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserListBuilder withResponseValidationOverride(bool Function(List<User>) responseDelegate) {
+  UserListBuilder withResponseValidationOverride(
+      bool Function(List<User>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

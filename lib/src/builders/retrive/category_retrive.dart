@@ -9,7 +9,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Category> {
+class CategoryRetriveBuilder
+    implements IQueryBuilder<CategoryRetriveBuilder, Category> {
   @override
   IAuthorization? authorization;
 
@@ -85,21 +86,24 @@ class CategoryRetriveBuilder implements IQueryBuilder<CategoryRetriveBuilder, Ca
   }
 
   @override
-  CategoryRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryRetriveBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryRetriveBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
+  CategoryRetriveBuilder withResponseValidationOverride(
+      bool Function(Category) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

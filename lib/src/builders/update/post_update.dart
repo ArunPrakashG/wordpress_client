@@ -151,7 +151,8 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
       if (!isNullOrEmpty(_pingStatus)) 'ping_status': _pingStatus,
       if (!isNullOrEmpty(_format)) 'format': _format,
       if (_asSticky != null && _asSticky!) 'sticky': '1',
-      if (_categories != null && _categories!.isNotEmpty) 'categories': _categories!.join(','),
+      if (_categories != null && _categories!.isNotEmpty)
+        'categories': _categories!.join(','),
       if (_tags != null && _tags!.isNotEmpty) 'tags': _tags!.join(','),
       if (!isNullOrEmpty(_slug)) 'slug': _slug,
     };
@@ -194,14 +195,16 @@ class PostUpdateBuilder implements IQueryBuilder<PostUpdateBuilder, Post> {
   }
 
   @override
-  PostUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  PostUpdateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  PostUpdateBuilder withResponseValidationOverride(bool Function(Post) responseDelegate) {
+  PostUpdateBuilder withResponseValidationOverride(
+      bool Function(Post) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

@@ -20,7 +20,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withStatisticDelegate(void Function(String?, String?, int?) delegate) {
+  BootstrapBuilder withStatisticDelegate(
+      void Function(String?, String?, int?) delegate) {
     _statisticsDelegate = delegate;
     return this;
   }
@@ -35,7 +36,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withResponsePreprocessor(bool Function(dynamic) responsePreprocessor) {
+  BootstrapBuilder withResponsePreprocessor(
+      bool Function(dynamic) responsePreprocessor) {
     _responsePreprocessorDelegate = responsePreprocessor;
     return this;
   }
@@ -45,7 +47,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorizationBuilder(IAuthorization Function(AuthorizationBuilder)? builder) {
+  BootstrapBuilder withDefaultAuthorizationBuilder(
+      IAuthorization Function(AuthorizationBuilder)? builder) {
     if (builder == null) {
       return this;
     }

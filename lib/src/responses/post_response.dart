@@ -75,18 +75,24 @@ class Post implements ISerializable<Post> {
   factory Post.fromMap(Map<String, dynamic> json) => Post(
         id: json['id'] ?? -1,
         date: json['date'] == null ? null : DateTime.parse(json['date']),
-        dateGmt: json['date_gmt'] == null ? null : DateTime.parse(json['date_gmt']),
+        dateGmt:
+            json['date_gmt'] == null ? null : DateTime.parse(json['date_gmt']),
         guid: json['guid'] == null ? null : Content.fromMap(json['guid']),
         password: json["password"] == null ? null : json["password"],
-        modified: json['modified'] == null ? null : DateTime.parse(json['modified']),
-        modifiedGmt: json['modified_gmt'] == null ? null : DateTime.parse(json['modified_gmt']),
+        modified:
+            json['modified'] == null ? null : DateTime.parse(json['modified']),
+        modifiedGmt: json['modified_gmt'] == null
+            ? null
+            : DateTime.parse(json['modified_gmt']),
         slug: json['slug'] ?? '',
         status: getContentStatusFromValue(json['status']),
         type: json['type'] ?? '',
         link: json['link'] ?? '',
         title: json['title'] == null ? null : Content.fromMap(json['title']),
-        content: json['content'] == null ? null : Content.fromMap(json['content']),
-        excerpt: json['excerpt'] == null ? null : Content.fromMap(json['excerpt']),
+        content:
+            json['content'] == null ? null : Content.fromMap(json['content']),
+        excerpt:
+            json['excerpt'] == null ? null : Content.fromMap(json['excerpt']),
         author: json['author'] ?? '' as int?,
         featuredMedia: json['featured_media'] ?? '' as int?,
         commentStatus: getStatusFromValue(json['comment_status']),
@@ -94,11 +100,19 @@ class Post implements ISerializable<Post> {
         sticky: json['sticky'] ?? false,
         template: json['template'] ?? '',
         format: getFormatFromValue(json['format']),
-        meta: json['meta'] == null ? null : List<dynamic>.from(json['meta'].map((x) => x)),
-        categories: json['categories'] == null ? null : List<int>.from(json['categories'].map((x) => x)),
-        tags: json['tags'] == null ? null : List<int>.from(json['tags'].map((x) => x)),
+        meta: json['meta'] == null
+            ? null
+            : List<dynamic>.from(json['meta'].map((x) => x)),
+        categories: json['categories'] == null
+            ? null
+            : List<int>.from(json['categories'].map((x) => x)),
+        tags: json['tags'] == null
+            ? null
+            : List<int>.from(json['tags'].map((x) => x)),
         yoastHead: json['yoast_head'] ?? '',
-        authorMeta: json['author_meta'] == null ? null : AuthorMeta.fromMap(json['author_meta']),
+        authorMeta: json['author_meta'] == null
+            ? null
+            : AuthorMeta.fromMap(json['author_meta']),
         featuredImageUrl: json['featured_image_url'] ?? '',
         links: json['_links'] == null ? null : Links.fromMap(json['_links']),
       );
@@ -110,7 +124,8 @@ class Post implements ISerializable<Post> {
         'guid': guid == null ? null : guid!.toMap(),
         'password': password,
         'modified': modified == null ? null : modified!.toIso8601String(),
-        'modified_gmt': modifiedGmt == null ? null : modifiedGmt!.toIso8601String(),
+        'modified_gmt':
+            modifiedGmt == null ? null : modifiedGmt!.toIso8601String(),
         'slug': slug ?? '',
         'status': status.toString().split('.').last,
         'type': type ?? type.toString().split('.').last,
@@ -126,7 +141,9 @@ class Post implements ISerializable<Post> {
         'template': template ?? '',
         'format': format.toString().split('.').last,
         'meta': meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
-        'categories': categories == null ? null : List<dynamic>.from(categories!.map((x) => x)),
+        'categories': categories == null
+            ? null
+            : List<dynamic>.from(categories!.map((x) => x)),
         'tags': tags == null ? null : List<dynamic>.from(tags!.map((x) => x)),
         'yoast_head': yoastHead ?? '',
         'author_meta': authorMeta == null ? null : authorMeta!.toMap(),

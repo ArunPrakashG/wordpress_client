@@ -8,7 +8,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Category> {
+class CategoryDeleteBuilder
+    implements IQueryBuilder<CategoryDeleteBuilder, Category> {
   @override
   IAuthorization? authorization;
 
@@ -87,21 +88,24 @@ class CategoryDeleteBuilder implements IQueryBuilder<CategoryDeleteBuilder, Cate
   }
 
   @override
-  CategoryDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CategoryDeleteBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers = [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CategoryDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CategoryDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CategoryDeleteBuilder withResponseValidationOverride(bool Function(Category) responseDelegate) {
+  CategoryDeleteBuilder withResponseValidationOverride(
+      bool Function(Category) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

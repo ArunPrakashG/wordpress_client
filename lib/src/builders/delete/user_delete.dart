@@ -101,14 +101,16 @@ class UserDeleteBuilder implements IQueryBuilder<UserDeleteBuilder, User> {
   }
 
   @override
-  UserDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  UserDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  UserDeleteBuilder withResponseValidationOverride(
+      bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

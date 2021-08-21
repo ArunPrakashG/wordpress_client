@@ -18,7 +18,8 @@ class MediaDetails {
   final Map<String, SizeValue>? sizes;
   final ImageMeta? imageMeta;
 
-  factory MediaDetails.fromJson(String str) => MediaDetails.fromMap(json.decode(str));
+  factory MediaDetails.fromJson(String str) =>
+      MediaDetails.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -26,15 +27,23 @@ class MediaDetails {
         width: json["width"] == null ? null : json["width"],
         height: json["height"] == null ? null : json["height"],
         file: json["file"] == null ? null : json["file"],
-        sizes: json["sizes"] == null ? null : Map.from(json["sizes"]).map((k, v) => MapEntry<String, SizeValue>(k, SizeValue.fromMap(v))),
-        imageMeta: json["image_meta"] == null ? null : ImageMeta.fromMap(json["image_meta"]),
+        sizes: json["sizes"] == null
+            ? null
+            : Map.from(json["sizes"]).map(
+                (k, v) => MapEntry<String, SizeValue>(k, SizeValue.fromMap(v))),
+        imageMeta: json["image_meta"] == null
+            ? null
+            : ImageMeta.fromMap(json["image_meta"]),
       );
 
   Map<String, dynamic> toMap() => {
         "width": width == null ? null : width,
         "height": height == null ? null : height,
         "file": file == null ? null : file,
-        "sizes": sizes == null ? null : Map.from(sizes!).map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
+        "sizes": sizes == null
+            ? null
+            : Map.from(sizes!)
+                .map((k, v) => MapEntry<String, dynamic>(k, v.toMap())),
         "image_meta": imageMeta == null ? null : imageMeta!.toMap(),
       };
 }

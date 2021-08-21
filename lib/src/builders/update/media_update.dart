@@ -164,14 +164,16 @@ class MediaUpdateBuilder implements IQueryBuilder<MediaUpdateBuilder, Media> {
   }
 
   @override
-  MediaUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MediaUpdateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MediaUpdateBuilder withResponseValidationOverride(bool Function(Media) responseDelegate) {
+  MediaUpdateBuilder withResponseValidationOverride(
+      bool Function(Media) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

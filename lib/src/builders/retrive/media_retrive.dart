@@ -85,21 +85,24 @@ class MediaRetriveBuilder implements IQueryBuilder<MediaRetriveBuilder, Media> {
   }
 
   @override
-  MediaRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  MediaRetriveBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  MediaRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MediaRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MediaRetriveBuilder withResponseValidationOverride(bool Function(Media) responseDelegate) {
+  MediaRetriveBuilder withResponseValidationOverride(
+      bool Function(Media) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

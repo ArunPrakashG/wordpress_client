@@ -38,14 +38,19 @@ class ImageMeta {
         credit: json["credit"] == null ? null : json["credit"],
         camera: json["camera"] == null ? null : json["camera"],
         caption: json["caption"] == null ? null : json["caption"],
-        createdTimestamp: json["created_timestamp"] == null ? null : json["created_timestamp"],
+        createdTimestamp: json["created_timestamp"] == null
+            ? null
+            : json["created_timestamp"],
         copyright: json["copyright"] == null ? null : json["copyright"],
         focalLength: json["focal_length"] == null ? null : json["focal_length"],
         iso: json["iso"] == null ? null : json["iso"],
-        shutterSpeed: json["shutter_speed"] == null ? null : json["shutter_speed"],
+        shutterSpeed:
+            json["shutter_speed"] == null ? null : json["shutter_speed"],
         title: json["title"] == null ? null : json["title"],
         orientation: json["orientation"] == null ? null : json["orientation"],
-        keywords: json["keywords"] == null ? null : List<dynamic>.from(json["keywords"].map((x) => x)),
+        keywords: json["keywords"] == null
+            ? null
+            : List<dynamic>.from(json["keywords"].map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
@@ -60,6 +65,8 @@ class ImageMeta {
         "shutter_speed": shutterSpeed == null ? null : shutterSpeed,
         "title": title == null ? null : title,
         "orientation": orientation == null ? null : orientation,
-        "keywords": keywords == null ? null : List<dynamic>.from(keywords!.map((x) => x)),
+        "keywords": keywords == null
+            ? null
+            : List<dynamic>.from(keywords!.map((x) => x)),
       };
 }

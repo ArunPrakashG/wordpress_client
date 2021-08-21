@@ -94,14 +94,16 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
     return this;
   }
 
-  PostListBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  PostListBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  PostListBuilder withResponseValidationOverride(bool Function(List<Post>) responseDelegate) {
+  PostListBuilder withResponseValidationOverride(
+      bool Function(List<Post>) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
@@ -200,7 +202,8 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
       return this;
     }
 
-    if (sortOrder == FilterPostSortOrder.DATE && endpoint!.toLowerCase() == 'users') {
+    if (sortOrder == FilterPostSortOrder.DATE &&
+        endpoint!.toLowerCase() == 'users') {
       _sortOrder = 'registered_date';
       return this;
     }
@@ -324,24 +327,35 @@ class PostListBuilder implements IQueryBuilder<PostListBuilder, List<Post>> {
       if (_emdeded) '_embed': '1',
       if (_after != null) 'after': _after!.toIso8601String(),
       if (_before != null) 'before': _before!.toIso8601String(),
-      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty) 'author': _allowedAuthors!.join(','),
-      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty) 'author_exclude': _excludedAuthors!.join(','),
-      if (_allowedIds != null && _allowedIds!.isNotEmpty) 'include': _allowedIds!.join(','),
-      if (_excludedIds != null && _excludedIds!.isNotEmpty) 'exclude': _excludedIds!.join(','),
+      if (_allowedAuthors != null && _allowedAuthors!.isNotEmpty)
+        'author': _allowedAuthors!.join(','),
+      if (_excludedAuthors != null && _excludedAuthors!.isNotEmpty)
+        'author_exclude': _excludedAuthors!.join(','),
+      if (_allowedIds != null && _allowedIds!.isNotEmpty)
+        'include': _allowedIds!.join(','),
+      if (_excludedIds != null && _excludedIds!.isNotEmpty)
+        'exclude': _excludedIds!.join(','),
       if (_resultOffset > 0) 'offset': _resultOffset.toString(),
       if (!isNullOrEmpty(_sortOrder)) 'orderby': _sortOrder,
       if (!isNullOrEmpty(_resultOrder)) 'order': _resultOrder,
-      if (_limitBySlug != null && _limitBySlug!.isNotEmpty) 'slug': _limitBySlug!.join(','),
+      if (_limitBySlug != null && _limitBySlug!.isNotEmpty)
+        'slug': _limitBySlug!.join(','),
       if (!isNullOrEmpty(_limitByStatus)) 'status': _limitByStatus,
-      if (!isNullOrEmpty(_limitByTaxonomyRelation)) 'tax_relation': _limitByTaxonomyRelation,
-      if (_allowedCategories != null && _allowedCategories!.isNotEmpty) 'categories': _allowedCategories!.join(','),
-      if (_excludedCategories != null && _excludedCategories!.isNotEmpty) 'categories_exclude': _excludedCategories!.join(','),
-      if (_allowedTags != null && _allowedTags!.isNotEmpty) 'tags': _allowedTags!.join(','),
-      if (_excludedTags != null && _excludedTags!.isNotEmpty) 'tags_exclude': _excludedTags!.join(','),
+      if (!isNullOrEmpty(_limitByTaxonomyRelation))
+        'tax_relation': _limitByTaxonomyRelation,
+      if (_allowedCategories != null && _allowedCategories!.isNotEmpty)
+        'categories': _allowedCategories!.join(','),
+      if (_excludedCategories != null && _excludedCategories!.isNotEmpty)
+        'categories_exclude': _excludedCategories!.join(','),
+      if (_allowedTags != null && _allowedTags!.isNotEmpty)
+        'tags': _allowedTags!.join(','),
+      if (_excludedTags != null && _excludedTags!.isNotEmpty)
+        'tags_exclude': _excludedTags!.join(','),
       if (_onlySticky) 'sticky': '1',
       if (queryParameters != null && queryParameters!.isNotEmpty)
         for (var pair in queryParameters!)
-          if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value)) pair.key: pair.value
+          if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value))
+            pair.key: pair.value
     };
   }
 

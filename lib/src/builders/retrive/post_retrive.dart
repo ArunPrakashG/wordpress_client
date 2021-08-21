@@ -80,7 +80,8 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
       if (!isNullOrEmpty(_password)) 'password': _password,
       if (queryParameters != null && queryParameters!.isNotEmpty)
         for (var pair in queryParameters!)
-          if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value)) pair.key: pair.value
+          if (!isNullOrEmpty(pair.key) && !isNullOrEmpty(pair.value))
+            pair.key: pair.value
     };
   }
 
@@ -115,14 +116,16 @@ class PostRetriveBuilder implements IQueryBuilder<PostRetriveBuilder, Post> {
   }
 
   @override
-  PostRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  PostRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  PostRetriveBuilder withResponseValidationOverride(bool Function(Post) responseDelegate) {
+  PostRetriveBuilder withResponseValidationOverride(
+      bool Function(Post) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

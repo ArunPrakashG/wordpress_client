@@ -11,7 +11,8 @@ void main() async {
   TempMailClient tempMailClient;
   Map<String, dynamic>? json;
 
-  json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
+  json =
+      jsonDecode(await (await File('test/test_settings.json')).readAsString());
   client = WordpressClient(
     json!['base_url'],
     json['path'],
@@ -79,7 +80,10 @@ void main() async {
       );
 
       expect(200, response.responseCode);
-      expect(19, response.value!.length, reason: 'For some reason, WP API is only returning PER_PAGE - 1 values.', skip: true);
+      expect(19, response.value!.length,
+          reason:
+              'For some reason, WP API is only returning PER_PAGE - 1 values.',
+          skip: true);
     });
 
     test('List Users', () async {
@@ -139,14 +143,16 @@ void main() async {
     });
 
     test('Update User', () async {
-      final response = await client.updateUser((builder) => builder.withId(userId).withFirstName('updated first name').build());
+      final response = await client.updateUser((builder) =>
+          builder.withId(userId).withFirstName('updated first name').build());
 
       expect(200, response.responseCode);
       expect('updated first name', response.value!.firstName);
     });
 
     test('Retrive User', () async {
-      final response = await client.retriveUser((builder) => builder.withUserId(userId).build());
+      final response = await client
+          .retriveUser((builder) => builder.withUserId(userId).build());
 
       expect(200, response.responseCode);
       expect(userId, response.value!.id);
@@ -154,7 +160,11 @@ void main() async {
 
     test('Delete User', () async {
       final deleteUserResponse = await client.deleteUser(
-        (builder) => builder.withUserId(userId).withForce(true).withReassign(3).withCallback(
+        (builder) => builder
+            .withUserId(userId)
+            .withForce(true)
+            .withReassign(3)
+            .withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);
@@ -202,7 +212,12 @@ void main() async {
 
     test('Update Post', () async {
       final response = await client.updatePost(
-        (builder) => builder.withId(postId).withFeaturedMedia(468930).withAuthor(3).withTitle('Generated Sample Post Edited').withCallback(
+        (builder) => builder
+            .withId(postId)
+            .withFeaturedMedia(468930)
+            .withAuthor(3)
+            .withTitle('Generated Sample Post Edited')
+            .withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);

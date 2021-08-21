@@ -110,14 +110,16 @@ class TagCreateBuilder implements IQueryBuilder<TagCreateBuilder, Tag> {
   }
 
   @override
-  TagCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagCreateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  TagCreateBuilder withResponseValidationOverride(bool Function(Tag) responseDelegate) {
+  TagCreateBuilder withResponseValidationOverride(
+      bool Function(Tag) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

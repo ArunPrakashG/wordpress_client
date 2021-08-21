@@ -57,16 +57,26 @@ class Comment extends ISerializable<Comment> {
         authorEmail: json["author_email"] == null ? null : json["author_email"],
         authorUrl: json["author_url"] == null ? null : json["author_url"],
         authorIp: json["author_ip"] == null ? null : json["author_ip"],
-        authorUserAgent: json["author_user_agent"] == null ? null : json["author_user_agent"],
+        authorUserAgent: json["author_user_agent"] == null
+            ? null
+            : json["author_user_agent"],
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
-        dateGmt: json["date_gmt"] == null ? null : DateTime.parse(json["date_gmt"]),
-        content: json["content"] == null ? null : Content.fromMap(json["content"]),
+        dateGmt:
+            json["date_gmt"] == null ? null : DateTime.parse(json["date_gmt"]),
+        content:
+            json["content"] == null ? null : Content.fromMap(json["content"]),
         link: json["link"] == null ? null : json["link"],
-        status: json["status"] == null ? null : getCommentStatusFromValue(json["status"]),
+        status: json["status"] == null
+            ? null
+            : getCommentStatusFromValue(json["status"]),
         type: json["type"] == null ? null : json["type"],
-        authorAvatarUrls:
-            json["author_avatar_urls"] == null ? null : Map.from(json["author_avatar_urls"]).map((k, v) => MapEntry<String, String>(k, v)),
-        meta: json["meta"] == null ? null : List<dynamic>.from(json["meta"].map((x) => x)),
+        authorAvatarUrls: json["author_avatar_urls"] == null
+            ? null
+            : Map.from(json["author_avatar_urls"])
+                .map((k, v) => MapEntry<String, String>(k, v)),
+        meta: json["meta"] == null
+            ? null
+            : List<dynamic>.from(json["meta"].map((x) => x)),
         links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
       );
 
@@ -84,9 +94,14 @@ class Comment extends ISerializable<Comment> {
         "date_gmt": dateGmt == null ? null : dateGmt!.toIso8601String(),
         "content": content == null ? null : content!.toMap(),
         "link": link == null ? null : link,
-        "status": status == null ? null : status.toString().split('.').last.toLowerCase(),
+        "status": status == null
+            ? null
+            : status.toString().split('.').last.toLowerCase(),
         "type": type == null ? null : type,
-        "author_avatar_urls": authorAvatarUrls == null ? null : Map.from(authorAvatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "author_avatar_urls": authorAvatarUrls == null
+            ? null
+            : Map.from(authorAvatarUrls!)
+                .map((k, v) => MapEntry<String, dynamic>(k, v)),
         "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
         "_links": links == null ? null : links!.toMap(),
       };

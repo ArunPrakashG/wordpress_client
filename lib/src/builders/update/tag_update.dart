@@ -115,14 +115,16 @@ class TagUpdateBuilder implements IQueryBuilder<TagUpdateBuilder, Tag> {
   }
 
   @override
-  TagUpdateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagUpdateBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  TagUpdateBuilder withResponseValidationOverride(bool Function(Tag) responseDelegate) {
+  TagUpdateBuilder withResponseValidationOverride(
+      bool Function(Tag) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

@@ -17,7 +17,8 @@ class LinkContainer {
   final int? count;
   final String? href;
 
-  factory LinkContainer.fromJson(String str) => LinkContainer.fromMap(json.decode(str));
+  factory LinkContainer.fromJson(String str) =>
+      LinkContainer.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 

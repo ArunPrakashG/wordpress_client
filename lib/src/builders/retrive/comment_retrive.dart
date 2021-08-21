@@ -9,7 +9,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CommentRetriveBuilder implements IQueryBuilder<CommentRetriveBuilder, Comment> {
+class CommentRetriveBuilder
+    implements IQueryBuilder<CommentRetriveBuilder, Comment> {
   @override
   IAuthorization? authorization;
 
@@ -92,21 +93,24 @@ class CommentRetriveBuilder implements IQueryBuilder<CommentRetriveBuilder, Comm
   }
 
   @override
-  CommentRetriveBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CommentRetriveBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers ??= [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CommentRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CommentRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CommentRetriveBuilder withResponseValidationOverride(bool Function(Comment) responseDelegate) {
+  CommentRetriveBuilder withResponseValidationOverride(
+      bool Function(Comment) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

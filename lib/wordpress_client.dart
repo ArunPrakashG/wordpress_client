@@ -8,8 +8,10 @@ export 'src/authorization/authorization_base.dart' show IAuthorization;
 // Authorization
 export 'src/authorization/authorization_builder.dart' show AuthorizationBuilder;
 export 'src/authorization/authorization_methods/basic_auth.dart' show BasicAuth;
-export 'src/authorization/authorization_methods/basic_jwt.dart' show BasicJwtAuth;
-export 'src/authorization/authorization_methods/useful_jwt.dart' show UsefulJwtAuth;
+export 'src/authorization/authorization_methods/basic_jwt.dart'
+    show BasicJwtAuth;
+export 'src/authorization/authorization_methods/useful_jwt.dart'
+    show UsefulJwtAuth;
 // Requests
 export 'src/builders/request.dart';
 export 'src/builders/request_builder_base.dart';

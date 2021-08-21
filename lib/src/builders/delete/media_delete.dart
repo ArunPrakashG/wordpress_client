@@ -97,14 +97,16 @@ class MediaDeleteBuilder implements IQueryBuilder<MediaDeleteBuilder, Media> {
   }
 
   @override
-  MediaDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  MediaDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MediaDeleteBuilder withResponseValidationOverride(bool Function(Media) responseDelegate) {
+  MediaDeleteBuilder withResponseValidationOverride(
+      bool Function(Media) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

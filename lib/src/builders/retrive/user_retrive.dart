@@ -93,14 +93,16 @@ class UserRetriveBuilder implements IQueryBuilder<UserRetriveBuilder, User> {
   }
 
   @override
-  UserRetriveBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  UserRetriveBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  UserRetriveBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
+  UserRetriveBuilder withResponseValidationOverride(
+      bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

@@ -36,7 +36,9 @@ class Tag extends ISerializable<Tag> {
         name: json["name"] == null ? null : json["name"],
         slug: json["slug"] == null ? null : json["slug"],
         taxonomy: json["taxonomy"] == null ? null : json["taxonomy"],
-        meta: json["meta"] == null ? null : List<dynamic>.from(json["meta"].map((x) => x)),
+        meta: json["meta"] == null
+            ? null
+            : List<dynamic>.from(json["meta"].map((x) => x)),
         links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
       );
 

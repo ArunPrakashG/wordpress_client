@@ -9,7 +9,8 @@ import '../../utilities/pair.dart';
 import '../request.dart';
 import '../request_builder_base.dart';
 
-class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Comment> {
+class CommentDeleteBuilder
+    implements IQueryBuilder<CommentDeleteBuilder, Comment> {
   @override
   IAuthorization? authorization;
 
@@ -95,21 +96,24 @@ class CommentDeleteBuilder implements IQueryBuilder<CommentDeleteBuilder, Commen
   }
 
   @override
-  CommentDeleteBuilder withHeaders(Iterable<Pair<String, String>> customHeaders) {
+  CommentDeleteBuilder withHeaders(
+      Iterable<Pair<String, String>> customHeaders) {
     headers = [];
     headers!.addAll(customHeaders);
     return this;
   }
 
   @override
-  CommentDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  CommentDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  CommentDeleteBuilder withResponseValidationOverride(bool Function(Comment) responseDelegate) {
+  CommentDeleteBuilder withResponseValidationOverride(
+      bool Function(Comment) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

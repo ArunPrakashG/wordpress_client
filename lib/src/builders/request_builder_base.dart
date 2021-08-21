@@ -20,7 +20,8 @@ abstract class IQueryBuilder<TRequestType, YResponseType> {
 
   TRequestType withHeaders(Iterable<Pair<String, String>> customHeaders);
 
-  TRequestType withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters);
+  TRequestType withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters);
 
   TRequestType withCancellationToken(CancelToken token);
 
@@ -28,7 +29,8 @@ abstract class IQueryBuilder<TRequestType, YResponseType> {
 
   TRequestType withCallback(Callback requestCallback);
 
-  TRequestType withResponseValidationOverride(bool Function(YResponseType) responseDelegate);
+  TRequestType withResponseValidationOverride(
+      bool Function(YResponseType) responseDelegate);
 
   Request<YResponseType> build();
 }

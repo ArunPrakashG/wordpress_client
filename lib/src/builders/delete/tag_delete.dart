@@ -93,14 +93,16 @@ class TagDeleteBuilder implements IQueryBuilder<TagDeleteBuilder, Tag> {
   }
 
   @override
-  TagDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
+  TagDeleteBuilder withQueryParameters(
+      Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  TagDeleteBuilder withResponseValidationOverride(bool Function(Tag) responseDelegate) {
+  TagDeleteBuilder withResponseValidationOverride(
+      bool Function(Tag) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
