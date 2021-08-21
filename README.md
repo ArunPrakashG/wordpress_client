@@ -171,7 +171,7 @@ WordpressClient(
     'api path',
     bootstrapper: (builder) => builder
         ...
-        .withDefaultAuthorizationBuilder(CustomAuth('username', 'password', callback: Callback(...)))
+        .withDefaultAuthorization(CustomAuth('username', 'password', callback: Callback(...)))
         ...
         .build(),
   );
