@@ -12,6 +12,14 @@
 
 ---
 
+## Features
+* Complete fluent system, Define request parameters with builder functions which allows to fluently create a request or add extra custom headers, authorization etc.
+* Most coomon 3 authorization systems are supported.
+* Response preprocessor functions to pre process the response before it gets returned in a ResponseContainer.
+* Provides statistics such as time taken for the request to complete.
+* Support for Custom Requests / Authorization systems.
+* And many more!
+
 ## NOTE
 
 **Authorization API has been sligtly changed on 5.1.0 from previous 5.0.4 build.** You can read more about this change in [API Changes](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changes) Wiki
