@@ -1,34 +1,18 @@
-import '../builders/request.dart';
-import '../internal_requester.dart';
-import '../operations/delete.dart';
-import '../operations/retrive.dart';
-import '../operations/update.dart';
-import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+part of '../wordpress_client_base.dart';
 
-class MeInterface<T extends ISerializable<T>>
-    implements IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T> {
+class MeInterface implements IDeleteOperation<User>, IRetriveOperation<User>, IUpdateOperation<User> {
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<T?>(typeResolver, request);
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<T?>(typeResolver, request);
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<T?>(typeResolver, request);
   }
 }

@@ -21,11 +21,12 @@ class InternalRequester {
   bool Function(dynamic)? _responsePreprocessorDelegate;
   static final Map<String?, int> endPointStatistics = Map<String?, int>();
   static void Function(String, String?, int?)? _statisticsDelegate;
-  bool? _isBusy;
+  bool _isBusy = false;
   bool _singleRequestAtATimeMode = false;
 
-  InternalRequester(
-      String? baseUrl, String? path, BootstrapConfiguration? configuration) {
+  InternalRequester.emptyInstance();
+
+  InternalRequester(String? baseUrl, String? path, BootstrapConfiguration? configuration) {
     if (baseUrl == null) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -51,12 +52,10 @@ class InternalRequester {
     _singleRequestAtATimeMode = configuration.waitWhileBusy ?? false;
 
     if (configuration.responsePreprocessorDelegate != null) {
-      _responsePreprocessorDelegate =
-          configuration.responsePreprocessorDelegate;
+      _responsePreprocessorDelegate = configuration.responsePreprocessorDelegate;
     }
 
-    if (configuration.defaultAuthorization != null &&
-        !configuration.defaultAuthorization!.isDefault) {
+    if (configuration.defaultAuthorization != null && !configuration.defaultAuthorization!.isDefault) {
       _defaultAuthorization = configuration.defaultAuthorization;
     }
 
@@ -68,8 +67,7 @@ class InternalRequester {
       _client!.options.headers['User-Agent'] = configuration.defaultUserAgent;
     }
 
-    if (configuration.defaultHeaders != null &&
-        configuration.defaultHeaders!.isNotEmpty) {
+    if (configuration.defaultHeaders != null && configuration.defaultHeaders!.isNotEmpty) {
       for (final header in configuration.defaultHeaders!) {
         _client!.options.headers[header.key] = header.value;
       }
@@ -103,7 +101,7 @@ class InternalRequester {
       return;
     }
 
-    while (_isBusy!) {
+    while (_isBusy) {
       await Future.delayed(Duration(milliseconds: 500));
     }
   }
@@ -117,24 +115,19 @@ class InternalRequester {
   bool _handleResponse<T>(Request<T> request, T responseContainer) {
     request.callback?.invokeResponseCallback(responseContainer);
 
-    if (_responsePreprocessorDelegate != null &&
-        !_responsePreprocessorDelegate!(responseContainer)) {
+    if (_responsePreprocessorDelegate != null && !_responsePreprocessorDelegate!(responseContainer)) {
       return false;
     }
 
-    if (request.validationDelegate != null &&
-        !request.validationDelegate!(responseContainer)) {
+    if (request.validationDelegate != null && !request.validationDelegate!(responseContainer)) {
       return false;
     }
 
     return true;
   }
 
-  Future<ResponseContainer<T?>> createRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<T?>> createRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
@@ -153,8 +146,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
 
@@ -167,8 +159,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
@@ -202,8 +193,7 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> deleteRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
+  Future<ResponseContainer<T?>> deleteRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
     if (request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
@@ -223,8 +213,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
 
@@ -259,11 +248,8 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<List<T>?>> listRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<List<T>>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<List<T>?>> listRequest<T extends ISerializable<T>?>(T typeResolver, Request<List<T>>? request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
@@ -281,8 +267,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
 
@@ -297,17 +282,14 @@ class InternalRequester {
         );
       }
 
-      final responseDataContainer = (response.data as Iterable<dynamic>)
-          .map<T>((e) => typeResolver.fromJson(e))
-          .toList();
+      final responseDataContainer = (response.data as Iterable<dynamic>).map<T>((e) => typeResolver.fromJson(e)).toList();
 
       if (!_handleResponse<List<T>>(request, responseDataContainer)) {
         return ResponseContainer<List<T>?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
@@ -340,11 +322,8 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> retriveRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<T?>> retriveRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
@@ -363,8 +342,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
 
@@ -377,8 +355,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
@@ -411,11 +388,8 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> updateRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<T?>> updateRequest<T extends ISerializable<T>?>(T typeResolver, Request<T>? request) async {
+    if (typeResolver == null || request == null || !request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
@@ -434,8 +408,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          message: 'Either response is null or status code is not in range of 200 ~ 300',
         );
       }
 
@@ -448,8 +421,7 @@ class InternalRequester {
           null,
           duration: watch.elapsed,
           responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          message: 'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
         );
       }
 
@@ -482,10 +454,7 @@ class InternalRequester {
     }
   }
 
-  Map<String, dynamic> _parseResponseHeaders(
-          Map<String, List<String>> headers) =>
-      headers
-          .map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
+  Map<String, dynamic> _parseResponseHeaders(Map<String, List<String>> headers) => headers.map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
 
   Future<RequestOptions> _parseAsDioRequest(Request request) async {
     if (!request.isRequestExecutable) {
@@ -513,26 +482,18 @@ class InternalRequester {
       followRedirects: true,
       maxRedirects: 5,
       data: request.formBody,
-      onReceiveProgress: (current, max) =>
-          request.callback?.invokeReceiveProgressCallback(max, current),
-      onSendProgress: (current, max) =>
-          request.callback?.invokeSendProgressCallback(max, current),
+      onReceiveProgress: (current, max) => request.callback?.invokeReceiveProgressCallback(max, current),
+      onSendProgress: (current, max) => request.callback?.invokeSendProgressCallback(max, current),
     );
 
     bool hasAuthorizedAlready = false;
 
     if (request.shouldAuthorize && !hasAuthorizedAlready) {
-      hasAuthorizedAlready = await _authorizeRequest(
-          options, _client, request.authorization,
-          callback: request.callback);
+      hasAuthorizedAlready = await _authorizeRequest(options, _client, request.authorization, callback: request.callback);
     }
 
-    if (_defaultAuthorization != null &&
-        !_defaultAuthorization!.isDefault &&
-        !hasAuthorizedAlready) {
-      hasAuthorizedAlready = await _authorizeRequest(
-          options, _client, _defaultAuthorization,
-          callback: request.callback);
+    if (_defaultAuthorization != null && !_defaultAuthorization!.isDefault && !hasAuthorizedAlready) {
+      hasAuthorizedAlready = await _authorizeRequest(options, _client, _defaultAuthorization, callback: request.callback);
     }
 
     if (request.headers != null && request.headers!.isNotEmpty) {
@@ -544,13 +505,8 @@ class InternalRequester {
     return options;
   }
 
-  static Future<bool> _authorizeRequest(
-      RequestOptions? requestOptions, Dio? client, IAuthorization? auth,
-      {Callback? callback}) async {
-    if (auth == null ||
-        auth.isDefault ||
-        client == null ||
-        requestOptions == null) {
+  static Future<bool> _authorizeRequest(RequestOptions? requestOptions, Dio? client, IAuthorization? auth, {Callback? callback}) async {
+    if (auth == null || auth.isDefault || client == null || requestOptions == null) {
       return false;
     }
 

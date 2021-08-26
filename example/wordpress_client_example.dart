@@ -6,8 +6,7 @@ void main() async {
 
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
-  ResponseContainer<List<Post?>?> posts = await client
-      .listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
+  ResponseContainer<List<Post?>?> posts = await client.listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
   print(posts.value!.first!.id);
 
   // Or
@@ -21,8 +20,7 @@ void main() async {
         .withDefaultUserAgent('wordpress_client/4.0.0')
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
-        .withDefaultAuthorization(
-            UsefulJwtAuth('test_user', 'super_secret_password'))
+        .withDefaultAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
         .withStatisticDelegate(
       (baseUrl, endpoint, count) {
         print('Request send to: $baseUrl ($count times)');
@@ -63,5 +61,18 @@ void main() async {
     }).build(),
   );
 
+  client.initializeCustomInterface<TestResponse>('test_interface');
   print(response.value!.first!.id);
+}
+
+class TestResponse extends ISerializable<TestResponse> {
+  @override
+  TestResponse fromJson(Map<String, dynamic>? json) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    throw UnimplementedError();
+  }
 }
