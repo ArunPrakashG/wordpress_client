@@ -1,18 +1,33 @@
 part of '../wordpress_client_base.dart';
 
-class MeInterface implements IDeleteOperation<User>, IRetriveOperation<User>, IUpdateOperation<User> {
+class MeInterface implements IDeleteOperation<User, MeDeleteBuilder>, IRetriveOperation<User, MeRetriveBuilder>, IUpdateOperation<User, MeUpdateBuilder> {
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> delete({required Request<User>? Function(MeDeleteBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<User>(
+      User(),
+      builder(
+        MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> retrive({required Request<User>? Function(MeRetriveBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<User>(
+      User(),
+      builder(
+        MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> update({required Request<User>? Function(MeUpdateBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<User>(
+      User(),
+      builder(
+        MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

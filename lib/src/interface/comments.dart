@@ -1,30 +1,64 @@
 part of '../wordpress_client_base.dart';
 
-class CommentInterface<T extends ISerializable<T>>
-    implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
+class CommentInterface
+    implements
+        ICreateOperation<Comment, CommentCreateBuilder>,
+        IDeleteOperation<Comment, CommentDeleteBuilder>,
+        IRetriveOperation<Comment, CommentRetriveBuilder>,
+        IUpdateOperation<Comment, CommentUpdateBuilder>,
+        IListOperation<Comment, CommentListBuilder> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> create(
+      {required Request<Comment>? Function(CommentCreateBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<Comment>(
+      Comment(),
+      builder(
+        CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> delete(
+      {required Request<Comment>? Function(CommentDeleteBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<Comment>(
+      Comment(),
+      builder(
+        CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver, Request<List<T>>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Comment?>?>> list(
+      {required Request<List<Comment>>? Function(CommentListBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<Comment>(
+      Comment(),
+      builder(
+        CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> retrive(
+      {required Request<Comment>? Function(CommentRetriveBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<Comment>(
+      Comment(),
+      builder(
+        CommentRetriveBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> update(
+      {required Request<Comment>? Function(CommentUpdateBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<Comment>(
+      Comment(),
+      builder(
+        CommentUpdateBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

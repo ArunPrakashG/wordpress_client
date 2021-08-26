@@ -1,30 +1,28 @@
 part of '../wordpress_client_base.dart';
 
-class PostsInterface<T extends ISerializable<T>>
-    implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
+class PostsInterface implements ICreateOperation<Post>, IDeleteOperation<Post>, IRetriveOperation<Post>, IUpdateOperation<Post>, IListOperation<Post> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Post?>> create({Request<Post>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<Post>(Post(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Post?>> delete({Request<Post>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<Post>(Post(), request);
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver, Request<List<T>>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Post?>?>> list({Request<List<Post>>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<Post>(Post(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Post?>> retrive({Request<Post>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<Post>(Post(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Post?>> update({Request<Post>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<Post>(Post(), request);
   }
 }

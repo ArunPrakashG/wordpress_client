@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:wordpress_client/src/builders/retrive/comment_retrive.dart';
+import 'package:wordpress_client/src/builders/update/comment_update.dart';
 
 import 'builders/create/comment_create.dart';
 import 'builders/delete/comment_delete.dart';
@@ -29,7 +31,7 @@ part 'interface/posts.dart';
 part 'interface/tags.dart';
 part 'interface/users.dart';
 
-InternalRequester _requester = InternalRequester.emptyInstance();
+late InternalRequester _requester;
 
 Future<InternalRequester> _getInternalRequesterClient({bool shouldWaitIfBusy = false}) async {
   if (shouldWaitIfBusy) {
@@ -44,6 +46,8 @@ Future<InternalRequester> _getInternalRequesterClient({bool shouldWaitIfBusy = f
 class WordpressClient {
   Map<String, dynamic>? _interfaces;
   static String? baseUrl;
+
+  late MeInterface meInterface;
 
   WordpressClient(String? baseUrl, String? path, {BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper}) {
     if (isNullOrEmpty(baseUrl)) {
@@ -77,19 +81,7 @@ class WordpressClient {
     _interfaces!['comments'] = CommentInterface<Comment>();
   }
 
-  void initializeCustomInterface<T extends ISerializable<T>>(String interfaceId) {
-    if (isNullOrEmpty(interfaceId)) {
-      throw NullReferenceException('Interface ID is invalid.');
-    }
-
-    if (_interfaces![interfaceId] != null) {
-      throw InterfaceExistException('$interfaceId interface already exists!');
-    }
-
-    _interfaces![interfaceId] = CustomInterface<T>();
-  }
-
-  T? _getInterfaceById<T>(String id) {
+  T? getInterfaceById<T>(String id) {
     if (_interfaces == null || _interfaces!.isEmpty) {
       throw ClientNotInitializedException('Please correctly initialize WordpressClient before retriving the available interfaces.');
     }
@@ -103,32 +95,6 @@ class WordpressClient {
     }
 
     return _interfaces![id];
-  }
-
-  CustomInterface<TBase>? getCustomInterface<TBase extends ISerializable<TBase>>(String interfaceId) => _getInterfaceById<CustomInterface<TBase>>(interfaceId);
-
-  Future<ResponseContainer<User?>> retriveMe(Request Function(MeRetriveBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me')!.retrive<User>(
-      typeResolver: User(),
-      request: builder(MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
-      requesterClient: _requester,
-    );
-  }
-
-  Future<ResponseContainer<User?>> deleteMe(Request Function(MeDeleteBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me')!.delete<User>(
-      typeResolver: User(),
-      request: builder(MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
-      requesterClient: _requester,
-    );
-  }
-
-  Future<ResponseContainer<User?>> updateMe(Request Function(MeUpdateBuilder) builder) async {
-    return _getInterfaceById<MeInterface<User>>('me')!.update<User>(
-      typeResolver: User(),
-      request: builder(MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues()) as Request<User>?,
-      requesterClient: _requester,
-    );
   }
 
   Future<ResponseContainer<List<User?>?>> listUsers(Request Function(UserListBuilder) builder) async {

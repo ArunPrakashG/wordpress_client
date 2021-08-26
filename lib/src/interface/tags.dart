@@ -1,30 +1,28 @@
 part of '../wordpress_client_base.dart';
 
-class TagInterface<T extends ISerializable<T>>
-    implements ICreateOperation<T>, IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T>, IListOperation<T> {
+class TagInterface implements ICreateOperation<Tag>, IDeleteOperation<Tag>, IRetriveOperation<Tag>, IUpdateOperation<Tag>, IListOperation<Tag> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> create({Request<Tag>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<Tag>(Tag(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> delete({Request<Tag>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<Tag>(Tag(), request);
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver, Request<List<T>>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Tag?>?>> list({Request<List<Tag>>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<Tag>(Tag(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> retrive({Request<Tag>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<Tag>(Tag(), request);
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>({T? typeResolver, Request<T>? request, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> update({Request<Tag>? request, bool shouldWaitWhileClientBusy = false}) async {
+    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<Tag>(Tag(), request);
   }
 }

@@ -2,6 +2,6 @@ import '../builders/request.dart';
 import '../responses/response_container.dart';
 import '../utilities/serializable_instance.dart';
 
-abstract class IListOperation<T> {
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>({T? typeResolver, Request<List<T>>? request, bool shouldWaitWhileClientBusy = false});
+abstract class IListOperation<T, Y> {
+  Future<ResponseContainer<List<T?>?>> list({required Request<List<T>>? Function(Y) builder, bool shouldWaitWhileClientBusy = false});
 }
