@@ -1,57 +1,68 @@
-import '../internal_requester.dart';
+import '../../wordpress_client.dart';
+import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../builders/request.dart';
 import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+import '../responses/tag_response.dart';
+import 'interface_base.dart';
 
-class TagInterface<T extends ISerializable<T>>
+class TagInterface extends IInterface
     implements
-        ICreateOperation<T>,
-        IDeleteOperation<T>,
-        IRetriveOperation<T>,
-        IUpdateOperation<T>,
-        IListOperation<T> {
+        ICreateOperation<Tag, TagCreateBuilder>,
+        IDeleteOperation<Tag, TagDeleteBuilder>,
+        IRetriveOperation<Tag, TagRetriveBuilder>,
+        IUpdateOperation<Tag, TagUpdateBuilder>,
+        IListOperation<Tag, TagListBuilder> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> create(Request<Tag>? Function(TagCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<Tag>(
+      Tag(),
+      builder(
+        TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> delete(Request<Tag>? Function(TagDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<Tag>(
+      Tag(),
+      builder(
+        TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<List<T>>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Tag?>?>> list(Request<List<Tag>>? Function(TagListBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<Tag>(
+      Tag(),
+      builder(
+        TagListBuilder().withEndpoint('tags').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> retrive(Request<Tag>? Function(TagRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<Tag>(
+      Tag(),
+      builder(
+        TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Tag?>> update(Request<Tag>? Function(TagUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<Tag>(
+      Tag(),
+      builder(
+        TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

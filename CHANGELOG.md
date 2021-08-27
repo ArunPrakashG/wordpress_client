@@ -9,3 +9,7 @@
 ## 5.1.0
 
 - BREAKING CHANGE: Authorization API Change.
+
+## 5.1.1
+
+- Formatting changes.

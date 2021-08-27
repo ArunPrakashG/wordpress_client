@@ -1,57 +1,68 @@
-import '../internal_requester.dart';
+import '../../wordpress_client.dart';
+import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../builders/request.dart';
 import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+import '../responses/user_response.dart';
+import 'interface_base.dart';
 
-class UsersInterface<T extends ISerializable<T>>
+class UsersInterface extends IInterface
     implements
-        ICreateOperation<T>,
-        IDeleteOperation<T>,
-        IRetriveOperation<T>,
-        IUpdateOperation<T>,
-        IListOperation<T> {
+        ICreateOperation<User, UserCreateBuilder>,
+        IDeleteOperation<User, UserDeleteBuilder>,
+        IRetriveOperation<User, UserRetriveBuilder>,
+        IUpdateOperation<User, UserUpdateBuilder>,
+        IListOperation<User, UserListBuilder> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> create(Request<User>? Function(UserCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<User>(
+      User(),
+      builder(
+        UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> delete(Request<User>? Function(UserDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<User>(
+      User(),
+      builder(
+        UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<List<T>>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<User?>?>> list(Request<List<User>>? Function(UserListBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<User>(
+      User(),
+      builder(
+        UserListBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> retrive(Request<User>? Function(UserRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<User>(
+      User(),
+      builder(
+        UserRetriveBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> update(Request<User>? Function(UserUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<User>(
+      User(),
+      builder(
+        UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

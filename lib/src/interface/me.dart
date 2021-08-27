@@ -1,34 +1,43 @@
-import '../builders/request.dart';
-import '../internal_requester.dart';
+import 'dart:async';
+
+import '../../wordpress_client.dart';
+import '../builders_import.dart';
 import '../operations/delete.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
 import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+import '../responses/user_response.dart';
+import 'interface_base.dart';
 
-class MeInterface<T extends ISerializable<T>>
-    implements IDeleteOperation<T>, IRetriveOperation<T>, IUpdateOperation<T> {
+class MeInterface extends IInterface
+    implements IDeleteOperation<User, MeDeleteBuilder>, IRetriveOperation<User, MeRetriveBuilder>, IUpdateOperation<User, MeUpdateBuilder> {
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> delete(Request<User>? Function(MeDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<User>(
+      User(),
+      builder(
+        MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> retrive(Request<User>? Function(MeRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<User>(
+      User(),
+      builder(
+        MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<User?>> update(Request<User>? Function(MeUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<User>(
+      User(),
+      builder(
+        MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

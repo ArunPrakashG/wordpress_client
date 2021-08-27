@@ -1,57 +1,76 @@
-import '../internal_requester.dart';
+import 'dart:async';
+
+import '../../wordpress_client.dart';
+import '../builders/create/comment_create.dart';
+import '../builders/delete/comment_delete.dart';
+import '../builders/list/comment_list.dart';
+import '../builders/request.dart';
+import '../builders/retrive/comment_retrive.dart';
+import '../builders/update/comment_update.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../builders/request.dart';
+import '../responses/comment_response.dart';
 import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+import 'interface_base.dart';
 
-class CommentInterface<T extends ISerializable<T>>
+class CommentInterface extends IInterface
     implements
-        ICreateOperation<T>,
-        IDeleteOperation<T>,
-        IRetriveOperation<T>,
-        IUpdateOperation<T>,
-        IListOperation<T> {
+        ICreateOperation<Comment, CommentCreateBuilder>,
+        IDeleteOperation<Comment, CommentDeleteBuilder>,
+        IRetriveOperation<Comment, CommentRetriveBuilder>,
+        IUpdateOperation<Comment, CommentUpdateBuilder>,
+        IListOperation<Comment, CommentListBuilder> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> create(Request<Comment>? Function(CommentCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<Comment>(
+      Comment(),
+      builder(
+        CommentCreateBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> delete(Request<Comment>? Function(CommentDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<Comment>(
+      Comment(),
+      builder(
+        CommentDeleteBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<List<T>>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Comment?>?>> list(Request<List<Comment>>? Function(CommentListBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<Comment>(
+      Comment(),
+      builder(
+        CommentListBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> retrive(Request<Comment>? Function(CommentRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<Comment>(
+      Comment(),
+      builder(
+        CommentRetriveBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Comment?>> update(Request<Comment>? Function(CommentUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<Comment>(
+      Comment(),
+      builder(
+        CommentUpdateBuilder().withEndpoint('comments').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

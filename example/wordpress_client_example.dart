@@ -1,13 +1,15 @@
 import 'package:wordpress_client/src/authorization/authorization_methods/useful_jwt.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
+import 'custom_interface_example/custom_interface.dart';
+
 void main() async {
   WordpressClient client;
 
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
-  ResponseContainer<List<Post?>?> posts = await client
-      .listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
+
+  ResponseContainer<List<Post?>?> posts = await client.posts.list((builder) => builder.withPerPage(20).withPageNumber(1).build());
   print(posts.value!.first!.id);
 
   // Or
@@ -21,8 +23,7 @@ void main() async {
         .withDefaultUserAgent('wordpress_client/4.0.0')
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
-        .withDefaultAuthorization(
-            UsefulJwtAuth('test_user', 'super_secret_password'))
+        .withDefaultAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
         .withStatisticDelegate(
       (baseUrl, endpoint, count) {
         print('Request send to: $baseUrl ($count times)');
@@ -30,7 +31,7 @@ void main() async {
     ).build(),
   );
 
-  ResponseContainer<List<Post?>?> response = await client.listPost(
+  ResponseContainer<List<Post?>?> response = await client.posts.list(
     (builder) => builder
         .withPerPage(20)
         .withPageNumber(1)
@@ -64,4 +65,10 @@ void main() async {
   );
 
   print(response.value!.first!.id);
+
+  // initialize custom interface
+  await client.initInterface<MyCustomInterface>(MyCustomInterface(), 'my_custom_interface');
+
+  // to use it...
+  await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
 }

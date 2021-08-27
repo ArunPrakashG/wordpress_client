@@ -1,57 +1,68 @@
-import '../internal_requester.dart';
+import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrive.dart';
 import '../operations/update.dart';
-import '../builders/request.dart';
+import '../responses/category_response.dart';
 import '../responses/response_container.dart';
-import '../utilities/serializable_instance.dart';
+import 'interface_base.dart';
 
-class CategoryInterface<T extends ISerializable<T>>
+class CategoryInterface extends IInterface
     implements
-        ICreateOperation<T>,
-        IDeleteOperation<T>,
-        IRetriveOperation<T>,
-        IUpdateOperation<T>,
-        IListOperation<T> {
+        ICreateOperation<Category, CategoryCreateBuilder>,
+        IDeleteOperation<Category, CategoryDeleteBuilder>,
+        IRetriveOperation<Category, CategoryRetriveBuilder>,
+        IUpdateOperation<Category, CategoryUpdateBuilder>,
+        IListOperation<Category, CategoryListBuilder> {
   @override
-  Future<ResponseContainer<T?>> create<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.createRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Category?>> create(Request<Category>? Function(CategoryCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<Category>(
+      Category(),
+      builder(
+        CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> delete<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.deleteRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Category?>> delete(Request<Category>? Function(CategoryDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<Category>(
+      Category(),
+      builder(
+        CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<List<T?>?>> list<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<List<T>>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.listRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<List<Category?>?>> list(Request<List<Category>>? Function(CategoryListBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<Category>(
+      Category(),
+      builder(
+        CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> retrive<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.retriveRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Category?>> retrive(Request<Category>? Function(CategoryRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<Category>(
+      Category(),
+      builder(
+        CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues(),
+      ),
+    );
   }
 
   @override
-  Future<ResponseContainer<T?>> update<T extends ISerializable<T>>(
-      {T? typeResolver,
-      Request<T>? request,
-      InternalRequester? requesterClient}) {
-    return requesterClient!.updateRequest<T?>(typeResolver, request);
+  Future<ResponseContainer<Category?>> update(Request<Category>? Function(CategoryUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<Category>(
+      Category(),
+      builder(
+        CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues(),
+      ),
+    );
   }
 }

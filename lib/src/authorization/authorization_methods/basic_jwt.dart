@@ -14,8 +14,7 @@ import '../authorization_base.dart';
 ///
 /// This plugin isn't in active development and may contain lots of bugs/issues. It is recommended to use [UsefulJwtAuth] instead.
 class BasicJwtAuth extends IAuthorization {
-  BasicJwtAuth(String? username, String? password, {Callback? callback})
-      : super(username, password, callback: callback);
+  BasicJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
@@ -29,10 +28,7 @@ class BasicJwtAuth extends IAuthorization {
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
 
-  bool get _isAuthExpiried =>
-      _lastAuthorizedTime != null &&
-      DateTime.now().difference(_lastAuthorizedTime!).inHours >
-          (daysUntilTokenExpiry * 24);
+  bool get _isAuthExpiried => _lastAuthorizedTime != null && DateTime.now().difference(_lastAuthorizedTime!).inHours > (daysUntilTokenExpiry * 24);
 
   @override
   FutureOr<bool> authorize() async {
@@ -44,15 +40,13 @@ class BasicJwtAuth extends IAuthorization {
       return false;
     }
 
-    if (!_isAuthExpiried &&
-        !_hasValidatedOnce &&
-        !isNullOrEmpty(_encryptedAccessToken)) {
+    if (!_isAuthExpiried && !_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
       return validate();
     }
 
     try {
       final response = await _client!.post(
-        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token'),
+        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token'),
         data: {
           'username': userName,
           'password': password,
@@ -69,8 +63,7 @@ class BasicJwtAuth extends IAuthorization {
 
       callback?.invokeResponseCallback(response.data);
 
-      if (!(response.data['isSuccess'] as bool) ||
-          response.data['token'] == null) {
+      if (!(response.data['isSuccess'] as bool) || response.data['token'] == null) {
         return false;
       }
 
@@ -119,7 +112,7 @@ class BasicJwtAuth extends IAuthorization {
 
     try {
       final response = await _client!.post(
-        parseUrl(WordpressClient.baseUrl, 'jwt-auth/v1/token/validate'),
+        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token/validate'),
         options: Options(
           method: 'POST',
           headers: {'Authorization': await generateAuthUrl()},
@@ -131,8 +124,7 @@ class BasicJwtAuth extends IAuthorization {
       }
 
       callback?.invokeResponseCallback(response.data);
-      return _hasValidatedOnce =
-          ((response.data['code'] as String) == 'jwt_auth_valid_token');
+      return _hasValidatedOnce = ((response.data['code'] as String) == 'jwt_auth_valid_token');
     } on DioError catch (e) {
       callback?.invokeRequestErrorCallback(e);
       return false;
