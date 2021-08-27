@@ -1,11 +1,14 @@
 import 'package:wordpress_client/src/authorization/authorization_methods/useful_jwt.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
+import 'custom_interface_example/custom_interface.dart';
+
 void main() async {
   WordpressClient client;
 
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
+
   ResponseContainer<List<Post?>?> posts = await client.posts.list((builder) => builder.withPerPage(20).withPageNumber(1).build());
   print(posts.value!.first!.id);
 
@@ -62,16 +65,10 @@ void main() async {
   );
 
   print(response.value!.first!.id);
-}
 
-class TestResponse extends ISerializable<TestResponse> {
-  @override
-  TestResponse fromJson(Map<String, dynamic>? json) {
-    throw UnimplementedError();
-  }
+  // initialize custom interface
+  await client.initInterface<MyCustomInterface>(MyCustomInterface(), 'my_custom_interface');
 
-  @override
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
-  }
+  // to use it...
+  await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
 }

@@ -13,6 +13,7 @@ export 'src/authorization/authorization_methods/useful_jwt.dart' show UsefulJwtA
 
 // Requests
 export 'src/builders/request.dart';
+export 'src/interface/interface_base.dart';
 export 'src/builders/request_builder_base.dart';
 
 // Operations
@@ -35,4 +36,5 @@ export 'src/utilities/callback.dart';
 export 'src/utilities/serializable_instance.dart';
 
 // Core files
-export 'src/wordpress_client_base.dart' show WordpressClient, IInterface;
+export 'src/wordpress_client_base.dart' show WordpressClient;
+export 'src/internal_requester.dart' show InternalRequester;
