@@ -36,7 +36,7 @@ You can use this library just like any other Dart package.
 
 ```dart
 dependencies:
-  wordpress_client: ^5.1.0
+  wordpress_client: {latest}
 ```
 
 - Import the library to your project class in which you want to use the library.
