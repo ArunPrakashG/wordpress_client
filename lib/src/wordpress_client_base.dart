@@ -84,6 +84,15 @@ class WordpressClient {
   ///
   /// [interface] is instance of interface type [T]
   ///
+  /// Some keys are already occupied:
+  /// - `me`
+  /// - `posts`
+  /// - `categories`
+  /// - `comments`
+  /// - `media`
+  /// - `tags`
+  /// - `users`
+  ///
   /// Example usage:
   ///
   /// ```dart

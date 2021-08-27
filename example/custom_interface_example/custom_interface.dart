@@ -21,9 +21,6 @@ class MyCustomInterface extends IInterface
     return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<MyResponse>(
       MyResponse(),
       builder(
-        // this way, you can assign default values before the user uses this builder from their code.
-        // Here, request will be initialized with default values (if any) and
-        // my_endpoint as the request endpoint before user starts to build the request in their code
         MyResponseCreateBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
       ),
     );
@@ -35,9 +32,6 @@ class MyCustomInterface extends IInterface
     return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<MyResponse>(
       MyResponse(),
       builder(
-        // this way, you can assign default values before the user uses this builder from their code.
-        // Here, request will be initialized with default values (if any) and
-        // my_endpoint as the request endpoint before user starts to build the request in their code
         MyResponseDeleteBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
       ),
     );
@@ -49,9 +43,6 @@ class MyCustomInterface extends IInterface
     return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<MyResponse>(
       MyResponse(),
       builder(
-        // this way, you can assign default values before the user uses this builder from their code.
-        // Here, request will be initialized with default values (if any) and
-        // my_endpoint as the request endpoint before user starts to build the request in their code
         MyResponseListBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
       ),
     );
@@ -63,9 +54,6 @@ class MyCustomInterface extends IInterface
     return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<MyResponse>(
       MyResponse(),
       builder(
-        // this way, you can assign default values before the user uses this builder from their code.
-        // Here, request will be initialized with default values (if any) and
-        // my_endpoint as the request endpoint before user starts to build the request in their code
         MyResponseRetriveBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
       ),
     );
@@ -77,9 +65,6 @@ class MyCustomInterface extends IInterface
     return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<MyResponse>(
       MyResponse(),
       builder(
-        // this way, you can assign default values before the user uses this builder from their code.
-        // Here, request will be initialized with default values (if any) and
-        // my_endpoint as the request endpoint before user starts to build the request in their code
         MyResponseUpdateBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
       ),
     );

@@ -24,7 +24,9 @@
 
 ## NOTE
 
-**Authorization API has been sligtly changed on 5.1.0 from previous 5.0.4 build.** You can read more about this change in [API Changes](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changes) Wiki
+**Interface API (the way you get posts/users etc) has been changed a lot internally in 5.2.1 (latest) build from previous 5.1.0 build.**
+The new system provides a standard structure for defining custom endpoint requests at the same time keeping request building fluidity.
+Checkout [Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Requests) section for changed API usage.
 
 ## Usage
 
@@ -59,7 +61,7 @@ You can read about advanced method in [Advanced Method](https://github.com/ArunP
 - Now you are ready to send requests to Wordpress REST API. For example, to send request to get the latest 20 posts in your Wordpress site:
 
 ```dart
-ResponseContainer<List<Post>> response = await client.listPost(
+ResponseContainer<List<Post>> response = await client.posts.list(
     (builder) => builder
         .withPerPage(20)
         .withPageNumber(1)
