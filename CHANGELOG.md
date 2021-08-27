@@ -14,6 +14,6 @@
 
 - Formatting changes.
 
-## 5.2.2
+## 5.2.3
 
 - BREAKING CHANGE: Request API Change.
