@@ -1,18 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
-import 'package:wordpress_client/src/utilities/helpers.dart';
 import 'package:wordpress_client/wordpress_client.dart';
+
+String getRandString(int len) {
+  var random = Random.secure();
+  var values = List<int>.generate(len, (i) => random.nextInt(255));
+  return base64UrlEncode(values);
+}
 
 void main() async {
   WordpressClient client;
   TempMailClient tempMailClient;
   Map<String, dynamic>? json;
 
-  json =
-      jsonDecode(await (await File('test/test_settings.json')).readAsString());
+  json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
   client = WordpressClient(
     json!['base_url'],
     json['path'],
@@ -48,7 +53,7 @@ void main() async {
 
   group('', () {
     test('List Posts', () async {
-      final response = await client.listPost(
+      final response = await client.posts.list(
         (builder) => builder.withPerPage(20).withPageNumber(1).build(),
       );
 
@@ -57,7 +62,7 @@ void main() async {
     });
 
     test('List Tags', () async {
-      final response = await client.listTag(
+      final response = await client.tags.list(
         (builder) => builder.withPerPage(20).withPageNumber(1).build(),
       );
 
@@ -66,7 +71,7 @@ void main() async {
     });
 
     test('List Category', () async {
-      final response = await client.listCategory(
+      final response = await client.categories.list(
         (builder) => builder.withPerPage(2).withPageNumber(1).build(),
       );
 
@@ -75,19 +80,16 @@ void main() async {
     });
 
     test('List Media', () async {
-      final response = await client.listMedia(
+      final response = await client.media.list(
         (builder) => builder.withPerPage(20).withPageNumber(1).build(),
       );
 
       expect(200, response.responseCode);
-      expect(19, response.value!.length,
-          reason:
-              'For some reason, WP API is only returning PER_PAGE - 1 values.',
-          skip: true);
+      expect(19, response.value!.length, reason: 'For some reason, WP API is only returning PER_PAGE - 1 values.', skip: true);
     });
 
     test('List Users', () async {
-      final response = await client.listUsers(
+      final response = await client.users.list(
         (builder) => builder.withPerPage(10).withPageNumber(1).build(),
       );
 
@@ -98,7 +100,7 @@ void main() async {
 
   group('', () {
     test('Retrive Current User', () async {
-      final response = await client.retriveMe(
+      final response = await client.me.retrive(
         (builder) => builder.withCallback(Callback(
           requestErrorCallback: (error) {
             print('Error: ' + error.errorResponse!.message!);
@@ -120,7 +122,7 @@ void main() async {
     int? userId = 0;
 
     test('Create User', () async {
-      final response = await client.createUser(
+      final response = await client.users.create(
         (builder) => builder
             .withEmail(email)
             .withDescription('Generate User')
@@ -143,28 +145,22 @@ void main() async {
     });
 
     test('Update User', () async {
-      final response = await client.updateUser((builder) =>
-          builder.withId(userId).withFirstName('updated first name').build());
+      final response = await client.users.update((builder) => builder.withId(userId).withFirstName('updated first name').build());
 
       expect(200, response.responseCode);
       expect('updated first name', response.value!.firstName);
     });
 
     test('Retrive User', () async {
-      final response = await client
-          .retriveUser((builder) => builder.withUserId(userId).build());
+      final response = await client.users.retrive((builder) => builder.withUserId(userId).build());
 
       expect(200, response.responseCode);
       expect(userId, response.value!.id);
     });
 
     test('Delete User', () async {
-      final deleteUserResponse = await client.deleteUser(
-        (builder) => builder
-            .withUserId(userId)
-            .withForce(true)
-            .withReassign(3)
-            .withCallback(
+      final deleteUserResponse = await client.users.delete(
+        (builder) => builder.withUserId(userId).withForce(true).withReassign(3).withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);
@@ -183,7 +179,7 @@ void main() async {
     test(
       'Create Post',
       () async {
-        final response = await client.createPost(
+        final response = await client.posts.create(
           (builder) => builder
               .withCommentStatus(Status.CLOSED)
               .withPingStatus(Status.CLOSED)
@@ -211,13 +207,8 @@ void main() async {
     );
 
     test('Update Post', () async {
-      final response = await client.updatePost(
-        (builder) => builder
-            .withId(postId)
-            .withFeaturedMedia(468930)
-            .withAuthor(3)
-            .withTitle('Generated Sample Post Edited')
-            .withCallback(
+      final response = await client.posts.update(
+        (builder) => builder.withId(postId).withFeaturedMedia(468930).withAuthor(3).withTitle('Generated Sample Post Edited').withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);
@@ -232,7 +223,7 @@ void main() async {
     });
 
     test('Retrive Post', () async {
-      final response = await client.retrivePost(
+      final response = await client.posts.retrive(
         (builder) => builder.withPostId(postId).build(),
       );
 
@@ -241,7 +232,7 @@ void main() async {
     });
 
     test('Delete Post', () async {
-      final deleteResponse = await client.deletePost(
+      final deleteResponse = await client.posts.delete(
         (builder) => builder.withPostId(postId).withCallback(
           Callback(
             requestErrorCallback: (error) {
