@@ -24,6 +24,8 @@ class InternalRequester {
   bool _isBusy = false;
   bool _singleRequestAtATimeMode = false;
 
+  bool get isBusy => _isBusy;
+
   InternalRequester.emptyInstance();
 
   InternalRequester(String? baseUrl, String? path, BootstrapConfiguration? configuration) {
@@ -105,8 +107,6 @@ class InternalRequester {
       await Future.delayed(Duration(milliseconds: 500));
     }
   }
-
-  bool? getBusyStatus() => _isBusy;
 
   void removeDefaultAuthorization() {
     _defaultAuthorization = null;

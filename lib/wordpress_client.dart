@@ -5,6 +5,7 @@
 library wordpress_client;
 
 export 'src/authorization/authorization_base.dart' show IAuthorization;
+
 // Authorization
 export 'src/authorization/authorization_builder.dart' show AuthorizationBuilder;
 export 'src/authorization/authorization_methods/basic_auth.dart' show BasicAuth;
@@ -14,6 +15,13 @@ export 'src/authorization/authorization_methods/useful_jwt.dart' show UsefulJwtA
 // Requests
 export 'src/builders/request.dart';
 export 'src/builders/request_builder_base.dart';
+
+// Operations
+export 'src/operations/create.dart';
+export 'src/operations/delete.dart';
+export 'src/operations/update.dart';
+export 'src/operations/list.dart';
+export 'src/operations/retrive.dart';
 
 // Enums
 export 'src/enums.dart';
@@ -26,4 +34,4 @@ export 'src/utilities/callback.dart';
 export 'src/utilities/serializable_instance.dart';
 
 // Core files
-export 'src/wordpress_client_base.dart' show WordpressClient;
+export 'src/wordpress_client_base.dart' show WordpressClient, IInterface;

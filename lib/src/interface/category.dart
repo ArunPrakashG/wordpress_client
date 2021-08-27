@@ -1,6 +1,14 @@
-part of '../wordpress_client_base.dart';
+import '../builders_import.dart';
+import '../operations/create.dart';
+import '../operations/delete.dart';
+import '../operations/list.dart';
+import '../operations/retrive.dart';
+import '../operations/update.dart';
+import '../responses/category_response.dart';
+import '../responses/response_container.dart';
+import '../wordpress_client_base.dart';
 
-class CategoryInterface
+class CategoryInterface extends IInterface
     implements
         ICreateOperation<Category, CategoryCreateBuilder>,
         IDeleteOperation<Category, CategoryDeleteBuilder>,
@@ -8,9 +16,8 @@ class CategoryInterface
         IUpdateOperation<Category, CategoryUpdateBuilder>,
         IListOperation<Category, CategoryListBuilder> {
   @override
-  Future<ResponseContainer<Category?>> create(
-      {required Request<Category>? Function(CategoryCreateBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<Category>(
+  Future<ResponseContainer<Category?>> create(Request<Category>? Function(CategoryCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (await getInternalRequester(shouldWaitIfBusy: shouldWaitWhileClientBusy)).createRequest<Category>(
       Category(),
       builder(
         CategoryCreateBuilder().withEndpoint('categories').initializeWithDefaultValues(),
@@ -19,9 +26,8 @@ class CategoryInterface
   }
 
   @override
-  Future<ResponseContainer<Category?>> delete(
-      {required Request<Category>? Function(CategoryDeleteBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<Category>(
+  Future<ResponseContainer<Category?>> delete(Request<Category>? Function(CategoryDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (await getInternalRequester(shouldWaitIfBusy: shouldWaitWhileClientBusy)).deleteRequest<Category>(
       Category(),
       builder(
         CategoryDeleteBuilder().withEndpoint('categories').initializeWithDefaultValues(),
@@ -30,9 +36,9 @@ class CategoryInterface
   }
 
   @override
-  Future<ResponseContainer<List<Category?>?>> list(
-      {required Request<List<Category>>? Function(CategoryListBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<Category>(
+  Future<ResponseContainer<List<Category?>?>> list(Request<List<Category>>? Function(CategoryListBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (await getInternalRequester(shouldWaitIfBusy: shouldWaitWhileClientBusy)).listRequest<Category>(
       Category(),
       builder(
         CategoryListBuilder().withEndpoint('categories').initializeWithDefaultValues(),
@@ -41,9 +47,8 @@ class CategoryInterface
   }
 
   @override
-  Future<ResponseContainer<Category?>> retrive(
-      {required Request<Category>? Function(CategoryRetriveBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<Category>(
+  Future<ResponseContainer<Category?>> retrive(Request<Category>? Function(CategoryRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (await getInternalRequester(shouldWaitIfBusy: shouldWaitWhileClientBusy)).retriveRequest<Category>(
       Category(),
       builder(
         CategoryRetriveBuilder().withEndpoint('categories').initializeWithDefaultValues(),
@@ -52,9 +57,8 @@ class CategoryInterface
   }
 
   @override
-  Future<ResponseContainer<Category?>> update(
-      {required Request<Category>? Function(CategoryUpdateBuilder) builder, bool shouldWaitWhileClientBusy = false}) async {
-    return (await _getInternalRequesterClient(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<Category>(
+  Future<ResponseContainer<Category?>> update(Request<Category>? Function(CategoryUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
+    return (await getInternalRequester(shouldWaitIfBusy: shouldWaitWhileClientBusy)).updateRequest<Category>(
       Category(),
       builder(
         CategoryUpdateBuilder().withEndpoint('categories').initializeWithDefaultValues(),

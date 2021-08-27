@@ -1,6 +1,6 @@
 import 'package:dio/src/cancel_token.dart';
-import 'package:wordpress_client/src/authorization/authorization_base.dart';
 
+import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';
 import '../../utilities/callback.dart';
@@ -103,16 +103,14 @@ class MeDeleteBuilder implements IQueryBuilder<MeDeleteBuilder, User> {
   }
 
   @override
-  MeDeleteBuilder withQueryParameters(
-      Iterable<Pair<String, String>> extraQueryParameters) {
+  MeDeleteBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MeDeleteBuilder withResponseValidationOverride(
-      bool Function(User) responseDelegate) {
+  MeDeleteBuilder withResponseValidationOverride(bool Function(User) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }

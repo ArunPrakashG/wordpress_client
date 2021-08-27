@@ -6,7 +6,7 @@ void main() async {
 
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
-  ResponseContainer<List<Post?>?> posts = await client.listPost((builder) => builder.withPerPage(20).withPageNumber(1).build());
+  ResponseContainer<List<Post?>?> posts = await client.posts.list((builder) => builder.withPerPage(20).withPageNumber(1).build());
   print(posts.value!.first!.id);
 
   // Or
@@ -28,7 +28,7 @@ void main() async {
     ).build(),
   );
 
-  ResponseContainer<List<Post?>?> response = await client.listPost(
+  ResponseContainer<List<Post?>?> response = await client.posts.list(
     (builder) => builder
         .withPerPage(20)
         .withPageNumber(1)
@@ -61,7 +61,6 @@ void main() async {
     }).build(),
   );
 
-  client.initializeCustomInterface<TestResponse>('test_interface');
   print(response.value!.first!.id);
 }
 
