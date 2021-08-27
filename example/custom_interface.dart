@@ -14,13 +14,11 @@ class TestInterface extends IInterface
 
   @override
   Future<ResponseContainer<Post?>> delete(Request<Post>? Function(PostDeleteBuilder p1) builder, {bool shouldWaitWhileClientBusy = false}) {
-    // TODO: implement delete
     throw UnimplementedError();
   }
 
   @override
   Future<ResponseContainer<Post?>> retrive(Request<Post>? Function(PostRetriveBuilder p1) builder, {bool shouldWaitWhileClientBusy = false}) {
-    // TODO: implement retrive
     throw UnimplementedError();
   }
 }
