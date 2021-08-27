@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
 import 'package:wordpress_client/wordpress_client.dart';
-import '../example/custom_interface_example/custom_interface.dart';
 
 String getRandString(int len) {
   var random = Random.secure();
