@@ -17,3 +17,7 @@
 ## 5.2.3
 
 - BREAKING CHANGE: Request API Change.
+
+## 5.2.4
+
+- Remove unused package
