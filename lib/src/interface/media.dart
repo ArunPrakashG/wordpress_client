@@ -5,7 +5,7 @@ import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/media_response.dart';
 import '../responses/response_container.dart';
@@ -15,7 +15,7 @@ class MediaInterface extends IInterface
     implements
         ICreateOperation<Media, MediaCreateBuilder>,
         IDeleteOperation<Media, MediaDeleteBuilder>,
-        IRetriveOperation<Media, MediaRetriveBuilder>,
+        IRetrieveOperation<Media, MediaRetriveBuilder>,
         IUpdateOperation<Media, MediaUpdateBuilder>,
         IListOperation<Media, MediaListBuilder> {
   @override

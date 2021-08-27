@@ -21,7 +21,7 @@ export 'src/operations/create.dart';
 export 'src/operations/delete.dart';
 export 'src/operations/update.dart';
 export 'src/operations/list.dart';
-export 'src/operations/retrive.dart';
+export 'src/operations/retrieve.dart';
 
 // Enums
 export 'src/enums.dart';

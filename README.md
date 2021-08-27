@@ -1,24 +1,26 @@
 <div align="center">
 <h1>WordpressClient</h1>
   
-[pub.dev](https://pub.dev/packages/wordpress_client) 
+[pub.dev](https://pub.dev/packages/wordpress_client)
 
 ![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white) ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white) ![WordPress](https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white)
 
-[![likes](https://badges.bar/wordpress_client/likes)](https://pub.dev/packages/wordpress_client/score) [![popularity](https://badges.bar/wordpress_client/popularity)](https://pub.dev/packages/wordpress_client/score) [![pub points](https://badges.bar/wordpress_client/pub%20points)](https://pub.dev/packages/wordpress_client/score)  
- 
-**wordpress_client** is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern. This library is a port of [WordpressCore](https://github.com/ArunPrakashG/WordpressCore) library written in C# (also written by me)  
+[![likes](https://badges.bar/wordpress_client/likes)](https://pub.dev/packages/wordpress_client/score) [![popularity](https://badges.bar/wordpress_client/popularity)](https://pub.dev/packages/wordpress_client/score) [![pub points](https://badges.bar/wordpress_client/pub%20points)](https://pub.dev/packages/wordpress_client/score)
+
+**wordpress_client** is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern. This library is a port of [WordpressCore](https://github.com/ArunPrakashG/WordpressCore) library written in C# (also written by me)
+
 </div>
 
 ---
 
 ## Features
-* Complete fluent system, Define request parameters with builder functions which allows to fluently create a request or add extra custom headers, authorization etc.
-* Most coomon 3 authorization systems are supported.
-* Response preprocessor functions to pre process the response before it gets returned in a ResponseContainer.
-* Provides statistics such as time taken for the request to complete.
-* Support for Custom Requests / Authorization systems.
-* And many more!
+
+- Complete fluent system, Define request parameters with builder functions which allows to fluently create a request or add extra custom headers, authorization etc.
+- Most common 3 authorization systems are supported.
+- Response preprocessor functions to pre process the response before it gets returned in a ResponseContainer.
+- Provides statistics such as time taken for the request to complete.
+- Support for Custom Requests / Authorization systems.
+- And many more!
 
 ## NOTE
 
@@ -35,7 +37,8 @@ dependencies:
   wordpress_client: ^5.1.0
 ```
 
-- Import the library to your project class in which you want to use the library. 
+- Import the library to your project class in which you want to use the library.
+
 ```dart
 import 'package:wordpress_client/wordpress_client.dart';
 ```
@@ -46,12 +49,15 @@ import 'package:wordpress_client/wordpress_client.dart';
   - Advanced method (with Bootstrapper to configure various settings like User Agent, Authorization etc)
 
 ### Simple method
+
 ```dart
 WordpressClient client = new WordpressClient('https://www.replaceme.com/wp-json', 'wp/v2');
 ```
+
 You can read about advanced method in [Advanced Method](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#advanced-method) wiki page.
 
 - Now you are ready to send requests to Wordpress REST API. For example, to send request to get the latest 20 posts in your Wordpress site:
+
 ```dart
 ResponseContainer<List<Post>> response = await client.listPost(
     (builder) => builder
@@ -92,9 +98,9 @@ For Custom Authorization implementation, Check out [Authorization](https://githu
 | **Post Statuses**  | ---    | ---  | ---    | ---    |
 | **Settings**       | ---    | ---  | ---    | ---    |
 
-
 ## Custom Response Types (Custom Requests)
-Check out [Custom Response Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Response-Types-(Custom-Requests)) wiki page.
+
+Check out [Custom Response Types](<https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Response-Types-(Custom-Requests)>) wiki page.
 
 ## Features and bugs
 

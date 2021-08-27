@@ -3,7 +3,7 @@ import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/response_container.dart';
 import '../responses/user_response.dart';
@@ -13,7 +13,7 @@ class UsersInterface extends IInterface
     implements
         ICreateOperation<User, UserCreateBuilder>,
         IDeleteOperation<User, UserDeleteBuilder>,
-        IRetriveOperation<User, UserRetriveBuilder>,
+        IRetrieveOperation<User, UserRetriveBuilder>,
         IUpdateOperation<User, UserUpdateBuilder>,
         IListOperation<User, UserListBuilder> {
   @override

@@ -12,7 +12,7 @@ class MyCustomInterface extends IInterface
     implements
         ICreateOperation<MyResponse, MyResponseCreateBuilder>,
         IDeleteOperation<MyResponse, MyResponseDeleteBuilder>,
-        IRetriveOperation<MyResponse, MyResponseRetriveBuilder>,
+        IRetrieveOperation<MyResponse, MyResponseRetriveBuilder>,
         IUpdateOperation<MyResponse, MyResponseUpdateBuilder>,
         IListOperation<MyResponse, MyResponseListBuilder> {
   @override

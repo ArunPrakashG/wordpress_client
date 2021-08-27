@@ -10,7 +10,7 @@ import '../builders/update/comment_update.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/comment_response.dart';
 import '../responses/response_container.dart';
@@ -20,7 +20,7 @@ class CommentInterface extends IInterface
     implements
         ICreateOperation<Comment, CommentCreateBuilder>,
         IDeleteOperation<Comment, CommentDeleteBuilder>,
-        IRetriveOperation<Comment, CommentRetriveBuilder>,
+        IRetrieveOperation<Comment, CommentRetriveBuilder>,
         IUpdateOperation<Comment, CommentUpdateBuilder>,
         IListOperation<Comment, CommentListBuilder> {
   @override

@@ -3,7 +3,7 @@ import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/post_response.dart';
 import '../responses/response_container.dart';
@@ -13,7 +13,7 @@ class PostsInterface extends IInterface
     implements
         ICreateOperation<Post, PostCreateBuilder>,
         IDeleteOperation<Post, PostDeleteBuilder>,
-        IRetriveOperation<Post, PostRetriveBuilder>,
+        IRetrieveOperation<Post, PostRetriveBuilder>,
         IUpdateOperation<Post, PostUpdateBuilder>,
         IListOperation<Post, PostListBuilder> {
   @override

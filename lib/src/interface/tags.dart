@@ -3,7 +3,7 @@ import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/response_container.dart';
 import '../responses/tag_response.dart';
@@ -13,7 +13,7 @@ class TagInterface extends IInterface
     implements
         ICreateOperation<Tag, TagCreateBuilder>,
         IDeleteOperation<Tag, TagDeleteBuilder>,
-        IRetriveOperation<Tag, TagRetriveBuilder>,
+        IRetrieveOperation<Tag, TagRetriveBuilder>,
         IUpdateOperation<Tag, TagUpdateBuilder>,
         IListOperation<Tag, TagListBuilder> {
   @override

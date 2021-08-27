@@ -2,7 +2,7 @@ import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
-import '../operations/retrive.dart';
+import '../operations/retrieve.dart';
 import '../operations/update.dart';
 import '../responses/category_response.dart';
 import '../responses/response_container.dart';
@@ -12,7 +12,7 @@ class CategoryInterface extends IInterface
     implements
         ICreateOperation<Category, CategoryCreateBuilder>,
         IDeleteOperation<Category, CategoryDeleteBuilder>,
-        IRetriveOperation<Category, CategoryRetriveBuilder>,
+        IRetrieveOperation<Category, CategoryRetriveBuilder>,
         IUpdateOperation<Category, CategoryUpdateBuilder>,
         IListOperation<Category, CategoryListBuilder> {
   @override
