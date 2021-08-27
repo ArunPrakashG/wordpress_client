@@ -4,9 +4,8 @@
 /// Responses can contain statistical data such as Time taken for the request to finish as [Duration], Any errors that might have occured, and the raw response from the server.
 library wordpress_client;
 
-export 'src/authorization/authorization_base.dart' show IAuthorization;
-
 // Authorization
+export 'src/authorization/authorization_base.dart' show IAuthorization;
 export 'src/authorization/authorization_builder.dart' show AuthorizationBuilder;
 export 'src/authorization/authorization_methods/basic_auth.dart' show BasicAuth;
 export 'src/authorization/authorization_methods/basic_jwt.dart' show BasicJwtAuth;
@@ -28,6 +27,8 @@ export 'src/enums.dart';
 
 // Responses
 export 'src/responses_import.dart';
+export 'package:dio/src/cancel_token.dart';
+export 'src/utilities/pair.dart';
 
 // Callback
 export 'src/utilities/callback.dart';
