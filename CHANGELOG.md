@@ -13,3 +13,7 @@
 ## 5.1.1
 
 - Formatting changes.
+
+## 5.2.2
+
+- BREAKING CHANGE: Request API Change.
