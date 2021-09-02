@@ -102,7 +102,7 @@ For Custom Authorization implementation, Check out [Authorization](https://githu
 
 ## Custom Response Types (Custom Requests)
 
-Check out [Custom Response Types](<https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Response-Types-(Custom-Requests)>) wiki page.
+Check out [Custom Response Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Requests) wiki page.
 
 ## Features and bugs
 
