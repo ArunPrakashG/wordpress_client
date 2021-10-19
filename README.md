@@ -102,7 +102,7 @@ For Custom Authorization implementation, Check out [Authorization](https://githu
 
 ## Custom Response Types (Custom Requests)
 
-Check out [Custom Response Types](<https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Response-Types-(Custom-Requests)>) wiki page.
+Check out [Custom Response Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Requests) wiki page.
 
 ## Features and bugs
 
@@ -119,3 +119,5 @@ meanwhile, PR's for new features/bug fixes are always welcome!
 
 [license]: https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE
 [tracker]: https://github.com/ArunPrakashG/wordpress_client/issues
+
+<a href="https://www.buymeacoffee.com/arunprakashg" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
