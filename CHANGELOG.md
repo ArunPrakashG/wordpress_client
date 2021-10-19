@@ -21,3 +21,7 @@
 ## 5.2.4
 
 - Remove unused package
+
+## 5.2.5
+
+- BREAKING CHANGE: Remove Author Meta & Featured Image Url Fields from Post response. (these were not in the base api response, you can add them using custom plugins.)

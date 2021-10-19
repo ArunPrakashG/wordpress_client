@@ -133,8 +133,7 @@ class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
 
   Map<String, dynamic> _parseParameters() {
     if (_multipartFile == null) {
-      throw NullReferenceException(
-          'File cannot be empty or null in a Media Request');
+      throw NullReferenceException('File cannot be empty or null in a Media Request');
     }
 
     return {
@@ -195,16 +194,14 @@ class MediaCreateBuilder implements IQueryBuilder<MediaCreateBuilder, Media> {
   }
 
   @override
-  MediaCreateBuilder withQueryParameters(
-      Iterable<Pair<String, String>> extraQueryParameters) {
+  MediaCreateBuilder withQueryParameters(Iterable<Pair<String, String>> extraQueryParameters) {
     queryParameters ??= [];
     queryParameters!.addAll(extraQueryParameters);
     return this;
   }
 
   @override
-  MediaCreateBuilder withResponseValidationOverride(
-      bool Function(Media) responseDelegate) {
+  MediaCreateBuilder withResponseValidationOverride(bool Function(Media) responseDelegate) {
     responseValidationDelegate = responseDelegate;
     return this;
   }
