@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
 import 'package:wordpress_client/wordpress_client.dart';
+import 'package:path_provider/path_provider.dart';
 
 String getRandString(int len) {
   var random = Random.secure();
@@ -12,10 +13,12 @@ String getRandString(int len) {
   return base64UrlEncode(values);
 }
 
-void main() async {
+Future<void> main() async {
   WordpressClient client;
   TempMailClient tempMailClient;
   Map<String, dynamic>? json;
+
+  String cachePath = (await getTemporaryDirectory()).path;
 
   json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
   client = WordpressClient(
@@ -25,6 +28,8 @@ void main() async {
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(60)
+        .withResponseCache(true)
+        .withCachePath(cachePath)
         .withStatisticDelegate((requestUrl, endpoint, count) {
           print('Request URL: $requestUrl');
         })
@@ -52,6 +57,25 @@ void main() async {
   final mailResponse = await tempMailClient.getEmails(1);
 
   group('', () {
+    test(
+      'Response Time',
+      () async {
+        final firstResponse = await client.posts.list(
+          (builder) => builder.withPerPage(20).withPageNumber(1).build(),
+        );
+
+        final secondResponse = await client.posts.list(
+          (builder) => builder.withPerPage(20).withPageNumber(1).build(),
+        );
+
+        print('First Response Time Taken: ${firstResponse.duration?.inMilliseconds} ms');
+        print('Second Response Time Taken: ${secondResponse.duration?.inMilliseconds} ms');
+
+        expect(200, firstResponse.responseCode);
+        expect(200, secondResponse.responseCode);
+      },
+    );
+
     test('List Posts', () async {
       final response = await client.posts.list(
         (builder) => builder.withPerPage(20).withPageNumber(1).build(),

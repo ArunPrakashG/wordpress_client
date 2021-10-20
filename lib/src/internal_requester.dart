@@ -1,5 +1,6 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import 'authorization/authorization_base.dart';
@@ -43,6 +44,7 @@ class InternalRequester {
         requestTimeout: defaultRequestTimeout,
         shouldFollowRedirects: true,
         maxRedirects: 5,
+        cacheResponses: false,
       );
     }
 
@@ -95,6 +97,23 @@ class InternalRequester {
 
     if (configuration.useCookies ?? false) {
       _client!.interceptors.add(CookieManager(CookieJar()));
+    }
+
+    if ((configuration.cacheResponses ?? false) && configuration.responseCachePath != null) {
+      _client!.interceptors.add(
+        DioCacheInterceptor(
+          options: CacheOptions(
+            store: FileCacheStore(configuration.responseCachePath!),
+            policy: CachePolicy.request,
+            hitCacheOnErrorExcept: [401, 403],
+            maxStale: const Duration(days: 7),
+            priority: CachePriority.normal,
+            cipher: null,
+            keyBuilder: CacheOptions.defaultCacheKeyBuilder,
+            allowPostMethod: false,
+          ),
+        ),
+      );
     }
   }
 

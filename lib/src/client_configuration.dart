@@ -11,6 +11,8 @@ class BootstrapConfiguration {
   final int? maxRedirects;
   final bool? useCookies;
   final bool? waitWhileBusy;
+  final bool? cacheResponses;
+  final String? responseCachePath;
   final void Function(String, String?, int?)? statisticsDelegate;
 
   BootstrapConfiguration({
@@ -24,5 +26,7 @@ class BootstrapConfiguration {
     this.maxRedirects,
     this.waitWhileBusy,
     this.statisticsDelegate,
+    this.cacheResponses,
+    this.responseCachePath,
   });
 }

@@ -13,6 +13,8 @@ class BootstrapBuilder {
   int _defaultMaxRedirects = 5;
   bool? _useCookies;
   bool? _waitWhileBusy;
+  bool? _cacheResponses;
+  String? _cachePath;
   void Function(String?, String?, int?)? _statisticsDelegate;
 
   BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
@@ -20,9 +22,18 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withStatisticDelegate(
-      void Function(String?, String?, int?) delegate) {
+  BootstrapBuilder withStatisticDelegate(void Function(String?, String?, int?) delegate) {
     _statisticsDelegate = delegate;
+    return this;
+  }
+
+  BootstrapBuilder withResponseCache(bool cacheResponse) {
+    _cacheResponses = cacheResponse;
+    return this;
+  }
+
+  BootstrapBuilder withCachePath(String cachePath) {
+    _cachePath = cachePath;
     return this;
   }
 
@@ -36,8 +47,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withResponsePreprocessor(
-      bool Function(dynamic) responsePreprocessor) {
+  BootstrapBuilder withResponsePreprocessor(bool Function(dynamic) responsePreprocessor) {
     _responsePreprocessorDelegate = responsePreprocessor;
     return this;
   }
@@ -47,8 +57,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorizationBuilder(
-      IAuthorization Function(AuthorizationBuilder)? builder) {
+  BootstrapBuilder withDefaultAuthorizationBuilder(IAuthorization Function(AuthorizationBuilder)? builder) {
     if (builder == null) {
       return this;
     }
@@ -90,6 +99,8 @@ class BootstrapBuilder {
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
       waitWhileBusy: _waitWhileBusy,
+      cacheResponses: _cacheResponses,
+      responseCachePath: _cachePath,
     );
   }
 }
