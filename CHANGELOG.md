@@ -33,3 +33,11 @@
 ## 5.2.7
 
 - Bug fix
+
+## 5.2.8
+
+- Revert author meta & featured image removal
+
+## 5.2.9
+
+- Bug Fix

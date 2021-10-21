@@ -31,9 +31,19 @@ class Callback {
       return;
     }
 
+    if (error.response!.data == null) {
+      return requestErrorCallback!(
+        ErrorContainer(
+          errorResponse: null,
+          internalError: error,
+        ),
+      );
+    }
+
     requestErrorCallback!(
       ErrorContainer(
-        errorResponse: ErrorResponse.fromMap(error.response!.data),
+        errorResponse:
+            error.response!.data is Map<String, dynamic> ? ErrorResponse.fromMap(error.response!.data) : ErrorResponse.fromJson(error.response!.data),
         internalError: error,
       ),
     );
