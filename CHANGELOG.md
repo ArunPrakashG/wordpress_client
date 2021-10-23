@@ -45,3 +45,7 @@
 ## 5.3.0
 
 - Bug fix
+
+## 5.3.1
+
+- Response structure fix

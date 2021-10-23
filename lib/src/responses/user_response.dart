@@ -48,7 +48,7 @@ class User implements ISerializable<User> {
   final String? slug;
   final List<String>? roles;
   final Map<String, String>? avatarUrls;
-  final List<dynamic>? meta;
+  final dynamic meta;
   final String? yoastHead;
   final Links? links;
 
@@ -61,30 +61,16 @@ class User implements ISerializable<User> {
         firstName: json["first_name"] == null ? null : json["first_name"],
         lastName: json["last_name"] == null ? null : json["last_name"],
         email: json["email"] == null ? null : json["email"],
-        registeredDate: json["registered_date"] == null
-            ? null
-            : DateTime.parse(json["registered_date"]),
-        capabilities: json["capabilities"] == null
-            ? null
-            : Map.from(json["capabilities"])
-                .map((k, v) => MapEntry<String, bool>(k, v)),
-        extraCapabilities: json["extra_capabilities"] == null
-            ? null
-            : ExtraCapabilities.fromMap(json["extra_capabilities"]),
+        registeredDate: json["registered_date"] == null ? null : DateTime.parse(json["registered_date"]),
+        capabilities: json["capabilities"] == null ? null : Map.from(json["capabilities"]).map((k, v) => MapEntry<String, bool>(k, v)),
+        extraCapabilities: json["extra_capabilities"] == null ? null : ExtraCapabilities.fromMap(json["extra_capabilities"]),
         url: json["url"] == null ? null : json["url"],
         description: json["description"] == null ? null : json["description"],
         link: json["link"] == null ? null : json["link"],
         slug: json["slug"] == null ? null : json["slug"],
-        roles: json["roles"] == null
-            ? null
-            : List<String>.from(json["roles"].map((x) => x)),
-        avatarUrls: json["avatar_urls"] == null
-            ? null
-            : Map.from(json["avatar_urls"])
-                .map((k, v) => MapEntry<String, String>(k, v)),
-        meta: json["meta"] == null
-            ? null
-            : List<dynamic>.from(json["meta"].map((x) => x)),
+        roles: json["roles"] == null ? null : List<String>.from(json["roles"].map((x) => x)),
+        avatarUrls: json["avatar_urls"] == null ? null : Map.from(json["avatar_urls"]).map((k, v) => MapEntry<String, String>(k, v)),
+        meta: json["meta"],
         yoastHead: json["yoast_head"] == null ? null : json["yoast_head"],
         links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
       );
@@ -100,21 +86,12 @@ class User implements ISerializable<User> {
         "description": description == null ? null : description,
         "link": link == null ? null : link,
         "slug": slug == null ? null : slug,
-        "registered_date":
-            registeredDate == null ? null : registeredDate!.toIso8601String(),
-        "capabilities": capabilities == null
-            ? null
-            : Map.from(capabilities!)
-                .map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "extra_capabilities":
-            extraCapabilities == null ? null : extraCapabilities!.toMap(),
-        "roles":
-            roles == null ? null : List<dynamic>.from(roles!.map((x) => x)),
-        "avatar_urls": avatarUrls == null
-            ? null
-            : Map.from(avatarUrls!)
-                .map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "meta": meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        "registered_date": registeredDate == null ? null : registeredDate!.toIso8601String(),
+        "capabilities": capabilities == null ? null : Map.from(capabilities!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "extra_capabilities": extraCapabilities == null ? null : extraCapabilities!.toMap(),
+        "roles": roles == null ? null : List<dynamic>.from(roles!.map((x) => x)),
+        "avatar_urls": avatarUrls == null ? null : Map.from(avatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
+        "meta": meta,
         "yoast_head": yoastHead == null ? null : yoastHead,
         "_links": links == null ? null : links!.toMap(),
       };

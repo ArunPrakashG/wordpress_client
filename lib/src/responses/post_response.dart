@@ -60,7 +60,7 @@ class Post implements ISerializable<Post> {
   final bool? sticky;
   final String? template;
   final PostFormat? format;
-  final List<dynamic>? meta;
+  final dynamic meta;
   final List<int>? categories;
   final List<int>? tags;
 
@@ -99,7 +99,7 @@ class Post implements ISerializable<Post> {
         sticky: json['sticky'] ?? false,
         template: json['template'] ?? '',
         format: getFormatFromValue(json['format']),
-        meta: json['meta'] == null ? null : List<dynamic>.from(json['meta'].map((x) => x)),
+        meta: json['meta'],
         categories: json['categories'] == null ? null : List<int>.from(json['categories'].map((x) => x)),
         tags: json['tags'] == null ? null : List<int>.from(json['tags'].map((x) => x)),
         yoastHead: json['yoast_head'] ?? '',
@@ -132,7 +132,7 @@ class Post implements ISerializable<Post> {
         'featured_image_url': featuredImageUrl,
         'author_meta': authorMeta?.toMap(),
         'format': format.toString().split('.').last,
-        'meta': meta == null ? null : List<dynamic>.from(meta!.map((x) => x)),
+        'meta': meta,
         'categories': categories == null ? null : List<dynamic>.from(categories!.map((x) => x)),
         'tags': tags == null ? null : List<dynamic>.from(tags!.map((x) => x)),
         'yoast_head': yoastHead ?? '',
