@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 import '../responses/error_container.dart';
-import '../responses/error_response.dart';
 
 class Callback {
   final void Function(Exception)? unhandledExceptionCallback;
@@ -42,8 +41,7 @@ class Callback {
 
     requestErrorCallback!(
       ErrorContainer(
-        errorResponse:
-            error.response!.data is Map<String, dynamic> ? ErrorResponse.fromMap(error.response!.data) : ErrorResponse.fromJson(error.response!.data),
+        errorResponse: error.response!.data,
         internalError: error,
       ),
     );
