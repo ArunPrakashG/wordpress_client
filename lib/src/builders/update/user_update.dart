@@ -1,6 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dio/src/cancel_token.dart';
-
 import '../../authorization/authorization_base.dart';
 import '../../enums.dart';
 import '../../responses/user_response.dart';

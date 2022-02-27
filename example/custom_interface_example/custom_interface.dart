@@ -16,56 +16,86 @@ class MyCustomInterface extends IInterface
         IUpdateOperation<MyResponse, MyResponseUpdateBuilder>,
         IListOperation<MyResponse, MyResponseListBuilder> {
   @override
-  Future<ResponseContainer<MyResponse?>> create(Request<MyResponse>? Function(MyResponseCreateBuilder p1) builder,
+  Future<ResponseContainer<MyResponse?>> create(
+      Request<MyResponse>? Function(MyResponseCreateBuilder p1) builder,
       {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<MyResponse>(
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .createRequest<MyResponse>(
       MyResponse(),
       builder(
-        MyResponseCreateBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
+        MyResponseCreateBuilder()
+            .withEndpoint('my_endpoint')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<MyResponse?>> delete(Request<MyResponse>? Function(MyResponseDeleteBuilder p1) builder,
+  Future<ResponseContainer<MyResponse?>> delete(
+      Request<MyResponse>? Function(MyResponseDeleteBuilder p1) builder,
       {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<MyResponse>(
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .deleteRequest<MyResponse>(
       MyResponse(),
       builder(
-        MyResponseDeleteBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
+        MyResponseDeleteBuilder()
+            .withEndpoint('my_endpoint')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<List<MyResponse?>?>> list(Request<List<MyResponse>>? Function(MyResponseListBuilder p1) builder,
+  Future<ResponseContainer<List<MyResponse>?>> list(
+      Request<List<MyResponse>>? Function(MyResponseListBuilder p1) builder,
       {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<MyResponse>(
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .listRequest<MyResponse>(
       MyResponse(),
       builder(
-        MyResponseListBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
+        MyResponseListBuilder()
+            .withEndpoint('my_endpoint')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<MyResponse?>> retrive(Request<MyResponse>? Function(MyResponseRetriveBuilder p1) builder,
+  Future<ResponseContainer<MyResponse?>> retrive(
+      Request<MyResponse>? Function(MyResponseRetriveBuilder p1) builder,
       {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<MyResponse>(
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .retriveRequest<MyResponse>(
       MyResponse(),
       builder(
-        MyResponseRetriveBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
+        MyResponseRetriveBuilder()
+            .withEndpoint('my_endpoint')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<MyResponse?>> update(Request<MyResponse>? Function(MyResponseUpdateBuilder p1) builder,
+  Future<ResponseContainer<MyResponse?>> update(
+      Request<MyResponse>? Function(MyResponseUpdateBuilder p1) builder,
       {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<MyResponse>(
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .updateRequest<MyResponse>(
       MyResponse(),
       builder(
-        MyResponseUpdateBuilder().withEndpoint('my_endpoint').initializeWithDefaultValues(),
+        MyResponseUpdateBuilder()
+            .withEndpoint('my_endpoint')
+            .initializeWithDefaultValues(),
       ),
     );
   }
