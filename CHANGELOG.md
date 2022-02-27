@@ -57,3 +57,11 @@
 ## 5.4.1
 
 - Null safety fix
+
+## 5.4.2
+
+- Packages fix
+
+## 5.4.3
+
+- Total pages parsing fix
