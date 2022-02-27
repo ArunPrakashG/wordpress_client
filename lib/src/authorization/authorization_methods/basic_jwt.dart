@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../authorization_base.dart';
 
 /// Most widely used authentication system, which is most easy to integrate and secure (when compared with basic auth)
 ///
@@ -14,7 +13,8 @@ import '../authorization_base.dart';
 ///
 /// This plugin isn't in active development and may contain lots of bugs/issues. It is recommended to use [UsefulJwtAuth] instead.
 class BasicJwtAuth extends IAuthorization {
-  BasicJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
+  BasicJwtAuth(String? username, String? password, {Callback? callback})
+      : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
@@ -28,7 +28,10 @@ class BasicJwtAuth extends IAuthorization {
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
 
-  bool get _isAuthExpiried => _lastAuthorizedTime != null && DateTime.now().difference(_lastAuthorizedTime!).inHours > (daysUntilTokenExpiry * 24);
+  bool get _isAuthExpiried =>
+      _lastAuthorizedTime != null &&
+      DateTime.now().difference(_lastAuthorizedTime!).inHours >
+          (daysUntilTokenExpiry * 24);
 
   @override
   FutureOr<bool> authorize() async {
@@ -40,7 +43,9 @@ class BasicJwtAuth extends IAuthorization {
       return false;
     }
 
-    if (!_isAuthExpiried && !_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
+    if (!_isAuthExpiried &&
+        !_hasValidatedOnce &&
+        !isNullOrEmpty(_encryptedAccessToken)) {
       return validate();
     }
 
@@ -63,7 +68,8 @@ class BasicJwtAuth extends IAuthorization {
 
       callback?.invokeResponseCallback(response.data);
 
-      if (!(response.data['isSuccess'] as bool) || response.data['token'] == null) {
+      if (!(response.data['isSuccess'] as bool) ||
+          response.data['token'] == null) {
         return false;
       }
 
@@ -124,7 +130,8 @@ class BasicJwtAuth extends IAuthorization {
       }
 
       callback?.invokeResponseCallback(response.data);
-      return _hasValidatedOnce = ((response.data['code'] as String) == 'jwt_auth_valid_token');
+      return _hasValidatedOnce =
+          ((response.data['code'] as String) == 'jwt_auth_valid_token');
     } on DioError catch (e) {
       callback?.invokeRequestErrorCallback(e);
       return false;

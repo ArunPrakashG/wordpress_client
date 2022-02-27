@@ -2,14 +2,6 @@ import 'dart:async';
 
 import '../../wordpress_client.dart';
 import '../builders_import.dart';
-import '../operations/create.dart';
-import '../operations/delete.dart';
-import '../operations/list.dart';
-import '../operations/retrieve.dart';
-import '../operations/update.dart';
-import '../responses/media_response.dart';
-import '../responses/response_container.dart';
-import 'interface_base.dart';
 
 class MediaInterface extends IInterface
     implements
@@ -19,28 +11,47 @@ class MediaInterface extends IInterface
         IUpdateOperation<Media, MediaUpdateBuilder>,
         IListOperation<Media, MediaListBuilder> {
   @override
-  Future<ResponseContainer<Media?>> create(Request<Media>? Function(MediaCreateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).createRequest<Media>(
+  Future<ResponseContainer<Media?>> create(
+      Request<Media>? Function(MediaCreateBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .createRequest<Media>(
       Media(),
       builder(
-        MediaCreateBuilder().withEndpoint('media').initializeWithDefaultValues(),
+        MediaCreateBuilder()
+            .withEndpoint('media')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<Media?>> delete(Request<Media>? Function(MediaDeleteBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).deleteRequest<Media>(
+  Future<ResponseContainer<Media?>> delete(
+      Request<Media>? Function(MediaDeleteBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .deleteRequest<Media>(
       Media(),
       builder(
-        MediaDeleteBuilder().withEndpoint('media').initializeWithDefaultValues(),
+        MediaDeleteBuilder()
+            .withEndpoint('media')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<List<Media?>?>> list(Request<List<Media>>? Function(MediaListBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).listRequest<Media>(
+  Future<ResponseContainer<List<Media>?>> list(
+      Request<List<Media>>? Function(MediaListBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .listRequest<Media>(
       Media(),
       builder(
         MediaListBuilder().withEndpoint('media').initializeWithDefaultValues(),
@@ -49,21 +60,35 @@ class MediaInterface extends IInterface
   }
 
   @override
-  Future<ResponseContainer<Media?>> retrive(Request<Media>? Function(MediaRetriveBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).retriveRequest<Media>(
+  Future<ResponseContainer<Media?>> retrive(
+      Request<Media>? Function(MediaRetriveBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .retriveRequest<Media>(
       Media(),
       builder(
-        MediaRetriveBuilder().withEndpoint('media').initializeWithDefaultValues(),
+        MediaRetriveBuilder()
+            .withEndpoint('media')
+            .initializeWithDefaultValues(),
       ),
     );
   }
 
   @override
-  Future<ResponseContainer<Media?>> update(Request<Media>? Function(MediaUpdateBuilder) builder, {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy ? await getInternalRequesterWhenFree() : internalRequester).updateRequest<Media>(
+  Future<ResponseContainer<Media?>> update(
+      Request<Media>? Function(MediaUpdateBuilder) builder,
+      {bool shouldWaitWhileClientBusy = false}) async {
+    return (shouldWaitWhileClientBusy
+            ? await getInternalRequesterWhenFree()
+            : internalRequester)
+        .updateRequest<Media>(
       Media(),
       builder(
-        MediaUpdateBuilder().withEndpoint('media').initializeWithDefaultValues(),
+        MediaUpdateBuilder()
+            .withEndpoint('media')
+            .initializeWithDefaultValues(),
       ),
     );
   }

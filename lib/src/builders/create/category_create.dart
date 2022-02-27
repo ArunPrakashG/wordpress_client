@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dio/src/cancel_token.dart';
 import 'package:wordpress_client/src/authorization/authorization_base.dart';
 
 import '../../enums.dart';

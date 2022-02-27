@@ -49,3 +49,11 @@
 ## 5.3.1
 
 - Response structure fix
+
+## 5.4.0
+
+- Packages update
+
+## 5.4.1
+
+- Null safety fix

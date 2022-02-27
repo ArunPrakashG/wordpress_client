@@ -1,17 +1,16 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:dio/src/dio.dart';
 
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../authorization_base.dart';
 
 /// Similar to [BasicJwtAuth], this plugin is in active development and has much more features than the previous one. It is recommended to use this plugin instead of the previous one.
 ///
 /// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
 class UsefulJwtAuth extends IAuthorization {
-  UsefulJwtAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
+  UsefulJwtAuth(String? username, String? password, {Callback? callback})
+      : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
@@ -25,7 +24,10 @@ class UsefulJwtAuth extends IAuthorization {
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
 
-  bool get _isAuthExpiried => _lastAuthorizedTime != null && DateTime.now().difference(_lastAuthorizedTime!).inHours > (daysUntilTokenExpiry * 24);
+  bool get _isAuthExpiried =>
+      _lastAuthorizedTime != null &&
+      DateTime.now().difference(_lastAuthorizedTime!).inHours >
+          (daysUntilTokenExpiry * 24);
 
   @override
   FutureOr<bool> authorize() async {
@@ -37,7 +39,9 @@ class UsefulJwtAuth extends IAuthorization {
       return false;
     }
 
-    if (!_isAuthExpiried && !_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
+    if (!_isAuthExpiried &&
+        !_hasValidatedOnce &&
+        !isNullOrEmpty(_encryptedAccessToken)) {
       return validate();
     }
 
@@ -60,7 +64,8 @@ class UsefulJwtAuth extends IAuthorization {
 
       callback?.invokeResponseCallback(response.data);
 
-      if (response.data['data'] == null || !(response.data['success'] as bool)) {
+      if (response.data['data'] == null ||
+          !(response.data['success'] as bool)) {
         return false;
       }
 
@@ -121,7 +126,8 @@ class UsefulJwtAuth extends IAuthorization {
       }
 
       callback?.invokeResponseCallback(response.data);
-      return _hasValidatedOnce = ((response.data['code'] as String) == 'jwt_auth_valid_token');
+      return _hasValidatedOnce =
+          ((response.data['code'] as String) == 'jwt_auth_valid_token');
     } on DioError catch (e) {
       callback?.invokeRequestErrorCallback(e);
       return false;
