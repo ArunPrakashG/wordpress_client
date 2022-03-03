@@ -3,6 +3,18 @@ import 'dart:math';
 
 // import 'package:html/parser.dart';
 
+extension MapExtensions on Map<String, dynamic> {
+  String toJsonString() {
+    return json.encode(this);
+  }
+
+  void addIfNotNull(String key, dynamic value) {
+    if (value != null) {
+      this[key] = value;
+    }
+  }
+}
+
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
 bool isAlphaNumeric(String value) => RegExp(r"^[a-zA-Z0-9]*$").hasMatch(value);

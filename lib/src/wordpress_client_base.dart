@@ -19,32 +19,11 @@ import 'internal_requester.dart';
 import 'utilities/helpers.dart';
 
 class WordpressClient {
-  late InternalRequester _requester;
-
-  /// Base url supplied through constructor.
-  static String requestBaseUrl = '';
-
-  /// Base url path supplied through constructor.
-  static String requestPath = '';
-
-  /// Combined url of [requestBaseUrl] and [requestPath]
-  static String requestBaseWithPath = '';
-
-  /// The current user interface.
-  ///
-  /// Requests will only work if you are authorized with valid credentials.
-  MeInterface get me => _customInterfaces!['me'];
-
-  PostsInterface get posts => _customInterfaces!['posts'];
-  CategoryInterface get categories => _customInterfaces!['categories'];
-  CommentInterface get comments => _customInterfaces!['comments'];
-  MediaInterface get media => _customInterfaces!['media'];
-  TagInterface get tags => _customInterfaces!['tags'];
-  UsersInterface get users => _customInterfaces!['users'];
-
-  Map<String, dynamic>? _customInterfaces;
-
-  WordpressClient(String? baseUrl, String? path, {BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper}) {
+  WordpressClient(
+    String baseUrl,
+    String path, {
+    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+  }) {
     if (isNullOrEmpty(baseUrl)) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -53,20 +32,53 @@ class WordpressClient {
       throw NullReferenceException('Path is invalid.');
     }
 
-    requestBaseUrl = baseUrl!;
-    requestPath = path!;
+    requestBaseUrl = baseUrl;
+    requestPath = path;
     requestBaseWithPath = parseUrl(baseUrl, path);
-    _customInterfaces ??= {};
+
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
 
     _requester = InternalRequester(
-      baseUrl,
-      path,
-      bootstrapper == null ? null : bootstrapper(BootstrapBuilder()),
+      baseUrl: baseUrl,
+      path: path,
+      configuration: configuration,
     );
 
     _initInternalInterfaces();
   }
 
+  late InternalRequester _requester;
+
+  /// Base url supplied through constructor.
+  static late String requestBaseUrl;
+
+  /// Base url path supplied through constructor.
+  static late String requestPath;
+
+  /// Combined url of [requestBaseUrl] and [requestPath]
+  static String requestBaseWithPath = '';
+
+  /// The current user interface.
+  ///
+  /// Requests will only work if you are authorized with valid credentials.
+  MeInterface get me => _customInterfaces['me'] as MeInterface;
+
+  PostsInterface get posts => _customInterfaces['posts'] as PostsInterface;
+  CategoryInterface get categories =>
+      _customInterfaces['categories'] as CategoryInterface;
+  CommentInterface get comments =>
+      _customInterfaces['comments'] as CommentInterface;
+  MediaInterface get media => _customInterfaces['media'] as MediaInterface;
+  TagInterface get tags => _customInterfaces['tags'] as TagInterface;
+  UsersInterface get users => _customInterfaces['users'] as UsersInterface;
+
+  final Map<String, dynamic> _customInterfaces = <String, dynamic>{};
+
+  // ignore: avoid_void_async
   void _initInternalInterfaces() async {
     await initInterface<MeInterface>(MeInterface(), 'me');
     await initInterface<PostsInterface>(PostsInterface(), 'posts');
@@ -99,19 +111,20 @@ class WordpressClient {
   /// await client.initInterface<MyCustomInterface>(MyCustomInterface(), 'my_custom_interface');
   /// ```
   ///
-  Future<void> initInterface<T extends IInterface>(T? interface, String? key) async {
-    _customInterfaces ??= {};
-
+  Future<void> initInterface<T extends IInterface>(
+    T? interface,
+    String? key,
+  ) async {
     if (interface == null || isNullOrEmpty(key)) {
       throw InvalidInterfaceException();
     }
 
-    if (_customInterfaces![key] != null) {
+    if (_customInterfaces[key] != null) {
       throw InterfaceExistException('[$key] Interface already exists.');
     }
 
     await interface.init(_requester, key);
-    _customInterfaces![key!] = interface;
+    _customInterfaces[key!] = interface;
   }
 
   /// Gets an initialized interface.
@@ -129,21 +142,20 @@ class WordpressClient {
   /// ```
   ///
   T getCustomInterface<T extends IInterface>([String? key]) {
-    _customInterfaces ??= {};
-
-    var interface;
-
-    if (!isNullOrEmpty(key)) {
-      interface = _customInterfaces![key];
+    if (!isNullOrEmpty(key) && _customInterfaces[key] != null) {
+      return _customInterfaces[key] as T;
     }
 
-    interface ??= _customInterfaces!.values.singleWhere((element) => element is T);
+    final interfacesOfType = _customInterfaces.values.whereType<T>();
 
-    if (interface == null) {
-      throw InterfaceDoNotExistException('The specified interface do not exist.');
+    if (interfacesOfType.isEmpty) {
+      throw InterfaceDoNotExistException(
+          'The specified interface do not exist.');
     }
 
-    if (!(interface as T).hasInitilizedAlready) {
+    final interface = interfacesOfType.first;
+
+    if (!interface.hasInitilizedAlready) {
       throw InterfaceNotInitializedException();
     }
 
@@ -152,5 +164,7 @@ class WordpressClient {
 
   void removeDefaultAuthorization() => _requester.removeDefaultAuthorization();
 
-  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) => _requester.configure(bootstrapper(BootstrapBuilder()));
+  void reconfigureRequester(
+          BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) =>
+      _requester.configure(bootstrapper(BootstrapBuilder()));
 }

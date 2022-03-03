@@ -3,12 +3,6 @@ import 'package:dio/dio.dart';
 import '../responses/error_container.dart';
 
 class Callback {
-  final void Function(Exception)? unhandledExceptionCallback;
-  final void Function(ErrorContainer)? requestErrorCallback;
-  final void Function(dynamic)? responseCallback;
-  final void Function(int, int)? onReceiveProgress;
-  final void Function(int, int)? onSendProgress;
-
   const Callback({
     this.unhandledExceptionCallback,
     this.responseCallback,
@@ -16,6 +10,12 @@ class Callback {
     this.requestErrorCallback,
     this.onSendProgress,
   });
+
+  final void Function(Exception)? unhandledExceptionCallback;
+  final void Function(ErrorContainer)? requestErrorCallback;
+  final void Function(dynamic)? responseCallback;
+  final void Function(int current, int total)? onReceiveProgress;
+  final void Function(int current, int total)? onSendProgress;
 
   void invokeUnhandledExceptionCallback(Exception e) {
     if (unhandledExceptionCallback == null) {
@@ -55,19 +55,19 @@ class Callback {
     responseCallback!(response);
   }
 
-  void invokeReceiveProgressCallback(int total, int current) {
+  void invokeReceiveProgressCallback(int current, int total) {
     if (onReceiveProgress == null) {
       return;
     }
 
-    onReceiveProgress!(total, current);
+    onReceiveProgress!(current, total);
   }
 
-  void invokeSendProgressCallback(int total, int current) {
+  void invokeSendProgressCallback(int current, int total) {
     if (onSendProgress == null) {
       return;
     }
 
-    onSendProgress!(total, current);
+    onSendProgress!(current, total);
   }
 }

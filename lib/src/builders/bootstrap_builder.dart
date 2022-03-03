@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_positional_boolean_parameters, avoid_returning_this
+
 import '../authorization/authorization_base.dart';
 import '../authorization/authorization_builder.dart';
 import '../client_configuration.dart';
@@ -8,21 +10,24 @@ class BootstrapBuilder {
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
   String? _defaultUserAgent;
-  List<Pair<String, String>>? _defaultHeaders;
+  Map<String, String>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  bool? _useCookies;
-  bool? _waitWhileBusy;
-  bool? _cacheResponses;
+  bool _useCookies = false;
+  bool _waitWhileBusy = false;
+  bool _cacheResponses = false;
   String? _cachePath;
-  void Function(String?, String?, int?)? _statisticsDelegate;
+  void Function(String baseUrl, String endPoint, int requestCount)?
+      _statisticsDelegate;
 
   BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
     _waitWhileBusy = value;
     return this;
   }
 
-  BootstrapBuilder withStatisticDelegate(void Function(String?, String?, int?) delegate) {
+  BootstrapBuilder withStatisticDelegate(
+      void Function(String? baseUrl, String endPoint, int requestCount)
+          delegate) {
     _statisticsDelegate = delegate;
     return this;
   }
@@ -47,7 +52,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withResponsePreprocessor(bool Function(dynamic) responsePreprocessor) {
+  BootstrapBuilder withResponsePreprocessor(
+      bool Function(dynamic) responsePreprocessor) {
     _responsePreprocessorDelegate = responsePreprocessor;
     return this;
   }
@@ -57,11 +63,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultAuthorizationBuilder(IAuthorization Function(AuthorizationBuilder)? builder) {
-    if (builder == null) {
-      return this;
-    }
-
+  BootstrapBuilder withDefaultAuthorizationBuilder(
+      IAuthorization Function(AuthorizationBuilder) builder) {
     _defaultAuthorization = builder(AuthorizationBuilder());
     return this;
   }
@@ -71,9 +74,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultHeaders(List<Pair<String, String>> headers) {
-    _defaultHeaders ??= [];
-    _defaultHeaders!.addAll(headers);
+  BootstrapBuilder withDefaultHeaders(Map<String, String> headers) {
+    _defaultHeaders = headers;
     return this;
   }
 

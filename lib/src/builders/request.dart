@@ -7,19 +7,7 @@ import '../utilities/helpers.dart';
 import '../utilities/pair.dart';
 
 class Request<TResponseType> {
-  final String? endpoint;
-  final Callback? callback;
-  final bool Function(TResponseType)? validationDelegate;
-  final CancelToken? cancelToken;
-  final HttpMethod? httpMethod;
-  final IAuthorization? authorization;
-  final dynamic formBody;
-  final List<Pair<String, String>>? headers;
-  final Map<String, String?>? queryParams;
-  String? generatedRequestPath;
-  final bool isListRequest;
-
-  Request(
+  const Request(
     this.endpoint, {
     this.isListRequest = false,
     this.callback = const Callback(),
@@ -30,12 +18,26 @@ class Request<TResponseType> {
     this.authorization,
     this.headers,
     this.queryParams,
-  }) {
-    generatedRequestPath = _buildUrlQueryString();
-  }
+  });
+
+  final String? endpoint;
+  final Callback? callback;
+  final bool Function(TResponseType)? validationDelegate;
+  final CancelToken? cancelToken;
+  final HttpMethod? httpMethod;
+  final IAuthorization? authorization;
+  final dynamic formBody;
+  final List<Pair<String, String>>? headers;
+  final Map<String, String?>? queryParams;
+
+  final bool isListRequest;
+
+  String? get generatedRequestPath => _buildUrlQueryString();
 
   bool _hasIdInUrlAlready(
-      String requestQueryUrl, MapEntry<String, String?> currentEntry) {
+    String requestQueryUrl,
+    MapEntry<String, String?> currentEntry,
+  ) {
     if (!requestQueryUrl.contains('/')) {
       return false;
     }
@@ -60,8 +62,9 @@ class Request<TResponseType> {
         continue;
       }
 
+      // ignore: use_string_buffers
       requestQueryUrl +=
-          getJoiningChar(requestQueryUrl) + param.key + '=' + param.value!;
+          '${getJoiningChar(requestQueryUrl)}${param.key}=${param.value!}';
     }
 
     return requestQueryUrl;

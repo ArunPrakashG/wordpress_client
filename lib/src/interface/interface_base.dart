@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../wordpress_client_base.dart';
 import '../internal_requester.dart';
+import '../wordpress_client_base.dart';
 
 /// The base of all custom requests.
 /// extend from this interface on your custom request interfaces to get the internal requester client for all your requests.
@@ -25,7 +25,7 @@ abstract class IInterface {
   /// You can directly get [InternalRequester] with waiting by [internalRequester] variable.
   Future<InternalRequester> getInternalRequesterWhenFree() async {
     while (internalRequester.isBusy) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
     }
 
     return internalRequester;

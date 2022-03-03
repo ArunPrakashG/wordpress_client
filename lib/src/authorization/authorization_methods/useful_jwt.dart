@@ -9,8 +9,11 @@ import '../../utilities/helpers.dart';
 ///
 /// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
 class UsefulJwtAuth extends IAuthorization {
-  UsefulJwtAuth(String? username, String? password, {Callback? callback})
-      : super(username, password, callback: callback);
+  UsefulJwtAuth(
+    String? username,
+    String? password, {
+    Callback? callback,
+  }) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
@@ -18,8 +21,8 @@ class UsefulJwtAuth extends IAuthorization {
   bool _hasInit = false;
   Dio? _client;
 
-  static final int daysUntilTokenExpiry = 3;
-  static final String scheme = 'Bearer';
+  static const int kDaysUntilTokenExpiry = 3;
+  static const String kAuthScheme = 'Bearer';
 
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
@@ -27,7 +30,7 @@ class UsefulJwtAuth extends IAuthorization {
   bool get _isAuthExpiried =>
       _lastAuthorizedTime != null &&
       DateTime.now().difference(_lastAuthorizedTime!).inHours >
-          (daysUntilTokenExpiry * 24);
+          (kDaysUntilTokenExpiry * 24);
 
   @override
   FutureOr<bool> authorize() async {
@@ -46,7 +49,7 @@ class UsefulJwtAuth extends IAuthorization {
     }
 
     try {
-      final response = await _client!.post(
+      final response = await _client!.post<dynamic>(
         parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token'),
         data: {
           'username': userName,
@@ -69,7 +72,7 @@ class UsefulJwtAuth extends IAuthorization {
         return false;
       }
 
-      _encryptedAccessToken = response.data['data']['token'];
+      _encryptedAccessToken = response.data?['data']?['token'] as String?;
 
       if (_encryptedAccessToken != null) {
         _lastAuthorizedTime = DateTime.now();
@@ -80,7 +83,7 @@ class UsefulJwtAuth extends IAuthorization {
       callback?.invokeRequestErrorCallback(e);
       return false;
     } catch (ex) {
-      callback?.invokeUnhandledExceptionCallback(ex as dynamic);
+      callback?.invokeUnhandledExceptionCallback(ex as Exception);
       return false;
     }
   }
@@ -113,11 +116,14 @@ class UsefulJwtAuth extends IAuthorization {
     }
 
     try {
-      final response = await _client!.post(
+      final authUrl = await generateAuthUrl();
+      final response = await _client!.post<dynamic>(
         parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token/validate'),
         options: Options(
           method: 'POST',
-          headers: {'Authorization': await generateAuthUrl()},
+          headers: <String, dynamic>{
+            'Authorization': authUrl,
+          },
         ),
       );
 
@@ -127,12 +133,12 @@ class UsefulJwtAuth extends IAuthorization {
 
       callback?.invokeResponseCallback(response.data);
       return _hasValidatedOnce =
-          ((response.data['code'] as String) == 'jwt_auth_valid_token');
+          (response.data['code'] as String) == 'jwt_auth_valid_token';
     } on DioError catch (e) {
       callback?.invokeRequestErrorCallback(e);
       return false;
     } catch (ex) {
-      callback?.invokeUnhandledExceptionCallback(ex as dynamic);
+      callback?.invokeUnhandledExceptionCallback(ex as Exception);
       return false;
     }
   }
@@ -143,6 +149,6 @@ class UsefulJwtAuth extends IAuthorization {
       return null;
     }
 
-    return '$scheme $_encryptedAccessToken';
+    return '$kAuthScheme $_encryptedAccessToken';
   }
 }

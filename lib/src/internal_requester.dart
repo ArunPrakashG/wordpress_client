@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:wordpress_client/src/constants.dart';
 
 import 'authorization/authorization_base.dart';
 import 'builders/request.dart';
@@ -14,48 +15,32 @@ import 'utilities/callback.dart';
 import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
 
-const int defaultRequestTimeout = 60 * 1000;
-
 class InternalRequester {
+  InternalRequester({
+    required String baseUrl,
+    required String path,
+    BootstrapConfiguration configuration = const BootstrapConfiguration(),
+  }) {
+    _baseUrl = parseUrl(baseUrl, path);
+    configure(configuration);
+  }
+
+  InternalRequester.emptyInstance();
+
   Dio? _client;
   String? _baseUrl;
   IAuthorization? _defaultAuthorization;
   bool Function(dynamic)? _responsePreprocessorDelegate;
-  static final Map<String?, int> endPointStatistics = Map<String?, int>();
-  static void Function(String, String?, int?)? _statisticsDelegate;
+  static final Map<String, int> _endPointStatistics = <String, int>{};
+  static void Function(String baseUrl, String endpoint, int requestCount)?
+      _statisticsDelegate;
   bool _isBusy = false;
   bool _singleRequestAtATimeMode = false;
 
   bool get isBusy => _isBusy;
 
-  InternalRequester.emptyInstance();
-
-  InternalRequester(
-      String? baseUrl, String? path, BootstrapConfiguration? configuration) {
-    if (baseUrl == null) {
-      throw NullReferenceException('Base URL is invalid.');
-    }
-
-    if (path == null) {
-      throw NullReferenceException('Endpoint is invalid.');
-    }
-
-    if (configuration == null) {
-      configuration = new BootstrapConfiguration(
-        useCookies: false,
-        requestTimeout: defaultRequestTimeout,
-        shouldFollowRedirects: true,
-        maxRedirects: 5,
-        cacheResponses: false,
-      );
-    }
-
-    _baseUrl = parseUrl(baseUrl, path);
-    configure(configuration);
-  }
-
   void configure(BootstrapConfiguration configuration) {
-    _singleRequestAtATimeMode = configuration.waitWhileBusy ?? false;
+    _singleRequestAtATimeMode = configuration.waitWhileBusy;
 
     if (configuration.responsePreprocessorDelegate != null) {
       _responsePreprocessorDelegate =
@@ -77,7 +62,7 @@ class InternalRequester {
 
     if (configuration.defaultHeaders != null &&
         configuration.defaultHeaders!.isNotEmpty) {
-      for (final header in configuration.defaultHeaders!) {
+      for (final header in configuration.defaultHeaders!.entries) {
         _client!.options.headers[header.key] = header.value;
       }
     }
@@ -93,33 +78,33 @@ class InternalRequester {
         ),
       );
     } else {
-      _client!.options.connectTimeout = configuration.requestTimeout!;
-      _client!.options.receiveTimeout = configuration.requestTimeout!;
-      _client!.options.followRedirects = configuration.shouldFollowRedirects!;
-      _client!.options.maxRedirects = configuration.maxRedirects!;
+      _client!.options.connectTimeout = configuration.requestTimeout;
+      _client!.options.receiveTimeout = configuration.requestTimeout;
+      _client!.options.followRedirects = configuration.shouldFollowRedirects;
+      _client!.options.maxRedirects = configuration.maxRedirects;
       _client!.options.baseUrl = _baseUrl!;
     }
 
-    if (configuration.useCookies ?? false) {
+    if (configuration.useCookies) {
       _client!.interceptors.add(CookieManager(CookieJar()));
     }
 
-    if ((configuration.cacheResponses ?? false) &&
+    if (configuration.cacheResponses &&
         configuration.responseCachePath != null) {
       _client!.interceptors.add(
         DioCacheInterceptor(
           options: CacheOptions(
             store: FileCacheStore(configuration.responseCachePath!),
-            policy: CachePolicy.request,
             hitCacheOnErrorExcept: [401, 403],
             maxStale: const Duration(days: 7),
-            priority: CachePriority.normal,
-            cipher: null,
-            keyBuilder: CacheOptions.defaultCacheKeyBuilder,
-            allowPostMethod: false,
           ),
         ),
       );
+    }
+
+    if (configuration.interceptors != null &&
+        configuration.interceptors!.isNotEmpty) {
+      _client!.interceptors.addAll(configuration.interceptors!);
     }
   }
 
@@ -129,7 +114,7 @@ class InternalRequester {
     }
 
     while (_isBusy) {
-      await Future.delayed(Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
     }
   }
 
@@ -154,7 +139,9 @@ class InternalRequester {
   }
 
   Future<ResponseContainer<T?>> createRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
+    T typeResolver,
+    Request<T>? request,
+  ) async {
     if (typeResolver == null ||
         request == null ||
         !request.isRequestExecutable) {
@@ -168,7 +155,7 @@ class InternalRequester {
     var watch = Stopwatch()..start();
     _isBusy = true;
     try {
-      final response = await _client!.fetch(options);
+      final response = await _client!.fetch<dynamic>(options);
       watch.stop();
 
       if (!isInRange(response.statusCode!, 200, 299)) {
@@ -183,7 +170,8 @@ class InternalRequester {
 
       request.callback?.invokeResponseCallback(response.data);
 
-      final responseDataContainer = typeResolver.fromJson(response.data);
+      final responseDataContainer =
+          typeResolver.fromJson(response.data as Map<String, dynamic>);
 
       if (!_handleResponse<T>(request, responseDataContainer)) {
         return ResponseContainer<T?>.failed(
@@ -435,7 +423,9 @@ class InternalRequester {
   }
 
   Future<ResponseContainer<T?>> updateRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
+    T typeResolver,
+    Request<T>? request,
+  ) async {
     if (typeResolver == null ||
         request == null ||
         !request.isRequestExecutable) {
@@ -506,19 +496,27 @@ class InternalRequester {
   }
 
   Map<String, dynamic> _parseResponseHeaders(
-          Map<String, List<String>> headers) =>
-      headers
-          .map<String, dynamic>((key, value) => MapEntry(key, value.join(';')));
+    Map<String, List<String>> headers,
+  ) {
+    return headers.map<String, dynamic>(
+      (key, value) => MapEntry<String, String>(
+        key,
+        value.join(';'),
+      ),
+    );
+  }
 
   Future<RequestOptions> _parseAsDioRequest(Request request) async {
     if (!request.isRequestExecutable) {
       throw NullReferenceException('Request object is null');
     }
 
-    Uri? requestUri = Uri.tryParse(parseUrl(
-      _baseUrl,
-      request.generatedRequestPath,
-    ));
+    final requestUri = Uri.tryParse(
+      parseUrl(
+        _baseUrl,
+        request.generatedRequestPath,
+      ),
+    );
 
     if (requestUri == null) {
       throw RequestUriParsingFailedException('Request path is invalid.');
@@ -526,36 +524,37 @@ class InternalRequester {
 
     _invokeStatisticsCallback(requestUri.toString(), request.endpoint);
 
-    RequestOptions options = RequestOptions(
+    final options = RequestOptions(
       path: requestUri.toString(),
       method: request.httpMethod.toString().split('.').last,
       cancelToken: request.cancelToken,
-      receiveTimeout: defaultRequestTimeout,
-      sendTimeout: defaultRequestTimeout,
-      connectTimeout: defaultRequestTimeout,
       followRedirects: true,
       maxRedirects: 5,
       data: request.formBody,
-      onReceiveProgress: (current, max) =>
-          request.callback?.invokeReceiveProgressCallback(max, current),
-      onSendProgress: (current, max) =>
-          request.callback?.invokeSendProgressCallback(max, current),
+      onReceiveProgress: request.callback?.invokeReceiveProgressCallback,
+      onSendProgress: request.callback?.invokeSendProgressCallback,
     );
 
-    bool hasAuthorizedAlready = false;
+    var hasAuthorizedAlready = false;
 
     if (request.shouldAuthorize && !hasAuthorizedAlready) {
       hasAuthorizedAlready = await _authorizeRequest(
-          options, _client, request.authorization,
-          callback: request.callback);
+        options,
+        _client,
+        request.authorization,
+        callback: request.callback,
+      );
     }
 
     if (_defaultAuthorization != null &&
         !_defaultAuthorization!.isDefault &&
         !hasAuthorizedAlready) {
       hasAuthorizedAlready = await _authorizeRequest(
-          options, _client, _defaultAuthorization,
-          callback: request.callback);
+        options,
+        _client,
+        _defaultAuthorization,
+        callback: request.callback,
+      );
     }
 
     if (request.headers != null && request.headers!.isNotEmpty) {
@@ -593,14 +592,19 @@ class InternalRequester {
   }
 
   void _invokeStatisticsCallback(String requestUrl, String? endpoint) {
-    if (endPointStatistics[endpoint] == null) {
-      endPointStatistics[endpoint] = 1;
+    if (_endPointStatistics[endpoint ?? ''] == null) {
+      _endPointStatistics[endpoint ?? ''] = 1;
     } else {
-      endPointStatistics[endpoint] = endPointStatistics[endpoint]! - 1;
+      _endPointStatistics[endpoint ?? ''] =
+          _endPointStatistics[endpoint ?? '']! - 1;
     }
 
     if (_statisticsDelegate != null) {
-      _statisticsDelegate!(requestUrl, endpoint, endPointStatistics[endpoint]);
+      _statisticsDelegate!(
+        requestUrl,
+        endpoint ?? '',
+        _endPointStatistics[endpoint ?? ''] ?? 0,
+      );
     }
   }
 }
