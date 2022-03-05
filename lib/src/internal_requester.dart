@@ -15,6 +15,12 @@ import 'utilities/callback.dart';
 import 'utilities/helpers.dart';
 import 'utilities/serializable_instance.dart';
 
+typedef StatisticsCallback = void Function(
+  String baseUrl,
+  String endpoint,
+  int requestCount,
+);
+
 class InternalRequester {
   InternalRequester({
     required String baseUrl,
@@ -25,15 +31,12 @@ class InternalRequester {
     configure(configuration);
   }
 
-  InternalRequester.emptyInstance();
-
   Dio? _client;
   String? _baseUrl;
   IAuthorization? _defaultAuthorization;
   bool Function(dynamic)? _responsePreprocessorDelegate;
   static final Map<String, int> _endPointStatistics = <String, int>{};
-  static void Function(String baseUrl, String endpoint, int requestCount)?
-      _statisticsDelegate;
+  static StatisticsCallback? _statisticsCallback;
   bool _isBusy = false;
   bool _singleRequestAtATimeMode = false;
 
@@ -53,7 +56,7 @@ class InternalRequester {
     }
 
     if (configuration.statisticsDelegate != null) {
-      _statisticsDelegate = configuration.statisticsDelegate;
+      _statisticsCallback = configuration.statisticsDelegate;
     }
 
     if (configuration.defaultUserAgent != null) {
@@ -599,8 +602,8 @@ class InternalRequester {
           _endPointStatistics[endpoint ?? '']! - 1;
     }
 
-    if (_statisticsDelegate != null) {
-      _statisticsDelegate!(
+    if (_statisticsCallback != null) {
+      _statisticsCallback!(
         requestUrl,
         endpoint ?? '',
         _endPointStatistics[endpoint ?? ''] ?? 0,
