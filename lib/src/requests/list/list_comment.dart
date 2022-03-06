@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class ListCommentRequest implements IRequest {
@@ -46,8 +47,8 @@ class ListCommentRequest implements IRequest {
   String? password;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -67,5 +68,8 @@ class ListCommentRequest implements IRequest {
       ..addIfNotNull('status', status)
       ..addIfNotNull('type', type)
       ..addIfNotNull('password', password);
+
+    requestContent.endpoint = 'comments';
+    requestContent.method = HttpMethod.GET;
   }
 }

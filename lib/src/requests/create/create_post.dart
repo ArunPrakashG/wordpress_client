@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class CreatePostRequest implements IRequest {
@@ -36,8 +37,8 @@ class CreatePostRequest implements IRequest {
   List<int>? tags;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('title', title)
       ..addIfNotNull('content', content)
       ..addIfNotNull('excerpt', excerpt)
@@ -52,5 +53,8 @@ class CreatePostRequest implements IRequest {
       ..addIfNotNull('categories', categories?.join(','))
       ..addIfNotNull('tags', tags?.join(','))
       ..addIfNotNull('slug', slug);
+
+    requestContent.endpoint = 'posts';
+    requestContent.method = HttpMethod.POST;
   }
 }

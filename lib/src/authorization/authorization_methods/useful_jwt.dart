@@ -80,7 +80,7 @@ class UsefulJwtAuth extends IAuthorization {
 
       return _hasValidatedOnce = !isNullOrEmpty(_encryptedAccessToken);
     } on DioError catch (e) {
-      callback?.invokeRequestErrorCallback(e);
+      callback?.invokeDioErrorCallback(e);
       return false;
     } catch (ex) {
       callback?.invokeUnhandledExceptionCallback(ex as Exception);
@@ -135,7 +135,7 @@ class UsefulJwtAuth extends IAuthorization {
       return _hasValidatedOnce =
           (response.data['code'] as String) == 'jwt_auth_valid_token';
     } on DioError catch (e) {
-      callback?.invokeRequestErrorCallback(e);
+      callback?.invokeDioErrorCallback(e);
       return false;
     } catch (ex) {
       callback?.invokeUnhandledExceptionCallback(ex as Exception);

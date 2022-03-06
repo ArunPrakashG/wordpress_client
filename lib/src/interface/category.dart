@@ -17,8 +17,9 @@ class CategoryInterface extends IInterface
         IListOperation<Category, CategoryListBuilder> {
   @override
   Future<ResponseContainer<Category?>> create(
-      Request<Category>? Function(CategoryCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
+    Request<Category>? Function(CategoryCreateBuilder) builder, {
+    bool shouldWaitWhileClientBusy = false,
+  }) async {
     return (shouldWaitWhileClientBusy
             ? await getInternalRequesterWhenFree()
             : internalRequester)

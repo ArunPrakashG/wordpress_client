@@ -3,17 +3,16 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:wordpress_client/src/constants.dart';
 
 import 'authorization/authorization_base.dart';
-import 'builders/request.dart';
 import 'client_configuration.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
+import 'requests/generic_request.dart';
 import 'responses/response_container.dart';
+import 'type_map.dart';
 import 'utilities/callback.dart';
 import 'utilities/helpers.dart';
-import 'utilities/serializable_instance.dart';
 
 typedef StatisticsCallback = void Function(
   String baseUrl,
@@ -25,16 +24,17 @@ class InternalRequester {
   InternalRequester({
     required String baseUrl,
     required String path,
+    required this.typeMap,
     BootstrapConfiguration configuration = const BootstrapConfiguration(),
   }) {
     _baseUrl = parseUrl(baseUrl, path);
     configure(configuration);
   }
 
-  Dio? _client;
-  String? _baseUrl;
+  final Dio _client = Dio();
+  late final String _baseUrl;
+  final TypeMap typeMap;
   IAuthorization? _defaultAuthorization;
-  bool Function(dynamic)? _responsePreprocessorDelegate;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
   bool _isBusy = false;
@@ -44,11 +44,6 @@ class InternalRequester {
 
   void configure(BootstrapConfiguration configuration) {
     _singleRequestAtATimeMode = configuration.waitWhileBusy;
-
-    if (configuration.responsePreprocessorDelegate != null) {
-      _responsePreprocessorDelegate =
-          configuration.responsePreprocessorDelegate;
-    }
 
     if (configuration.defaultAuthorization != null &&
         !configuration.defaultAuthorization!.isDefault) {
@@ -60,41 +55,29 @@ class InternalRequester {
     }
 
     if (configuration.defaultUserAgent != null) {
-      _client!.options.headers['User-Agent'] = configuration.defaultUserAgent;
+      _client.options.headers['User-Agent'] = configuration.defaultUserAgent;
     }
 
     if (configuration.defaultHeaders != null &&
         configuration.defaultHeaders!.isNotEmpty) {
       for (final header in configuration.defaultHeaders!.entries) {
-        _client!.options.headers[header.key] = header.value;
+        _client.options.headers[header.key] = header.value;
       }
     }
 
-    if (_client == null) {
-      _client = Dio(
-        BaseOptions(
-          connectTimeout: configuration.requestTimeout,
-          receiveTimeout: configuration.requestTimeout,
-          followRedirects: configuration.shouldFollowRedirects,
-          maxRedirects: configuration.maxRedirects,
-          baseUrl: _baseUrl!,
-        ),
-      );
-    } else {
-      _client!.options.connectTimeout = configuration.requestTimeout;
-      _client!.options.receiveTimeout = configuration.requestTimeout;
-      _client!.options.followRedirects = configuration.shouldFollowRedirects;
-      _client!.options.maxRedirects = configuration.maxRedirects;
-      _client!.options.baseUrl = _baseUrl!;
-    }
+    _client.options.connectTimeout = configuration.requestTimeout;
+    _client.options.receiveTimeout = configuration.requestTimeout;
+    _client.options.followRedirects = configuration.shouldFollowRedirects;
+    _client.options.maxRedirects = configuration.maxRedirects;
+    _client.options.baseUrl = _baseUrl;
 
     if (configuration.useCookies) {
-      _client!.interceptors.add(CookieManager(CookieJar()));
+      _client.interceptors.add(CookieManager(CookieJar()));
     }
 
     if (configuration.cacheResponses &&
         configuration.responseCachePath != null) {
-      _client!.interceptors.add(
+      _client.interceptors.add(
         DioCacheInterceptor(
           options: CacheOptions(
             store: FileCacheStore(configuration.responseCachePath!),
@@ -107,7 +90,7 @@ class InternalRequester {
 
     if (configuration.interceptors != null &&
         configuration.interceptors!.isNotEmpty) {
-      _client!.interceptors.addAll(configuration.interceptors!);
+      _client.interceptors.addAll(configuration.interceptors!);
     }
   }
 
@@ -125,489 +108,521 @@ class InternalRequester {
     _defaultAuthorization = null;
   }
 
-  bool _handleResponse<T>(Request<T> request, T responseContainer) {
-    request.callback?.invokeResponseCallback(responseContainer);
-
-    if (_responsePreprocessorDelegate != null &&
-        !_responsePreprocessorDelegate!(responseContainer)) {
-      return false;
+  bool _validateResponse<T>(GenericRequest request, T? response) {
+    if (!request.shouldValidateResponse) {
+      return true;
     }
 
-    if (request.validationDelegate != null &&
-        !request.validationDelegate!(responseContainer)) {
-      return false;
-    }
-
-    return true;
+    return request.responseValidationCallback!(response);
   }
 
-  Future<ResponseContainer<T?>> createRequest<T extends ISerializable<T>?>(
-    T typeResolver,
-    Request<T>? request,
-  ) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<T?>> createRequest<T>(GenericRequest request) async {
+    if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    final options = await _parseAsDioRequest(request);
-
     await waitWhileBusy();
-
-    var watch = Stopwatch()..start();
+    final watch = Stopwatch()..start();
     _isBusy = true;
+
     try {
-      final response = await _client!.fetch<dynamic>(options);
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParams,
+        onSendProgress: request.callback?.onSendProgress,
+        onReceiveProgress: request.callback?.onReceiveProgress,
+        options: Options(
+          method: request.method.name,
+          sendTimeout: request.sendTimeout,
+          receiveTimeout: request.receiveTimeout,
+          headers: request.headers,
+          responseType: ResponseType.json,
+        ),
+      );
+
       watch.stop();
 
-      if (!isInRange(response.statusCode!, 200, 299)) {
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
+      );
+
+      if (dioResponse.statusCode == null) {
+        throw NullReferenceException(
+            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+      }
+
+      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          responseCode: dioResponse.statusCode!,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          message: dioResponse.statusMessage ??
+              'Request failed with status code ${dioResponse.statusCode}',
         );
       }
 
-      request.callback?.invokeResponseCallback(response.data);
+      request.callback?.invokeResponseCallback(dioResponse.data);
 
-      final responseDataContainer =
-          typeResolver.fromJson(response.data as Map<String, dynamic>);
+      final response = deserialize<T>(dioResponse.data);
 
-      if (!_handleResponse<T>(request, responseDataContainer)) {
+      if (!_validateResponse<T>(request, response)) {
         return ResponseContainer<T?>.failed(
-          null,
+          response,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          responseCode: dioResponse.statusCode!,
+          message: 'Manual response validation failed.',
         );
       }
 
       return ResponseContainer<T>(
-        responseDataContainer,
-        responseCode: response.statusCode,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
+        response,
+        responseCode: dioResponse.statusCode!,
+        responseHeaders: dioResponse.headers.getHeaderMap(),
         duration: watch.elapsed,
-        message: response.statusMessage,
+        message: dioResponse.statusMessage,
       );
-    } on DioError catch (e) {
-      request.callback?.invokeRequestErrorCallback(e);
+    } catch (e) {
+      if (e is DioError) {
+        request.callback?.invokeDioErrorCallback(e);
+      } else {
+        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+      }
 
       return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
-        responseCode: -1,
-      );
-    } on Exception catch (ex) {
-      request.callback?.invokeUnhandledExceptionCallback(ex);
-
-      return ResponseContainer<T?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${ex.toString()})',
-        responseCode: -1,
       );
     } finally {
       _isBusy = false;
     }
   }
 
-  Future<ResponseContainer<T?>> deleteRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
-    if (request == null || !request.isRequestExecutable) {
+  Future<ResponseContainer<T?>> deleteRequest<T>(GenericRequest request) async {
+    if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    final options = await _parseAsDioRequest(request);
-
     await waitWhileBusy();
-
-    var watch = Stopwatch()..start();
+    final watch = Stopwatch()..start();
     _isBusy = true;
+
     try {
-      final response = await _client!.fetch(options);
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParams,
+        onSendProgress: request.callback?.onSendProgress,
+        onReceiveProgress: request.callback?.onReceiveProgress,
+        options: Options(
+          method: request.method.name,
+          sendTimeout: request.sendTimeout,
+          receiveTimeout: request.receiveTimeout,
+          headers: request.headers,
+          responseType: ResponseType.json,
+        ),
+      );
+
       watch.stop();
 
-      if (!isInRange(response.statusCode!, 200, 299)) {
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
+      );
+
+      if (dioResponse.statusCode == null) {
+        throw NullReferenceException(
+            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+      }
+
+      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          responseCode: dioResponse.statusCode!,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          message: dioResponse.statusMessage ??
+              'Request failed with status code ${dioResponse.statusCode}',
         );
       }
 
-      request.callback?.invokeResponseCallback(response.data);
+      request.callback?.invokeResponseCallback(dioResponse.data);
+
+      if (!_validateResponse<T>(request, null)) {
+        return ResponseContainer<T?>.failed(
+          null,
+          duration: watch.elapsed,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          responseCode: dioResponse.statusCode!,
+          message: 'Manual response validation failed.',
+        );
+      }
 
       return ResponseContainer<T?>(
         null,
-        responseCode: response.statusCode,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
+        responseCode: dioResponse.statusCode!,
+        responseHeaders: dioResponse.headers.getHeaderMap(),
         duration: watch.elapsed,
+        message: dioResponse.statusMessage,
       );
-    } on DioError catch (e) {
-      request.callback?.invokeRequestErrorCallback(e);
+    } catch (e) {
+      if (e is DioError) {
+        request.callback?.invokeDioErrorCallback(e);
+      } else {
+        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+      }
 
       return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
-        responseCode: -1,
-      );
-    } on Exception catch (ex) {
-      request.callback?.invokeUnhandledExceptionCallback(ex);
-
-      return ResponseContainer<T?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${ex.toString()})',
-        responseCode: -1,
       );
     } finally {
       _isBusy = false;
     }
   }
 
-  Future<ResponseContainer<List<T>?>> listRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<List<T>>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+  Future<ResponseContainer<List<T>?>> listRequest<T>(
+    GenericRequest request,
+  ) async {
+    if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    final options = await _parseAsDioRequest(request);
     await waitWhileBusy();
-
-    var watch = Stopwatch()..start();
+    final watch = Stopwatch()..start();
     _isBusy = true;
+
     try {
-      final response = await _client!.fetch(options);
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParams,
+        onSendProgress: request.callback?.onSendProgress,
+        onReceiveProgress: request.callback?.onReceiveProgress,
+        options: Options(
+          method: request.method.name,
+          sendTimeout: request.sendTimeout,
+          receiveTimeout: request.receiveTimeout,
+          headers: request.headers,
+          responseType: ResponseType.json,
+        ),
+      );
+
       watch.stop();
 
-      if (!isInRange(response.statusCode!, 200, 299)) {
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
+      );
+
+      if (dioResponse.statusCode == null) {
+        throw NullReferenceException(
+            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+      }
+
+      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return ResponseContainer<List<T>?>.failed(
           null,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          responseCode: dioResponse.statusCode!,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          message: dioResponse.statusMessage ??
+              'Request failed with status code ${dioResponse.statusCode}',
         );
       }
 
-      request.callback?.invokeResponseCallback(response.data);
+      request.callback?.invokeResponseCallback(dioResponse.data);
 
-      if (!(response.data is Iterable<dynamic>)) {
+      if (dioResponse.data is! Iterable<dynamic>) {
         return ResponseContainer<List<T>?>.failed(
           null,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message: 'Invalid response object received.',
+          responseCode: dioResponse.statusCode!,
+          message: 'Response is not a list.',
         );
       }
 
-      final responseDataContainer = (response.data as Iterable<dynamic>)
-          .map<T>((e) => typeResolver.fromJson(e))
+      final response = (dioResponse.data as Iterable<dynamic>)
+          .map<T>(deserialize<T>)
           .toList();
 
-      if (!_handleResponse<List<T>>(request, responseDataContainer)) {
+      if (!_validateResponse<List<T>>(request, response)) {
         return ResponseContainer<List<T>?>.failed(
-          null,
+          response,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          responseCode: dioResponse.statusCode!,
+          message: 'Manual response validation failed.',
         );
       }
 
       return ResponseContainer<List<T>>(
-        responseDataContainer,
-        responseCode: response.statusCode,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
+        response,
+        responseCode: dioResponse.statusCode!,
+        responseHeaders: dioResponse.headers.getHeaderMap(),
         duration: watch.elapsed,
+        message: dioResponse.statusMessage,
       );
-    } on DioError catch (e) {
-      request.callback?.invokeRequestErrorCallback(e);
+    } catch (e) {
+      if (e is DioError) {
+        request.callback?.invokeDioErrorCallback(e);
+      } else {
+        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+      }
 
       return ResponseContainer<List<T>?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
-        responseCode: -1,
-      );
-    } on Exception catch (ex) {
-      request.callback?.invokeUnhandledExceptionCallback(ex);
-
-      return ResponseContainer<List<T>?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${ex.toString()})',
-        responseCode: -1,
       );
     } finally {
       _isBusy = false;
     }
   }
 
-  Future<ResponseContainer<T?>> retriveRequest<T extends ISerializable<T>?>(
-      T typeResolver, Request<T>? request) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
-    }
-
-    final options = await _parseAsDioRequest(request);
-
-    await waitWhileBusy();
-
-    var watch = Stopwatch()..start();
-    _isBusy = true;
-    try {
-      final response = await _client!.fetch(options);
-      watch.stop();
-
-      if (!isInRange(response.statusCode!, 200, 299)) {
-        return ResponseContainer<T?>.failed(
-          null,
-          duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
-        );
-      }
-
-      request.callback?.invokeResponseCallback(response.data);
-
-      final responseDataContainer = typeResolver.fromJson(response.data);
-
-      if (!_handleResponse<T>(request, responseDataContainer)) {
-        return ResponseContainer<T?>.failed(
-          null,
-          duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
-        );
-      }
-
-      return ResponseContainer<T>(
-        responseDataContainer,
-        responseCode: response.statusCode,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
-        duration: watch.elapsed,
-      );
-    } on DioError catch (e) {
-      request.callback?.invokeRequestErrorCallback(e);
-
-      return ResponseContainer<T?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${e.toString()})',
-        responseCode: -1,
-      );
-    } on Exception catch (ex) {
-      request.callback?.invokeUnhandledExceptionCallback(ex);
-
-      return ResponseContainer<T?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${ex.toString()})',
-        responseCode: -1,
-      );
-    } finally {
-      _isBusy = false;
-    }
-  }
-
-  Future<ResponseContainer<T?>> updateRequest<T extends ISerializable<T>?>(
-    T typeResolver,
-    Request<T>? request,
+  Future<ResponseContainer<T?>> retriveRequest<T>(
+    GenericRequest request,
   ) async {
-    if (typeResolver == null ||
-        request == null ||
-        !request.isRequestExecutable) {
+    if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    final options = await _parseAsDioRequest(request);
-
     await waitWhileBusy();
-
-    var watch = Stopwatch()..start();
+    final watch = Stopwatch()..start();
     _isBusy = true;
+
     try {
-      final response = await _client!.fetch(options);
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParams,
+        onSendProgress: request.callback?.onSendProgress,
+        onReceiveProgress: request.callback?.onReceiveProgress,
+        options: Options(
+          method: request.method.name,
+          sendTimeout: request.sendTimeout,
+          receiveTimeout: request.receiveTimeout,
+          headers: request.headers,
+          responseType: ResponseType.json,
+        ),
+      );
+
       watch.stop();
 
-      if (!isInRange(response.statusCode!, 200, 299)) {
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
+      );
+
+      if (dioResponse.statusCode == null) {
+        throw NullReferenceException(
+            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+      }
+
+      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return ResponseContainer<T?>.failed(
           null,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Either response is null or status code is not in range of 200 ~ 300',
+          responseCode: dioResponse.statusCode!,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          message: dioResponse.statusMessage ??
+              'Request failed with status code ${dioResponse.statusCode}',
         );
       }
 
-      request.callback?.invokeResponseCallback(response.data);
+      request.callback?.invokeResponseCallback(dioResponse.data);
 
-      final responseDataContainer = typeResolver.fromJson(response.data);
+      final response = deserialize<T>(dioResponse.data);
 
-      if (!_handleResponse<T>(request, responseDataContainer)) {
+      if (!_validateResponse<T>(request, response)) {
         return ResponseContainer<T?>.failed(
-          null,
+          response,
           duration: watch.elapsed,
-          responseCode: response.statusCode,
-          message:
-              'Request aborted by user either in responsePreprocessorDelegate() or validationDelegate()',
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          responseCode: dioResponse.statusCode!,
+          message: 'Manual response validation failed.',
         );
       }
 
       return ResponseContainer<T>(
-        responseDataContainer,
-        responseCode: response.statusCode,
-        responseHeaders: _parseResponseHeaders(response.headers.map),
+        response,
+        responseCode: dioResponse.statusCode!,
+        responseHeaders: dioResponse.headers.getHeaderMap(),
         duration: watch.elapsed,
+        message: dioResponse.statusMessage,
       );
-    } on DioError catch (e) {
-      request.callback?.invokeRequestErrorCallback(e);
+    } catch (e) {
+      if (e is DioError) {
+        request.callback?.invokeDioErrorCallback(e);
+      } else {
+        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+      }
 
       return ResponseContainer<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
-        responseCode: -1,
-      );
-    } on Exception catch (ex) {
-      request.callback?.invokeUnhandledExceptionCallback(ex);
-
-      return ResponseContainer<T?>.failed(
-        null,
-        duration: watch.elapsed,
-        message: 'Exception occured. (${ex.toString()})',
-        responseCode: -1,
       );
     } finally {
       _isBusy = false;
     }
   }
 
-  Map<String, dynamic> _parseResponseHeaders(
-    Map<String, List<String>> headers,
-  ) {
-    return headers.map<String, dynamic>(
-      (key, value) => MapEntry<String, String>(
-        key,
-        value.join(';'),
-      ),
-    );
-  }
-
-  Future<RequestOptions> _parseAsDioRequest(Request request) async {
+  Future<ResponseContainer<T?>> updateRequest<T>(GenericRequest request) async {
     if (!request.isRequestExecutable) {
-      throw NullReferenceException('Request object is null');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    final requestUri = Uri.tryParse(
-      parseUrl(
-        _baseUrl,
-        request.generatedRequestPath,
-      ),
-    );
+    await waitWhileBusy();
+    final watch = Stopwatch()..start();
+    _isBusy = true;
 
-    if (requestUri == null) {
-      throw RequestUriParsingFailedException('Request path is invalid.');
-    }
+    try {
+      await _processRequest(request);
 
-    _invokeStatisticsCallback(requestUri.toString(), request.endpoint);
-
-    final options = RequestOptions(
-      path: requestUri.toString(),
-      method: request.httpMethod.toString().split('.').last,
-      cancelToken: request.cancelToken,
-      followRedirects: true,
-      maxRedirects: 5,
-      data: request.formBody,
-      onReceiveProgress: request.callback?.invokeReceiveProgressCallback,
-      onSendProgress: request.callback?.invokeSendProgressCallback,
-    );
-
-    var hasAuthorizedAlready = false;
-
-    if (request.shouldAuthorize && !hasAuthorizedAlready) {
-      hasAuthorizedAlready = await _authorizeRequest(
-        options,
-        _client,
-        request.authorization,
-        callback: request.callback,
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParams,
+        onSendProgress: request.callback?.onSendProgress,
+        onReceiveProgress: request.callback?.onReceiveProgress,
+        options: Options(
+          method: request.method.name,
+          sendTimeout: request.sendTimeout,
+          receiveTimeout: request.receiveTimeout,
+          headers: request.headers,
+          responseType: ResponseType.json,
+        ),
       );
-    }
 
-    if (_defaultAuthorization != null &&
-        !_defaultAuthorization!.isDefault &&
-        !hasAuthorizedAlready) {
-      hasAuthorizedAlready = await _authorizeRequest(
-        options,
-        _client,
-        _defaultAuthorization,
-        callback: request.callback,
+      watch.stop();
+
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
       );
-    }
 
-    if (request.headers != null && request.headers!.isNotEmpty) {
-      for (final pair in request.headers!) {
-        options.headers[pair.key] = pair.value;
+      if (dioResponse.statusCode == null) {
+        throw NullReferenceException(
+            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
-    }
 
-    return options;
+      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+        return ResponseContainer<T?>.failed(
+          null,
+          duration: watch.elapsed,
+          responseCode: dioResponse.statusCode!,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          message: dioResponse.statusMessage ??
+              'Request failed with status code ${dioResponse.statusCode}',
+        );
+      }
+
+      request.callback?.invokeResponseCallback(dioResponse.data);
+
+      final response = deserialize<T>(dioResponse.data);
+
+      if (!_validateResponse<T>(request, response)) {
+        return ResponseContainer<T?>.failed(
+          response,
+          duration: watch.elapsed,
+          responseHeaders: dioResponse.headers.getHeaderMap(),
+          responseCode: dioResponse.statusCode!,
+          message: 'Manual response validation failed.',
+        );
+      }
+
+      return ResponseContainer<T>(
+        response,
+        responseCode: dioResponse.statusCode!,
+        responseHeaders: dioResponse.headers.getHeaderMap(),
+        duration: watch.elapsed,
+        message: dioResponse.statusMessage,
+      );
+    } catch (e) {
+      if (e is DioError) {
+        request.callback?.invokeDioErrorCallback(e);
+      } else {
+        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+      }
+
+      return ResponseContainer<T?>.failed(
+        null,
+        duration: watch.elapsed,
+        message: 'Exception occured. (${e.toString()})',
+      );
+    } finally {
+      _isBusy = false;
+    }
   }
 
-  static Future<bool> _authorizeRequest(
-      RequestOptions? requestOptions, Dio? client, IAuthorization? auth,
-      {Callback? callback}) async {
-    if (auth == null ||
-        auth.isDefault ||
-        client == null ||
-        requestOptions == null) {
+  Future<void> _processRequest(GenericRequest request) async {
+    if (request.shouldAuthorize) {
+      await _authorize(
+        request: request,
+        auth: request.authorization!,
+        callback: request.callback,
+      );
+    }
+
+    if (_defaultAuthorization != null && !_defaultAuthorization!.isDefault) {
+      await _authorize(
+        request: request,
+        auth: _defaultAuthorization!,
+        callback: request.callback,
+      );
+    }
+  }
+
+  Future<bool> _authorize({
+    required GenericRequest request,
+    required IAuthorization auth,
+    Callback? callback,
+  }) async {
+    if (!auth.isValidAuth) {
       return false;
     }
 
-    if (await auth.isAuthenticated()) {
-      requestOptions.headers['Authorization'] = await auth.generateAuthUrl();
+    if (await request.authorization!.isAuthenticated()) {
+      request.headers['Authorization'] = (await auth.generateAuthUrl())!;
       return true;
     }
 
-    await auth.init(client);
+    await auth.init(_client);
 
     if (await auth.authorize()) {
-      requestOptions.headers['Authorization'] = await auth.generateAuthUrl();
+      request.headers['Authorization'] = (await auth.generateAuthUrl())!;
       return auth.isAuthenticated();
     }
 
     return false;
   }
 
-  void _invokeStatisticsCallback(String requestUrl, String? endpoint) {
-    if (_endPointStatistics[endpoint ?? ''] == null) {
-      _endPointStatistics[endpoint ?? ''] = 1;
-    } else {
-      _endPointStatistics[endpoint ?? ''] =
-          _endPointStatistics[endpoint ?? '']! - 1;
+  void _invokeStatisticsCallback(String requestUrl, String endpoint) {
+    if (_endPointStatistics[endpoint] == null) {
+      _endPointStatistics[endpoint] = 1;
     }
 
-    if (_statisticsCallback != null) {
-      _statisticsCallback!(
-        requestUrl,
-        endpoint ?? '',
-        _endPointStatistics[endpoint ?? ''] ?? 0,
-      );
+    _endPointStatistics[endpoint] = _endPointStatistics[endpoint]! + 1;
+
+    if (_statisticsCallback == null) {
+      return;
     }
+
+    _statisticsCallback!(
+      requestUrl,
+      endpoint,
+      _endPointStatistics[endpoint]!,
+    );
   }
 }

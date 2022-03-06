@@ -1,4 +1,6 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class CreateUserRequest implements IRequest {
@@ -31,8 +33,8 @@ class CreateUserRequest implements IRequest {
   List<String>? roles;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('username', username)
       ..addIfNotNull('email', email)
       ..addIfNotNull('name', displayName)
@@ -45,5 +47,8 @@ class CreateUserRequest implements IRequest {
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('roles', roles?.join(','));
+
+    requestContent.endpoint = 'users';
+    requestContent.method = HttpMethod.POST;
   }
 }

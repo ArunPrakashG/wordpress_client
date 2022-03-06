@@ -1,4 +1,6 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdateUserRequest implements IRequest {
@@ -33,8 +35,8 @@ class UpdateUserRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('username', username)
       ..addIfNotNull('name', name)
       ..addIfNotNull('email', email)
@@ -47,5 +49,8 @@ class UpdateUserRequest implements IRequest {
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('password', password)
       ..addIfNotNull('roles', roles?.join(','));
+
+    requestContent.endpoint = 'users/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

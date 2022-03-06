@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class RetriveCommentRequest implements IRequest {
@@ -14,10 +15,12 @@ class RetriveCommentRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
-      ..addIfNotNull('password', password)
-      ..addIfNotNull('id', id);
+      ..addIfNotNull('password', password);
+
+    requestContent.endpoint = 'comments';
+    requestContent.method = HttpMethod.GET;
   }
 }

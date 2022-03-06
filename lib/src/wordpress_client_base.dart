@@ -16,6 +16,8 @@ import 'interface/posts.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'internal_requester.dart';
+import 'responses/category_response.dart';
+import 'type_map.dart';
 import 'utilities/helpers.dart';
 
 class WordpressClient {
@@ -45,6 +47,7 @@ class WordpressClient {
     _requester = InternalRequester(
       baseUrl: baseUrl,
       path: path,
+      typeMap: _initTypeMap(TypeMap()),
       configuration: configuration,
     );
 
@@ -79,7 +82,7 @@ class WordpressClient {
   final Map<String, dynamic> _customInterfaces = <String, dynamic>{};
 
   // ignore: avoid_void_async
-  void _initInternalInterfaces() async {
+  Future<void> _initInternalInterfaces() async {
     await initInterface<MeInterface>(MeInterface(), 'me');
     await initInterface<PostsInterface>(PostsInterface(), 'posts');
     await initInterface<CategoryInterface>(CategoryInterface(), 'categories');
@@ -87,6 +90,14 @@ class WordpressClient {
     await initInterface<MediaInterface>(MediaInterface(), 'media');
     await initInterface<TagInterface>(TagInterface(), 'tags');
     await initInterface<UsersInterface>(UsersInterface(), 'users');
+  }
+
+  TypeMap _initTypeMap(TypeMap typeMap) {
+    return typeMap
+      ..addJsonPairForType<Category>(
+        decoder: Category.fromJson,
+        encoder: (dynamic category) => (category as Category).toJson(),
+      );
   }
 
   /// Called to initialize an interface.

@@ -1,4 +1,6 @@
+import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class CreateCategoryRequest implements IRequest {
@@ -15,11 +17,14 @@ class CreateCategoryRequest implements IRequest {
   int? parentId;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('name', name)
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('parent_id', parentId);
+
+    requestContent.endpoint = 'categories';
+    requestContent.method = HttpMethod.POST;
   }
 }

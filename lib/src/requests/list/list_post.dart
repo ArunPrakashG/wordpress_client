@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class ListPostRequest implements IRequest {
@@ -50,8 +51,8 @@ class ListPostRequest implements IRequest {
   String? status;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -73,5 +74,8 @@ class ListPostRequest implements IRequest {
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status);
+
+    requestContent.endpoint = 'posts';
+    requestContent.method = HttpMethod.GET;
   }
 }

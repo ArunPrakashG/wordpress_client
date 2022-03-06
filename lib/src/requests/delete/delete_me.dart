@@ -1,19 +1,24 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class DeleteMeRequest implements IRequest {
   DeleteMeRequest({
     this.force,
-    this.reassign,
+    required this.reassign,
   });
 
   bool? force;
-  int? reassign;
+  int reassign;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('force', force)
-      ..addIfNotNull('reassign', (reassign ?? -1) > 0 ? reassign : null);
+      ..addIfNotNull('reassign', reassign);
+
+    requestContent.endpoint = 'users/me';
+    requestContent.method = HttpMethod.DELETE;
   }
 }

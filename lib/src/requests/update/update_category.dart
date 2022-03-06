@@ -1,4 +1,6 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdateCategoryRequest implements IRequest {
@@ -17,12 +19,14 @@ class UpdateCategoryRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('description', description)
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('parent', parent)
-      ..addIfNotNull('id', id);
+      ..addIfNotNull('parent', parent);
+
+    requestContent.endpoint = 'categories/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

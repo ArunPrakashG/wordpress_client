@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdateMediaRequest implements IRequest {
@@ -30,8 +31,8 @@ class UpdateMediaRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('title', title)
@@ -41,7 +42,9 @@ class UpdateMediaRequest implements IRequest {
       ..addIfNotNull('alt_text', altText)
       ..addIfNotNull('caption', caption)
       ..addIfNotNull('description', description)
-      ..addIfNotNull('post', post)
-      ..addIfNotNull('id', id);
+      ..addIfNotNull('post', post);
+
+    requestContent.endpoint = 'media/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

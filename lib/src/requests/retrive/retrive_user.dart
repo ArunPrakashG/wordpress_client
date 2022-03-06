@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class RetriveUserRequest implements IRequest {
@@ -12,9 +13,10 @@ class RetriveUserRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
-      ..addIfNotNull('context', context?.name)
-      ..addIfNotNull('id', id);
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters.addIfNotNull('context', context?.name);
+
+    requestContent.endpoint = 'users/$id';
+    requestContent.method = HttpMethod.GET;
   }
 }

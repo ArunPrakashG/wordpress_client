@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class ListMediaRequest implements IRequest {
@@ -46,8 +47,8 @@ class ListMediaRequest implements IRequest {
   MediaFilterStatus? status;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -67,5 +68,8 @@ class ListMediaRequest implements IRequest {
       ..addIfNotNull('media_type', mediaType?.name)
       ..addIfNotNull('mime_type', mimeType)
       ..addIfNotNull('status', status?.name);
+
+    requestContent.endpoint = 'media';
+    requestContent.method = HttpMethod.GET;
   }
 }

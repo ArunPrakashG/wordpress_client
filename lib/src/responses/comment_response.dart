@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import '../enums.dart';
-import '../utilities/serializable_instance.dart';
-import 'partial_responses/content.dart';
-import 'partial_responses/links.dart';
+import 'response_properties/content.dart';
+import 'response_properties/links.dart';
 
-class Comment extends ISerializable<Comment> {
+class Comment {
   Comment({
     this.id,
     this.post,
@@ -27,6 +24,33 @@ class Comment extends ISerializable<Comment> {
     this.links,
   });
 
+  factory Comment.fromJson(dynamic json) {
+    return Comment(
+      id: json['id'] as int?,
+      post: json['post'] as int?,
+      parent: json['parent'] as int?,
+      author: json['author'] as int?,
+      authorName: json['author_name'] as String?,
+      authorEmail: json['author_email'] as String?,
+      authorUrl: json['author_url'] as String?,
+      authorIp: json['author_ip'] as String?,
+      authorUserAgent: json['author_user_agent'] as String?,
+      date: DateTime.tryParse(json['date'] as String? ?? ''),
+      dateGmt: DateTime.tryParse(json['date_gmt'] as String? ?? ''),
+      content: Content.fromJson(json['content'] as Map<String, dynamic>?),
+      link: json['link'] as String?,
+      status: getCommentStatusFromValue(json['status'] as String?),
+      type: json['type'] as String?,
+      authorAvatarUrls: json['author_avatar_urls'] == null
+          ? null
+          : Map<String, String>.from(
+                  json['author_avatar_urls'] as Map<String, dynamic>)
+              .map(MapEntry<String, String>.new),
+      meta: json['meta'],
+      links: Links.fromJson(json['_links']),
+    );
+  }
+
   final int? id;
   final int? post;
   final int? parent;
@@ -41,58 +65,34 @@ class Comment extends ISerializable<Comment> {
   final Content? content;
   final String? link;
   final CommentStatus? status;
-  final Type? type;
+  final String? type;
   final Map<String, String>? authorAvatarUrls;
   final dynamic meta;
   final Links? links;
 
-  factory Comment.fromJson(String str) => Comment.fromMap(json.decode(str));
-
-  factory Comment.fromMap(Map<String, dynamic> json) => Comment(
-        id: json["id"] == null ? null : json["id"],
-        post: json["post"] == null ? null : json["post"],
-        parent: json["parent"] == null ? null : json["parent"],
-        author: json["author"] == null ? null : json["author"],
-        authorName: json["author_name"] == null ? null : json["author_name"],
-        authorEmail: json["author_email"] == null ? null : json["author_email"],
-        authorUrl: json["author_url"] == null ? null : json["author_url"],
-        authorIp: json["author_ip"] == null ? null : json["author_ip"],
-        authorUserAgent: json["author_user_agent"] == null ? null : json["author_user_agent"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
-        dateGmt: json["date_gmt"] == null ? null : DateTime.parse(json["date_gmt"]),
-        content: json["content"] == null ? null : Content.fromMap(json["content"]),
-        link: json["link"] == null ? null : json["link"],
-        status: json["status"] == null ? null : getCommentStatusFromValue(json["status"]),
-        type: json["type"] == null ? null : json["type"],
-        authorAvatarUrls: json["author_avatar_urls"] == null ? null : Map.from(json["author_avatar_urls"]).map((k, v) => MapEntry<String, String>(k, v)),
-        meta: json["meta"],
-        links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "id": id == null ? null : id,
-        "post": post == null ? null : post,
-        "parent": parent == null ? null : parent,
-        "author": author == null ? null : author,
-        "author_name": authorName == null ? null : authorName,
-        "author_email": authorEmail == null ? null : authorEmail,
-        "author_url": authorUrl == null ? null : authorUrl,
-        "author_ip": authorIp == null ? null : authorIp,
-        "author_user_agent": authorUserAgent == null ? null : authorUserAgent,
-        "date": date == null ? null : date!.toIso8601String(),
-        "date_gmt": dateGmt == null ? null : dateGmt!.toIso8601String(),
-        "content": content == null ? null : content!.toMap(),
-        "link": link == null ? null : link,
-        "status": status == null ? null : status.toString().split('.').last.toLowerCase(),
-        "type": type == null ? null : type,
-        "author_avatar_urls": authorAvatarUrls == null ? null : Map.from(authorAvatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "meta": meta,
-        "_links": links == null ? null : links!.toMap(),
-      };
-
-  @override
-  Comment fromJson(Map<String, dynamic>? json) => Comment.fromMap(json!);
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'post': post,
+      'parent': parent,
+      'author': author,
+      'author_name': authorName,
+      'author_email': authorEmail,
+      'author_url': authorUrl,
+      'author_ip': authorIp,
+      'author_user_agent': authorUserAgent,
+      'date': date?.toIso8601String(),
+      'date_gmt': dateGmt?.toIso8601String(),
+      'content': content?.toJson(),
+      'link': link,
+      'status': status?.name,
+      'type': type,
+      'author_avatar_urls': authorAvatarUrls == null
+          ? null
+          : Map<String, dynamic>.from(authorAvatarUrls!)
+              .map<String, dynamic>(MapEntry<String, dynamic>.new),
+      'meta': meta,
+      '_links': links?.toJson(),
+    };
+  }
 }

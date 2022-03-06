@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
+
+import '../type_map.dart';
+
 // import 'package:html/parser.dart';
 
 extension MapExtensions on Map<String, dynamic> {
@@ -12,6 +16,14 @@ extension MapExtensions on Map<String, dynamic> {
     if (value != null) {
       this[key] = value;
     }
+  }
+}
+
+extension HeaderExtension on Headers {
+  Map<String, String> getHeaderMap() {
+    return map.map<String, String>((key, value) {
+      return MapEntry(key, value.join(';'));
+    });
   }
 }
 
@@ -80,7 +92,53 @@ bool isInRange(int value, int min, int max) => value >= min && value <= max;
 //String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
 String parseHtmlString(String htmlString) =>
-    htmlString.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+    htmlString.replaceAll(RegExp('<[^>]*>|&[^;]+;'), ' ');
+
+Type typeOf<T>() => T;
+
+T deserialize<T>(dynamic object) {
+  if (object is! Map<String, dynamic>) {
+    throw Exception('object is not a map. Cannot decode.');
+  }
+
+  final decoder = TypeMap.getDecoderForType<T>();
+  return decoder(object);
+}
+
+Map<String, dynamic> serialize<T>(T object) {
+  final encoder = TypeMap.getEncoderForType<T>();
+  return encoder(object);
+}
+
+List<T> mapIterableWithChecks<T>(
+  dynamic json,
+  T Function(Map<String, dynamic> json) decoder,
+) {
+  if (json == null || json is! Iterable<dynamic>) {
+    return [];
+  }
+
+  return json.map((dynamic e) => decoder(e as Map<String, dynamic>)).toList();
+}
+
+T? mapToTypeNoSafety<T>(dynamic json, T Function(dynamic json) decoder) {
+  if (json == null) {
+    return null;
+  }
+
+  return decoder(json);
+}
+
+T? mapToType<T>(
+  dynamic json,
+  T Function(Map<String, dynamic> json) decoder,
+) {
+  if (json == null || json is! Map<String, dynamic>) {
+    return null;
+  }
+
+  return decoder(json);
+}
 
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types

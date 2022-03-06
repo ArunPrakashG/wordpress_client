@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import '../../enums.dart';
 import '../../exceptions/file_not_exist_exception.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class CreateMediaRequest implements IRequest {
@@ -35,7 +36,7 @@ class CreateMediaRequest implements IRequest {
   Status? pingStatus;
 
   @override
-  Map<String, dynamic> build() {
+  void build(RequestContent requestContent) {
     final file = File(mediaFilePath);
 
     if (!file.existsSync()) {
@@ -50,7 +51,7 @@ class CreateMediaRequest implements IRequest {
       contentType: MediaType.parse(mediaType),
     );
 
-    return <String, dynamic>{}
+    requestContent.body
       ..addIfNotNull('alt_text', altText)
       ..addIfNotNull('caption', caption)
       ..addIfNotNull('description', description)
@@ -64,5 +65,8 @@ class CreateMediaRequest implements IRequest {
       ..addIfNotNull('Content-Disposition',
           'attachment; filename=${multipartFile.filename}')
       ..addIfNotNull('file', multipartFile);
+
+    requestContent.endpoint = 'media';
+    requestContent.method = HttpMethod.POST;
   }
 }

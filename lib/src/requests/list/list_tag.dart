@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class ListTagRequest implements IRequest {
@@ -32,8 +33,8 @@ class ListTagRequest implements IRequest {
   bool? hideEmpty;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -46,5 +47,8 @@ class ListTagRequest implements IRequest {
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('post', post)
       ..addIfNotNull('hide_empty', hideEmpty);
+
+    requestContent.endpoint = 'tags';
+    requestContent.method = HttpMethod.GET;
   }
 }

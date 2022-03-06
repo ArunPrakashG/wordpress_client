@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class ListUserRequest implements IRequest {
@@ -32,8 +33,8 @@ class ListUserRequest implements IRequest {
   String? who;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -46,5 +47,8 @@ class ListUserRequest implements IRequest {
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('roles', roles)
       ..addIfNotNull('who', who);
+
+    requestContent.endpoint = 'users';
+    requestContent.method = HttpMethod.GET;
   }
 }

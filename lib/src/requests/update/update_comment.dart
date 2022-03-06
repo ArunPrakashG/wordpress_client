@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdateCommentRequest implements IRequest {
@@ -30,8 +31,8 @@ class UpdateCommentRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('author', author)
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('author_ip', authorIp)
@@ -42,5 +43,8 @@ class UpdateCommentRequest implements IRequest {
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('content', content)
       ..addIfNotNull('post', post);
+
+    requestContent.endpoint = 'comments/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

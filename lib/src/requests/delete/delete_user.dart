@@ -1,19 +1,26 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class DeleteUserRequest implements IRequest {
   DeleteUserRequest({
     this.force,
-    this.reassign,
+    required this.reassign,
+    required this.id,
   });
 
   bool? force;
-  int? reassign;
+  int reassign;
+  int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('force', force)
-      ..addIfNotNull('reassign', (reassign ?? -1) > 0 ? reassign : null);
+      ..addIfNotNull('reassign', reassign);
+
+    requestContent.endpoint = 'users/$id';
+    requestContent.method = HttpMethod.DELETE;
   }
 }

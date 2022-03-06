@@ -1,9 +1,6 @@
-import 'dart:convert';
+import 'response_properties/links.dart';
 
-import '../utilities/serializable_instance.dart';
-import 'partial_responses/links.dart';
-
-class Tag extends ISerializable<Tag> {
+class Tag {
   Tag({
     this.id,
     this.count,
@@ -16,6 +13,20 @@ class Tag extends ISerializable<Tag> {
     this.links,
   });
 
+  factory Tag.fromJson(dynamic json) {
+    return Tag(
+      id: json['id'] as int?,
+      count: json['count'] as int?,
+      description: json['description'] as String?,
+      link: json['link'] as String?,
+      name: json['name'] as String?,
+      slug: json['slug'] as String?,
+      taxonomy: json['taxonomy'] as String?,
+      meta: json['meta'],
+      links: Links.fromJson(json['_links']),
+    );
+  }
+
   final int? id;
   final int? count;
   final String? description;
@@ -26,35 +37,17 @@ class Tag extends ISerializable<Tag> {
   final dynamic meta;
   final Links? links;
 
-  factory Tag.fromJson(String str) => Tag.fromMap(json.decode(str));
-
-  factory Tag.fromMap(Map<String, dynamic> json) => Tag(
-        id: json["id"] == null ? null : json["id"],
-        count: json["count"] == null ? null : json["count"],
-        description: json["description"] == null ? null : json["description"],
-        link: json["link"] == null ? null : json["link"],
-        name: json["name"] == null ? null : json["name"],
-        slug: json["slug"] == null ? null : json["slug"],
-        taxonomy: json["taxonomy"] == null ? null : json["taxonomy"],
-        meta: json["meta"],
-        links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "id": id == null ? null : id,
-        "count": count == null ? null : count,
-        "description": description == null ? null : description,
-        "link": link == null ? null : link,
-        "name": name == null ? null : name,
-        "slug": slug == null ? null : slug,
-        "taxonomy": taxonomy == null ? null : taxonomy,
-        "meta": meta,
-        "_links": links == null ? null : links!.toMap(),
-      };
-
-  @override
-  Tag fromJson(Map<String, dynamic>? json) => Tag.fromMap(json!);
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'count': count,
+      'description': description,
+      'link': link,
+      'name': name,
+      'slug': slug,
+      'taxonomy': taxonomy,
+      'meta': meta,
+      '_links': links?.toJson(),
+    };
+  }
 }

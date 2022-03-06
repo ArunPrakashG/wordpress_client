@@ -1,5 +1,6 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class RetriveMeRequest implements IRequest {
@@ -10,7 +11,9 @@ class RetriveMeRequest implements IRequest {
   FilterContext? context;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}..addIfNotNull('context', context?.name);
+  void build(RequestContent requestContent) {
+    requestContent.queryParameters.addIfNotNull('context', context?.name);
+    requestContent.endpoint = 'users/me';
+    requestContent.method = HttpMethod.GET;
   }
 }

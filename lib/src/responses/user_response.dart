@@ -1,15 +1,8 @@
-// To parse this JSON data, do
-//
-//     final user = userFromMap(jsonString);
+import '../utilities/helpers.dart';
+import 'response_properties/extra_capabilities.dart';
+import 'response_properties/links.dart';
 
-import 'dart:convert';
-
-import 'package:wordpress_client/src/utilities/serializable_instance.dart';
-
-import 'partial_responses/extra_capabilities.dart';
-import 'partial_responses/links.dart';
-
-class User implements ISerializable<User> {
+class User {
   User({
     this.id,
     this.name,
@@ -20,7 +13,6 @@ class User implements ISerializable<User> {
     this.roles,
     this.avatarUrls,
     this.meta,
-    this.yoastHead,
     this.links,
     this.capabilities,
     this.email,
@@ -49,56 +41,57 @@ class User implements ISerializable<User> {
   final List<String>? roles;
   final Map<String, String>? avatarUrls;
   final dynamic meta;
-  final String? yoastHead;
   final Links? links;
 
-  factory User.fromJson(String str) => User.fromMap(json.decode(str));
+  factory User.fromJson(dynamic json) {
+    return User(
+      id: json['id'] as int?,
+      name: json['name'] as String?,
+      username: json['username'] as String?,
+      firstName: json['first_name'] as String?,
+      lastName: json['last_name'] as String?,
+      email: json['email'] as String?,
+      registeredDate:
+          DateTime.tryParse(json['registered_date'] as String? ?? ''),
+      capabilities: json['capabilities'] == null
+          ? null
+          : Map<String, bool>.from(json['capabilities'] as Map<String, dynamic>)
+              .map(MapEntry<String, bool>.new),
+      extraCapabilities: ExtraCapabilities.fromJson(json['extra_capabilities']),
+      url: json['url'] as String?,
+      description: json['description'] as String?,
+      link: json['link'] as String?,
+      slug: json['slug'] as String?,
+      roles: mapIterableWithChecks(json['roles'], (value) => value as String),
+      avatarUrls: json['avatar_urls'] == null
+          ? null
+          : Map<String, String>.from(
+                  json['avatar_urls'] as Map<String, dynamic>)
+              .map(MapEntry<String, String>.new),
+      meta: json['meta'],
+      links: Links.fromJson(json['_links']),
+    );
+  }
 
-  factory User.fromMap(Map<String, dynamic> json) => User(
-        id: json["id"] == null ? null : json["id"],
-        name: json["name"] == null ? null : json["name"],
-        username: json["username"] == null ? null : json["username"],
-        firstName: json["first_name"] == null ? null : json["first_name"],
-        lastName: json["last_name"] == null ? null : json["last_name"],
-        email: json["email"] == null ? null : json["email"],
-        registeredDate: json["registered_date"] == null ? null : DateTime.parse(json["registered_date"]),
-        capabilities: json["capabilities"] == null ? null : Map.from(json["capabilities"]).map((k, v) => MapEntry<String, bool>(k, v)),
-        extraCapabilities: json["extra_capabilities"] == null ? null : ExtraCapabilities.fromMap(json["extra_capabilities"]),
-        url: json["url"] == null ? null : json["url"],
-        description: json["description"] == null ? null : json["description"],
-        link: json["link"] == null ? null : json["link"],
-        slug: json["slug"] == null ? null : json["slug"],
-        roles: json["roles"] == null ? null : List<String>.from(json["roles"].map((x) => x)),
-        avatarUrls: json["avatar_urls"] == null ? null : Map.from(json["avatar_urls"]).map((k, v) => MapEntry<String, String>(k, v)),
-        meta: json["meta"],
-        yoastHead: json["yoast_head"] == null ? null : json["yoast_head"],
-        links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "id": id == null ? null : id,
-        "name": name == null ? null : name,
-        "url": url == null ? null : url,
-        "username": username == null ? null : username,
-        "first_name": firstName == null ? null : firstName,
-        "last_name": lastName == null ? null : lastName,
-        "email": email == null ? null : email,
-        "description": description == null ? null : description,
-        "link": link == null ? null : link,
-        "slug": slug == null ? null : slug,
-        "registered_date": registeredDate == null ? null : registeredDate!.toIso8601String(),
-        "capabilities": capabilities == null ? null : Map.from(capabilities!).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "extra_capabilities": extraCapabilities == null ? null : extraCapabilities!.toMap(),
-        "roles": roles == null ? null : List<dynamic>.from(roles!.map((x) => x)),
-        "avatar_urls": avatarUrls == null ? null : Map.from(avatarUrls!).map((k, v) => MapEntry<String, dynamic>(k, v)),
-        "meta": meta,
-        "yoast_head": yoastHead == null ? null : yoastHead,
-        "_links": links == null ? null : links!.toMap(),
-      };
-
-  @override
-  User fromJson(Map<String, dynamic>? json) => User.fromMap(json!);
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'url': url,
+      'username': username,
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'description': description,
+      'link': link,
+      'slug': slug,
+      'registered_date': registeredDate?.toIso8601String(),
+      'capabilities': capabilities,
+      'extra_capabilities': extraCapabilities?.toJson(),
+      'roles': roles,
+      'avatar_urls': avatarUrls,
+      'meta': meta,
+      '_links': links?.toJson(),
+    };
+  }
 }

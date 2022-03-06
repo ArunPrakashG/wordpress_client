@@ -1,4 +1,6 @@
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdateTagRequest implements IRequest {
@@ -15,10 +17,13 @@ class UpdateTagRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('name', name);
+
+    requestContent.endpoint = 'tags/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

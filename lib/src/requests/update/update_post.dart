@@ -1,5 +1,6 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
+import '../request_content.dart';
 import '../request_interface.dart';
 
 class UpdatePostRequest implements IRequest {
@@ -36,8 +37,8 @@ class UpdatePostRequest implements IRequest {
   int id;
 
   @override
-  Map<String, dynamic> build() {
-    return <String, dynamic>{}
+  void build(RequestContent requestContent) {
+    requestContent.body
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('title', title)
       ..addIfNotNull('content', content)
@@ -52,5 +53,8 @@ class UpdatePostRequest implements IRequest {
       ..addIfNotNull('categories', categories?.join(','))
       ..addIfNotNull('tags', tags?.join(','))
       ..addIfNotNull('slug', slug);
+
+    requestContent.endpoint = 'posts/$id';
+    requestContent.method = HttpMethod.POST;
   }
 }

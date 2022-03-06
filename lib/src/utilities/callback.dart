@@ -14,8 +14,8 @@ class Callback {
   final void Function(Exception)? unhandledExceptionCallback;
   final void Function(ErrorContainer)? requestErrorCallback;
   final void Function(dynamic)? responseCallback;
-  final void Function(int current, int total)? onReceiveProgress;
-  final void Function(int current, int total)? onSendProgress;
+  final void Function(int received, int total)? onReceiveProgress;
+  final void Function(int send, int total)? onSendProgress;
 
   void invokeUnhandledExceptionCallback(Exception e) {
     if (unhandledExceptionCallback == null) {
@@ -25,7 +25,7 @@ class Callback {
     unhandledExceptionCallback!(e);
   }
 
-  void invokeRequestErrorCallback(DioError error) {
+  void invokeDioErrorCallback(DioError error) {
     if (requestErrorCallback == null) {
       return;
     }
