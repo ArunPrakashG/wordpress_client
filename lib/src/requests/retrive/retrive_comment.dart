@@ -10,7 +10,7 @@ class RetriveCommentRequest implements IRequest {
     required this.id,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   String? password;
   int id;
 

@@ -1,26 +1,51 @@
+// ignore_for_file: avoid_redundant_argument_values, omit_local_variable_types, avoid_print
+
+import 'package:wordpress_client/src/requests/list/list_post.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
-import 'custom_interface_example/custom_interface.dart';
-
-void main() async {
+Future<void> main() async {
   WordpressClient client;
 
   // Simple Usage
-  client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
+  client = WordpressClient(
+    'https://www.pathanamthittamedia.com/wp-json',
+    'wp/v2',
+    bootstrapper: (bootstrapper) => bootstrapper.withStatisticDelegate(
+      (baseUrl, endpoint, requestCount) {
+        print('$baseUrl $endpoint $requestCount');
+      },
+    ).build(),
+  );
 
-  WordpressResponse<List<Post?>?> posts = await client.posts
-      .list((builder) => builder.withPerPage(20).withPageNumber(1).build());
-  print(posts.value!.first!.id);
+  await client.initialize();
+
+  WordpressResponse<List<Post>?> postsResponse = await client.posts.list(
+    WordpressRequest(
+      requestData: ListPostRequest(
+        perPage: 10,
+        page: 1,
+        order: Order.desc,
+      ),
+    ),
+  );
+
+  if (postsResponse.isSuccess) {
+    for (final post in postsResponse.data!) {
+      print(post.title?.parsedText);
+    }
+  } else {
+    print(postsResponse.message);
+  }
 
   // Or
 
   // Advanced Usage
-  client = new WordpressClient(
+  client = WordpressClient(
     'https://www.example.com/wp-json',
     'wp/v2',
     bootstrapper: (bootstrapper) => bootstrapper
         .withCookies(true)
-        .withDefaultUserAgent('wordpress_client/4.0.0')
+        .withDefaultUserAgent('wordpress_client/6.1.0')
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withDefaultAuthorization(
@@ -32,47 +57,56 @@ void main() async {
     ).build(),
   );
 
-  WordpressResponse<List<Post?>?> response = await client.posts.list(
-    (builder) => builder
-        .withPerPage(20)
-        .withPageNumber(1)
-        .orderResultsBy(FilterOrder.descending)
-        .sortResultsBy(FilterPostSortOrder.date)
-        .withAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
-        .withCallback(
-          Callback(
-            unhandledExceptionCallback: (ex) {
-              print('Unhandled Exception: $ex');
-            },
-            requestErrorCallback: (errorContainer) {
-              print('Request Error: ${errorContainer.errorResponse!.message}');
-            },
-            onSendProgress: (current, total) {
-              print('Send Progress: $current/$total');
-            },
-            onReceiveProgress: (current, total) {
-              print('Receive Progress: $current/$total');
-            },
-          ),
-        )
-        .withResponseValidationOverride((rawResponse) {
-      // ignore: unnecessary_null_comparison
-      if (rawResponse.any((element) => element.content!.parsedText == null)) {
-        return false;
-      }
+  postsResponse = await client.posts.list(
+    WordpressRequest(
+      requestData: ListPostRequest(
+        perPage: 10,
+        page: 1,
+        order: Order.desc,
+      ),
+      responseValidationCallback: (dynamic response) {
+        if (response is! List<Post>) {
+          return false;
+        }
 
-      return true;
-    }).build(),
+        return true;
+      },
+      authorization: UsefulJwtAuth(
+        'test_user',
+        'super_secret_password',
+      ),
+      callback: Callback(
+        unhandledExceptionCallback: (ex) {
+          print('Unhandled Exception: $ex');
+        },
+        requestErrorCallback: (errorContainer) {
+          print('Request Error: ${errorContainer.errorResponse!.message}');
+        },
+        onSendProgress: (current, total) {
+          print('Send Progress: $current/$total');
+        },
+        onReceiveProgress: (current, total) {
+          print('Receive Progress: $current/$total');
+        },
+      ),
+    ),
   );
 
-  print(response.value!.first!.id);
+  if (postsResponse.isSuccess) {
+    for (final post in postsResponse.data!) {
+      print(post.title?.parsedText);
+    }
 
-  // initialize custom interface
-  await client.initInterface<MyCustomInterface>(
-      MyCustomInterface(), 'my_custom_interface');
+    // You access total pages & total count headers directly
+    print('Per Page: ${postsResponse.totalPagesCount}');
+    print('Total Count: ${postsResponse.totalCount}');
 
-  // to use it...
-  await client
-      .getCustomInterface<MyCustomInterface>()
-      .create((p1) => p1.build());
+    // You can also access the headers directly
+    print('X-WP-Total: ${postsResponse.responseHeaders['X-WP-Total']}');
+
+    // You can also check how much time the request took easily.
+    print('Request took: ${postsResponse.requestDuration?.inMilliseconds}');
+  } else {
+    print(postsResponse.message);
+  }
 }

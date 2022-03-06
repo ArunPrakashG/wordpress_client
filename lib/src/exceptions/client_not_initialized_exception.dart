@@ -1,5 +1,5 @@
 class ClientNotInitializedException implements Exception {
-  final String reason;
+  const ClientNotInitializedException(this.reason);
 
-  ClientNotInitializedException(this.reason);
+  final String reason;
 }

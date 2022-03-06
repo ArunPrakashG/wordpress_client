@@ -1,3 +1,3 @@
 class InvalidInterfaceException implements Exception {
-  InvalidInterfaceException();
+  const InvalidInterfaceException();
 }

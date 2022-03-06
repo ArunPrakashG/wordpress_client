@@ -9,7 +9,7 @@ class RetriveCategoryRequest implements IRequest {
     required this.id,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int id;
 
   @override

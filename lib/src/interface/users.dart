@@ -4,7 +4,6 @@ import '../requests/delete/delete_user.dart';
 import '../requests/list/list_user.dart';
 import '../requests/retrive/retrive_user.dart';
 import '../requests/update/update_user.dart';
-import '../wordpress_client_base.dart';
 
 class UsersInterface extends IInterface
     with
@@ -15,35 +14,35 @@ class UsersInterface extends IInterface
         IList<User, ListUserRequest> {
   @override
   Future<WordpressResponse<User?>> create(
-    GenericRequest<CreateUserRequest> request,
+    WordpressRequest<CreateUserRequest> request,
   ) async {
     return internalRequester.createRequest<User>(request);
   }
 
   @override
   Future<WordpressResponse<User?>> delete(
-    GenericRequest<DeleteUserRequest> request,
+    WordpressRequest<DeleteUserRequest> request,
   ) async {
     return internalRequester.deleteRequest<User>(request);
   }
 
   @override
   Future<WordpressResponse<List<User>?>> list(
-    GenericRequest<ListUserRequest> request,
+    WordpressRequest<ListUserRequest> request,
   ) async {
     return internalRequester.listRequest<User>(request);
   }
 
   @override
   Future<WordpressResponse<User?>> retrive(
-    GenericRequest<RetriveUserRequest> request,
+    WordpressRequest<RetriveUserRequest> request,
   ) async {
     return internalRequester.retriveRequest<User>(request);
   }
 
   @override
   Future<WordpressResponse<User?>> update(
-    GenericRequest<UpdateUserRequest> request,
+    WordpressRequest<UpdateUserRequest> request,
   ) async {
     return internalRequester.updateRequest<User>(request);
   }

@@ -19,15 +19,15 @@ class ListUserRequest implements IRequest {
     this.who,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page;
   int perPage;
   String? search;
   List<int>? exclude;
   List<int>? include;
   int? resultOffset;
-  FilterOrder? order;
-  FilterUserSortOrder? orderBy;
+  Order? order;
+  OrderBy? orderBy;
   List<int>? slug;
   int? roles;
   String? who;

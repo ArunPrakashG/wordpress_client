@@ -19,13 +19,13 @@ class ListCategoryRequest implements IRequest {
     this.hideEmpty,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page = 1;
   int perPage = 10;
   String? search;
   List<int>? exclude;
   List<int>? include;
-  FilterCategoryTagSortOrder? orderBy;
+  OrderBy? orderBy;
   String? order;
   List<String>? slug;
   int? parent;

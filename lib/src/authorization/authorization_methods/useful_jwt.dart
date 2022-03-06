@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
-
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
 
@@ -33,7 +31,7 @@ class UsefulJwtAuth extends IAuthorization {
           (kDaysUntilTokenExpiry * 24);
 
   @override
-  FutureOr<bool> authorize() async {
+  Future<bool> authorize() async {
     if (isValidAuth) {
       return true;
     }
@@ -89,7 +87,7 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  FutureOr<bool> init(Dio? client) {
+  Future<bool> init(Dio? client) async {
     if (_hasInit) {
       return true;
     }
@@ -101,7 +99,7 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  FutureOr<bool> isAuthenticated() {
+  Future<bool> isAuthenticated() async {
     if (_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
       return true;
     }
@@ -110,7 +108,7 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  FutureOr<bool> validate() async {
+  Future<bool> validate() async {
     if (_client == null || isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
@@ -144,7 +142,7 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  FutureOr<String?> generateAuthUrl() async {
+  Future<String?> generateAuthUrl() async {
     if (!await isAuthenticated()) {
       return null;
     }

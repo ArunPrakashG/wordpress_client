@@ -1,5 +1,5 @@
 class FileDoesntExistException implements Exception {
-  final String reason;
+  const FileDoesntExistException(this.reason);
 
-  FileDoesntExistException(this.reason);
+  final String reason;
 }

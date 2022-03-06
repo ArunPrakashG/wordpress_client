@@ -1,11 +1,10 @@
 import '../enums.dart';
 
 class RequestContent {
-  RequestContent({
-    this.headers = const {},
-    this.queryParameters = const {},
-    this.body = const <String, dynamic>{},
-  });
+  RequestContent()
+      : body = <String, dynamic>{},
+        headers = <String, String>{},
+        queryParameters = <String, String>{};
 
   final Map<String, String> headers;
   final Map<String, String> queryParameters;

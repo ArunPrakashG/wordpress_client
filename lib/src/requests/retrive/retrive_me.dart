@@ -5,10 +5,10 @@ import '../request_interface.dart';
 
 class RetriveMeRequest implements IRequest {
   RetriveMeRequest({
-    this.context = FilterContext.view,
+    this.context = RequestContext.view,
   });
 
-  FilterContext? context;
+  RequestContext? context;
 
   @override
   void build(RequestContent requestContent) {

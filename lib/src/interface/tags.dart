@@ -4,7 +4,6 @@ import '../requests/delete/delete_tag.dart';
 import '../requests/list/list_tag.dart';
 import '../requests/retrive/retrive_tag.dart';
 import '../requests/update/update_tag.dart';
-import '../wordpress_client_base.dart';
 
 class TagInterface extends IInterface
     with
@@ -15,35 +14,35 @@ class TagInterface extends IInterface
         IList<Tag, ListTagRequest> {
   @override
   Future<WordpressResponse<Tag?>> create(
-    GenericRequest<CreateTagRequest> request,
+    WordpressRequest<CreateTagRequest> request,
   ) async {
     return internalRequester.createRequest<Tag>(request);
   }
 
   @override
   Future<WordpressResponse<Tag?>> delete(
-    GenericRequest<DeleteTagRequest> request,
+    WordpressRequest<DeleteTagRequest> request,
   ) async {
     return internalRequester.deleteRequest<Tag>(request);
   }
 
   @override
   Future<WordpressResponse<List<Tag>?>> list(
-    GenericRequest<ListTagRequest> request,
+    WordpressRequest<ListTagRequest> request,
   ) async {
     return internalRequester.listRequest<Tag>(request);
   }
 
   @override
   Future<WordpressResponse<Tag?>> retrive(
-    GenericRequest<RetriveTagRequest> request,
+    WordpressRequest<RetriveTagRequest> request,
   ) async {
     return internalRequester.retriveRequest<Tag>(request);
   }
 
   @override
   Future<WordpressResponse<Tag?>> update(
-    GenericRequest<UpdateTagRequest> request,
+    WordpressRequest<UpdateTagRequest> request,
   ) async {
     return internalRequester.updateRequest<Tag>(request);
   }

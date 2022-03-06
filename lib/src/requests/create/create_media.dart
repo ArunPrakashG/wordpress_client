@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart';
+import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:path/path.dart';
 
-import '../../enums.dart';
+import '../../enums.dart' show Status, HttpMethod;
 import '../../exceptions/file_not_exist_exception.dart';
 import '../../utilities/helpers.dart';
 import '../request_content.dart';
@@ -40,7 +40,7 @@ class CreateMediaRequest implements IRequest {
     final file = File(mediaFilePath);
 
     if (!file.existsSync()) {
-      throw FileDoesntExistException('File does not exist');
+      throw const FileDoesntExistException('File does not exist');
     }
 
     final fileName = basename(file.path);

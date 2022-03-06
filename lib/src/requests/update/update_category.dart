@@ -1,7 +1,5 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
-import '../request_interface.dart';
 
 class UpdateCategoryRequest implements IRequest {
   UpdateCategoryRequest({

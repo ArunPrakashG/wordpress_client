@@ -24,25 +24,6 @@ class User {
     this.username,
   });
 
-  final int? id;
-  final String? username;
-  final String? name;
-  final String? firstName;
-  final String? lastName;
-  final String? nickname;
-  final String? email;
-  final DateTime? registeredDate;
-  final Map<String, bool>? capabilities;
-  final ExtraCapabilities? extraCapabilities;
-  final String? url;
-  final String? description;
-  final String? link;
-  final String? slug;
-  final List<String>? roles;
-  final Map<String, String>? avatarUrls;
-  final dynamic meta;
-  final Links? links;
-
   factory User.fromJson(dynamic json) {
     return User(
       id: json['id'] as int?,
@@ -72,6 +53,25 @@ class User {
       links: Links.fromJson(json['_links']),
     );
   }
+
+  final int? id;
+  final String? username;
+  final String? name;
+  final String? firstName;
+  final String? lastName;
+  final String? nickname;
+  final String? email;
+  final DateTime? registeredDate;
+  final Map<String, bool>? capabilities;
+  final ExtraCapabilities? extraCapabilities;
+  final String? url;
+  final String? description;
+  final String? link;
+  final String? slug;
+  final List<String>? roles;
+  final Map<String, String>? avatarUrls;
+  final dynamic meta;
+  final Links? links;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

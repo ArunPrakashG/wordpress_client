@@ -1,7 +1,5 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
-import '../request_interface.dart';
 
 class ListTagRequest implements IRequest {
   ListTagRequest({
@@ -19,14 +17,14 @@ class ListTagRequest implements IRequest {
     this.hideEmpty,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page = 1;
   int perPage = 10;
   String? search;
   List<int>? exclude;
   List<int>? include;
-  FilterCategoryTagSortOrder? orderBy;
-  FilterOrder? order;
+  OrderBy? orderBy;
+  Order? order;
   int? offset;
   List<String>? slug;
   int? post;

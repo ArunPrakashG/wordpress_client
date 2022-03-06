@@ -1,3 +1,3 @@
 class AuthorizationFailedException implements Exception {
-  AuthorizationFailedException();
+  const AuthorizationFailedException();
 }

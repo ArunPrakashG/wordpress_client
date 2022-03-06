@@ -33,9 +33,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withStatisticDelegate(
-      void Function(String? baseUrl, String endPoint, int requestCount)
-          delegate) {
+  BootstrapBuilder withStatisticDelegate(StatisticsCallback? delegate) {
     _statisticsDelegate = delegate;
     return this;
   }

@@ -1,5 +1,5 @@
 class NullReferenceException implements Exception {
-  final String reason;
+  const NullReferenceException(this.reason);
 
-  NullReferenceException(this.reason);
+  final String reason;
 }

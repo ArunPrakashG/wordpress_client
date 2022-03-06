@@ -47,12 +47,13 @@ abstract class IInterface {
   /// }
   /// ```
   ///
-  FutureOr<void> init(InternalRequester requester, String? key) {
-    if (!hasInitilizedAlready) {
-      internalRequester = requester;
-      interfaceKey = key;
-
-      hasInitilizedAlready = true;
+  Future<void> init(InternalRequester requester, String? key) async {
+    if (hasInitilizedAlready) {
+      return;
     }
+
+    internalRequester = requester;
+    interfaceKey = key;
+    hasInitilizedAlready = true;
   }
 }

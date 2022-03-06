@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -9,7 +8,6 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import '../wordpress_client.dart';
 import 'bootstrap_builder.dart';
 import 'client_configuration.dart';
-import 'constants.dart';
 import 'exceptions/interface_do_not_exist_exception.dart';
 import 'exceptions/interface_exist_exception.dart';
 import 'exceptions/interface_not_initialized.dart';
@@ -23,14 +21,11 @@ import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
-import 'requests/request_content.dart';
-import 'requests/request_interface.dart';
 import 'responses/comment_response.dart';
 import 'type_map.dart';
 import 'utilities/helpers.dart';
 
 part 'internal_requester.dart';
-part 'requests/generic_request.dart';
 
 class WordpressClient {
   WordpressClient(
@@ -39,11 +34,11 @@ class WordpressClient {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
-      throw NullReferenceException('Base URL is invalid.');
+      throw const NullReferenceException('Base URL is invalid.');
     }
 
     if (isNullOrEmpty(path)) {
-      throw NullReferenceException('Path is invalid.');
+      throw const NullReferenceException('Path is invalid.');
     }
 
     requestBaseUrl = baseUrl;
@@ -61,8 +56,6 @@ class WordpressClient {
       path: path,
       configuration: configuration,
     );
-
-    _initInternalInterfaces();
   }
 
   late InternalRequester _requester;
@@ -82,18 +75,29 @@ class WordpressClient {
   /// The current user interface.
   ///
   /// Requests will only work if you are authorized with valid credentials.
-  MeInterface get me => _customInterfaces['me'] as MeInterface;
+  MeInterface get me => _interfaces['me'] as MeInterface;
 
-  PostsInterface get posts => _customInterfaces['posts'] as PostsInterface;
+  PostsInterface get posts => _interfaces['posts'] as PostsInterface;
   CategoryInterface get categories =>
-      _customInterfaces['categories'] as CategoryInterface;
-  CommentInterface get comments =>
-      _customInterfaces['comments'] as CommentInterface;
-  MediaInterface get media => _customInterfaces['media'] as MediaInterface;
-  TagInterface get tags => _customInterfaces['tags'] as TagInterface;
-  UsersInterface get users => _customInterfaces['users'] as UsersInterface;
+      _interfaces['categories'] as CategoryInterface;
+  CommentInterface get comments => _interfaces['comments'] as CommentInterface;
+  MediaInterface get media => _interfaces['media'] as MediaInterface;
+  TagInterface get tags => _interfaces['tags'] as TagInterface;
+  UsersInterface get users => _interfaces['users'] as UsersInterface;
 
-  final Map<String, dynamic> _customInterfaces = <String, dynamic>{};
+  static final Map<String, dynamic> _interfaces = <String, dynamic>{};
+
+  bool _hasInitialized = false;
+
+  /// Initializes all the built in interfaces and other services/
+  Future<void> initialize() async {
+    if (_hasInitialized) {
+      return;
+    }
+
+    await _initInternalInterfaces();
+    _hasInitialized = true;
+  }
 
   Future<void> _initInternalInterfaces() async {
     await initInterface<MeInterface, User>(
@@ -101,6 +105,7 @@ class WordpressClient {
       key: 'me',
       responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
+      overriteIfTypeExists: true,
     );
 
     await initInterface<PostsInterface, Post>(
@@ -138,11 +143,13 @@ class WordpressClient {
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
+    // TODO: Add a tag parameter to type map, so that we can have multiple maps of same type.
     await initInterface<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
       responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
+      overriteIfTypeExists: true,
     );
   }
 
@@ -187,10 +194,10 @@ class WordpressClient {
     bool overriteIfTypeExists = false,
   }) async {
     if (interface == null || isNullOrEmpty(key)) {
-      throw InvalidInterfaceException();
+      throw const InvalidInterfaceException();
     }
 
-    if (_customInterfaces[key] != null) {
+    if (_interfaces[key] != null) {
       throw InterfaceExistException('[$key] Interface already exists.');
     }
 
@@ -201,7 +208,7 @@ class WordpressClient {
     );
 
     await interface.init(_requester, key);
-    _customInterfaces[key!] = interface;
+    _interfaces[key!] = interface;
   }
 
   /// Registers a type to be used in [WordpressClient] Responses.
@@ -242,21 +249,21 @@ class WordpressClient {
   /// ```
   ///
   T getCustomInterface<T extends IInterface>([String? key]) {
-    if (!isNullOrEmpty(key) && _customInterfaces[key] != null) {
-      return _customInterfaces[key] as T;
+    if (!isNullOrEmpty(key) && _interfaces[key] != null) {
+      return _interfaces[key] as T;
     }
 
-    final interfacesOfType = _customInterfaces.values.whereType<T>();
+    final interfacesOfType = _interfaces.values.whereType<T>();
 
     if (interfacesOfType.isEmpty) {
-      throw InterfaceDoNotExistException(
+      throw const InterfaceDoNotExistException(
           'The specified interface do not exist.');
     }
 
     final interface = interfacesOfType.first;
 
     if (!interface.hasInitilizedAlready) {
-      throw InterfaceNotInitializedException();
+      throw const InterfaceNotInitializedException();
     }
 
     return interface;

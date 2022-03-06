@@ -22,12 +22,12 @@ enum HttpMethod {
   trace,
 }
 
-enum FilterOrder {
-  ascending,
-  descending,
+enum Order {
+  asc,
+  desc,
 }
 
-enum FilterPostSortOrder {
+enum OrderBy {
   date,
   author,
   id,
@@ -41,33 +41,16 @@ enum FilterPostSortOrder {
   email,
   url,
   name,
-}
-
-enum FilterUserSortOrder {
-  id,
-  include,
-  name,
   registered_date,
-  slug,
-  include_slugs,
-  email,
-  url,
-}
-enum FilterContext {
-  view,
-  embed,
-  edit,
-}
-
-enum FilterCategoryTagSortOrder {
-  id,
-  include,
-  name,
-  slug,
-  include_slugs,
   term_group,
   description,
   count,
+}
+
+enum RequestContext {
+  view,
+  embed,
+  edit,
 }
 
 enum MediaFilterStatus {
@@ -76,21 +59,15 @@ enum MediaFilterStatus {
 
 enum TaxonomyRelation {
   and,
-
   or,
 }
+
 enum ContentStatus {
   publish,
   future,
   draft,
   pending,
   private,
-}
-
-enum PostAvailabilityStatus {
-  published,
-  draft,
-  trash,
 }
 
 enum PostFormat {
@@ -116,7 +93,7 @@ enum Locale {
   en_US,
 }
 
-enum FilterMediaType {
+enum MediaType {
   image,
   video,
   text,

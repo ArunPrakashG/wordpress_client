@@ -1,3 +1,3 @@
 class InterfaceNotInitializedException implements Exception {
-  InterfaceNotInitializedException();
+  const InterfaceNotInitializedException();
 }

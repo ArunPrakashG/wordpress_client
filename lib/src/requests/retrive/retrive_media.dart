@@ -5,11 +5,11 @@ import '../request_interface.dart';
 
 class RetriveMediaRequest implements IRequest {
   RetriveMediaRequest({
-    this.context = FilterContext.view,
+    this.context = RequestContext.view,
     required this.id,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int id;
 
   @override

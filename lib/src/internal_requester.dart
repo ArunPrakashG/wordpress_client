@@ -92,7 +92,7 @@ class InternalRequester {
     _defaultAuthorization = null;
   }
 
-  bool _validateResponse<T>(GenericRequest request, T? response) {
+  bool _validateResponse<T>(WordpressRequest request, T? response) {
     if (!request.shouldValidateResponse) {
       return true;
     }
@@ -100,9 +100,10 @@ class InternalRequester {
     return request.responseValidationCallback!(response);
   }
 
-  Future<WordpressResponse<T?>> createRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> createRequest<T>(
+      WordpressRequest request) async {
     if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
+      throw const RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -134,14 +135,14 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
+        throw const NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return WordpressResponse<T?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           message: dioResponse.statusMessage ??
@@ -156,7 +157,7 @@ class InternalRequester {
       if (!_validateResponse<T>(request, response)) {
         return WordpressResponse<T?>.failed(
           response,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
           message: 'Manual response validation failed.',
@@ -167,7 +168,7 @@ class InternalRequester {
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: dioResponse.statusMessage,
       );
     } catch (e) {
@@ -179,7 +180,7 @@ class InternalRequester {
 
       return WordpressResponse<T?>.failed(
         null,
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
     } finally {
@@ -187,9 +188,10 @@ class InternalRequester {
     }
   }
 
-  Future<WordpressResponse<T?>> deleteRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> deleteRequest<T>(
+      WordpressRequest request) async {
     if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
+      throw const RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -221,14 +223,14 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
+        throw const NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return WordpressResponse<T?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           message: dioResponse.statusMessage ??
@@ -241,7 +243,7 @@ class InternalRequester {
       if (!_validateResponse<T>(request, null)) {
         return WordpressResponse<T?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
           message: 'Manual response validation failed.',
@@ -252,7 +254,7 @@ class InternalRequester {
         null,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: dioResponse.statusMessage,
       );
     } catch (e) {
@@ -264,7 +266,7 @@ class InternalRequester {
 
       return WordpressResponse<T?>.failed(
         null,
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
     } finally {
@@ -273,10 +275,10 @@ class InternalRequester {
   }
 
   Future<WordpressResponse<List<T>?>> listRequest<T>(
-    GenericRequest request,
+    WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
+      throw const RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -284,6 +286,11 @@ class InternalRequester {
     _isBusy = true;
 
     try {
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
+        request.endpoint,
+      );
+
       final dioResponse = await _client.request<dynamic>(
         request.endpoint,
         data: request.body,
@@ -302,20 +309,15 @@ class InternalRequester {
 
       watch.stop();
 
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
-
       if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
+        throw const NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return WordpressResponse<List<T>?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           message: dioResponse.statusMessage ??
@@ -328,7 +330,7 @@ class InternalRequester {
       if (dioResponse.data is! Iterable<dynamic>) {
         return WordpressResponse<List<T>?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           message: 'Response is not a list.',
         );
@@ -341,7 +343,7 @@ class InternalRequester {
       if (!_validateResponse<List<T>>(request, response)) {
         return WordpressResponse<List<T>?>.failed(
           response,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
           message: 'Manual response validation failed.',
@@ -352,7 +354,7 @@ class InternalRequester {
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: dioResponse.statusMessage,
       );
     } catch (e) {
@@ -364,7 +366,7 @@ class InternalRequester {
 
       return WordpressResponse<List<T>?>.failed(
         null,
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
     } finally {
@@ -373,10 +375,10 @@ class InternalRequester {
   }
 
   Future<WordpressResponse<T?>> retriveRequest<T>(
-    GenericRequest request,
+    WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
+      throw const RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -408,14 +410,14 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
+        throw const NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return WordpressResponse<T?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           message: dioResponse.statusMessage ??
@@ -430,7 +432,7 @@ class InternalRequester {
       if (!_validateResponse<T>(request, response)) {
         return WordpressResponse<T?>.failed(
           response,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
           message: 'Manual response validation failed.',
@@ -441,7 +443,7 @@ class InternalRequester {
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: dioResponse.statusMessage,
       );
     } catch (e) {
@@ -453,7 +455,7 @@ class InternalRequester {
 
       return WordpressResponse<T?>.failed(
         null,
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
     } finally {
@@ -461,9 +463,10 @@ class InternalRequester {
     }
   }
 
-  Future<WordpressResponse<T?>> updateRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> updateRequest<T>(
+      WordpressRequest request) async {
     if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
+      throw const RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -497,14 +500,14 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
+        throw const NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
         return WordpressResponse<T?>.failed(
           null,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           message: dioResponse.statusMessage ??
@@ -519,7 +522,7 @@ class InternalRequester {
       if (!_validateResponse<T>(request, response)) {
         return WordpressResponse<T?>.failed(
           response,
-          duration: watch.elapsed,
+          requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
           message: 'Manual response validation failed.',
@@ -530,7 +533,7 @@ class InternalRequester {
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: dioResponse.statusMessage,
       );
     } catch (e) {
@@ -542,7 +545,7 @@ class InternalRequester {
 
       return WordpressResponse<T?>.failed(
         null,
-        duration: watch.elapsed,
+        requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
     } finally {
@@ -550,7 +553,7 @@ class InternalRequester {
     }
   }
 
-  Future<void> _processRequest(GenericRequest request) async {
+  Future<void> _processRequest(WordpressRequest request) async {
     if (request.shouldAuthorize) {
       await _authorize(
         request: request,
@@ -569,7 +572,7 @@ class InternalRequester {
   }
 
   Future<bool> _authorize({
-    required GenericRequest request,
+    required WordpressRequest request,
     required IAuthorization auth,
     Callback? callback,
   }) async {

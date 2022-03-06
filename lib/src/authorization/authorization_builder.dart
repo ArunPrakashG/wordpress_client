@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_returning_this
+
 import '../enums.dart';
 import '../utilities/callback.dart';
 import 'authorization_base.dart';
@@ -32,9 +34,7 @@ class AuthorizationBuilder {
   }
 
   IAuthorization build() {
-    if (_type == null) {
-      _type = AuthorizationType.useful_jwt;
-    }
+    _type ??= AuthorizationType.useful_jwt;
 
     switch (_type!) {
       case AuthorizationType.basic_jwt:

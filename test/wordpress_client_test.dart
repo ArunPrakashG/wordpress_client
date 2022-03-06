@@ -63,7 +63,7 @@ Future<void> main() async {
       'Response Time',
       () async {
         final firstResponse = await client.posts.list(
-          GenericRequest(
+          WordpressRequest(
             requestData: ListPostRequest(
               perPage: 20,
             ),
@@ -75,9 +75,9 @@ Future<void> main() async {
         );
 
         print(
-            'First Response Time Taken: ${firstResponse.duration?.inMilliseconds} ms');
+            'First Response Time Taken: ${firstResponse.requestDuration?.inMilliseconds} ms');
         print(
-            'Second Response Time Taken: ${secondResponse.duration?.inMilliseconds} ms');
+            'Second Response Time Taken: ${secondResponse.requestDuration?.inMilliseconds} ms');
 
         expect(200, firstResponse.responseCode);
         expect(200, secondResponse.responseCode);
@@ -90,7 +90,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(20, response.value!.length);
+      expect(20, response.data!.length);
     });
 
     test('List Tags', () async {
@@ -99,7 +99,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(20, response.value!.length);
+      expect(20, response.data!.length);
     });
 
     test('List Category', () async {
@@ -108,7 +108,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(2, response.value!.length);
+      expect(2, response.data!.length);
     });
 
     test('List Media', () async {
@@ -117,7 +117,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(19, response.value!.length,
+      expect(19, response.data!.length,
           reason:
               'For some reason, WP API is only returning PER_PAGE - 1 values.',
           skip: true);
@@ -129,7 +129,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(10, response.value!.length);
+      expect(10, response.data!.length);
     });
   }, timeout: Timeout(Duration(minutes: 1)));
 
@@ -144,7 +144,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect('arunprakash', response.value!.slug);
+      expect('arunprakash', response.data!.slug);
     });
   }, timeout: Timeout(Duration(minutes: 1)));
 
@@ -175,8 +175,8 @@ Future<void> main() async {
       );
 
       expect(201, response.responseCode);
-      expect('gen_user_slug', response.value!.slug);
-      userId = response.value!.id;
+      expect('gen_user_slug', response.data!.slug);
+      userId = response.data!.id;
     });
 
     test('Update User', () async {
@@ -184,7 +184,7 @@ Future<void> main() async {
           builder.withId(userId).withFirstName('updated first name').build());
 
       expect(200, response.responseCode);
-      expect('updated first name', response.value!.firstName);
+      expect('updated first name', response.data!.firstName);
     });
 
     test('Retrive User', () async {
@@ -192,7 +192,7 @@ Future<void> main() async {
           .retrive((builder) => builder.withUserId(userId).build());
 
       expect(200, response.responseCode);
-      expect(userId, response.value!.id);
+      expect(userId, response.data!.id);
     });
 
     test('Delete User', () async {
@@ -241,9 +241,9 @@ Future<void> main() async {
         );
 
         expect(201, response.responseCode);
-        postId = response.value!.id;
-        expect('Generated Sample Post', response.value!.title!.parsedText);
-        expect('generated-post-slug', response.value!.slug);
+        postId = response.data!.id;
+        expect('Generated Sample Post', response.data!.title!.parsedText);
+        expect('generated-post-slug', response.data!.slug);
       },
     );
 
@@ -264,8 +264,8 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect('Generated Sample Post Edited', response.value!.title!.parsedText);
-      expect('generated-post-slug', response.value!.slug);
+      expect('Generated Sample Post Edited', response.data!.title!.parsedText);
+      expect('generated-post-slug', response.data!.slug);
     });
 
     test('Retrive Post', () async {
@@ -274,7 +274,7 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(postId, response.value!.id);
+      expect(postId, response.data!.id);
     });
 
     test('Delete Post', () async {

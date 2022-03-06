@@ -1,7 +1,5 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
-import '../request_interface.dart';
 
 class ListPostRequest implements IRequest {
   ListPostRequest({
@@ -25,10 +23,10 @@ class ListPostRequest implements IRequest {
     this.tagsExclude,
     this.sticky,
     this.slug,
-    this.status = 'publish',
+    this.status,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page = 1;
   int perPage = 10;
   String? search;
@@ -36,8 +34,8 @@ class ListPostRequest implements IRequest {
   DateTime? before;
   List<int>? exclude;
   List<int>? include;
-  FilterPostSortOrder? orderBy;
-  FilterOrder? order;
+  OrderBy? orderBy;
+  Order? order;
   List<int>? author;
   List<int>? authorExclude;
   int? offset;
@@ -48,7 +46,7 @@ class ListPostRequest implements IRequest {
   List<int>? tagsExclude;
   bool? sticky;
   List<String>? slug;
-  String? status;
+  ContentStatus? status;
 
   @override
   void build(RequestContent requestContent) {
@@ -73,7 +71,7 @@ class ListPostRequest implements IRequest {
       ..addIfNotNull('tags_exclude', tagsExclude?.join(','))
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
-      ..addIfNotNull('status', status);
+      ..addIfNotNull('status', status?.name);
 
     requestContent.endpoint = 'posts';
     requestContent.method = HttpMethod.get;

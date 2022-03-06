@@ -1,7 +1,5 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
-import '../request_interface.dart';
 
 class ListMediaRequest implements IRequest {
   ListMediaRequest({
@@ -26,7 +24,7 @@ class ListMediaRequest implements IRequest {
     this.status,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page = 1;
   int perPage = 10;
   String? search;
@@ -34,15 +32,15 @@ class ListMediaRequest implements IRequest {
   DateTime? before;
   List<int>? exclude;
   List<int>? include;
-  FilterCategoryTagSortOrder? orderBy;
-  FilterOrder? order;
+  OrderBy? orderBy;
+  Order? order;
   List<int>? author;
   List<int>? authorExclude;
   int? offset;
   List<int>? parent;
   List<int>? parentExclude;
   List<String>? slug;
-  FilterMediaType? mediaType;
+  MediaType? mediaType;
   String? mimeType;
   MediaFilterStatus? status;
 

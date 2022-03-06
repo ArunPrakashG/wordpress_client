@@ -1,42 +1,44 @@
+import '../utilities/helpers.dart';
+
 class WordpressResponse<T> {
   WordpressResponse(
-    this.value, {
+    this.data, {
     required this.responseCode,
     required this.responseHeaders,
-    this.duration,
+    this.requestDuration,
     this.message,
   });
 
   WordpressResponse.success(
-    this.value, {
+    this.data, {
     this.responseCode = 200,
     required this.responseHeaders,
-    this.duration,
+    this.requestDuration,
     this.message,
   });
 
   WordpressResponse.failed(
-    this.value, {
+    this.data, {
     this.responseCode = -1,
     this.responseHeaders = const <String, dynamic>{},
-    this.duration,
+    this.requestDuration,
     this.message,
   });
 
-  final T value;
+  final T data;
   final int responseCode;
   final Map<String, dynamic> responseHeaders;
-  final Duration? duration;
+  final Duration? requestDuration;
   final String? message;
 
-  bool get status => responseCode == 200;
+  bool get isSuccess => isInRange(responseCode, 200, 299);
 
   int get totalPagesCount => responseHeaders.isNotEmpty
       ? int.tryParse((responseHeaders['x-wp-totalpages'] as String?) ?? '0') ??
           0
       : 0;
 
-  int get totalPostsCount => responseHeaders.isNotEmpty
+  int get totalCount => responseHeaders.isNotEmpty
       ? int.tryParse((responseHeaders['x-wp-total'] as String?) ?? '0') ?? 0
       : 0;
 }

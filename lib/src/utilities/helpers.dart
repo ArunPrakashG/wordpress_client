@@ -13,9 +13,11 @@ extension MapExtensions on Map<String, dynamic> {
   }
 
   void addIfNotNull(String key, dynamic value) {
-    if (value != null) {
-      this[key] = value;
+    if (value == null) {
+      return;
     }
+
+    this[key] = value?.toString();
   }
 }
 
@@ -29,7 +31,7 @@ extension HeaderExtension on Headers {
 
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
-bool isAlphaNumeric(String value) => RegExp(r"^[a-zA-Z0-9]*$").hasMatch(value);
+bool isAlphaNumeric(String value) => RegExp(r'^[a-zA-Z0-9]*$').hasMatch(value);
 
 String parseUrl(String? baseUrl, String? path) {
   if (baseUrl == null || path == null) {

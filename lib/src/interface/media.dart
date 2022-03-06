@@ -6,7 +6,6 @@ import '../requests/delete/delete_media.dart';
 import '../requests/list/list_media.dart';
 import '../requests/retrive/retrive_media.dart';
 import '../requests/update/update_media.dart';
-import '../wordpress_client_base.dart';
 
 class MediaInterface extends IInterface
     with
@@ -17,35 +16,35 @@ class MediaInterface extends IInterface
         IList<Media, ListMediaRequest> {
   @override
   Future<WordpressResponse<Media?>> create(
-    GenericRequest<CreateMediaRequest> request,
+    WordpressRequest<CreateMediaRequest> request,
   ) async {
     return internalRequester.createRequest<Media>(request);
   }
 
   @override
   Future<WordpressResponse<Media?>> delete(
-    GenericRequest<DeleteMediaRequest> request,
+    WordpressRequest<DeleteMediaRequest> request,
   ) async {
     return internalRequester.deleteRequest<Media>(request);
   }
 
   @override
   Future<WordpressResponse<List<Media>?>> list(
-    GenericRequest<ListMediaRequest> request,
+    WordpressRequest<ListMediaRequest> request,
   ) async {
     return internalRequester.listRequest<Media>(request);
   }
 
   @override
   Future<WordpressResponse<Media?>> retrive(
-    GenericRequest<RetriveMediaRequest> request,
+    WordpressRequest<RetriveMediaRequest> request,
   ) async {
     return internalRequester.retriveRequest<Media>(request);
   }
 
   @override
   Future<WordpressResponse<Media?>> update(
-    GenericRequest<UpdateMediaRequest> request,
+    WordpressRequest<UpdateMediaRequest> request,
   ) async {
     return internalRequester.updateRequest<Media>(request);
   }

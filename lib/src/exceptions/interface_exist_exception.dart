@@ -1,5 +1,5 @@
 class InterfaceExistException implements Exception {
-  final String message;
+  const InterfaceExistException(this.message);
 
-  InterfaceExistException(this.message);
+  final String message;
 }

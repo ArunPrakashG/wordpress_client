@@ -7,7 +7,6 @@ import '../requests/list/list_comment.dart';
 import '../requests/retrive/retrive_comment.dart';
 import '../requests/update/update_comment.dart';
 import '../responses/comment_response.dart';
-import '../wordpress_client_base.dart';
 
 class CommentInterface extends IInterface
     with
@@ -18,35 +17,35 @@ class CommentInterface extends IInterface
         IList<Comment, ListCommentRequest> {
   @override
   Future<WordpressResponse<Comment?>> create(
-    GenericRequest<CreateCommentRequest> request,
+    WordpressRequest<CreateCommentRequest> request,
   ) async {
     return internalRequester.createRequest<Comment>(request);
   }
 
   @override
   Future<WordpressResponse<Comment?>> delete(
-    GenericRequest<DeleteCommentRequest> request,
+    WordpressRequest<DeleteCommentRequest> request,
   ) async {
     return internalRequester.deleteRequest<Comment>(request);
   }
 
   @override
   Future<WordpressResponse<List<Comment>?>> list(
-    GenericRequest<ListCommentRequest> request,
+    WordpressRequest<ListCommentRequest> request,
   ) async {
     return internalRequester.listRequest<Comment>(request);
   }
 
   @override
   Future<WordpressResponse<Comment?>> retrive(
-    GenericRequest<RetriveCommentRequest> request,
+    WordpressRequest<RetriveCommentRequest> request,
   ) async {
     return internalRequester.retriveRequest<Comment>(request);
   }
 
   @override
   Future<WordpressResponse<Comment?>> update(
-    GenericRequest<UpdateCommentRequest> request,
+    WordpressRequest<UpdateCommentRequest> request,
   ) async {
     return internalRequester.updateRequest<Comment>(request);
   }

@@ -1,7 +1,5 @@
 import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
-import '../request_interface.dart';
 
 class ListCommentRequest implements IRequest {
   ListCommentRequest({
@@ -21,12 +19,12 @@ class ListCommentRequest implements IRequest {
     this.parent,
     this.parentExclude,
     this.post,
-    this.status = 'approve',
+    this.status = CommentStatus.approved,
     this.type = 'comment',
     this.password,
   });
 
-  FilterContext? context;
+  RequestContext? context;
   int page = 1;
   int perPage = 10;
   String? search;
@@ -34,15 +32,15 @@ class ListCommentRequest implements IRequest {
   DateTime? before;
   List<int>? exclude;
   List<int>? include;
-  FilterCategoryTagSortOrder? orderBy;
-  FilterOrder? order;
+  OrderBy? orderBy;
+  Order? order;
   List<int>? author;
   List<int>? authorExclude;
   int? offset;
   List<int>? parent;
   List<int>? parentExclude;
   List<int>? post;
-  String? status;
+  CommentStatus? status;
   String? type;
   String? password;
 
@@ -65,7 +63,7 @@ class ListCommentRequest implements IRequest {
       ..addIfNotNull('parent', parent?.join(','))
       ..addIfNotNull('parent_exclude', parentExclude?.join(','))
       ..addIfNotNull('post', post)
-      ..addIfNotNull('status', status)
+      ..addIfNotNull('status', status?.name)
       ..addIfNotNull('type', type)
       ..addIfNotNull('password', password);
 

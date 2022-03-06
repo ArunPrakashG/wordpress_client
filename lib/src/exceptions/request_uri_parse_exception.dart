@@ -1,5 +1,5 @@
 class RequestUriParsingFailedException implements Exception {
-  final String reason;
+  const RequestUriParsingFailedException(this.reason);
 
-  RequestUriParsingFailedException(this.reason);
+  final String reason;
 }

@@ -12,6 +12,9 @@ import '../utilities/helpers.dart';
 ///
 /// There is no storage system to store the nounce inside the client, therefore the base class has the responsibility to handle this mechanism.
 abstract class IAuthorization {
+  /// Default constructor, used to pass username and password.
+  IAuthorization(this.userName, this.password, {this.callback});
+
   /// The username
   String? userName;
 
@@ -27,9 +30,6 @@ abstract class IAuthorization {
   /// Gets if this is an invalid or default authorization instance without username or password fields.
   bool get isDefault => isNullOrEmpty(userName) || isNullOrEmpty(password);
 
-  /// Default constructor, used to pass username and password.
-  IAuthorization(this.userName, this.password, {this.callback});
-
   /// Helps to initialize authorization instance with internal requesting client passed as a parameter.
   ///
   /// This function is called only if there is no valid nounce available ie., when isAuthenticated() returns false.
@@ -38,7 +38,7 @@ abstract class IAuthorization {
   /// authorize() / validate() functions will not be called before calling init() function.
   ///
   /// If you require Http request calls inside isAuthenticated() / generateAuthUrl() calls, then you will need to implement your own requesting mechanism  ///
-  FutureOr<bool> init(Dio? client);
+  Future<bool> init(Dio? client);
 
   /// Called to validate token. (such as in JWT auth)
   ///
@@ -48,19 +48,19 @@ abstract class IAuthorization {
   /// Example 1: JWT authentication token can be validated through an endpoint, you can implement that validation logic inside this.
   ///
   /// Example 2: Basic Auth does not require any validation, therefore you can simply return true or if still require some custom logic, you can implement that as well!
-  FutureOr<bool> validate();
+  Future<bool> validate();
 
   /// Called to check if this instance has a valid authentication nounce and generateAuthUrl() won't return false.
   ///
   /// This function will be called before init() function, therefore if you are using client instance passed through init() then there will be NullReferenceException.
   ///
   /// If you require HTTP requests in this method, then you need to implement custom logic.
-  FutureOr<bool> isAuthenticated();
+  Future<bool> isAuthenticated();
 
   /// Called to authorize a request if the request requires authentication.
   ///
   /// Returning true means the request should be authorized, false means authorization failed.
-  FutureOr<bool> authorize();
+  Future<bool> authorize();
 
   /// After authorize() is called, to get the authorization header string, (ie, '{scheme} {token}') the client calls this method to generate the raw string.
   ///
@@ -73,5 +73,5 @@ abstract class IAuthorization {
   ///
   /// Example 2: In case of Basic Auth
   /// Basic {base64 encoded username and password}
-  FutureOr<String?> generateAuthUrl();
+  Future<String?> generateAuthUrl();
 }
