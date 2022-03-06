@@ -70,6 +70,6 @@ class ListCommentRequest implements IRequest {
       ..addIfNotNull('password', password);
 
     requestContent.endpoint = 'comments';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

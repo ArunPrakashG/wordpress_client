@@ -1,6 +1,7 @@
-import '../builders/request.dart';
-import '../responses/response_container.dart';
+import '../requests/request_interface.dart';
+import '../responses/wordpress_response.dart';
+import '../wordpress_client_base.dart';
 
-abstract class ICreateOperation<T, Y> {
-  Future<ResponseContainer<T?>> create(Request<T>? Function(Y) builder, {bool shouldWaitWhileClientBusy = false});
+mixin ICreate<T, E extends IRequest> {
+  Future<WordpressResponse<T?>> create(GenericRequest<E> request);
 }

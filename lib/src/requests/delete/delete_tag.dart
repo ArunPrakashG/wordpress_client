@@ -17,6 +17,6 @@ class DeleteTagRequest implements IRequest {
     requestContent.body.addIfNotNull('force', force);
 
     requestContent.endpoint = 'tags/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

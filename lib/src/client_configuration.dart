@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import 'authorization/authorization_base.dart';
 import 'constants.dart';
+import 'wordpress_client_base.dart';
 
 class BootstrapConfiguration {
   const BootstrapConfiguration({
@@ -32,6 +33,5 @@ class BootstrapConfiguration {
   final bool waitWhileBusy;
   final bool cacheResponses;
   final String? responseCachePath;
-  final void Function(String baseUrl, String endPoint, int requestCount)?
-      statisticsDelegate;
+  final StatisticsCallback? statisticsDelegate;
 }

@@ -40,6 +40,6 @@ class CreateCommentRequest implements IRequest {
       ..addIfNotNull('post', post);
 
     requestContent.endpoint = 'comments';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

@@ -17,6 +17,6 @@ class RetriveCategoryRequest implements IRequest {
     requestContent.queryParameters.addIfNotNull('context', context?.name);
 
     requestContent.endpoint = 'categories/$id';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

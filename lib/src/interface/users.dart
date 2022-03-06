@@ -1,87 +1,50 @@
 import '../../wordpress_client.dart';
-import '../builders_import.dart';
+import '../requests/create/create_user.dart';
+import '../requests/delete/delete_user.dart';
+import '../requests/list/list_user.dart';
+import '../requests/retrive/retrive_user.dart';
+import '../requests/update/update_user.dart';
+import '../wordpress_client_base.dart';
 
 class UsersInterface extends IInterface
-    implements
-        ICreateOperation<User, UserCreateBuilder>,
-        IDeleteOperation<User, UserDeleteBuilder>,
-        IRetrieveOperation<User, UserRetriveBuilder>,
-        IUpdateOperation<User, UserUpdateBuilder>,
-        IListOperation<User, UserListBuilder> {
+    with
+        ICreate<User, CreateUserRequest>,
+        IDelete<User, DeleteUserRequest>,
+        IRetrive<User, RetriveUserRequest>,
+        IUpdate<User, UpdateUserRequest>,
+        IList<User, ListUserRequest> {
   @override
-  Future<ResponseContainer<User?>> create(
-      Request<User>? Function(UserCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<User>(
-      User(),
-      builder(
-        UserCreateBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> create(
+    GenericRequest<CreateUserRequest> request,
+  ) async {
+    return internalRequester.createRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<User?>> delete(
-      Request<User>? Function(UserDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<User>(
-      User(),
-      builder(
-        UserDeleteBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> delete(
+    GenericRequest<DeleteUserRequest> request,
+  ) async {
+    return internalRequester.deleteRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<List<User>?>> list(
-      Request<List<User>>? Function(UserListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<User>(
-      User(),
-      builder(
-        UserListBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<List<User>?>> list(
+    GenericRequest<ListUserRequest> request,
+  ) async {
+    return internalRequester.listRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<User?>> retrive(
-      Request<User>? Function(UserRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<User>(
-      User(),
-      builder(
-        UserRetriveBuilder()
-            .withEndpoint('users')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> retrive(
+    GenericRequest<RetriveUserRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<User?>> update(
-      Request<User>? Function(UserUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<User>(
-      User(),
-      builder(
-        UserUpdateBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> update(
+    GenericRequest<UpdateUserRequest> request,
+  ) async {
+    return internalRequester.updateRequest<User>(request);
   }
 }

@@ -1,18 +1,4 @@
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-
-import 'authorization/authorization_base.dart';
-import 'client_configuration.dart';
-import 'exceptions/null_reference_exception.dart';
-import 'exceptions/request_uri_parse_exception.dart';
-import 'requests/generic_request.dart';
-import 'responses/response_container.dart';
-import 'type_map.dart';
-import 'utilities/callback.dart';
-import 'utilities/helpers.dart';
+part of 'wordpress_client_base.dart';
 
 typedef StatisticsCallback = void Function(
   String baseUrl,
@@ -24,7 +10,6 @@ class InternalRequester {
   InternalRequester({
     required String baseUrl,
     required String path,
-    required this.typeMap,
     BootstrapConfiguration configuration = const BootstrapConfiguration(),
   }) {
     _baseUrl = parseUrl(baseUrl, path);
@@ -33,7 +18,6 @@ class InternalRequester {
 
   final Dio _client = Dio();
   late final String _baseUrl;
-  final TypeMap typeMap;
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
@@ -116,7 +100,7 @@ class InternalRequester {
     return request.responseValidationCallback!(response);
   }
 
-  Future<ResponseContainer<T?>> createRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> createRequest<T>(GenericRequest request) async {
     if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
@@ -155,7 +139,7 @@ class InternalRequester {
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -170,7 +154,7 @@ class InternalRequester {
       final response = deserialize<T>(dioResponse.data);
 
       if (!_validateResponse<T>(request, response)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           response,
           duration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -179,7 +163,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<T>(
+      return WordpressResponse<T>(
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -193,7 +177,7 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return ResponseContainer<T?>.failed(
+      return WordpressResponse<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -203,7 +187,7 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> deleteRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> deleteRequest<T>(GenericRequest request) async {
     if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
@@ -242,7 +226,7 @@ class InternalRequester {
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -255,7 +239,7 @@ class InternalRequester {
       request.callback?.invokeResponseCallback(dioResponse.data);
 
       if (!_validateResponse<T>(request, null)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           null,
           duration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -264,7 +248,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<T?>(
+      return WordpressResponse<T?>(
         null,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -278,7 +262,7 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return ResponseContainer<T?>.failed(
+      return WordpressResponse<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -288,7 +272,7 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<List<T>?>> listRequest<T>(
+  Future<WordpressResponse<List<T>?>> listRequest<T>(
     GenericRequest request,
   ) async {
     if (!request.isRequestExecutable) {
@@ -329,7 +313,7 @@ class InternalRequester {
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
-        return ResponseContainer<List<T>?>.failed(
+        return WordpressResponse<List<T>?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -342,7 +326,7 @@ class InternalRequester {
       request.callback?.invokeResponseCallback(dioResponse.data);
 
       if (dioResponse.data is! Iterable<dynamic>) {
-        return ResponseContainer<List<T>?>.failed(
+        return WordpressResponse<List<T>?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -355,7 +339,7 @@ class InternalRequester {
           .toList();
 
       if (!_validateResponse<List<T>>(request, response)) {
-        return ResponseContainer<List<T>?>.failed(
+        return WordpressResponse<List<T>?>.failed(
           response,
           duration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -364,7 +348,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<List<T>>(
+      return WordpressResponse<List<T>>(
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -378,7 +362,7 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return ResponseContainer<List<T>?>.failed(
+      return WordpressResponse<List<T>?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -388,7 +372,7 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> retriveRequest<T>(
+  Future<WordpressResponse<T?>> retriveRequest<T>(
     GenericRequest request,
   ) async {
     if (!request.isRequestExecutable) {
@@ -429,7 +413,7 @@ class InternalRequester {
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -444,7 +428,7 @@ class InternalRequester {
       final response = deserialize<T>(dioResponse.data);
 
       if (!_validateResponse<T>(request, response)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           response,
           duration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -453,7 +437,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<T>(
+      return WordpressResponse<T>(
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -467,7 +451,7 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return ResponseContainer<T?>.failed(
+      return WordpressResponse<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
@@ -477,7 +461,7 @@ class InternalRequester {
     }
   }
 
-  Future<ResponseContainer<T?>> updateRequest<T>(GenericRequest request) async {
+  Future<WordpressResponse<T?>> updateRequest<T>(GenericRequest request) async {
     if (!request.isRequestExecutable) {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
@@ -518,7 +502,7 @@ class InternalRequester {
       }
 
       if (!isInRange(dioResponse.statusCode!, 200, 299)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           null,
           duration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
@@ -533,7 +517,7 @@ class InternalRequester {
       final response = deserialize<T>(dioResponse.data);
 
       if (!_validateResponse<T>(request, response)) {
-        return ResponseContainer<T?>.failed(
+        return WordpressResponse<T?>.failed(
           response,
           duration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -542,7 +526,7 @@ class InternalRequester {
         );
       }
 
-      return ResponseContainer<T>(
+      return WordpressResponse<T>(
         response,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -556,7 +540,7 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return ResponseContainer<T?>.failed(
+      return WordpressResponse<T?>.failed(
         null,
         duration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',

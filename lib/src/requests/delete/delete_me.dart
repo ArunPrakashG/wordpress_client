@@ -19,6 +19,6 @@ class DeleteMeRequest implements IRequest {
       ..addIfNotNull('reassign', reassign);
 
     requestContent.endpoint = 'users/me';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

@@ -12,5 +12,5 @@ class RequestContent {
   final Map<String, dynamic> body;
 
   String endpoint = '';
-  HttpMethod method = HttpMethod.GET;
+  HttpMethod method = HttpMethod.get;
 }

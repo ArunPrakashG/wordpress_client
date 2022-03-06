@@ -1,95 +1,52 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../builders_import.dart';
+import '../requests/create/create_media.dart';
+import '../requests/delete/delete_media.dart';
+import '../requests/list/list_media.dart';
+import '../requests/retrive/retrive_media.dart';
+import '../requests/update/update_media.dart';
+import '../wordpress_client_base.dart';
 
 class MediaInterface extends IInterface
-    implements
-        ICreateOperation<Media, MediaCreateBuilder>,
-        IDeleteOperation<Media, MediaDeleteBuilder>,
-        IRetrieveOperation<Media, MediaRetriveBuilder>,
-        IUpdateOperation<Media, MediaUpdateBuilder>,
-        IListOperation<Media, MediaListBuilder> {
+    with
+        ICreate<Media, CreateMediaRequest>,
+        IDelete<Media, DeleteMediaRequest>,
+        IRetrive<Media, RetriveMediaRequest>,
+        IUpdate<Media, UpdateMediaRequest>,
+        IList<Media, ListMediaRequest> {
   @override
-  Future<ResponseContainer<Media?>> create(
-      Request<Media>? Function(MediaCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<Media>(
-      Media(),
-      builder(
-        MediaCreateBuilder()
-            .withEndpoint('media')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Media?>> create(
+    GenericRequest<CreateMediaRequest> request,
+  ) async {
+    return internalRequester.createRequest<Media>(request);
   }
 
   @override
-  Future<ResponseContainer<Media?>> delete(
-      Request<Media>? Function(MediaDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<Media>(
-      Media(),
-      builder(
-        MediaDeleteBuilder()
-            .withEndpoint('media')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Media?>> delete(
+    GenericRequest<DeleteMediaRequest> request,
+  ) async {
+    return internalRequester.deleteRequest<Media>(request);
   }
 
   @override
-  Future<ResponseContainer<List<Media>?>> list(
-      Request<List<Media>>? Function(MediaListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<Media>(
-      Media(),
-      builder(
-        MediaListBuilder().withEndpoint('media').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<List<Media>?>> list(
+    GenericRequest<ListMediaRequest> request,
+  ) async {
+    return internalRequester.listRequest<Media>(request);
   }
 
   @override
-  Future<ResponseContainer<Media?>> retrive(
-      Request<Media>? Function(MediaRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<Media>(
-      Media(),
-      builder(
-        MediaRetriveBuilder()
-            .withEndpoint('media')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Media?>> retrive(
+    GenericRequest<RetriveMediaRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<Media>(request);
   }
 
   @override
-  Future<ResponseContainer<Media?>> update(
-      Request<Media>? Function(MediaUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<Media>(
-      Media(),
-      builder(
-        MediaUpdateBuilder()
-            .withEndpoint('media')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Media?>> update(
+    GenericRequest<UpdateMediaRequest> request,
+  ) async {
+    return internalRequester.updateRequest<Media>(request);
   }
 }

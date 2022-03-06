@@ -3,7 +3,7 @@ import '../../utilities/helpers.dart';
 import '../request_content.dart';
 import '../request_interface.dart';
 
-class CreateCategoryRequest implements IRequest {
+class CreateCategoryRequest extends IRequest {
   CreateCategoryRequest({
     this.name,
     this.description,
@@ -25,6 +25,6 @@ class CreateCategoryRequest implements IRequest {
       ..addIfNotNull('parent_id', parentId);
 
     requestContent.endpoint = 'categories';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

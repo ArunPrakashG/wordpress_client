@@ -55,6 +55,6 @@ class UpdatePostRequest implements IRequest {
       ..addIfNotNull('slug', slug);
 
     requestContent.endpoint = 'posts/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

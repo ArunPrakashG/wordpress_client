@@ -1,6 +1,7 @@
-import '../builders/request.dart';
-import '../responses/response_container.dart';
+import '../requests/request_interface.dart';
+import '../responses/wordpress_response.dart';
+import '../wordpress_client_base.dart';
 
-abstract class IRetrieveOperation<T, Y> {
-  Future<ResponseContainer<T?>> retrive(Request<T>? Function(Y) builder, {bool shouldWaitWhileClientBusy = false});
+mixin IRetrive<T, E extends IRequest> {
+  Future<WordpressResponse<T?>> retrive(GenericRequest<E> request);
 }

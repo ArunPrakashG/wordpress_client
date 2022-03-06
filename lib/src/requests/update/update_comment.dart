@@ -45,6 +45,6 @@ class UpdateCommentRequest implements IRequest {
       ..addIfNotNull('post', post);
 
     requestContent.endpoint = 'comments/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

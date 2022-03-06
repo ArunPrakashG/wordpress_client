@@ -67,6 +67,6 @@ class CreateMediaRequest implements IRequest {
       ..addIfNotNull('file', multipartFile);
 
     requestContent.endpoint = 'media';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

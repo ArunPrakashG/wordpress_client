@@ -45,6 +45,6 @@ class UpdateMediaRequest implements IRequest {
       ..addIfNotNull('post', post);
 
     requestContent.endpoint = 'media/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

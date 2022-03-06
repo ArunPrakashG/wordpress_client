@@ -1,55 +1,34 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../builders_import.dart';
+import '../requests/delete/delete_me.dart';
+import '../requests/retrive/retrive_me.dart';
+import '../requests/update/update_me.dart';
+import '../wordpress_client_base.dart';
 
 class MeInterface extends IInterface
-    implements
-        IDeleteOperation<User, MeDeleteBuilder>,
-        IRetrieveOperation<User, MeRetriveBuilder>,
-        IUpdateOperation<User, MeUpdateBuilder> {
+    with
+        IDelete<User, DeleteMeRequest>,
+        IRetrive<User, RetriveMeRequest>,
+        IUpdate<User, UpdateMeRequest> {
   @override
-  Future<ResponseContainer<User?>> delete(
-      Request<User>? Function(MeDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<User>(
-      User(),
-      builder(
-        MeDeleteBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> delete(
+    GenericRequest<DeleteMeRequest> request,
+  ) async {
+    return internalRequester.deleteRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<User?>> retrive(
-      Request<User>? Function(MeRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<User>(
-      User(),
-      builder(
-        MeRetriveBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> retrive(
+    GenericRequest<RetriveMeRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<User>(request);
   }
 
   @override
-  Future<ResponseContainer<User?>> update(
-      Request<User>? Function(MeUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<User>(
-      User(),
-      builder(
-        MeUpdateBuilder().withEndpoint('users').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<User?>> update(
+    GenericRequest<UpdateMeRequest> request,
+  ) async {
+    return internalRequester.updateRequest<User>(request);
   }
 }

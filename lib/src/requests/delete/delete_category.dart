@@ -17,6 +17,6 @@ class DeleteCategoryRequest implements IRequest {
     requestContent.body.addIfNotNull('force', force);
 
     requestContent.endpoint = 'categories/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

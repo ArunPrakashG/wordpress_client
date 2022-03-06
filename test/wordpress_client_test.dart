@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
+import 'package:wordpress_client/src/requests/list/list_post.dart';
+import 'package:wordpress_client/src/requests/list/list_tag.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -18,12 +20,14 @@ Future<void> main() async {
   TempMailClient tempMailClient;
   Map<String, dynamic>? json;
 
-  String cachePath = (await getTemporaryDirectory()).path;
+  final cachePath = (await getTemporaryDirectory()).path;
 
-  json = jsonDecode(await (await File('test/test_settings.json')).readAsString());
+  final jsonFileContents = await File('test/test_settings.json').readAsString();
+
+  json = jsonDecode(jsonFileContents) as Map<String, dynamic>;
   client = WordpressClient(
-    json!['base_url'],
-    json['path'],
+    json['base_url'] as String,
+    json['path'] as String,
     bootstrapper: (builder) => builder
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
@@ -35,14 +39,12 @@ Future<void> main() async {
         })
         .withDefaultAuthorizationBuilder(
           (authBuilder) => authBuilder
-              .withUserName(json!['username'])
-              .withPassword(json['password'])
-              .withType(AuthorizationType.USEFUL_JWT)
+              .withUserName(json!['username'] as String)
+              .withPassword(json['password'] as String)
+              .withType(AuthorizationType.useful_jwt)
               .withCallback(
                 Callback(
-                  responseCallback: (response) {
-                    print(response);
-                  },
+                  responseCallback: print,
                   requestErrorCallback: (error) {
                     print('Error: ${error.errorResponse!.message}');
                   },
@@ -61,15 +63,21 @@ Future<void> main() async {
       'Response Time',
       () async {
         final firstResponse = await client.posts.list(
-          (builder) => builder.withPerPage(20).withPageNumber(1).build(),
+          GenericRequest(
+            requestData: ListPostRequest(
+              perPage: 20,
+            ),
+          ),
         );
 
         final secondResponse = await client.posts.list(
           (builder) => builder.withPerPage(20).withPageNumber(1).build(),
         );
 
-        print('First Response Time Taken: ${firstResponse.duration?.inMilliseconds} ms');
-        print('Second Response Time Taken: ${secondResponse.duration?.inMilliseconds} ms');
+        print(
+            'First Response Time Taken: ${firstResponse.duration?.inMilliseconds} ms');
+        print(
+            'Second Response Time Taken: ${secondResponse.duration?.inMilliseconds} ms');
 
         expect(200, firstResponse.responseCode);
         expect(200, secondResponse.responseCode);
@@ -109,7 +117,10 @@ Future<void> main() async {
       );
 
       expect(200, response.responseCode);
-      expect(19, response.value!.length, reason: 'For some reason, WP API is only returning PER_PAGE - 1 values.', skip: true);
+      expect(19, response.value!.length,
+          reason:
+              'For some reason, WP API is only returning PER_PAGE - 1 values.',
+          skip: true);
     });
 
     test('List Users', () async {
@@ -169,14 +180,16 @@ Future<void> main() async {
     });
 
     test('Update User', () async {
-      final response = await client.users.update((builder) => builder.withId(userId).withFirstName('updated first name').build());
+      final response = await client.users.update((builder) =>
+          builder.withId(userId).withFirstName('updated first name').build());
 
       expect(200, response.responseCode);
       expect('updated first name', response.value!.firstName);
     });
 
     test('Retrive User', () async {
-      final response = await client.users.retrive((builder) => builder.withUserId(userId).build());
+      final response = await client.users
+          .retrive((builder) => builder.withUserId(userId).build());
 
       expect(200, response.responseCode);
       expect(userId, response.value!.id);
@@ -184,7 +197,11 @@ Future<void> main() async {
 
     test('Delete User', () async {
       final deleteUserResponse = await client.users.delete(
-        (builder) => builder.withUserId(userId).withForce(true).withReassign(3).withCallback(
+        (builder) => builder
+            .withUserId(userId)
+            .withForce(true)
+            .withReassign(3)
+            .withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);
@@ -205,15 +222,15 @@ Future<void> main() async {
       () async {
         final response = await client.posts.create(
           (builder) => builder
-              .withCommentStatus(Status.CLOSED)
-              .withPingStatus(Status.CLOSED)
-              .withFormat(PostFormat.STANDARD)
+              .withCommentStatus(Status.closed)
+              .withPingStatus(Status.closed)
+              .withFormat(PostFormat.standard)
               .withContent(
                   'This a test post generated by an automated script using wordpress_client library. This post will be deleted automatically in short time.')
               .withExcerpt('A test post!')
               .withTitle('Generated Sample Post')
               .withSlug('generated-post-slug')
-              .withStatus(ContentStatus.PENDING)
+              .withStatus(ContentStatus.pending)
               .withFeaturedMedia(468930)
               .withAuthor(3)
               .withCallback(Callback(
@@ -232,7 +249,12 @@ Future<void> main() async {
 
     test('Update Post', () async {
       final response = await client.posts.update(
-        (builder) => builder.withId(postId).withFeaturedMedia(468930).withAuthor(3).withTitle('Generated Sample Post Edited').withCallback(
+        (builder) => builder
+            .withId(postId)
+            .withFeaturedMedia(468930)
+            .withAuthor(3)
+            .withTitle('Generated Sample Post Edited')
+            .withCallback(
           Callback(
             requestErrorCallback: (error) {
               print('Error: ' + error.errorResponse!.message!);

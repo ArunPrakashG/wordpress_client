@@ -2,6 +2,9 @@ import 'package:dio/dio.dart';
 
 import '../responses/error_container.dart';
 
+typedef ReceiveProgressCallback = void Function(int received, int total);
+typedef SendProgressCallback = void Function(int sent, int total);
+
 class Callback {
   const Callback({
     this.unhandledExceptionCallback,
@@ -14,8 +17,8 @@ class Callback {
   final void Function(Exception)? unhandledExceptionCallback;
   final void Function(ErrorContainer)? requestErrorCallback;
   final void Function(dynamic)? responseCallback;
-  final void Function(int received, int total)? onReceiveProgress;
-  final void Function(int send, int total)? onSendProgress;
+  final ReceiveProgressCallback? onReceiveProgress;
+  final SendProgressCallback? onSendProgress;
 
   void invokeUnhandledExceptionCallback(Exception e) {
     if (unhandledExceptionCallback == null) {
@@ -33,7 +36,6 @@ class Callback {
     if (error.response!.data == null) {
       return requestErrorCallback!(
         ErrorContainer(
-          errorResponse: null,
           internalError: error,
         ),
       );

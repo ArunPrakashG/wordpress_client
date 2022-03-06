@@ -17,6 +17,6 @@ class DeletePostRequest implements IRequest {
     requestContent.body.addIfNotNull('force', force);
 
     requestContent.endpoint = 'posts/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

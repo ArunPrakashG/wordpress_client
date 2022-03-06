@@ -49,6 +49,6 @@ class UpdateMeRequest implements IRequest {
       ..addIfNotNull('roles', roles?.join(','));
 
     requestContent.endpoint = 'users/me';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

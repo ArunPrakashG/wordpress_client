@@ -21,6 +21,6 @@ class DeleteUserRequest implements IRequest {
       ..addIfNotNull('reassign', reassign);
 
     requestContent.endpoint = 'users/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

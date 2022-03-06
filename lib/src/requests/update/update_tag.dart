@@ -24,6 +24,6 @@ class UpdateTagRequest implements IRequest {
       ..addIfNotNull('name', name);
 
     requestContent.endpoint = 'tags/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

@@ -22,6 +22,6 @@ class CreateTagRequest implements IRequest {
       ..addIfNotNull('slug', slug);
 
     requestContent.endpoint = 'tags';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

@@ -8,13 +8,13 @@ library wordpress_client;
 export 'src/authorization/authorization_base.dart' show IAuthorization;
 export 'src/authorization/authorization_builder.dart' show AuthorizationBuilder;
 export 'src/authorization/authorization_methods/basic_auth.dart' show BasicAuth;
-export 'src/authorization/authorization_methods/basic_jwt.dart' show BasicJwtAuth;
-export 'src/authorization/authorization_methods/useful_jwt.dart' show UsefulJwtAuth;
+export 'src/authorization/authorization_methods/basic_jwt.dart'
+    show BasicJwtAuth;
+export 'src/authorization/authorization_methods/useful_jwt.dart'
+    show UsefulJwtAuth;
 
 // Requests
-export 'src/builders/request.dart';
 export 'src/interface/interface_base.dart';
-export 'src/builders/request_builder_base.dart';
 
 // Operations
 export 'src/operations/create.dart';
@@ -22,19 +22,22 @@ export 'src/operations/delete.dart';
 export 'src/operations/update.dart';
 export 'src/operations/list.dart';
 export 'src/operations/retrieve.dart';
+export 'src/operations/custom.dart';
 
 // Enums
 export 'src/enums.dart';
 
 // Responses
-export 'src/responses_import.dart';
+export 'src/responses_export.dart';
+export 'package:dio/src/dio_error.dart';
+export 'package:dio/src/form_data.dart';
+export 'package:dio/src/interceptors/log.dart';
+export 'package:dio/src/multipart_file.dart';
 export 'package:dio/src/cancel_token.dart';
-export 'src/utilities/pair.dart';
+export 'package:dio/src/dio_mixin.dart';
 
 // Callback
 export 'src/utilities/callback.dart';
-export 'src/utilities/serializable_instance.dart';
 
 // Core files
 export 'src/wordpress_client_base.dart' show WordpressClient;
-export 'src/internal_requester.dart' show InternalRequester;

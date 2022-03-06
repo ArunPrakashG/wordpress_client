@@ -1,85 +1,50 @@
 import '../../wordpress_client.dart';
-import '../builders_import.dart';
+import '../requests/create/create_tag.dart';
+import '../requests/delete/delete_tag.dart';
+import '../requests/list/list_tag.dart';
+import '../requests/retrive/retrive_tag.dart';
+import '../requests/update/update_tag.dart';
+import '../wordpress_client_base.dart';
 
 class TagInterface extends IInterface
-    implements
-        ICreateOperation<Tag, TagCreateBuilder>,
-        IDeleteOperation<Tag, TagDeleteBuilder>,
-        IRetrieveOperation<Tag, TagRetriveBuilder>,
-        IUpdateOperation<Tag, TagUpdateBuilder>,
-        IListOperation<Tag, TagListBuilder> {
+    with
+        ICreate<Tag, CreateTagRequest>,
+        IDelete<Tag, DeleteTagRequest>,
+        IRetrive<Tag, RetriveTagRequest>,
+        IUpdate<Tag, UpdateTagRequest>,
+        IList<Tag, ListTagRequest> {
   @override
-  Future<ResponseContainer<Tag?>> create(
-      Request<Tag>? Function(TagCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<Tag>(
-      Tag(),
-      builder(
-        TagCreateBuilder().withEndpoint('tags').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Tag?>> create(
+    GenericRequest<CreateTagRequest> request,
+  ) async {
+    return internalRequester.createRequest<Tag>(request);
   }
 
   @override
-  Future<ResponseContainer<Tag?>> delete(
-      Request<Tag>? Function(TagDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<Tag>(
-      Tag(),
-      builder(
-        TagDeleteBuilder().withEndpoint('tags').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Tag?>> delete(
+    GenericRequest<DeleteTagRequest> request,
+  ) async {
+    return internalRequester.deleteRequest<Tag>(request);
   }
 
   @override
-  Future<ResponseContainer<List<Tag>?>> list(
-      Request<List<Tag>>? Function(TagListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<Tag>(
-      Tag(),
-      builder(
-        TagListBuilder().withEndpoint('tags').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<List<Tag>?>> list(
+    GenericRequest<ListTagRequest> request,
+  ) async {
+    return internalRequester.listRequest<Tag>(request);
   }
 
   @override
-  Future<ResponseContainer<Tag?>> retrive(
-      Request<Tag>? Function(TagRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<Tag>(
-      Tag(),
-      builder(
-        TagRetriveBuilder().withEndpoint('tags').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Tag?>> retrive(
+    GenericRequest<RetriveTagRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<Tag>(request);
   }
 
   @override
-  Future<ResponseContainer<Tag?>> update(
-      Request<Tag>? Function(TagUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<Tag>(
-      Tag(),
-      builder(
-        TagUpdateBuilder().withEndpoint('tags').initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Tag?>> update(
+    GenericRequest<UpdateTagRequest> request,
+  ) async {
+    return internalRequester.updateRequest<Tag>(request);
   }
 }

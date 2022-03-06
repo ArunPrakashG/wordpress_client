@@ -1,5 +1,5 @@
-class ResponseContainer<T> {
-  ResponseContainer(
+class WordpressResponse<T> {
+  WordpressResponse(
     this.value, {
     required this.responseCode,
     required this.responseHeaders,
@@ -7,7 +7,7 @@ class ResponseContainer<T> {
     this.message,
   });
 
-  ResponseContainer.success(
+  WordpressResponse.success(
     this.value, {
     this.responseCode = 200,
     required this.responseHeaders,
@@ -15,7 +15,7 @@ class ResponseContainer<T> {
     this.message,
   });
 
-  ResponseContainer.failed(
+  WordpressResponse.failed(
     this.value, {
     this.responseCode = -1,
     this.responseHeaders = const <String, dynamic>{},

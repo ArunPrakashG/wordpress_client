@@ -51,6 +51,6 @@ class UpdateUserRequest implements IRequest {
       ..addIfNotNull('roles', roles?.join(','));
 
     requestContent.endpoint = 'users/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

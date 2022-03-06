@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_positional_boolean_parameters, avoid_returning_this
 
-import '../authorization/authorization_base.dart';
-import '../authorization/authorization_builder.dart';
-import '../client_configuration.dart';
-import '../utilities/pair.dart';
+import 'package:dio/dio.dart';
+
+import 'authorization/authorization_base.dart';
+import 'authorization/authorization_builder.dart';
+import 'client_configuration.dart';
+import 'wordpress_client_base.dart';
 
 class BootstrapBuilder {
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds
@@ -17,11 +19,17 @@ class BootstrapBuilder {
   bool _waitWhileBusy = false;
   bool _cacheResponses = false;
   String? _cachePath;
-  void Function(String baseUrl, String endPoint, int requestCount)?
-      _statisticsDelegate;
+  StatisticsCallback? _statisticsDelegate;
+  List<Interceptor>? _interceptors;
 
   BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
     _waitWhileBusy = value;
+    return this;
+  }
+
+  BootstrapBuilder withDioInterceptor(Interceptor interceptor) {
+    _interceptors ??= [];
+    _interceptors!.add(interceptor);
     return this;
   }
 
@@ -103,6 +111,7 @@ class BootstrapBuilder {
       waitWhileBusy: _waitWhileBusy,
       cacheResponses: _cacheResponses,
       responseCachePath: _cachePath,
+      interceptors: _interceptors,
     );
   }
 }

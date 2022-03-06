@@ -49,6 +49,6 @@ class ListTagRequest implements IRequest {
       ..addIfNotNull('hide_empty', hideEmpty);
 
     requestContent.endpoint = 'tags';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

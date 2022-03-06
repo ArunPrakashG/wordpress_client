@@ -1,103 +1,57 @@
-import '../builders_import.dart';
 import '../operations/create.dart';
 import '../operations/delete.dart';
 import '../operations/list.dart';
 import '../operations/retrieve.dart';
 import '../operations/update.dart';
+import '../requests/create/create_category.dart';
+import '../requests/delete/delete_category.dart';
+import '../requests/list/list_category.dart';
+import '../requests/retrive/retrive_category.dart';
+import '../requests/update/update_category.dart';
 import '../responses/category_response.dart';
-import '../responses/response_container.dart';
+import '../responses/wordpress_response.dart';
+import '../wordpress_client_base.dart';
 import 'interface_base.dart';
 
 class CategoryInterface extends IInterface
-    implements
-        ICreateOperation<Category, CategoryCreateBuilder>,
-        IDeleteOperation<Category, CategoryDeleteBuilder>,
-        IRetrieveOperation<Category, CategoryRetriveBuilder>,
-        IUpdateOperation<Category, CategoryUpdateBuilder>,
-        IListOperation<Category, CategoryListBuilder> {
+    with
+        ICreate<Category, CreateCategoryRequest>,
+        IDelete<Category, DeleteCategoryRequest>,
+        IRetrive<Category, RetriveCategoryRequest>,
+        IUpdate<Category, UpdateCategoryRequest>,
+        IList<Category, ListCategoryRequest> {
   @override
-  Future<ResponseContainer<Category?>> create(
-    Request<Category>? Function(CategoryCreateBuilder) builder, {
-    bool shouldWaitWhileClientBusy = false,
-  }) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<Category>(
-      Category(),
-      builder(
-        CategoryCreateBuilder()
-            .withEndpoint('categories')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Category?>> create(
+    GenericRequest<CreateCategoryRequest> request,
+  ) {
+    return internalRequester.createRequest<Category>(request);
   }
 
   @override
-  Future<ResponseContainer<Category?>> delete(
-      Request<Category>? Function(CategoryDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<Category>(
-      Category(),
-      builder(
-        CategoryDeleteBuilder()
-            .withEndpoint('categories')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Category?>> delete(
+    GenericRequest<DeleteCategoryRequest> request,
+  ) {
+    return internalRequester.deleteRequest<Category>(request);
   }
 
   @override
-  Future<ResponseContainer<List<Category>?>> list(
-      Request<List<Category>>? Function(CategoryListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<Category>(
-      Category(),
-      builder(
-        CategoryListBuilder()
-            .withEndpoint('categories')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<List<Category>?>> list(
+    GenericRequest<ListCategoryRequest> request,
+  ) async {
+    return internalRequester.listRequest<Category>(request);
   }
 
   @override
-  Future<ResponseContainer<Category?>> retrive(
-      Request<Category>? Function(CategoryRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<Category>(
-      Category(),
-      builder(
-        CategoryRetriveBuilder()
-            .withEndpoint('categories')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Category?>> retrive(
+    GenericRequest<RetriveCategoryRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<Category>(request);
   }
 
   @override
-  Future<ResponseContainer<Category?>> update(
-      Request<Category>? Function(CategoryUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<Category>(
-      Category(),
-      builder(
-        CategoryUpdateBuilder()
-            .withEndpoint('categories')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Category?>> update(
+    GenericRequest<UpdateCategoryRequest> request,
+  ) async {
+    return internalRequester.updateRequest<Category>(request);
   }
 }

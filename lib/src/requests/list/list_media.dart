@@ -70,6 +70,6 @@ class ListMediaRequest implements IRequest {
       ..addIfNotNull('status', status?.name);
 
     requestContent.endpoint = 'media';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

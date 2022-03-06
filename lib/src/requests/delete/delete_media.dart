@@ -17,6 +17,6 @@ class DeleteMediaRequest implements IRequest {
     requestContent.body.addIfNotNull('force', force);
 
     requestContent.endpoint = 'media/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }

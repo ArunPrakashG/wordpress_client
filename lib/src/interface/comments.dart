@@ -1,102 +1,53 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../builders/create/comment_create.dart';
-import '../builders/delete/comment_delete.dart';
-import '../builders/list/comment_list.dart';
-import '../builders/retrive/comment_retrive.dart';
-import '../builders/update/comment_update.dart';
+import '../requests/create/create_comment.dart';
+import '../requests/delete/delete_comment.dart';
+import '../requests/list/list_comment.dart';
+import '../requests/retrive/retrive_comment.dart';
+import '../requests/update/update_comment.dart';
 import '../responses/comment_response.dart';
+import '../wordpress_client_base.dart';
 
 class CommentInterface extends IInterface
-    implements
-        ICreateOperation<Comment, CommentCreateBuilder>,
-        IDeleteOperation<Comment, CommentDeleteBuilder>,
-        IRetrieveOperation<Comment, CommentRetriveBuilder>,
-        IUpdateOperation<Comment, CommentUpdateBuilder>,
-        IListOperation<Comment, CommentListBuilder> {
+    with
+        ICreate<Comment, CreateCommentRequest>,
+        IDelete<Comment, DeleteCommentRequest>,
+        IRetrive<Comment, RetriveCommentRequest>,
+        IUpdate<Comment, UpdateCommentRequest>,
+        IList<Comment, ListCommentRequest> {
   @override
-  Future<ResponseContainer<Comment?>> create(
-      Request<Comment>? Function(CommentCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<Comment>(
-      Comment(),
-      builder(
-        CommentCreateBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Comment?>> create(
+    GenericRequest<CreateCommentRequest> request,
+  ) async {
+    return internalRequester.createRequest<Comment>(request);
   }
 
   @override
-  Future<ResponseContainer<Comment?>> delete(
-      Request<Comment>? Function(CommentDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<Comment>(
-      Comment(),
-      builder(
-        CommentDeleteBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Comment?>> delete(
+    GenericRequest<DeleteCommentRequest> request,
+  ) async {
+    return internalRequester.deleteRequest<Comment>(request);
   }
 
   @override
-  Future<ResponseContainer<List<Comment>?>> list(
-      Request<List<Comment>>? Function(CommentListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<Comment>(
-      Comment(),
-      builder(
-        CommentListBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<List<Comment>?>> list(
+    GenericRequest<ListCommentRequest> request,
+  ) async {
+    return internalRequester.listRequest<Comment>(request);
   }
 
   @override
-  Future<ResponseContainer<Comment?>> retrive(
-      Request<Comment>? Function(CommentRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<Comment>(
-      Comment(),
-      builder(
-        CommentRetriveBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Comment?>> retrive(
+    GenericRequest<RetriveCommentRequest> request,
+  ) async {
+    return internalRequester.retriveRequest<Comment>(request);
   }
 
   @override
-  Future<ResponseContainer<Comment?>> update(
-      Request<Comment>? Function(CommentUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<Comment>(
-      Comment(),
-      builder(
-        CommentUpdateBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
+  Future<WordpressResponse<Comment?>> update(
+    GenericRequest<UpdateCommentRequest> request,
+  ) async {
+    return internalRequester.updateRequest<Comment>(request);
   }
 }

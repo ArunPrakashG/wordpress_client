@@ -17,6 +17,6 @@ class RetriveTagRequest implements IRequest {
     requestContent.queryParameters.addIfNotNull('context', context?.name);
 
     requestContent.endpoint = 'tags/$id';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

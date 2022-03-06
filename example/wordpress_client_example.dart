@@ -8,7 +8,7 @@ void main() async {
   // Simple Usage
   client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
 
-  ResponseContainer<List<Post?>?> posts = await client.posts
+  WordpressResponse<List<Post?>?> posts = await client.posts
       .list((builder) => builder.withPerPage(20).withPageNumber(1).build());
   print(posts.value!.first!.id);
 
@@ -32,12 +32,12 @@ void main() async {
     ).build(),
   );
 
-  ResponseContainer<List<Post?>?> response = await client.posts.list(
+  WordpressResponse<List<Post?>?> response = await client.posts.list(
     (builder) => builder
         .withPerPage(20)
         .withPageNumber(1)
-        .orderResultsBy(FilterOrder.DESCENDING)
-        .sortResultsBy(FilterPostSortOrder.DATE)
+        .orderResultsBy(FilterOrder.descending)
+        .sortResultsBy(FilterPostSortOrder.date)
         .withAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
         .withCallback(
           Callback(

@@ -3,5 +3,5 @@ import 'request_content.dart';
 
 // ignore: one_member_abstracts
 abstract class IRequest {
-  void build(RequestContent content);
+  void build(RequestContent requestContent);
 }

@@ -49,6 +49,6 @@ class CreateUserRequest implements IRequest {
       ..addIfNotNull('roles', roles?.join(','));
 
     requestContent.endpoint = 'users';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

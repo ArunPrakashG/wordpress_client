@@ -21,6 +21,6 @@ class RetrivePostRequest implements IRequest {
       ..addIfNotNull('password', password);
 
     requestContent.endpoint = 'posts/$id';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

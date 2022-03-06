@@ -49,6 +49,6 @@ class ListCategoryRequest implements IRequest {
       ..addIfNotNull('hide_empty', hideEmpty);
 
     requestContent.endpoint = 'categories';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

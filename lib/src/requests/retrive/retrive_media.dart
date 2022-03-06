@@ -5,7 +5,7 @@ import '../request_interface.dart';
 
 class RetriveMediaRequest implements IRequest {
   RetriveMediaRequest({
-    this.context = FilterContext.VIEW,
+    this.context = FilterContext.view,
     required this.id,
   });
 
@@ -16,6 +16,6 @@ class RetriveMediaRequest implements IRequest {
   void build(RequestContent requestContent) {
     requestContent.queryParameters.addIfNotNull('context', context?.name);
     requestContent.endpoint = 'media/$id';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

@@ -76,6 +76,6 @@ class ListPostRequest implements IRequest {
       ..addIfNotNull('status', status);
 
     requestContent.endpoint = 'posts';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

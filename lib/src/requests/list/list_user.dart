@@ -49,6 +49,6 @@ class ListUserRequest implements IRequest {
       ..addIfNotNull('who', who);
 
     requestContent.endpoint = 'users';
-    requestContent.method = HttpMethod.GET;
+    requestContent.method = HttpMethod.get;
   }
 }

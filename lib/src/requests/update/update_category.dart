@@ -27,6 +27,6 @@ class UpdateCategoryRequest implements IRequest {
       ..addIfNotNull('parent', parent);
 
     requestContent.endpoint = 'categories/$id';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

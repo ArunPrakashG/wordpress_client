@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../internal_requester.dart';
 import '../wordpress_client_base.dart';
 
 /// The base of all custom requests.

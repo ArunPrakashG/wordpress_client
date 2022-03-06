@@ -55,6 +55,6 @@ class CreatePostRequest implements IRequest {
       ..addIfNotNull('slug', slug);
 
     requestContent.endpoint = 'posts';
-    requestContent.method = HttpMethod.POST;
+    requestContent.method = HttpMethod.post;
   }
 }

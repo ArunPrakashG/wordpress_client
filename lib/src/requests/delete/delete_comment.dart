@@ -21,6 +21,6 @@ class DeleteCommentRequest implements IRequest {
       ..addIfNotNull('password', password);
 
     requestContent.endpoint = 'comments/$id';
-    requestContent.method = HttpMethod.DELETE;
+    requestContent.method = HttpMethod.delete;
   }
 }
