@@ -43,7 +43,8 @@ class User {
       description: json['description'] as String?,
       link: json['link'] as String?,
       slug: json['slug'] as String?,
-      roles: mapIterableWithChecks(json['roles'], (value) => value as String),
+      roles: mapIterableWithChecks<String>(
+          json['roles'], (dynamic value) => value as String),
       avatarUrls: json['avatar_urls'] == null
           ? null
           : Map<String, String>.from(

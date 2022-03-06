@@ -101,7 +101,8 @@ class InternalRequester {
   }
 
   Future<WordpressResponse<T?>> createRequest<T>(
-      WordpressRequest request) async {
+    WordpressRequest request,
+  ) async {
     if (!request.isRequestExecutable) {
       throw const RequestUriParsingFailedException('Request is invalid.');
     }
@@ -111,8 +112,17 @@ class InternalRequester {
     _isBusy = true;
 
     try {
-      final dioResponse = await _client.request<dynamic>(
+      await _processRequest(request);
+
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
         request.endpoint,
+      );
+
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint.startsWith('/')
+            ? request.endpoint
+            : '/${request.endpoint}',
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
@@ -128,11 +138,6 @@ class InternalRequester {
       );
 
       watch.stop();
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
 
       if (dioResponse.statusCode == null) {
         throw const NullReferenceException(
@@ -189,7 +194,8 @@ class InternalRequester {
   }
 
   Future<WordpressResponse<T?>> deleteRequest<T>(
-      WordpressRequest request) async {
+    WordpressRequest request,
+  ) async {
     if (!request.isRequestExecutable) {
       throw const RequestUriParsingFailedException('Request is invalid.');
     }
@@ -199,8 +205,17 @@ class InternalRequester {
     _isBusy = true;
 
     try {
-      final dioResponse = await _client.request<dynamic>(
+      await _processRequest(request);
+
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
         request.endpoint,
+      );
+
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint.startsWith('/')
+            ? request.endpoint
+            : '/${request.endpoint}',
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
@@ -216,11 +231,6 @@ class InternalRequester {
       );
 
       watch.stop();
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
 
       if (dioResponse.statusCode == null) {
         throw const NullReferenceException(
@@ -286,13 +296,12 @@ class InternalRequester {
     _isBusy = true;
 
     try {
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
+      await _processRequest(request);
 
       final dioResponse = await _client.request<dynamic>(
-        request.endpoint,
+        request.endpoint.startsWith('/')
+            ? request.endpoint
+            : '/${request.endpoint}',
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
@@ -308,6 +317,11 @@ class InternalRequester {
       );
 
       watch.stop();
+
+      _invokeStatisticsCallback(
+        dioResponse.requestOptions.uri.toString(),
+        request.endpoint,
+      );
 
       if (dioResponse.statusCode == null) {
         throw const NullReferenceException(
@@ -361,7 +375,7 @@ class InternalRequester {
       if (e is DioError) {
         request.callback?.invokeDioErrorCallback(e);
       } else {
-        request.callback?.invokeUnhandledExceptionCallback(e as Exception);
+        request.callback?.invokeUnhandledExceptionCallback(e);
       }
 
       return WordpressResponse<List<T>?>.failed(
@@ -386,8 +400,17 @@ class InternalRequester {
     _isBusy = true;
 
     try {
-      final dioResponse = await _client.request<dynamic>(
+      await _processRequest(request);
+
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
         request.endpoint,
+      );
+
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint.startsWith('/')
+            ? request.endpoint
+            : '/${request.endpoint}',
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
@@ -403,11 +426,6 @@ class InternalRequester {
       );
 
       watch.stop();
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
 
       if (dioResponse.statusCode == null) {
         throw const NullReferenceException(
@@ -464,7 +482,8 @@ class InternalRequester {
   }
 
   Future<WordpressResponse<T?>> updateRequest<T>(
-      WordpressRequest request) async {
+    WordpressRequest request,
+  ) async {
     if (!request.isRequestExecutable) {
       throw const RequestUriParsingFailedException('Request is invalid.');
     }
@@ -476,8 +495,15 @@ class InternalRequester {
     try {
       await _processRequest(request);
 
-      final dioResponse = await _client.request<dynamic>(
+      _invokeStatisticsCallback(
+        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
         request.endpoint,
+      );
+
+      final dioResponse = await _client.request<dynamic>(
+        request.endpoint.startsWith('/')
+            ? request.endpoint
+            : '/${request.endpoint}',
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,

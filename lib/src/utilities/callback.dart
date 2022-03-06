@@ -14,13 +14,13 @@ class Callback {
     this.onSendProgress,
   });
 
-  final void Function(Exception)? unhandledExceptionCallback;
+  final void Function(dynamic)? unhandledExceptionCallback;
   final void Function(ErrorContainer)? requestErrorCallback;
   final void Function(dynamic)? responseCallback;
   final ReceiveProgressCallback? onReceiveProgress;
   final SendProgressCallback? onSendProgress;
 
-  void invokeUnhandledExceptionCallback(Exception e) {
+  void invokeUnhandledExceptionCallback(dynamic e) {
     if (unhandledExceptionCallback == null) {
       return;
     }

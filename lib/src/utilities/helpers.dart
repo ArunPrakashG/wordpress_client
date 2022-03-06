@@ -114,13 +114,13 @@ Map<String, dynamic> serialize<T>(T object) {
 
 List<T> mapIterableWithChecks<T>(
   dynamic json,
-  T Function(Map<String, dynamic> json) decoder,
+  T Function(dynamic json) decoder,
 ) {
   if (json == null || json is! Iterable<dynamic>) {
     return [];
   }
 
-  return json.map((dynamic e) => decoder(e as Map<String, dynamic>)).toList();
+  return json.map<T>((dynamic e) => decoder(e)).toList();
 }
 
 T? mapToTypeNoSafety<T>(dynamic json, T Function(dynamic json) decoder) {

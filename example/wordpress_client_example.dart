@@ -10,11 +10,18 @@ Future<void> main() async {
   client = WordpressClient(
     'https://www.pathanamthittamedia.com/wp-json',
     'wp/v2',
-    bootstrapper: (bootstrapper) => bootstrapper.withStatisticDelegate(
-      (baseUrl, endpoint, requestCount) {
-        print('$baseUrl $endpoint $requestCount');
-      },
-    ).build(),
+    bootstrapper: (bootstrapper) => bootstrapper
+        .withStatisticDelegate((baseUrl, endpoint, requestCount) {
+          print('$baseUrl $endpoint $requestCount');
+        })
+        .withDioInterceptor(
+          LogInterceptor(
+            error: true,
+            requestBody: true,
+            responseBody: true,
+          ),
+        )
+        .build(),
   );
 
   await client.initialize();
@@ -24,7 +31,7 @@ Future<void> main() async {
       requestData: ListPostRequest(
         perPage: 10,
         page: 1,
-        order: Order.desc,
+        order: Order.asc,
       ),
     ),
   );
@@ -40,73 +47,73 @@ Future<void> main() async {
   // Or
 
   // Advanced Usage
-  client = WordpressClient(
-    'https://www.example.com/wp-json',
-    'wp/v2',
-    bootstrapper: (bootstrapper) => bootstrapper
-        .withCookies(true)
-        .withDefaultUserAgent('wordpress_client/6.1.0')
-        .withDefaultMaxRedirects(5)
-        .withFollowRedirects(true)
-        .withDefaultAuthorization(
-            UsefulJwtAuth('test_user', 'super_secret_password'))
-        .withStatisticDelegate(
-      (baseUrl, endpoint, count) {
-        print('Request send to: $baseUrl ($count times)');
-      },
-    ).build(),
-  );
+  // client = WordpressClient(
+  //   'https://www.example.com/wp-json',
+  //   'wp/v2',
+  //   bootstrapper: (bootstrapper) => bootstrapper
+  //       .withCookies(true)
+  //       .withDefaultUserAgent('wordpress_client/6.1.0')
+  //       .withDefaultMaxRedirects(5)
+  //       .withFollowRedirects(true)
+  //       .withDefaultAuthorization(
+  //           UsefulJwtAuth('test_user', 'super_secret_password'))
+  //       .withStatisticDelegate(
+  //     (baseUrl, endpoint, count) {
+  //       print('Request send to: $baseUrl ($count times)');
+  //     },
+  //   ).build(),
+  // );
 
-  postsResponse = await client.posts.list(
-    WordpressRequest(
-      requestData: ListPostRequest(
-        perPage: 10,
-        page: 1,
-        order: Order.desc,
-      ),
-      responseValidationCallback: (dynamic response) {
-        if (response is! List<Post>) {
-          return false;
-        }
+  // postsResponse = await client.posts.list(
+  //   WordpressRequest(
+  //     requestData: ListPostRequest(
+  //       perPage: 10,
+  //       page: 1,
+  //       order: Order.desc,
+  //     ),
+  //     responseValidationCallback: (dynamic response) {
+  //       if (response is! List<Post>) {
+  //         return false;
+  //       }
 
-        return true;
-      },
-      authorization: UsefulJwtAuth(
-        'test_user',
-        'super_secret_password',
-      ),
-      callback: Callback(
-        unhandledExceptionCallback: (ex) {
-          print('Unhandled Exception: $ex');
-        },
-        requestErrorCallback: (errorContainer) {
-          print('Request Error: ${errorContainer.errorResponse!.message}');
-        },
-        onSendProgress: (current, total) {
-          print('Send Progress: $current/$total');
-        },
-        onReceiveProgress: (current, total) {
-          print('Receive Progress: $current/$total');
-        },
-      ),
-    ),
-  );
+  //       return true;
+  //     },
+  //     authorization: UsefulJwtAuth(
+  //       'test_user',
+  //       'super_secret_password',
+  //     ),
+  //     callback: Callback(
+  //       unhandledExceptionCallback: (dynamic ex) {
+  //         print('Unhandled Exception: $ex');
+  //       },
+  //       requestErrorCallback: (errorContainer) {
+  //         print('Request Error: ${errorContainer.errorResponse!.message}');
+  //       },
+  //       onSendProgress: (current, total) {
+  //         print('Send Progress: $current/$total');
+  //       },
+  //       onReceiveProgress: (current, total) {
+  //         print('Receive Progress: $current/$total');
+  //       },
+  //     ),
+  //   ),
+  // );
 
-  if (postsResponse.isSuccess) {
-    for (final post in postsResponse.data!) {
-      print(post.title?.parsedText);
-    }
+  // if (postsResponse.isSuccess) {
+  //   for (final post in postsResponse.data!) {
+  //     print(post.title?.parsedText);
+  //   }
 
-    // You access total pages & total count headers directly
-    print('Per Page: ${postsResponse.totalPagesCount}');
-    print('Total Count: ${postsResponse.totalCount}');
+  //   // You access total pages & total count headers directly
+  //   print('Per Page: ${postsResponse.totalPagesCount}');
+  //   print('Total Count: ${postsResponse.totalCount}');
 
-    // You can also access the headers directly
-    print('X-WP-Total: ${postsResponse.responseHeaders['X-WP-Total']}');
+  //   // You can also access the headers directly
+  //   print('X-WP-Total: ${postsResponse.responseHeaders['X-WP-Total']}');
 
-    // You can also check how much time the request took easily.
-    print('Request took: ${postsResponse.requestDuration?.inMilliseconds}');
-  } else {
-    print(postsResponse.message);
-  }
+  //   // You can also check how much time the request took easily.
+  //   print('Request took: ${postsResponse.requestDuration?.inMilliseconds} ms');
+  // } else {
+  //   print(postsResponse.message);
+  // }
 }

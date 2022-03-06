@@ -59,8 +59,9 @@ class Post {
       template: json['template'] as String?,
       format: getFormatFromValue(json['format'] as String?),
       meta: json['meta'],
-      categories: mapIterableWithChecks(json['categories'], (v) => v as int),
-      tags: mapIterableWithChecks(json['tags'], (v) => v as int),
+      categories: mapIterableWithChecks<int>(
+          json['categories'], (dynamic v) => v as int),
+      tags: mapIterableWithChecks<int>(json['tags'], (dynamic v) => v as int),
       authorMeta: AuthorMeta.fromJson(json['author_meta']),
       featuredImageUrl: json['featured_image_url'] as String?,
       links: Links.fromJson(json['_links']),
