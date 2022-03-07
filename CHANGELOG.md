@@ -65,3 +65,13 @@
 ## 5.4.3
 
 - Total pages parsing fix
+
+## 6.1.0-pre
+
+- Entire API changed. (Sorry for this, but this had to be done sooner or later!)
+- Fluency is maintaned by using Dart's cascading operator.
+- Performence as been improved, as well as memory consumption.
+
+## 6.1.1-pre
+
+- Removed test package

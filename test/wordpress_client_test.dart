@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:temp_mail_gen/temp_mail_gen.dart';
-import 'package:test/test.dart';
 import 'package:wordpress_client/src/requests/create/create_user.dart';
 import 'package:wordpress_client/src/requests/list/list_category.dart';
 import 'package:wordpress_client/src/requests/list/list_media.dart';
