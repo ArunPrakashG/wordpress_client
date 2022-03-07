@@ -6,8 +6,8 @@ import '../request_interface.dart';
 class ListCategoryRequest implements IRequest {
   ListCategoryRequest({
     this.context,
-    required this.page,
-    required this.perPage,
+    this.page = 1,
+    this.perPage = 10,
     this.search,
     this.exclude,
     this.include,
