@@ -22,7 +22,6 @@ String getRandString(int len) {
   return base64UrlEncode(values);
 }
 
-@TestOn('vm')
 Future<void> main() async {
   WordpressClient client;
   TempMailClient tempMailClient;
