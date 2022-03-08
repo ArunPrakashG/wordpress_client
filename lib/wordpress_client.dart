@@ -6,24 +6,11 @@ library wordpress_client;
 
 export 'package:dio/dio.dart';
 
-export 'src/authorization/authorization_base.dart' show IAuthorization;
-export 'src/authorization/authorization_builder.dart' show AuthorizationBuilder;
-export 'src/authorization/authorization_methods/basic_auth.dart' show BasicAuth;
-export 'src/authorization/authorization_methods/basic_jwt.dart'
-    show BasicJwtAuth;
-export 'src/authorization/authorization_methods/useful_jwt.dart'
-    show UsefulJwtAuth;
-export 'src/enums.dart';
+export 'src/authorization/authorization_export.dart';
 export 'src/interface/interface_base.dart';
-export 'src/operations/create.dart';
-export 'src/operations/custom.dart';
-export 'src/operations/delete.dart';
-export 'src/operations/list.dart';
-export 'src/operations/retrieve.dart';
-export 'src/operations/update.dart';
-export 'src/requests/request_content.dart';
-export 'src/requests/request_interface.dart';
-export 'src/requests/wordpress_request.dart';
-export 'src/responses_export.dart';
-export 'src/utilities/callback.dart';
-export 'src/wordpress_client_base.dart' show WordpressClient;
+export 'src/library_exports.dart';
+export 'src/operations/operations_export.dart';
+export 'src/requests/requests_export.dart';
+export 'src/responses/responses_export.dart';
+export 'src/utilities/utility_export.dart';
+export 'src/wordpress_client_base.dart';

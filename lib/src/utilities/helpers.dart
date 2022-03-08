@@ -98,6 +98,9 @@ String parseHtmlString(String htmlString) =>
 
 Type typeOf<T>() => T;
 
+/// Deserializes a JSON object by getting its decoder from [TypeMap]
+///
+/// You will need to initiate your custom interface first in order to deserialize using this method.
 T deserialize<T>(dynamic object) {
   if (object is! Map<String, dynamic>) {
     throw Exception('object is not a map. Cannot decode.');
@@ -107,6 +110,9 @@ T deserialize<T>(dynamic object) {
   return decoder(object);
 }
 
+/// Serializes a Dart object by getting its encoder from [TypeMap]
+///
+/// You will need to initiate your custom interface first in order to serialize using this method.
 Map<String, dynamic> serialize<T>(T object) {
   final encoder = TypeMap.getEncoderForType<T>();
   return encoder(object);

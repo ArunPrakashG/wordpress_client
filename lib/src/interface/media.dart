@@ -1,11 +1,6 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../requests/create/create_media.dart';
-import '../requests/delete/delete_media.dart';
-import '../requests/list/list_media.dart';
-import '../requests/retrive/retrive_media.dart';
-import '../requests/update/update_media.dart';
 
 class MediaInterface extends IInterface
     with

@@ -1,12 +1,6 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../requests/create/create_comment.dart';
-import '../requests/delete/delete_comment.dart';
-import '../requests/list/list_comment.dart';
-import '../requests/retrive/retrive_comment.dart';
-import '../requests/update/update_comment.dart';
-import '../responses/comment_response.dart';
 
 class CommentInterface extends IInterface
     with

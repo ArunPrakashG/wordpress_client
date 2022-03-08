@@ -1,9 +1,4 @@
 import '../../wordpress_client.dart';
-import '../requests/create/create_post.dart';
-import '../requests/delete/delete_post.dart';
-import '../requests/list/list_post.dart';
-import '../requests/retrive/retrive_post.dart';
-import '../requests/update/update_post.dart';
 
 class PostsInterface extends IInterface
     with

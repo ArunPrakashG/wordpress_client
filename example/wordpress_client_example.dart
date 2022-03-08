@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_redundant_argument_values, omit_local_variable_types, avoid_print
 
-import 'package:wordpress_client/src/requests/list/list_post.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 Future<void> main() async {
@@ -8,7 +7,7 @@ Future<void> main() async {
 
   // Simple Usage
   client = WordpressClient(
-    'https://www.pathanamthittamedia.com/wp-json',
+    'https://www.example.com/wp-json',
     'wp/v2',
     bootstrapper: (bootstrapper) => bootstrapper
         .withStatisticDelegate((baseUrl, endpoint, requestCount) {

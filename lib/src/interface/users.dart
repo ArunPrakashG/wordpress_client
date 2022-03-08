@@ -1,9 +1,4 @@
 import '../../wordpress_client.dart';
-import '../requests/create/create_user.dart';
-import '../requests/delete/delete_user.dart';
-import '../requests/list/list_user.dart';
-import '../requests/retrive/retrive_user.dart';
-import '../requests/update/update_user.dart';
 
 class UsersInterface extends IInterface
     with

@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../requests/delete/delete_me.dart';
-import '../requests/retrive/retrive_me.dart';
-import '../requests/update/update_me.dart';
 
 class MeInterface extends IInterface
     with

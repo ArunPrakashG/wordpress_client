@@ -1,5 +1,4 @@
 import '../../../wordpress_client.dart';
-import '../../utilities/helpers.dart';
 
 class CreateUserRequest implements IRequest {
   CreateUserRequest({

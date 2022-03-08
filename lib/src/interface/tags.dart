@@ -1,9 +1,4 @@
 import '../../wordpress_client.dart';
-import '../requests/create/create_tag.dart';
-import '../requests/delete/delete_tag.dart';
-import '../requests/list/list_tag.dart';
-import '../requests/retrive/retrive_tag.dart';
-import '../requests/update/update_tag.dart';
 
 class TagInterface extends IInterface
     with

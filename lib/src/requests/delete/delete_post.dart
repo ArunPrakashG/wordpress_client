@@ -1,5 +1,4 @@
 import '../../../wordpress_client.dart';
-import '../../utilities/helpers.dart';
 
 class DeletePostRequest implements IRequest {
   DeletePostRequest({
