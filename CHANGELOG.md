@@ -75,3 +75,11 @@
 ## 6.1.1-pre
 
 - Removed test package
+
+## 6.1.2-pre
+
+- Version fix
+
+## 6.1.3-pre
+
+- Bug fixes

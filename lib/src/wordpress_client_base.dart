@@ -11,7 +11,6 @@ import 'client_configuration.dart';
 import 'exceptions/interface_do_not_exist_exception.dart';
 import 'exceptions/interface_exist_exception.dart';
 import 'exceptions/interface_not_initialized.dart';
-import 'exceptions/invalid_interface_exception.dart';
 import 'exceptions/null_reference_exception.dart';
 import 'exceptions/request_uri_parse_exception.dart';
 import 'interface/category.dart';
@@ -21,6 +20,7 @@ import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
+import 'interface_key.dart';
 import 'responses/comment_response.dart';
 import 'type_map.dart';
 import 'utilities/helpers.dart';
@@ -75,21 +75,25 @@ class WordpressClient {
   /// The current user interface.
   ///
   /// Requests will only work if you are authorized with valid credentials.
-  MeInterface get me => _interfaces['me'] as MeInterface;
+  MeInterface get me => getInterface<MeInterface>('me');
 
-  PostsInterface get posts => _interfaces['posts'] as PostsInterface;
+  PostsInterface get posts => getInterface<PostsInterface>('posts');
   CategoryInterface get categories =>
-      _interfaces['categories'] as CategoryInterface;
-  CommentInterface get comments => _interfaces['comments'] as CommentInterface;
-  MediaInterface get media => _interfaces['media'] as MediaInterface;
-  TagInterface get tags => _interfaces['tags'] as TagInterface;
-  UsersInterface get users => _interfaces['users'] as UsersInterface;
+      getInterface<CategoryInterface>('categories');
+  CommentInterface get comments => getInterface<CommentInterface>('comments');
+  MediaInterface get media => getInterface<MediaInterface>('media');
+  TagInterface get tags => getInterface<TagInterface>('tags');
+  UsersInterface get users => getInterface<UsersInterface>('users');
 
-  static final Map<String, dynamic> _interfaces = <String, dynamic>{};
+  static final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
+      <InterfaceKey<dynamic>, dynamic>{};
 
   bool _hasInitialized = false;
 
-  /// Initializes all the built in interfaces and other services/
+  /// Initializes all the built in interfaces and other services
+  ///
+  /// This method should be called before any other method.
+  ///
   Future<void> initialize() async {
     if (_hasInitialized) {
       return;
@@ -105,7 +109,6 @@ class WordpressClient {
       key: 'me',
       responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
-      overriteIfTypeExists: true,
     );
 
     await initInterface<PostsInterface, Post>(
@@ -143,20 +146,18 @@ class WordpressClient {
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
-    // TODO: Add a tag parameter to type map, so that we can have multiple maps of same type.
     await initInterface<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
       responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
-      overriteIfTypeExists: true,
     );
   }
 
   /// Called to initialize an interface.
   /// All interfaces inherit from [IInterface] abstract class, which provides internal requester instance and other functions.
   ///
-  /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance.
+  /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance & the response type used by the interface requests.
   ///
   /// [interface] is instance of interface type [T]
   ///
@@ -187,29 +188,31 @@ class WordpressClient {
   /// ```
   ///
   Future<void> initInterface<T extends IInterface, E>({
-    required T? interface,
-    required String? key,
+    required T interface,
+    required String key,
     required JsonEncoderCallback responseEncoder,
     required JsonDecoderCallback<E> responseDecoder,
     bool overriteIfTypeExists = false,
   }) async {
-    if (interface == null || isNullOrEmpty(key)) {
-      throw const InvalidInterfaceException();
+    final interfaceKey = InterfaceKey<T>(key);
+
+    if (_interfaces[interfaceKey] != null) {
+      throw InterfaceExistException(
+          '[$interfaceKey] Interface already exists.');
     }
 
-    if (_interfaces[key] != null) {
-      throw InterfaceExistException('[$key] Interface already exists.');
-    }
-
-    registerResponseType<E>(
+    _registerResponseType<E>(
       decoder: responseDecoder,
       encoder: responseEncoder,
       overriteIfExists: overriteIfTypeExists,
     );
 
-    await interface.init(_requester, key);
-    _interfaces[key!] = interface;
+    await interface.init(_requester, interfaceKey);
+    _interfaces[interfaceKey] = interface;
   }
+
+  bool interfaceExists<T>([String? key]) =>
+      _interfaces[InterfaceKey<T>(key)] != null;
 
   /// Registers a type to be used in [WordpressClient] Responses.
   ///
@@ -222,7 +225,7 @@ class WordpressClient {
   /// These are required to decode and encode responses.
   ///
   /// [overriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
-  void registerResponseType<E>({
+  void _registerResponseType<E>({
     required JsonEncoderCallback encoder,
     required JsonDecoderCallback<E> decoder,
     bool overriteIfExists = false,
@@ -230,13 +233,13 @@ class WordpressClient {
     _typeMap.addJsonPairForType<E>(
       decoder: decoder,
       encoder: encoder,
-      overriteIfExists: overriteIfExists,
+      overwrite: overriteIfExists,
     );
   }
 
   /// Gets an initialized interface.
   ///
-  /// [key] parameter is optional. However, getting result by specifing key is faster than using type.
+  /// [key] parameter is optional. However, getting result by specifing key is faster.
   ///
   /// All custom interfaces must inherit from [IInterface] interface.
   ///
@@ -248,9 +251,11 @@ class WordpressClient {
   /// await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
   /// ```
   ///
-  T getCustomInterface<T extends IInterface>([String? key]) {
-    if (!isNullOrEmpty(key) && _interfaces[key] != null) {
-      return _interfaces[key] as T;
+  T getInterface<T extends IInterface>([String? key]) {
+    final interfaceKey = InterfaceKey<T>(key);
+
+    if (interfaceExists<T>(key)) {
+      return _interfaces[interfaceKey] as T;
     }
 
     final interfacesOfType = _interfaces.values.whereType<T>();
@@ -269,7 +274,7 @@ class WordpressClient {
     return interface;
   }
 
-  void removeDefaultAuthorization() => _requester.removeDefaultAuthorization();
+  void clearDefaultAuthorization() => _requester._removeDefaultAuthorization();
 
   void reconfigureRequester(
     BootstrapConfiguration Function(BootstrapBuilder) bootstrapper,

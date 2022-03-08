@@ -88,7 +88,7 @@ class InternalRequester {
     }
   }
 
-  void removeDefaultAuthorization() {
+  void _removeDefaultAuthorization() {
     _defaultAuthorization = null;
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../interface_key.dart';
 import '../wordpress_client_base.dart';
 
 /// The base of all custom requests.
@@ -15,7 +16,7 @@ abstract class IInterface {
   late InternalRequester internalRequester;
 
   /// The interface key, this must be unique and will act as a unique identifier for this interface.
-  late String? interfaceKey;
+  late InterfaceKey<dynamic> interfaceKey;
 
   bool hasInitilizedAlready = false;
 
@@ -47,7 +48,10 @@ abstract class IInterface {
   /// }
   /// ```
   ///
-  Future<void> init(InternalRequester requester, String? key) async {
+  Future<void> init(
+    InternalRequester requester,
+    InterfaceKey<dynamic> key,
+  ) async {
     if (hasInitilizedAlready) {
       return;
     }
