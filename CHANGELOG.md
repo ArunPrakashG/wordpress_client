@@ -91,3 +91,7 @@
 # 6.1.5-pre
 
 - Added Post extension for getting Media and Author
+
+# 6.1.6-pre
+
+- Support 3xx series respones (Cached Response)
