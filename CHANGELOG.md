@@ -87,3 +87,7 @@
 ## 6.1.4-pre
 
 - Bug fixes
+
+# 6.1.5-pre
+
+- Added Post extension for getting Media and Author
