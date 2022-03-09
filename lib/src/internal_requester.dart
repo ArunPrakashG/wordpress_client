@@ -144,7 +144,7 @@ class InternalRequester {
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
-      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+      if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
           null,
           requestDuration: watch.elapsed,
@@ -237,7 +237,7 @@ class InternalRequester {
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
-      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+      if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
           null,
           requestDuration: watch.elapsed,
@@ -328,7 +328,7 @@ class InternalRequester {
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
-      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+      if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<List<T>?>.failed(
           null,
           requestDuration: watch.elapsed,
@@ -432,7 +432,7 @@ class InternalRequester {
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
-      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+      if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
           null,
           requestDuration: watch.elapsed,
@@ -530,7 +530,7 @@ class InternalRequester {
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
-      if (!isInRange(dioResponse.statusCode!, 200, 299)) {
+      if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
           null,
           requestDuration: watch.elapsed,
