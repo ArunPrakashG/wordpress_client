@@ -90,6 +90,8 @@ class WordpressClient {
 
   bool _hasInitialized = false;
 
+  bool get isReady => _hasInitialized;
+
   /// Initializes all the built in interfaces and other services
   ///
   /// This method should be called before any other method.
