@@ -95,3 +95,7 @@
 # 6.1.6-pre
 
 - Support 3xx series respones (Cached Response)
+
+# 6.1.7-pre
+
+- Refactoring
