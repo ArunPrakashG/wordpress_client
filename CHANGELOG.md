@@ -99,3 +99,7 @@
 # 6.1.7-pre
 
 - Refactoring
+
+# 6.1.8-pre
+
+- Bug fixes
