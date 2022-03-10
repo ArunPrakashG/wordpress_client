@@ -5,13 +5,12 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:meta/meta.dart';
 
-import 'authorization/authorization_base.dart';
 import 'bootstrap_builder.dart';
 import 'exceptions/exceptions_export.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
-import 'interface/interfaces_export.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
@@ -28,9 +27,18 @@ import 'utilities/utility_export.dart';
 part 'internal_requester.dart';
 
 class WordpressClient {
+  /// Default Constructor.
+  ///
+  /// [baseUrl] is the base url of the wordpress site.
+  /// [path] is the path of the url appended to your REST API.
+  /// [bootstrapper] is a builder method for initializing the client.
+  ///
+  /// After this, you will have to initialize the client with [initialize] method call.
+  ///
+  /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
   WordpressClient(
-    String baseUrl,
-    String path, {
+    this.baseUrl,
+    this.path, {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
@@ -41,9 +49,37 @@ class WordpressClient {
       throw const NullReferenceException('Path is invalid.');
     }
 
-    requestBaseUrl = baseUrl;
-    requestPath = path;
-    requestBaseWithPath = parseUrl(baseUrl, path);
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
+
+    _requester = InternalRequester.configure(
+      baseUrl,
+      path,
+      configuration: configuration,
+    );
+  }
+
+  /// Default Constructor but with initialization.
+  ///
+  /// [baseUrl] is the base url of the wordpress site.
+  /// [path] is the path of the url appended to your REST API.
+  /// [bootstrapper] is a builder method for initializing the client.
+  ///
+  WordpressClient.initialize(
+    this.baseUrl,
+    this.path, {
+    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+  }) {
+    if (isNullOrEmpty(baseUrl)) {
+      throw const NullReferenceException('Base URL is invalid.');
+    }
+
+    if (isNullOrEmpty(path)) {
+      throw const NullReferenceException('Path is invalid.');
+    }
 
     var configuration = const BootstrapConfiguration();
 
@@ -51,26 +87,33 @@ class WordpressClient {
       configuration = bootstrapper(BootstrapBuilder());
     }
 
-    _requester = InternalRequester(
-      baseUrl: baseUrl,
-      path: path,
+    _requester = InternalRequester.configure(
+      baseUrl,
+      path,
       configuration: configuration,
     );
+
+    Timer.run(initialize);
   }
 
-  late InternalRequester _requester;
+  late final InternalRequester _requester;
 
   /// Base url supplied through constructor.
-  static late String requestBaseUrl;
+  final String baseUrl;
 
   /// Base url path supplied through constructor.
-  static late String requestPath;
+  final String path;
 
-  /// Combined url of [requestBaseUrl] and [requestPath]
-  static String requestBaseWithPath = '';
+  /// Combined url of [baseUrl] and [path]
+  String get requestUrl => parseUrl(baseUrl, path);
 
   /// Stores data on how to decode & encode responses.
   final TypeMap _typeMap = TypeMap();
+
+  /// Request Base Url.
+  ///
+  /// Basically, [baseUrl] + [path]
+  String get requestBaseUrl => baseUrl;
 
   /// The current user interface.
   ///
@@ -85,7 +128,7 @@ class WordpressClient {
   TagInterface get tags => getInterface<TagInterface>('tags');
   UsersInterface get users => getInterface<UsersInterface>('users');
 
-  static final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
+  final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
       <InterfaceKey<dynamic>, dynamic>{};
 
   bool _hasInitialized = false;
@@ -101,54 +144,54 @@ class WordpressClient {
       return;
     }
 
-    await _initInternalInterfaces();
+    _initInternalInterfaces();
     _hasInitialized = true;
   }
 
-  Future<void> _initInternalInterfaces() async {
-    await initInterface<MeInterface, User>(
+  void _initInternalInterfaces() {
+    initInterface<MeInterface, User>(
       interface: MeInterface(),
       key: 'me',
       responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
-    await initInterface<PostsInterface, Post>(
+    initInterface<PostsInterface, Post>(
       interface: PostsInterface(),
       key: 'posts',
       responseDecoder: Post.fromJson,
       responseEncoder: (dynamic post) => (post as Post).toJson(),
     );
 
-    await initInterface<CategoryInterface, Category>(
+    initInterface<CategoryInterface, Category>(
       interface: CategoryInterface(),
       key: 'categories',
       responseDecoder: Category.fromJson,
       responseEncoder: (dynamic category) => (category as Category).toJson(),
     );
 
-    await initInterface<CommentInterface, Comment>(
+    initInterface<CommentInterface, Comment>(
       interface: CommentInterface(),
       key: 'comments',
       responseDecoder: Comment.fromJson,
       responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
-    await initInterface<MediaInterface, Media>(
+    initInterface<MediaInterface, Media>(
       interface: MediaInterface(),
       key: 'media',
       responseDecoder: Media.fromJson,
       responseEncoder: (dynamic media) => (media as Media).toJson(),
     );
 
-    await initInterface<TagInterface, Tag>(
+    initInterface<TagInterface, Tag>(
       interface: TagInterface(),
       key: 'tags',
       responseDecoder: Tag.fromJson,
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
-    await initInterface<UsersInterface, User>(
+    initInterface<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
       responseDecoder: User.fromJson,
@@ -189,13 +232,13 @@ class WordpressClient {
   /// );
   /// ```
   ///
-  Future<void> initInterface<T extends IInterface, E>({
+  void initInterface<T extends IInterface, E>({
     required T interface,
     required String key,
     required JsonEncoderCallback responseEncoder,
     required JsonDecoderCallback<E> responseDecoder,
     bool overriteIfTypeExists = false,
-  }) async {
+  }) {
     final interfaceKey = InterfaceKey<T>(key);
 
     if (_interfaces[interfaceKey] != null) {
@@ -209,7 +252,7 @@ class WordpressClient {
       overriteIfExists: overriteIfTypeExists,
     );
 
-    await interface.init(_requester, interfaceKey);
+    interface._initInterface(_requester, baseUrl, path, interfaceKey);
     _interfaces[interfaceKey] = interface;
   }
 
@@ -254,6 +297,10 @@ class WordpressClient {
   /// ```
   ///
   T getInterface<T extends IInterface>([String? key]) {
+    if (!isReady) {
+      throw ClientNotReadyException();
+    }
+
     final interfaceKey = InterfaceKey<T>(key);
 
     if (interfaceExists<T>(key)) {
@@ -269,7 +316,7 @@ class WordpressClient {
 
     final interface = interfacesOfType.first;
 
-    if (!interface.hasInitilizedAlready) {
+    if (!interface._hasInitilizedAlready) {
       throw const InterfaceNotInitializedException();
     }
 
@@ -283,4 +330,71 @@ class WordpressClient {
   ) {
     return _requester.configure(bootstrapper(BootstrapBuilder()));
   }
+}
+
+/// The base of all custom requests.
+/// extend from this interface on your custom request interfaces to get the internal requester client for all your requests.
+abstract class IInterface {
+  late final String baseUrl;
+  late final String path;
+  String get requestBaseUrl => parseUrl(baseUrl, path);
+
+  /// The internal requester instance.
+  ///
+  /// This variable is assigned on init method automatically.
+  late final InternalRequester internalRequester;
+
+  /// The interface key, this must be unique and will act as a unique identifier for this interface.
+  late final InterfaceKey<dynamic> interfaceKey;
+
+  bool _hasInitilizedAlready = false;
+
+  /// Gets the internal requester client by waiting for it be free.
+  ///
+  /// You can directly get [InternalRequester] with waiting by [internalRequester] variable.
+  Future<InternalRequester> getInternalRequesterWhenFree() async {
+    while (internalRequester.isBusy) {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+
+    return internalRequester;
+  }
+
+  /// This method is used to initialize the interface by passing [InternalRequester] instance from the core to the interface.
+  ///
+  /// This method is called only once in interface lifecycle.
+  ///
+  /// It should always call super init() if it is overriden like so `super.init(requester, key)`.
+  /// Failing to call super init() method means [internalRequester] variable will be null and therefore none of the requests will go through and throws exception.
+  ///
+  /// Or you have to handle default init process by:
+  ///
+  /// ```dart
+  /// if(!hasInitilizedAlready){
+  ///   internalRequester = requester;
+  ///   interfaceKey = key;
+  ///   hasInitilizedAlready = true;
+  /// }
+  /// ```
+  ///
+
+  void _initInterface(
+    InternalRequester requester,
+    String baseUrl,
+    String path,
+    InterfaceKey<dynamic> key,
+  ) {
+    if (_hasInitilizedAlready) {
+      return;
+    }
+
+    internalRequester = requester;
+    interfaceKey = key;
+    baseUrl = baseUrl;
+    path = path;
+    _hasInitilizedAlready = true;
+    onInit();
+  }
+
+  void onInit() {}
 }

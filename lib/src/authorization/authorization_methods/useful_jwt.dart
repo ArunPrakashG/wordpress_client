@@ -48,7 +48,7 @@ class UsefulJwtAuth extends IAuthorization {
 
     try {
       final response = await _client!.post<dynamic>(
-        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token'),
+        parseUrl(requestBaseUrl, 'jwt-auth/v1/token'),
         data: {
           'username': userName,
           'password': password,
@@ -87,7 +87,7 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  Future<bool> init(Dio? client) async {
+  Future<bool> _init(Dio? client) async {
     if (_hasInit) {
       return true;
     }
@@ -116,7 +116,7 @@ class UsefulJwtAuth extends IAuthorization {
     try {
       final authUrl = await generateAuthUrl();
       final response = await _client!.post<dynamic>(
-        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token/validate'),
+        parseUrl(requestBaseUrl, 'jwt-auth/v1/token/validate'),
         options: Options(
           method: 'POST',
           headers: <String, dynamic>{

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 
-import '../authorization/authorization_base.dart';
 import '../constants.dart';
 import '../enums.dart';
 import '../utilities/callback.dart';
+import '../wordpress_client_base.dart';
 import 'request_content.dart';
 import 'request_interface.dart';
 

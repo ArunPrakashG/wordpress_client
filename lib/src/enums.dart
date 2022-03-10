@@ -1,5 +1,13 @@
 // ignore_for_file: constant_identifier_names
 
+enum ErrorType {
+  interfaceNotExist,
+  interfaceAlreadyExist,
+  requestFailedInternally,
+  requestFailed,
+  clientNotReady,
+}
+
 enum Status {
   open,
   closed,

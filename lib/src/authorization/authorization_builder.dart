@@ -2,7 +2,7 @@
 
 import '../enums.dart';
 import '../utilities/callback.dart';
-import 'authorization_base.dart';
+import '../wordpress_client_base.dart';
 import 'authorization_methods/basic_auth.dart';
 import 'authorization_methods/basic_jwt.dart';
 import 'authorization_methods/useful_jwt.dart';

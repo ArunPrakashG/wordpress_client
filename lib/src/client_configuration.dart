@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-import 'authorization/authorization_base.dart';
 import 'constants.dart';
 import 'wordpress_client_base.dart';
 

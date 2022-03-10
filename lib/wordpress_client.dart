@@ -7,7 +7,6 @@ library wordpress_client;
 export 'package:dio/dio.dart';
 
 export 'src/authorization/authorization_export.dart';
-export 'src/interface/interface_base.dart';
 export 'src/library_exports.dart';
 export 'src/operations/operations_export.dart';
 export 'src/requests/requests_export.dart';

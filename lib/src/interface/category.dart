@@ -11,7 +11,7 @@ import '../requests/update/update_category.dart';
 import '../requests/wordpress_request.dart';
 import '../responses/category_response.dart';
 import '../responses/wordpress_response.dart';
-import 'interface_base.dart';
+import '../wordpress_client_base.dart';
 
 class CategoryInterface extends IInterface
     with
