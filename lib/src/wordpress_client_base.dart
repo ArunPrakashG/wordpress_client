@@ -139,7 +139,7 @@ class WordpressClient {
   ///
   /// This method should be called before any other method.
   ///
-  Future<void> initialize() async {
+  void initialize() {
     if (_hasInitialized) {
       return;
     }
