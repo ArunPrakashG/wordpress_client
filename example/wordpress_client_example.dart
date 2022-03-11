@@ -6,7 +6,7 @@ Future<void> main() async {
   WordpressClient client;
 
   // Simple Usage
-  client = WordpressClient(
+  client = WordpressClient.initialize(
     'https://www.example.com/wp-json',
     'wp/v2',
     bootstrapper: (bootstrapper) => bootstrapper
@@ -23,8 +23,7 @@ Future<void> main() async {
         .build(),
   );
 
-  await client.initialize();
-
+  await Future<void>.delayed(const Duration(seconds: 2));
   WordpressResponse<List<Post>?> postsResponse = await client.posts.list(
     WordpressRequest(
       requestData: ListPostRequest(

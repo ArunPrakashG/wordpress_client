@@ -62,7 +62,7 @@ class InternalRequester {
     _client.options.receiveTimeout = configuration.requestTimeout;
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
-    _client.options.baseUrl = _baseUrl;
+    _client.options.baseUrl = requestBaseUrl;
 
     if (configuration.useCookies) {
       _client.interceptors.add(CookieManager(CookieJar()));
