@@ -68,19 +68,6 @@ class InternalRequester {
       _client.interceptors.add(CookieManager(CookieJar()));
     }
 
-    if (configuration.cacheResponses &&
-        configuration.responseCachePath != null) {
-      _client.interceptors.add(
-        DioCacheInterceptor(
-          options: CacheOptions(
-            store: FileCacheStore(configuration.responseCachePath!),
-            hitCacheOnErrorExcept: [401, 403],
-            maxStale: const Duration(days: 7),
-          ),
-        ),
-      );
-    }
-
     if (configuration.interceptors != null &&
         configuration.interceptors!.isNotEmpty) {
       _client.interceptors.addAll(configuration.interceptors!);

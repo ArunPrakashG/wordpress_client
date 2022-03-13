@@ -36,8 +36,6 @@ Future<void> main() async {
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(60)
-        .withResponseCache(true)
-        .withCachePath(cachePath)
         .withStatisticDelegate((requestUrl, endpoint, count) {
           print('$requestUrl => $endpoint => $count');
         })

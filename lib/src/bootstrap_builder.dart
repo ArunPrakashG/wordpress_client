@@ -16,8 +16,6 @@ class BootstrapBuilder {
   int _defaultMaxRedirects = 5;
   bool _useCookies = false;
   bool _waitWhileBusy = false;
-  bool _cacheResponses = false;
-  String? _cachePath;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
 
@@ -34,16 +32,6 @@ class BootstrapBuilder {
 
   BootstrapBuilder withStatisticDelegate(StatisticsCallback? delegate) {
     _statisticsDelegate = delegate;
-    return this;
-  }
-
-  BootstrapBuilder withResponseCache(bool cacheResponse) {
-    _cacheResponses = cacheResponse;
-    return this;
-  }
-
-  BootstrapBuilder withCachePath(String cachePath) {
-    _cachePath = cachePath;
     return this;
   }
 
@@ -106,8 +94,6 @@ class BootstrapBuilder {
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
       waitWhileBusy: _waitWhileBusy,
-      cacheResponses: _cacheResponses,
-      responseCachePath: _cachePath,
       interceptors: _interceptors,
     );
   }

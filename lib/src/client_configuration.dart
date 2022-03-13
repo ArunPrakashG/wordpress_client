@@ -15,8 +15,6 @@ class BootstrapConfiguration {
     this.maxRedirects = 5,
     this.waitWhileBusy = false,
     this.statisticsDelegate,
-    this.cacheResponses = false,
-    this.responseCachePath,
     this.interceptors,
   });
 
@@ -30,7 +28,5 @@ class BootstrapConfiguration {
   final bool useCookies;
   final List<Interceptor>? interceptors;
   final bool waitWhileBusy;
-  final bool cacheResponses;
-  final String? responseCachePath;
   final StatisticsCallback? statisticsDelegate;
 }
