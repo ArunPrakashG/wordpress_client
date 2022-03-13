@@ -6,6 +6,15 @@ enum ErrorType {
   requestFailedInternally,
   requestFailed,
   clientNotReady,
+  authorizationFailed,
+  bootstrapFailed,
+  fileDoesntExist,
+  interfaceDoNotExist,
+  interfaceExist,
+  interfaceNotInitialized,
+  invalidInterface,
+  nullReference,
+  requestUriParsingFailed,
 }
 
 enum Status {

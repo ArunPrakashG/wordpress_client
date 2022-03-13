@@ -113,7 +113,7 @@ class InternalRequester {
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw const RequestUriParsingFailedException('Request is invalid.');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -149,7 +149,7 @@ class InternalRequester {
       watch.stop();
 
       if (dioResponse.statusCode == null) {
-        throw const NullReferenceException(
+        throw NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
@@ -206,7 +206,7 @@ class InternalRequester {
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw const RequestUriParsingFailedException('Request is invalid.');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -242,7 +242,7 @@ class InternalRequester {
       watch.stop();
 
       if (dioResponse.statusCode == null) {
-        throw const NullReferenceException(
+        throw NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
@@ -297,7 +297,7 @@ class InternalRequester {
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw const RequestUriParsingFailedException('Request is invalid.');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -333,7 +333,7 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw const NullReferenceException(
+        throw NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
@@ -401,7 +401,7 @@ class InternalRequester {
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw const RequestUriParsingFailedException('Request is invalid.');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -437,7 +437,7 @@ class InternalRequester {
       watch.stop();
 
       if (dioResponse.statusCode == null) {
-        throw const NullReferenceException(
+        throw NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
@@ -494,7 +494,7 @@ class InternalRequester {
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
-      throw const RequestUriParsingFailedException('Request is invalid.');
+      throw RequestUriParsingFailedException('Request is invalid.');
     }
 
     await waitWhileBusy();
@@ -535,7 +535,7 @@ class InternalRequester {
       );
 
       if (dioResponse.statusCode == null) {
-        throw const NullReferenceException(
+        throw NullReferenceException(
             'Response status code is null. This means the request never reached the server. Please check your internet connection.');
       }
 
@@ -691,7 +691,6 @@ abstract class IAuthorization {
   /// authorize() / validate() functions will not be called before calling init() function.
   ///
   /// If you require Http request calls inside isAuthenticated() / generateAuthUrl() calls, then you will need to implement your own requesting mechanism  ///
-  @mustCallSuper
   Future<bool> _init({
     required Dio dioClient,
     required String baseUrl,

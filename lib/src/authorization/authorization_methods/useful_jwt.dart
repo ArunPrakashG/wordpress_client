@@ -16,7 +16,6 @@ class UsefulJwtAuth extends IAuthorization {
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
   bool _hasValidatedOnce = false;
-  bool _hasInit = false;
   Dio? _client;
 
   static const int kDaysUntilTokenExpiry = 3;
@@ -84,18 +83,6 @@ class UsefulJwtAuth extends IAuthorization {
       callback?.invokeUnhandledExceptionCallback(ex as Exception);
       return false;
     }
-  }
-
-  @override
-  Future<bool> _init(Dio? client) async {
-    if (_hasInit) {
-      return true;
-    }
-
-    _client = client;
-    _encryptedAccessToken = '';
-    _hasValidatedOnce = false;
-    return _hasInit = true;
   }
 
   @override

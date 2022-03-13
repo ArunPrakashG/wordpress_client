@@ -40,7 +40,9 @@ class CreateMediaRequest implements IRequest {
     final file = File(mediaFilePath);
 
     if (!file.existsSync()) {
-      throw const FileDoesntExistException('File does not exist');
+      throw FileDoesntExistException(
+        'The file at path "$mediaFilePath" doesn\'t exist.',
+      );
     }
 
     final fileName = basename(file.path);

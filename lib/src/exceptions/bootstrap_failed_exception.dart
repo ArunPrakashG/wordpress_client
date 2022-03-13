@@ -1,5 +1,10 @@
-class BootstrapFailedException implements Exception {
-  const BootstrapFailedException(this.reason);
+import '../enums.dart';
+import 'wordpress_exception_base.dart';
 
-  final String reason;
+class BootstrapFailedException implements WordpressException {
+  @override
+  ErrorType get errorType => ErrorType.bootstrapFailed;
+
+  @override
+  String? get message => 'Bootstrap process failed.';
 }

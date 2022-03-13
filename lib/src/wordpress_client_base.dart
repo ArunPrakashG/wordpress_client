@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:dio_cache_interceptor_file_store/dio_cache_interceptor_file_store.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:meta/meta.dart';
 
 import 'bootstrap_builder.dart';
 import 'exceptions/exceptions_export.dart';
@@ -42,11 +41,11 @@ class WordpressClient {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
-      throw const NullReferenceException('Base URL is invalid.');
+      throw NullReferenceException('Base URL is invalid.');
     }
 
     if (isNullOrEmpty(path)) {
-      throw const NullReferenceException('Path is invalid.');
+      throw NullReferenceException('Path is invalid.');
     }
 
     var configuration = const BootstrapConfiguration();
@@ -74,11 +73,11 @@ class WordpressClient {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
-      throw const NullReferenceException('Base URL is invalid.');
+      throw NullReferenceException('Base URL is invalid.');
     }
 
     if (isNullOrEmpty(path)) {
-      throw const NullReferenceException('Path is invalid.');
+      throw NullReferenceException('Path is invalid.');
     }
 
     var configuration = const BootstrapConfiguration();
@@ -242,8 +241,7 @@ class WordpressClient {
     final interfaceKey = InterfaceKey<T>(key);
 
     if (_interfaces[interfaceKey] != null) {
-      throw InterfaceExistException(
-          '[$interfaceKey] Interface already exists.');
+      throw InterfaceExistException<T>();
     }
 
     _registerResponseType<E>(
@@ -310,14 +308,14 @@ class WordpressClient {
     final interfacesOfType = _interfaces.values.whereType<T>();
 
     if (interfacesOfType.isEmpty) {
-      throw const InterfaceDoNotExistException(
-          'The specified interface do not exist.');
+      throw InterfaceDoNotExistException(
+          'The specified interface do not exist. (${typeOf<T>()}_$key)');
     }
 
     final interface = interfacesOfType.first;
 
     if (!interface._hasInitilizedAlready) {
-      throw const InterfaceNotInitializedException();
+      throw InterfaceNotInitializedException<T>();
     }
 
     return interface;
