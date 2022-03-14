@@ -15,7 +15,6 @@ import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'interface_key.dart';
 import 'library_exports.dart';
-import 'requests/requests_export.dart';
 import 'responses/responses_export.dart';
 import 'type_map.dart';
 import 'utilities/helpers.dart';

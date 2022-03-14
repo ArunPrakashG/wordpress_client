@@ -1,7 +1,11 @@
 import 'dart:async';
 
-import '../../../wordpress_client.dart';
+import 'package:dio/dio.dart';
+
+import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
+import '../../wordpress_client_base.dart';
+import 'useful_jwt.dart';
 
 /// Most widely used authentication system, which is most easy to integrate and secure (when compared with basic auth)
 ///

@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_redundant_argument_values, omit_local_variable_types, avoid_print
 
+import 'package:wordpress_client/requests.dart';
+import 'package:wordpress_client/responses.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 Future<void> main() async {

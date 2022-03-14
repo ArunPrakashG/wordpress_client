@@ -1,7 +1,11 @@
 import 'dart:async';
 
-import '../../../wordpress_client.dart';
+import 'package:dio/dio.dart';
+
+import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
+import '../../wordpress_client_base.dart';
+import 'basic_jwt.dart';
 
 /// Similar to [BasicJwtAuth], this plugin is in active development and has much more features than the previous one. It is recommended to use this plugin instead of the previous one.
 ///

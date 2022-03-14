@@ -1,3 +1,5 @@
+import '../../../requests.dart';
+import '../../../responses.dart';
 import '../../../wordpress_client.dart';
 
 extension PostExtensions on Post {
