@@ -15,13 +15,7 @@ Future<void> main() async {
         .withStatisticDelegate((baseUrl, endpoint, requestCount) {
           print('$baseUrl $endpoint $requestCount');
         })
-        .withDioInterceptor(
-          LogInterceptor(
-            error: true,
-            requestBody: true,
-            responseBody: true,
-          ),
-        )
+        .withDebugMode(true)
         .build(),
   );
 

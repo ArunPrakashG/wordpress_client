@@ -15,16 +15,17 @@ class BootstrapBuilder {
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
   bool _useCookies = false;
-  bool _waitWhileBusy = false;
+  bool _synchronized = false;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
   bool _debugMode = false;
 
-  BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
-    _waitWhileBusy = value;
+  BootstrapBuilder withSynchronizedRequests(bool value) {
+    _synchronized = value;
     return this;
   }
 
+  /// Attaches [LogInterceptor] to the [Dio] instance.
   BootstrapBuilder withDebugMode(bool value) {
     _debugMode = value;
     return this;
@@ -99,7 +100,7 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
-      synchronized: _waitWhileBusy,
+      synchronized: _synchronized,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
     );

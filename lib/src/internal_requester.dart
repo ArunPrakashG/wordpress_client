@@ -97,9 +97,7 @@ class InternalRequester {
   String _generatePath(WordpressRequest request) {
     return parseUrl(
       request.path ?? _path,
-      request.endpoint.startsWith('/')
-          ? request.endpoint
-          : '/${request.endpoint}',
+      request.endpoint,
     );
   }
 
