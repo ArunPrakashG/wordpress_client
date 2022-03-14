@@ -9,7 +9,7 @@ Future<void> main() async {
 
   // Simple Usage
   client = WordpressClient.initialize(
-    'https://www.pathanamthittamedia.com/',
+    'https://www.example.com/',
     'wp-json/wp/v2',
     bootstrapper: (bootstrapper) => bootstrapper
         .withStatisticDelegate((baseUrl, endpoint, requestCount) {
