@@ -18,9 +18,15 @@ class BootstrapBuilder {
   bool _waitWhileBusy = false;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
+  bool _debugMode = false;
 
   BootstrapBuilder withConcurrencyWaitWhileBusy(bool value) {
     _waitWhileBusy = value;
+    return this;
+  }
+
+  BootstrapBuilder withDebugMode(bool value) {
+    _debugMode = value;
     return this;
   }
 
@@ -93,8 +99,9 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
-      waitWhileBusy: _waitWhileBusy,
+      synchronized: _waitWhileBusy,
       interceptors: _interceptors,
+      enableDebugMode: _debugMode,
     );
   }
 }

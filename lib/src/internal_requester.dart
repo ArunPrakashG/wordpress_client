@@ -23,7 +23,8 @@ class InternalRequester {
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
-  bool _singleRequestAtATimeMode = false;
+  bool _synchronized = false;
+  bool _isDebugMode = false;
 
   /// The request base url.
   ///
@@ -33,7 +34,8 @@ class InternalRequester {
   String get requestBaseUrl => parseUrl(_baseUrl, _path);
 
   void configure(BootstrapConfiguration configuration) {
-    _singleRequestAtATimeMode = configuration.waitWhileBusy;
+    _synchronized = configuration.synchronized;
+    _isDebugMode = configuration.enableDebugMode;
 
     if (configuration.defaultAuthorization != null &&
         !configuration.defaultAuthorization!.isDefault) {
@@ -63,6 +65,15 @@ class InternalRequester {
 
     if (configuration.useCookies) {
       _client.interceptors.add(CookieManager(CookieJar()));
+    }
+
+    if (configuration.enableDebugMode) {
+      _client.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+        ),
+      );
     }
 
     if (configuration.interceptors != null &&
@@ -107,7 +118,7 @@ class InternalRequester {
 
     Response<dynamic> response;
 
-    if (_singleRequestAtATimeMode) {
+    if (_synchronized) {
       response = await _syncLock.synchronized<Response<dynamic>>(
         () async {
           watch.start();

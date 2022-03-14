@@ -23,6 +23,7 @@ import 'utilities/utility_export.dart';
 
 part 'internal_requester.dart';
 
+/// The main class for [WordpressClient].
 class WordpressClient {
   /// Default Constructor.
   ///
@@ -102,6 +103,16 @@ class WordpressClient {
 
   /// Base url path supplied through constructor.
   final String path;
+
+  /// Returns true if this instance of [WordpressClient] is running in debug mode.
+  ///
+  /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
+  bool get isDebugMode => _requester._isDebugMode;
+
+  /// Returns true if we have synchronized mode enabled.
+  ///
+  /// i.e., Only a single request is allowed at a time.
+  bool get isSynchronizedMode => _requester._synchronized;
 
   /// Combined url of [baseUrl] and [path]
   String get requestUrl => parseUrl(baseUrl, path);

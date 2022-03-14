@@ -13,11 +13,13 @@ class BootstrapConfiguration {
     this.defaultHeaders,
     this.shouldFollowRedirects = false,
     this.maxRedirects = 5,
-    this.waitWhileBusy = false,
+    this.synchronized = false,
     this.statisticsDelegate,
     this.interceptors,
+    this.enableDebugMode = false,
   });
 
+  final bool enableDebugMode;
   final int requestTimeout;
   final bool Function(dynamic)? responsePreprocessorDelegate;
   final IAuthorization? defaultAuthorization;
@@ -27,6 +29,6 @@ class BootstrapConfiguration {
   final int maxRedirects;
   final bool useCookies;
   final List<Interceptor>? interceptors;
-  final bool waitWhileBusy;
+  final bool synchronized;
   final StatisticsCallback? statisticsDelegate;
 }
