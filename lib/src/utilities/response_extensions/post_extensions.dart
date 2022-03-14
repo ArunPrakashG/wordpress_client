@@ -5,7 +5,7 @@ import '../../../wordpress_client.dart';
 extension PostExtensions on Post {
   Future<Media?> getMedia(
     WordpressClient client, {
-    Callback? callback,
+    WordpressCallback? callback,
     CancelToken? cancelToken,
   }) async {
     if (featuredMedia == null || !client.isReady) {
@@ -27,7 +27,7 @@ extension PostExtensions on Post {
 
   Future<User?> getAuthor(
     WordpressClient client, {
-    Callback? callback,
+    WordpressCallback? callback,
     CancelToken? cancelToken,
   }) async {
     if (author == null || !client.isReady) {

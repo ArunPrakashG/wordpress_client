@@ -19,14 +19,11 @@ class InternalRequester {
 
   final String _baseUrl;
   final String _path;
+  final sync.Lock _syncLock = sync.Lock();
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
-  bool _isBusy = false;
   bool _singleRequestAtATimeMode = false;
-
-  /// Specifies whether the requester is busy with processing another request or not at the moment.
-  bool get isBusy => _isBusy;
 
   /// The request base url.
   ///
@@ -62,7 +59,7 @@ class InternalRequester {
     _client.options.receiveTimeout = configuration.requestTimeout;
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
-    _client.options.baseUrl = requestBaseUrl;
+    _client.options.baseUrl = _baseUrl;
 
     if (configuration.useCookies) {
       _client.interceptors.add(CookieManager(CookieJar()));
@@ -71,16 +68,6 @@ class InternalRequester {
     if (configuration.interceptors != null &&
         configuration.interceptors!.isNotEmpty) {
       _client.interceptors.addAll(configuration.interceptors!);
-    }
-  }
-
-  Future<void> waitWhileBusy() async {
-    if (!_singleRequestAtATimeMode) {
-      return;
-    }
-
-    while (_isBusy) {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
     }
   }
 
@@ -96,29 +83,64 @@ class InternalRequester {
     return request.responseValidationCallback!(response);
   }
 
-  Future<WordpressResponse<T?>> createRequest<T>(
+  String _generatePath(WordpressRequest request) {
+    return parseUrl(
+      request.path ?? _path,
+      request.endpoint.startsWith('/')
+          ? request.endpoint
+          : '/${request.endpoint}',
+    );
+  }
+
+  Future<Response<dynamic>> _requestAsync(
     WordpressRequest request,
+    Stopwatch watch,
   ) async {
-    if (!request.isRequestExecutable) {
-      throw RequestUriParsingFailedException('Request is invalid.');
-    }
+    await _processRequest(request);
 
-    await waitWhileBusy();
-    final watch = Stopwatch()..start();
-    _isBusy = true;
+    _invokeStatisticsCallback(
+      Uri.tryParse(parseUrl(requestBaseUrl, request.endpoint)).toString(),
+      request.endpoint,
+    );
 
-    try {
-      await _processRequest(request);
+    watch.reset();
 
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
+    Response<dynamic> response;
+
+    if (_singleRequestAtATimeMode) {
+      response = await _syncLock.synchronized<Response<dynamic>>(
+        () async {
+          watch.start();
+
+          return _client.request<dynamic>(
+            _generatePath(request),
+            data: request.body,
+            cancelToken: request.cancelToken,
+            queryParameters: request.queryParams,
+            onSendProgress: request.callback?.onSendProgress,
+            onReceiveProgress: request.callback?.onReceiveProgress,
+            options: Options(
+              method: request.method.name,
+              sendTimeout: request.sendTimeout,
+              receiveTimeout: request.receiveTimeout,
+              headers: request.headers,
+            ),
+          );
+        },
+        timeout: const Duration(
+          minutes: 1,
+        ),
       );
+    } else {
+      watch.start();
 
-      final dioResponse = await _client.request<dynamic>(
-        request.endpoint.startsWith('/')
-            ? request.endpoint
-            : '/${request.endpoint}',
+      response = await _client.request<dynamic>(
+        parseUrl(
+          _path,
+          request.endpoint.startsWith('/')
+              ? request.endpoint
+              : '/${request.endpoint}',
+        ),
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
@@ -129,16 +151,31 @@ class InternalRequester {
           sendTimeout: request.sendTimeout,
           receiveTimeout: request.receiveTimeout,
           headers: request.headers,
-          responseType: ResponseType.json,
         ),
       );
+    }
 
-      watch.stop();
+    watch.stop();
 
-      if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
-            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
-      }
+    if (response.statusCode == null) {
+      throw NullReferenceException(
+          'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+    }
+
+    return response;
+  }
+
+  Future<WordpressResponse<T?>> createRequest<T>(
+    WordpressRequest request,
+  ) async {
+    if (!request.isRequestExecutable) {
+      throw RequestUriParsingFailedException('Request is invalid.');
+    }
+
+    final watch = Stopwatch();
+
+    try {
+      final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
@@ -184,8 +221,6 @@ class InternalRequester {
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
-    } finally {
-      _isBusy = false;
     }
   }
 
@@ -196,42 +231,10 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    await waitWhileBusy();
-    final watch = Stopwatch()..start();
-    _isBusy = true;
+    final watch = Stopwatch();
 
     try {
-      await _processRequest(request);
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
-
-      final dioResponse = await _client.request<dynamic>(
-        request.endpoint.startsWith('/')
-            ? request.endpoint
-            : '/${request.endpoint}',
-        data: request.body,
-        cancelToken: request.cancelToken,
-        queryParameters: request.queryParams,
-        onSendProgress: request.callback?.onSendProgress,
-        onReceiveProgress: request.callback?.onReceiveProgress,
-        options: Options(
-          method: request.method.name,
-          sendTimeout: request.sendTimeout,
-          receiveTimeout: request.receiveTimeout,
-          headers: request.headers,
-          responseType: ResponseType.json,
-        ),
-      );
-
-      watch.stop();
-
-      if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
-            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
-      }
+      final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
@@ -275,8 +278,6 @@ class InternalRequester {
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
-    } finally {
-      _isBusy = false;
     }
   }
 
@@ -287,42 +288,10 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    await waitWhileBusy();
-    final watch = Stopwatch()..start();
-    _isBusy = true;
+    final watch = Stopwatch();
 
     try {
-      await _processRequest(request);
-
-      final dioResponse = await _client.request<dynamic>(
-        request.endpoint.startsWith('/')
-            ? request.endpoint
-            : '/${request.endpoint}',
-        data: request.body,
-        cancelToken: request.cancelToken,
-        queryParameters: request.queryParams,
-        onSendProgress: request.callback?.onSendProgress,
-        onReceiveProgress: request.callback?.onReceiveProgress,
-        options: Options(
-          method: request.method.name,
-          sendTimeout: request.sendTimeout,
-          receiveTimeout: request.receiveTimeout,
-          headers: request.headers,
-          responseType: ResponseType.json,
-        ),
-      );
-
-      watch.stop();
-
-      _invokeStatisticsCallback(
-        dioResponse.requestOptions.uri.toString(),
-        request.endpoint,
-      );
-
-      if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
-            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
-      }
+      final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<List<T>?>.failed(
@@ -379,8 +348,6 @@ class InternalRequester {
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
-    } finally {
-      _isBusy = false;
     }
   }
 
@@ -391,42 +358,10 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    await waitWhileBusy();
-    final watch = Stopwatch()..start();
-    _isBusy = true;
+    final watch = Stopwatch();
 
     try {
-      await _processRequest(request);
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
-
-      final dioResponse = await _client.request<dynamic>(
-        request.endpoint.startsWith('/')
-            ? request.endpoint
-            : '/${request.endpoint}',
-        data: request.body,
-        cancelToken: request.cancelToken,
-        queryParameters: request.queryParams,
-        onSendProgress: request.callback?.onSendProgress,
-        onReceiveProgress: request.callback?.onReceiveProgress,
-        options: Options(
-          method: request.method.name,
-          sendTimeout: request.sendTimeout,
-          receiveTimeout: request.receiveTimeout,
-          headers: request.headers,
-          responseType: ResponseType.json,
-        ),
-      );
-
-      watch.stop();
-
-      if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
-            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
-      }
+      final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
@@ -472,8 +407,6 @@ class InternalRequester {
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
-    } finally {
-      _isBusy = false;
     }
   }
 
@@ -484,47 +417,10 @@ class InternalRequester {
       throw RequestUriParsingFailedException('Request is invalid.');
     }
 
-    await waitWhileBusy();
-    final watch = Stopwatch()..start();
-    _isBusy = true;
+    final watch = Stopwatch();
 
     try {
-      await _processRequest(request);
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
-
-      final dioResponse = await _client.request<dynamic>(
-        request.endpoint.startsWith('/')
-            ? request.endpoint
-            : '/${request.endpoint}',
-        data: request.body,
-        cancelToken: request.cancelToken,
-        queryParameters: request.queryParams,
-        onSendProgress: request.callback?.onSendProgress,
-        onReceiveProgress: request.callback?.onReceiveProgress,
-        options: Options(
-          method: request.method.name,
-          sendTimeout: request.sendTimeout,
-          receiveTimeout: request.receiveTimeout,
-          headers: request.headers,
-          responseType: ResponseType.json,
-        ),
-      );
-
-      watch.stop();
-
-      _invokeStatisticsCallback(
-        Uri.tryParse(parseUrl(_baseUrl, request.endpoint)).toString(),
-        request.endpoint,
-      );
-
-      if (dioResponse.statusCode == null) {
-        throw NullReferenceException(
-            'Response status code is null. This means the request never reached the server. Please check your internet connection.');
-      }
+      final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
         return WordpressResponse<T?>.failed(
@@ -570,8 +466,6 @@ class InternalRequester {
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
-    } finally {
-      _isBusy = false;
     }
   }
 
@@ -596,7 +490,7 @@ class InternalRequester {
   Future<bool> _authorize({
     required WordpressRequest request,
     required IAuthorization auth,
-    Callback? callback,
+    WordpressCallback? callback,
   }) async {
     if (!auth.isValidAuth) {
       return false;
@@ -662,7 +556,7 @@ abstract class IAuthorization {
   String? password;
 
   // A Callback, if assigned, will help with logging of data of requests send and received on this instance.
-  Callback? callback;
+  WordpressCallback? callback;
 
   /// Gets if this authorization instance has valid authentication nounce. (token/encryptedToken)
   bool get isValidAuth;

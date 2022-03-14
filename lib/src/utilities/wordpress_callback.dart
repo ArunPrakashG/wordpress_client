@@ -5,8 +5,8 @@ import '../responses/error_container.dart';
 typedef ReceiveProgressCallback = void Function(int received, int total);
 typedef SendProgressCallback = void Function(int sent, int total);
 
-class Callback {
-  const Callback({
+class WordpressCallback {
+  const WordpressCallback({
     this.unhandledExceptionCallback,
     this.responseCallback,
     this.onReceiveProgress,
@@ -14,10 +14,21 @@ class Callback {
     this.onSendProgress,
   });
 
-  final void Function(dynamic)? unhandledExceptionCallback;
-  final void Function(ErrorContainer)? requestErrorCallback;
-  final void Function(dynamic)? responseCallback;
+  /// Invoked when an unhandled exception occurs.
+  final void Function(dynamic unhandledException)? unhandledExceptionCallback;
+
+  /// Invoked from an exception is thrown from internal [Dio] instance or from a failed request.
+  final void Function(ErrorContainer errorContainer)? requestErrorCallback;
+
+  /// Invoked when response is received.
+  ///
+  /// Argument [response] can be of any type, depending on the response received. Mostly, its a [Map] or [List] or [String].
+  final void Function(dynamic response)? responseCallback;
+
+  /// Invoked when response is received. This is directly invoked from [Dio].
   final ReceiveProgressCallback? onReceiveProgress;
+
+  /// Invoked when request is sent. This is directly invoked from [Dio].
   final SendProgressCallback? onSendProgress;
 
   void invokeUnhandledExceptionCallback(dynamic e) {

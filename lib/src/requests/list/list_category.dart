@@ -26,7 +26,7 @@ class ListCategoryRequest implements IRequest {
   List<int>? exclude;
   List<int>? include;
   OrderBy? orderBy;
-  String? order;
+  Order? order;
   List<String>? slug;
   int? parent;
   int? post;
@@ -42,7 +42,7 @@ class ListCategoryRequest implements IRequest {
       ..addIfNotNull('exclude', exclude?.join(','))
       ..addIfNotNull('include', include?.join(','))
       ..addIfNotNull('order_by', orderBy?.name)
-      ..addIfNotNull('order', order)
+      ..addIfNotNull('order', order?.name)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('post', post)

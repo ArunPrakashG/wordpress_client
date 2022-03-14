@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
 import 'exceptions/exceptions_export.dart';
@@ -32,6 +33,8 @@ class WordpressClient {
   /// After this, you will have to initialize the client with [initialize] method call.
   ///
   /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
+  ///
+  /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
   WordpressClient(
     this.baseUrl,
     this.path, {
@@ -113,15 +116,92 @@ class WordpressClient {
 
   /// The current user interface.
   ///
-  /// Requests will only work if you are authorized with valid credentials.
+  /// Provides functionality to manipulate current authorized user.
+  ///
+  /// Available Operations:
+  /// - Retrive (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   MeInterface get me => getInterface<MeInterface>('me');
 
+  /// The posts interface.
+  ///
+  /// Provides functionality to manipulate posts.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   PostsInterface get posts => getInterface<PostsInterface>('posts');
+
+  /// The categories interface.
+  ///
+  /// Provides functionality to manipulate categories.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   CategoryInterface get categories =>
       getInterface<CategoryInterface>('categories');
+
+  /// The comments interface.
+  ///
+  /// Provides functionality to manipulate comments.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   CommentInterface get comments => getInterface<CommentInterface>('comments');
+
+  /// The media interface.
+  ///
+  /// Provides functionality to manipulate media.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   MediaInterface get media => getInterface<MediaInterface>('media');
+
+  /// The tags interface.
+  ///
+  /// Provides functionality to manipulate tags.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   TagInterface get tags => getInterface<TagInterface>('tags');
+
+  /// The users interface.
+  ///
+  /// Provides functionality to manipulate users.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
   UsersInterface get users => getInterface<UsersInterface>('users');
 
   final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
@@ -129,6 +209,9 @@ class WordpressClient {
 
   bool _hasInitialized = false;
 
+  /// Status on if the client has been initialized successfully.
+  ///
+  /// This will be true if [initialize] method has been called and completed.
   bool get isReady => _hasInitialized;
 
   /// Initializes all the built in interfaces and other services
@@ -203,6 +286,7 @@ class WordpressClient {
   /// [interface] is instance of interface type [T]
   ///
   /// [responseDecoder] is a function that takes a json object and returns an instance of [T]
+  ///
   /// [responseEncoder] is a function that takes an instance of [T] and returns a json object
   /// These are required to decode and encode responses for this interface.
   ///
@@ -247,10 +331,15 @@ class WordpressClient {
       overriteIfExists: overriteIfTypeExists,
     );
 
-    interface._initInterface(_requester, baseUrl, path, interfaceKey);
+    interface._initInterface(
+      _requester,
+      interfaceKey,
+    );
+
     _interfaces[interfaceKey] = interface;
   }
 
+  /// Checks if an interface with the given Type [T] and [key] exists.
   bool interfaceExists<T>([String? key]) =>
       _interfaces[InterfaceKey<T>(key)] != null;
 
@@ -318,8 +407,10 @@ class WordpressClient {
     return interface;
   }
 
+  /// Clears default authorization if exists.
   void clearDefaultAuthorization() => _requester._removeDefaultAuthorization();
 
+  /// Called to reconfigure the client with new settings.
   void reconfigureRequester(
     BootstrapConfiguration Function(BootstrapBuilder) bootstrapper,
   ) {
@@ -327,13 +418,9 @@ class WordpressClient {
   }
 }
 
-/// The base of all custom requests.
-/// extend from this interface on your custom request interfaces to get the internal requester client for all your requests.
+/// The base of all request interfaces.
+/// You must extend from this interface to define custom requests.
 abstract class IInterface {
-  late final String baseUrl;
-  late final String path;
-  String get requestBaseUrl => parseUrl(baseUrl, path);
-
   /// The internal requester instance.
   ///
   /// This variable is assigned on init method automatically.
@@ -343,17 +430,6 @@ abstract class IInterface {
   late final InterfaceKey<dynamic> interfaceKey;
 
   bool _hasInitilizedAlready = false;
-
-  /// Gets the internal requester client by waiting for it be free.
-  ///
-  /// You can directly get [InternalRequester] with waiting by [internalRequester] variable.
-  Future<InternalRequester> getInternalRequesterWhenFree() async {
-    while (internalRequester.isBusy) {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-    }
-
-    return internalRequester;
-  }
 
   /// This method is used to initialize the interface by passing [InternalRequester] instance from the core to the interface.
   ///
@@ -372,11 +448,8 @@ abstract class IInterface {
   /// }
   /// ```
   ///
-
   void _initInterface(
     InternalRequester requester,
-    String baseUrl,
-    String path,
     InterfaceKey<dynamic> key,
   ) {
     if (_hasInitilizedAlready) {
@@ -385,11 +458,10 @@ abstract class IInterface {
 
     internalRequester = requester;
     interfaceKey = key;
-    baseUrl = baseUrl;
-    path = path;
     _hasInitilizedAlready = true;
     onInit();
   }
 
+  /// This method is called right after internal initialization process of the interface completes.
   void onInit() {}
 }

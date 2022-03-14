@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
-import '../../utilities/callback.dart';
+import '../../utilities/wordpress_callback.dart';
 import '../../utilities/helpers.dart';
 import '../../wordpress_client_base.dart';
 import 'useful_jwt.dart';
@@ -18,7 +18,7 @@ class BasicJwtAuth extends IAuthorization {
   BasicJwtAuth(
     String? username,
     String? password, {
-    Callback? callback,
+    WordpressCallback? callback,
   }) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;

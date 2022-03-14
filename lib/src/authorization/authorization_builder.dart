@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_returning_this
 
 import '../enums.dart';
-import '../utilities/callback.dart';
+import '../utilities/wordpress_callback.dart';
 import '../wordpress_client_base.dart';
 import 'authorization_methods/basic_auth.dart';
 import 'authorization_methods/basic_jwt.dart';
@@ -11,7 +11,7 @@ class AuthorizationBuilder {
   String? _userName;
   String? _password;
   AuthorizationType? _type;
-  Callback? _callback;
+  WordpressCallback? _callback;
 
   AuthorizationBuilder withUserName(String? userName) {
     _userName = userName;
@@ -28,7 +28,7 @@ class AuthorizationBuilder {
     return this;
   }
 
-  AuthorizationBuilder withCallback(Callback? callback) {
+  AuthorizationBuilder withCallback(WordpressCallback? callback) {
     callback = callback;
     return this;
   }

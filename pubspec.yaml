@@ -18,3 +18,4 @@ dependencies:
   http_parser: ^4.0.0
   meta: ^1.7.0
   path: ^1.8.0
+  synchronized: ^3.0.0

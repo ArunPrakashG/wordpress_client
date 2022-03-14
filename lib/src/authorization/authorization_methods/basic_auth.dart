@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../../utilities/callback.dart';
+import '../../utilities/wordpress_callback.dart';
 import '../../utilities/helpers.dart';
 import '../../wordpress_client_base.dart';
 
@@ -13,7 +13,7 @@ class BasicAuth extends IAuthorization {
   BasicAuth(
     String? username,
     String? password, {
-    Callback? callback,
+    WordpressCallback? callback,
   }) : super(username, password, callback: callback);
 
   static const String scheme = 'Basic';
