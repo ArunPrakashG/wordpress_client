@@ -1,4 +1,6 @@
 // ignore: one_member_abstracts
+// ignore_for_file: comment_references
+
 import 'request_content.dart';
 
 /// Base class of all requests.

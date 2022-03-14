@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../../utilities/wordpress_callback.dart';
 import '../../utilities/helpers.dart';
+import '../../utilities/wordpress_callback.dart';
 import '../../wordpress_client_base.dart';
 
 /// The most basic authentication system using username and password.

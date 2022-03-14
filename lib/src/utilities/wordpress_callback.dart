@@ -1,3 +1,5 @@
+// ignore_for_file: comment_references
+
 import 'package:dio/dio.dart';
 
 import '../responses/error_container.dart';

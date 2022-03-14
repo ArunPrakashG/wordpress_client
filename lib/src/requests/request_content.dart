@@ -1,3 +1,5 @@
+// ignore_for_file: comment_references
+
 import '../enums.dart';
 
 /// This class acts as a middleman between the request interface & and the request build method.

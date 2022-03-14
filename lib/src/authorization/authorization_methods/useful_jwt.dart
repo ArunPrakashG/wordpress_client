@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
-import '../../utilities/wordpress_callback.dart';
 import '../../utilities/helpers.dart';
+import '../../utilities/wordpress_callback.dart';
 import '../../wordpress_client_base.dart';
 import 'basic_jwt.dart';
 
