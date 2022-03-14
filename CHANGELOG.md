@@ -107,3 +107,10 @@
 # 6.1.9-pre
 
 - Bug fixes
+
+
+# 6.2.0-pre
+
+- Refactoring
+- Request Synchronization
+- Debug Mode
