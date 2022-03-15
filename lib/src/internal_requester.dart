@@ -136,20 +136,12 @@ class InternalRequester {
             ),
           );
         },
-        timeout: const Duration(
-          minutes: 1,
-        ),
       );
     } else {
       watch.start();
 
       response = await _client.request<dynamic>(
-        parseUrl(
-          _path,
-          request.endpoint.startsWith('/')
-              ? request.endpoint
-              : '/${request.endpoint}',
-        ),
+        _generatePath(request),
         data: request.body,
         cancelToken: request.cancelToken,
         queryParameters: request.queryParams,
