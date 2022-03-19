@@ -19,14 +19,12 @@ Future<void> main() async {
         .build(),
   );
 
-  await Future<void>.delayed(const Duration(seconds: 2));
   WordpressResponse<List<Post>?> postsResponse = await client.posts.list(
     WordpressRequest(
-      requestData: ListPostRequest(
-        perPage: 10,
-        page: 1,
-        order: Order.asc,
-      ),
+      requestData: ListPostRequest()
+        ..page = 1
+        ..perPage = 10
+        ..order = Order.asc,
     ),
   );
 
