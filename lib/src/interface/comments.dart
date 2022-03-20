@@ -1,102 +1,12 @@
-import 'dart:async';
-
+import '../../operations.dart';
+import '../../requests.dart';
+import '../../responses.dart';
 import '../../wordpress_client.dart';
-import '../builders/create/comment_create.dart';
-import '../builders/delete/comment_delete.dart';
-import '../builders/list/comment_list.dart';
-import '../builders/retrive/comment_retrive.dart';
-import '../builders/update/comment_update.dart';
-import '../responses/comment_response.dart';
 
 class CommentInterface extends IInterface
-    implements
-        ICreateOperation<Comment, CommentCreateBuilder>,
-        IDeleteOperation<Comment, CommentDeleteBuilder>,
-        IRetrieveOperation<Comment, CommentRetriveBuilder>,
-        IUpdateOperation<Comment, CommentUpdateBuilder>,
-        IListOperation<Comment, CommentListBuilder> {
-  @override
-  Future<ResponseContainer<Comment?>> create(
-      Request<Comment>? Function(CommentCreateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .createRequest<Comment>(
-      Comment(),
-      builder(
-        CommentCreateBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
-  }
-
-  @override
-  Future<ResponseContainer<Comment?>> delete(
-      Request<Comment>? Function(CommentDeleteBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .deleteRequest<Comment>(
-      Comment(),
-      builder(
-        CommentDeleteBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
-  }
-
-  @override
-  Future<ResponseContainer<List<Comment>?>> list(
-      Request<List<Comment>>? Function(CommentListBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .listRequest<Comment>(
-      Comment(),
-      builder(
-        CommentListBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
-  }
-
-  @override
-  Future<ResponseContainer<Comment?>> retrive(
-      Request<Comment>? Function(CommentRetriveBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .retriveRequest<Comment>(
-      Comment(),
-      builder(
-        CommentRetriveBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
-  }
-
-  @override
-  Future<ResponseContainer<Comment?>> update(
-      Request<Comment>? Function(CommentUpdateBuilder) builder,
-      {bool shouldWaitWhileClientBusy = false}) async {
-    return (shouldWaitWhileClientBusy
-            ? await getInternalRequesterWhenFree()
-            : internalRequester)
-        .updateRequest<Comment>(
-      Comment(),
-      builder(
-        CommentUpdateBuilder()
-            .withEndpoint('comments')
-            .initializeWithDefaultValues(),
-      ),
-    );
-  }
-}
+    with
+        CreateMixin<Comment, CreateCommentRequest>,
+        DeleteMixin<DeleteCommentRequest>,
+        RetrieveMixin<Comment, RetriveCommentRequest>,
+        UpdateMixin<Comment, UpdateCommentRequest>,
+        ListMixin<Comment, ListCommentRequest> {}

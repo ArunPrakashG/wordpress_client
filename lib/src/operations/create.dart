@@ -1,6 +1,12 @@
-import '../builders/request.dart';
-import '../responses/response_container.dart';
+import '../requests/request_interface.dart';
+import '../requests/wordpress_request.dart';
+import '../responses/wordpress_response.dart';
+import '../wordpress_client_base.dart';
 
-abstract class ICreateOperation<T, Y> {
-  Future<ResponseContainer<T?>> create(Request<T>? Function(Y) builder, {bool shouldWaitWhileClientBusy = false});
+mixin CreateMixin<T, E extends IRequest> {
+  InternalRequester get internalRequester;
+
+  Future<WordpressResponse<T?>> create(WordpressRequest<E> request) async {
+    return internalRequester.createRequest<T>(request);
+  }
 }

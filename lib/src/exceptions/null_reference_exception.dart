@@ -1,5 +1,7 @@
-class NullReferenceException implements Exception {
-  final String reason;
+import '../enums.dart';
+import 'wordpress_exception_base.dart';
 
-  NullReferenceException(this.reason);
+class NullReferenceException extends WordpressException {
+  NullReferenceException(String message)
+      : super(ErrorType.nullReference, message);
 }

@@ -1,72 +1,144 @@
-enum Status { OPEN, CLOSED }
-enum CommentStatus { APPROVED, PENDING }
-enum HttpMethod { PUT, POST, GET, DELETE, UPDATE, HEAD, OPTIONS, PATCH, TRACE }
-enum FilterOrder { ASCENDING, DESCENDING }
-enum FilterPostSortOrder {
-  DATE,
-  AUTHOR,
-  ID,
-  INCLUDE,
-  MODIFIED,
-  PARENT,
-  RELEVANCE,
-  SLUG,
-  INCLUDESLUGS,
-  TITLE,
-  EMAIL,
-  URL,
-  NAME
-}
-enum FilterUserSortOrder {
-  ID,
-  INCLUDE,
-  NAME,
-  REGISTERED_DATE,
-  SLUG,
-  INCLUDE_SLUGS,
-  EMAIL,
-  URL
-}
-enum FilterContext { VIEW, EMBED, EDIT }
-enum FilterCategoryTagSortOrder {
-  ID,
-  INCLUDE,
-  NAME,
-  SLUG,
-  INCLUDE_SLUGS,
-  TERM_GROUP,
-  DESCRIPTION,
-  COUNT
-}
-enum MediaFilterStatus { INHERIT }
-enum TaxonomyRelation { AND, OR }
-enum ContentStatus { PUBLISH, FUTURE, DRAFT, PENDING, PRIVATE }
-enum PostAvailabilityStatus { PUBLISHED, DRAFT, TRASH }
-enum PostFormat {
-  STANDARD,
-  ASIDE,
-  CHAT,
-  GALLERY,
-  LINK,
-  IMAGE,
-  QUOTE,
-  STATUS,
-  VIDEO,
-  AUDIO
-}
-enum AuthorizationType { BASIC_JWT, USEFUL_JWT, BASIC }
-enum Locale { en_US }
-enum FilterMediaType { IMAGE, VIDEO, TEXT, APPLICATION, AUDIO }
+// ignore_for_file: constant_identifier_names
 
-extension ParseToString on HttpMethod {
-  String toShortString() {
-    return this.toString().split('.').last;
-  }
+enum ErrorType {
+  interfaceNotExist,
+  interfaceAlreadyExist,
+  requestFailedInternally,
+  requestFailed,
+  clientNotReady,
+  authorizationFailed,
+  bootstrapFailed,
+  fileDoesntExist,
+  interfaceDoNotExist,
+  interfaceExist,
+  interfaceNotInitialized,
+  invalidInterface,
+  nullReference,
+  requestUriParsingFailed,
+}
+
+enum Status {
+  open,
+  closed,
+}
+
+enum CommentStatus {
+  approved,
+  pending,
+}
+
+/// Different HTTP Methods which is supported by the client.
+enum HttpMethod {
+  /// Put Method
+  put,
+
+  /// Post Method
+  post,
+
+  /// Get Method
+  get,
+
+  /// Delete Method
+  delete,
+
+  /// Update Method
+  update,
+
+  /// Head Method
+  head,
+
+  /// Options Method
+  options,
+
+  /// Patch Method
+  patch,
+
+  /// Trace Method
+  trace,
+}
+
+enum Order {
+  asc,
+  desc,
+}
+
+enum OrderBy {
+  date,
+  author,
+  id,
+  include,
+  modified,
+  parent,
+  relevance,
+  slug,
+  include_slugs,
+  title,
+  email,
+  url,
+  name,
+  registered_date,
+  term_group,
+  description,
+  count,
+}
+
+enum RequestContext {
+  view,
+  embed,
+  edit,
+}
+
+enum MediaFilterStatus {
+  inherit,
+}
+
+enum TaxonomyRelation {
+  and,
+  or,
+}
+
+enum ContentStatus {
+  publish,
+  future,
+  draft,
+  pending,
+  private,
+}
+
+enum PostFormat {
+  standard,
+  aside,
+  chat,
+  gallery,
+  link,
+  image,
+  quote,
+  status,
+  video,
+  audio,
+}
+
+enum AuthorizationType {
+  basic_jwt,
+  useful_jwt,
+  basic,
+}
+
+enum Locale {
+  en_US,
+}
+
+enum MediaType {
+  image,
+  video,
+  text,
+  application,
+  audio,
 }
 
 ContentStatus getContentStatusFromValue(String? value) {
   if (value == null) {
-    return ContentStatus.PENDING;
+    return ContentStatus.pending;
   }
 
   return ContentStatus.values
@@ -78,7 +150,7 @@ ContentStatus getContentStatusFromValue(String? value) {
 
 CommentStatus getCommentStatusFromValue(String? value) {
   if (value == null) {
-    return CommentStatus.PENDING;
+    return CommentStatus.pending;
   }
 
   return CommentStatus.values
@@ -90,7 +162,7 @@ CommentStatus getCommentStatusFromValue(String? value) {
 
 MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
   if (value == null) {
-    return MediaFilterStatus.INHERIT;
+    return MediaFilterStatus.inherit;
   }
 
   return MediaFilterStatus.values
@@ -102,7 +174,7 @@ MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
 
 PostFormat getFormatFromValue(String? value) {
   if (value == null) {
-    return PostFormat.STANDARD;
+    return PostFormat.standard;
   }
 
   return PostFormat.values
@@ -114,7 +186,7 @@ PostFormat getFormatFromValue(String? value) {
 
 Status getStatusFromValue(String? value) {
   if (value == null) {
-    return Status.OPEN;
+    return Status.open;
   }
 
   return Status.values

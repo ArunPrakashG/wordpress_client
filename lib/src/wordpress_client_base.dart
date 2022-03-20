@@ -1,50 +1,46 @@
 import 'dart:async';
 
-import 'builders_import.dart';
-import 'client_configuration.dart';
-import 'exceptions/interface_do_not_exist_exception.dart';
-import 'exceptions/interface_exist_exception.dart';
-import 'exceptions/interface_not_initialized.dart';
-import 'exceptions/invalid_interface_exception.dart';
-import 'exceptions/null_reference_exception.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:synchronized/synchronized.dart' as sync;
+
+import 'bootstrap_builder.dart';
+import 'exceptions/exceptions_export.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
-import 'interface/interface_base.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
-import 'internal_requester.dart';
+import 'interface_key.dart';
+import 'library_exports.dart';
+import 'responses/responses_export.dart';
+import 'type_map.dart';
 import 'utilities/helpers.dart';
+import 'utilities/utility_export.dart';
 
+part 'internal_requester.dart';
+
+/// The main class for [WordpressClient].
 class WordpressClient {
-  late InternalRequester _requester;
-
-  /// Base url supplied through constructor.
-  static String requestBaseUrl = '';
-
-  /// Base url path supplied through constructor.
-  static String requestPath = '';
-
-  /// Combined url of [requestBaseUrl] and [requestPath]
-  static String requestBaseWithPath = '';
-
-  /// The current user interface.
+  /// Default Constructor.
   ///
-  /// Requests will only work if you are authorized with valid credentials.
-  MeInterface get me => _customInterfaces!['me'];
-
-  PostsInterface get posts => _customInterfaces!['posts'];
-  CategoryInterface get categories => _customInterfaces!['categories'];
-  CommentInterface get comments => _customInterfaces!['comments'];
-  MediaInterface get media => _customInterfaces!['media'];
-  TagInterface get tags => _customInterfaces!['tags'];
-  UsersInterface get users => _customInterfaces!['users'];
-
-  Map<String, dynamic>? _customInterfaces;
-
-  WordpressClient(String? baseUrl, String? path, {BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper}) {
+  /// [baseUrl] is the base url of the wordpress site.
+  /// [path] is the path of the url appended to your REST API.
+  /// [bootstrapper] is a builder method for initializing the client.
+  ///
+  /// After this, you will have to initialize the client with [initialize] method call.
+  ///
+  /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
+  ///
+  /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
+  WordpressClient(
+    String baseUrl,
+    String path, {
+    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+  }) {
     if (isNullOrEmpty(baseUrl)) {
       throw NullReferenceException('Base URL is invalid.');
     }
@@ -53,36 +49,267 @@ class WordpressClient {
       throw NullReferenceException('Path is invalid.');
     }
 
-    requestBaseUrl = baseUrl!;
-    requestPath = path!;
-    requestBaseWithPath = parseUrl(baseUrl, path);
-    _customInterfaces ??= {};
+    if (baseUrl.contains('www.')) {
+      baseUrl = baseUrl.replaceFirst('www.', '');
+    }
 
-    _requester = InternalRequester(
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
+
+    _requester = InternalRequester.configure(
       baseUrl,
       path,
-      bootstrapper == null ? null : bootstrapper(BootstrapBuilder()),
+      configuration,
     );
-
-    _initInternalInterfaces();
   }
 
-  void _initInternalInterfaces() async {
-    await initInterface<MeInterface>(MeInterface(), 'me');
-    await initInterface<PostsInterface>(PostsInterface(), 'posts');
-    await initInterface<CategoryInterface>(CategoryInterface(), 'categories');
-    await initInterface<CommentInterface>(CommentInterface(), 'comments');
-    await initInterface<MediaInterface>(MediaInterface(), 'media');
-    await initInterface<TagInterface>(TagInterface(), 'tags');
-    await initInterface<UsersInterface>(UsersInterface(), 'users');
+  /// Default Constructor but with initialization.
+  ///
+  /// [baseUrl] is the base url of the wordpress site.
+  /// [path] is the path of the url appended to your REST API.
+  /// [bootstrapper] is a builder method for initializing the client.
+  ///
+  WordpressClient.initialize(
+    String baseUrl,
+    String path, {
+    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+  }) {
+    if (isNullOrEmpty(baseUrl)) {
+      throw NullReferenceException('Base URL is invalid.');
+    }
+
+    if (isNullOrEmpty(path)) {
+      throw NullReferenceException('Path is invalid.');
+    }
+
+    if (baseUrl.contains('www.')) {
+      baseUrl = baseUrl.replaceFirst('www.', '');
+    }
+
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
+
+    _requester = InternalRequester.configure(
+      baseUrl,
+      path,
+      configuration,
+    );
+
+    initialize();
+  }
+
+  late final InternalRequester _requester;
+
+  /// Base url supplied through constructor.
+  String get baseUrl => _requester._baseUrl;
+
+  /// Base url path supplied through constructor.
+  String get path => _requester._path;
+
+  /// Returns true if this instance of [WordpressClient] is running in debug mode.
+  ///
+  /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
+  bool get isDebugMode => _requester._isDebugMode;
+
+  /// Returns true if we have synchronized mode enabled.
+  ///
+  /// i.e., Only a single request is allowed at a time.
+  bool get isSynchronizedMode => _requester._synchronized;
+
+  /// Returns true if we have valid default authorization which is to be used for all requests.
+  bool get hasValidDefaultAuthorization =>
+      _requester._defaultAuthorization != null &&
+      _requester._defaultAuthorization!.isValidAuth;
+
+  /// Combined url of [baseUrl] and [path]
+  String get requestUrl => _requester.requestBaseUrl;
+
+  /// Stores data on how to decode & encode responses.
+  final TypeMap _typeMap = TypeMap();
+
+  /// The current user interface.
+  ///
+  /// Provides functionality to manipulate current authorized user.
+  ///
+  /// Available Operations:
+  /// - Retrive (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  MeInterface get me => getInterface<MeInterface>('me');
+
+  /// The posts interface.
+  ///
+  /// Provides functionality to manipulate posts.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  PostsInterface get posts => getInterface<PostsInterface>('posts');
+
+  /// The categories interface.
+  ///
+  /// Provides functionality to manipulate categories.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  CategoryInterface get categories =>
+      getInterface<CategoryInterface>('categories');
+
+  /// The comments interface.
+  ///
+  /// Provides functionality to manipulate comments.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  CommentInterface get comments => getInterface<CommentInterface>('comments');
+
+  /// The media interface.
+  ///
+  /// Provides functionality to manipulate media.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  MediaInterface get media => getInterface<MediaInterface>('media');
+
+  /// The tags interface.
+  ///
+  /// Provides functionality to manipulate tags.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  TagInterface get tags => getInterface<TagInterface>('tags');
+
+  /// The users interface.
+  ///
+  /// Provides functionality to manipulate users.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  UsersInterface get users => getInterface<UsersInterface>('users');
+
+  final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
+      <InterfaceKey<dynamic>, dynamic>{};
+
+  bool _hasInitialized = false;
+
+  /// Status on if the client has been initialized successfully.
+  ///
+  /// This will be true if [initialize] method has been called and completed.
+  bool get isReady => _hasInitialized;
+
+  /// Initializes all the built in interfaces and other services
+  ///
+  /// This method should be called before any other method.
+  ///
+  void initialize() {
+    if (_hasInitialized) {
+      return;
+    }
+
+    _initInternalInterfaces();
+    _hasInitialized = true;
+  }
+
+  void _initInternalInterfaces() {
+    initInterface<MeInterface, User>(
+      interface: MeInterface(),
+      key: 'me',
+      responseDecoder: (map) => User.fromJson(map),
+      responseEncoder: (dynamic user) => (user as User).toJson(),
+    );
+
+    initInterface<PostsInterface, Post>(
+      interface: PostsInterface(),
+      key: 'posts',
+      responseDecoder: (map) => Post.fromJson(map),
+      responseEncoder: (dynamic post) => (post as Post).toJson(),
+    );
+
+    initInterface<CategoryInterface, Category>(
+      interface: CategoryInterface(),
+      key: 'categories',
+      responseDecoder: (map) => Category.fromJson(map),
+      responseEncoder: (dynamic category) => (category as Category).toJson(),
+    );
+
+    initInterface<CommentInterface, Comment>(
+      interface: CommentInterface(),
+      key: 'comments',
+      responseDecoder: (map) => Comment.fromJson(map),
+      responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
+    );
+
+    initInterface<MediaInterface, Media>(
+      interface: MediaInterface(),
+      key: 'media',
+      responseDecoder: (map) => Media.fromJson(map),
+      responseEncoder: (dynamic media) => (media as Media).toJson(),
+    );
+
+    initInterface<TagInterface, Tag>(
+      interface: TagInterface(),
+      key: 'tags',
+      responseDecoder: (map) => Tag.fromJson(map),
+      responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
+    );
+
+    initInterface<UsersInterface, User>(
+      interface: UsersInterface(),
+      key: 'users',
+      responseDecoder: (map) => User.fromJson(map),
+      responseEncoder: (dynamic user) => (user as User).toJson(),
+    );
   }
 
   /// Called to initialize an interface.
   /// All interfaces inherit from [IInterface] abstract class, which provides internal requester instance and other functions.
   ///
-  /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance.
+  /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance & the response type used by the interface requests.
   ///
   /// [interface] is instance of interface type [T]
+  ///
+  /// [responseDecoder] is a function that takes a json object and returns an instance of [T]
+  ///
+  /// [responseEncoder] is a function that takes an instance of [T] and returns a json object
+  /// These are required to decode and encode responses for this interface.
+  ///
+  /// [overriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
   ///
   /// Some keys are already occupied:
   /// - `me`
@@ -96,27 +323,71 @@ class WordpressClient {
   /// Example usage:
   ///
   /// ```dart
-  /// await client.initInterface<MyCustomInterface>(MyCustomInterface(), 'my_custom_interface');
+  /// await initInterface<UsersInterface, User>(
+  ///   interface: CustomInterface(),
+  ///   key: 'custom_interface_key',
+  ///   responseDecoder: [CustomResponseObject].fromJson,
+  ///   responseEncoder: (dynamic response) => (response as [CustomResponseObject]).toJson(),
+  /// );
   /// ```
   ///
-  Future<void> initInterface<T extends IInterface>(T? interface, String? key) async {
-    _customInterfaces ??= {};
+  void initInterface<T extends IInterface, E>({
+    required T interface,
+    required String key,
+    required JsonEncoderCallback responseEncoder,
+    required JsonDecoderCallback<E> responseDecoder,
+    bool overriteIfTypeExists = false,
+  }) {
+    final interfaceKey = InterfaceKey<T>(key);
 
-    if (interface == null || isNullOrEmpty(key)) {
-      throw InvalidInterfaceException();
+    if (_interfaces[interfaceKey] != null) {
+      throw InterfaceExistException<T>();
     }
 
-    if (_customInterfaces![key] != null) {
-      throw InterfaceExistException('[$key] Interface already exists.');
-    }
+    _registerResponseType<E>(
+      decoder: responseDecoder,
+      encoder: responseEncoder,
+      overriteIfExists: overriteIfTypeExists,
+    );
 
-    await interface.init(_requester, key);
-    _customInterfaces![key!] = interface;
+    interface._initInterface(
+      _requester,
+      interfaceKey,
+    );
+
+    _interfaces[interfaceKey] = interface;
+  }
+
+  /// Checks if an interface with the given Type [T] and [key] exists.
+  bool interfaceExists<T>([String? key]) =>
+      _interfaces[InterfaceKey<T>(key)] != null;
+
+  /// Registers a type to be used in [WordpressClient] Responses.
+  ///
+  /// This is called automatically on [initInterface], During initializing of an interface.
+  ///
+  /// By default, all respones used inside [WordpressClient] library is registered. If you try to register them again, it will throw [MapAlreadyExistException] exception.
+  ///
+  /// [decoder] is a function that takes a json object and returns an instance of [E]
+  /// [encoder] is a function that takes an instance of [E] and returns a json object
+  /// These are required to decode and encode responses.
+  ///
+  /// [overriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
+  void _registerResponseType<E>({
+    required JsonEncoderCallback encoder,
+    required JsonDecoderCallback<E> decoder,
+    bool overriteIfExists = false,
+  }) {
+    _typeMap.addJsonPairForType<E>(
+      decoder: decoder,
+      encoder: encoder,
+      overwrite: overriteIfExists,
+    );
   }
 
   /// Gets an initialized interface.
   ///
-  /// [key] parameter is optional. However, getting result by specifing key is faster than using type.
+  /// [key] parameter is optional. However, getting result by specifing key is faster.
   ///
   /// All custom interfaces must inherit from [IInterface] interface.
   ///
@@ -128,29 +399,98 @@ class WordpressClient {
   /// await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
   /// ```
   ///
-  T getCustomInterface<T extends IInterface>([String? key]) {
-    _customInterfaces ??= {};
-
-    var interface;
-
-    if (!isNullOrEmpty(key)) {
-      interface = _customInterfaces![key];
+  T getInterface<T extends IInterface>([String? key]) {
+    if (!isReady) {
+      throw ClientNotReadyException();
     }
 
-    interface ??= _customInterfaces!.values.singleWhere((element) => element is T);
+    final interfaceKey = InterfaceKey<T>(key);
 
-    if (interface == null) {
-      throw InterfaceDoNotExistException('The specified interface do not exist.');
+    if (interfaceExists<T>(key)) {
+      return _interfaces[interfaceKey] as T;
     }
 
-    if (!(interface as T).hasInitilizedAlready) {
-      throw InterfaceNotInitializedException();
+    final interfacesOfType = _interfaces.values.whereType<T>();
+
+    if (interfacesOfType.isEmpty) {
+      throw InterfaceDoNotExistException(
+          'The specified interface do not exist. (${typeOf<T>()}_$key)');
+    }
+
+    final interface = interfacesOfType.first;
+
+    if (!interface._hasInitilizedAlready) {
+      throw InterfaceNotInitializedException<T>();
     }
 
     return interface;
   }
 
-  void removeDefaultAuthorization() => _requester.removeDefaultAuthorization();
+  /// Clears default authorization if exists.
+  void clearDefaultAuthorization() => _requester._removeDefaultAuthorization();
 
-  void reconfigureRequester(BootstrapConfiguration Function(BootstrapBuilder) bootstrapper) => _requester.configure(bootstrapper(BootstrapBuilder()));
+  /// Called to reconfigure the client with new settings.
+  ///
+  /// The default builder will contain all the previous settings.
+  ///
+  /// Only the settings that have changed since will be updated.
+  void reconfigureClient(
+    BootstrapConfiguration Function(BootstrapBuilder) bootstrapper,
+  ) {
+    return _requester.configure(
+      bootstrapper(
+        BootstrapBuilder.fromConfiguration(
+          _requester._configuration,
+        ),
+      ),
+    );
+  }
+}
+
+/// The base of all request interfaces.
+/// You must extend from this interface to define custom requests.
+abstract class IInterface {
+  /// The internal requester instance.
+  ///
+  /// This variable is assigned on init method automatically.
+  late final InternalRequester internalRequester;
+
+  /// The interface key, this must be unique and will act as a unique identifier for this interface.
+  late final InterfaceKey<dynamic> interfaceKey;
+
+  bool _hasInitilizedAlready = false;
+
+  /// This method is used to initialize the interface by passing [InternalRequester] instance from the core to the interface.
+  ///
+  /// This method is called only once in interface lifecycle.
+  ///
+  /// It should always call super init() if it is overriden like so `super.init(requester, key)`.
+  /// Failing to call super init() method means [internalRequester] variable will be null and therefore none of the requests will go through and throws exception.
+  ///
+  /// Or you have to handle default init process by:
+  ///
+  /// ```dart
+  /// if(!hasInitilizedAlready){
+  ///   internalRequester = requester;
+  ///   interfaceKey = key;
+  ///   hasInitilizedAlready = true;
+  /// }
+  /// ```
+  ///
+  void _initInterface(
+    InternalRequester requester,
+    InterfaceKey<dynamic> key,
+  ) {
+    if (_hasInitilizedAlready) {
+      return;
+    }
+
+    internalRequester = requester;
+    interfaceKey = key;
+    _hasInitilizedAlready = true;
+    onInit();
+  }
+
+  /// This method is called right after internal initialization process of the interface completes.
+  void onInit() {}
 }

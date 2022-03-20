@@ -1,78 +1,62 @@
+// ignore_for_file: avoid_redundant_argument_values, omit_local_variable_types, avoid_print
+
+import 'package:wordpress_client/authorization.dart';
+import 'package:wordpress_client/requests.dart';
+import 'package:wordpress_client/responses.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
-import 'custom_interface_example/custom_interface.dart';
-
-void main() async {
+Future<void> main() async {
   WordpressClient client;
 
   // Simple Usage
-  client = new WordpressClient('https://www.example.com/wp-json', 'wp/v2');
-
-  ResponseContainer<List<Post?>?> posts = await client.posts
-      .list((builder) => builder.withPerPage(20).withPageNumber(1).build());
-  print(posts.value!.first!.id);
-
-  // Or
-
-  // Advanced Usage
-  client = new WordpressClient(
-    'https://www.example.com/wp-json',
-    'wp/v2',
+  client = WordpressClient.initialize(
+    'https://example.com/',
+    'wp-json/wp/v2',
     bootstrapper: (bootstrapper) => bootstrapper
-        .withCookies(true)
-        .withDefaultUserAgent('wordpress_client/4.0.0')
-        .withDefaultMaxRedirects(5)
-        .withFollowRedirects(true)
+        .withDebugMode(true)
         .withDefaultAuthorization(
-            UsefulJwtAuth('test_user', 'super_secret_password'))
-        .withStatisticDelegate(
-      (baseUrl, endpoint, count) {
-        print('Request send to: $baseUrl ($count times)');
-      },
-    ).build(),
-  );
-
-  ResponseContainer<List<Post?>?> response = await client.posts.list(
-    (builder) => builder
-        .withPerPage(20)
-        .withPageNumber(1)
-        .orderResultsBy(FilterOrder.DESCENDING)
-        .sortResultsBy(FilterPostSortOrder.DATE)
-        .withAuthorization(UsefulJwtAuth('test_user', 'super_secret_password'))
-        .withCallback(
-          Callback(
-            unhandledExceptionCallback: (ex) {
-              print('Unhandled Exception: $ex');
-            },
-            requestErrorCallback: (errorContainer) {
-              print('Request Error: ${errorContainer.errorResponse!.message}');
-            },
-            onSendProgress: (current, total) {
-              print('Send Progress: $current/$total');
-            },
-            onReceiveProgress: (current, total) {
-              print('Receive Progress: $current/$total');
-            },
+          UsefulJwtAuth(
+            'username',
+            'password',
+            callback: WordpressCallback(
+              unhandledExceptionCallback: (dynamic unhandledException) {
+                print('Unhandled Exception: $unhandledException');
+              },
+              requestErrorCallback: (errorContainer) {
+                print('Request Error: ${errorContainer.errorResponse}');
+              },
+              responseCallback: (dynamic response) {
+                print('Response: $response');
+              },
+            ),
           ),
         )
-        .withResponseValidationOverride((rawResponse) {
-      // ignore: unnecessary_null_comparison
-      if (rawResponse.any((element) => element.content!.parsedText == null)) {
-        return false;
-      }
-
-      return true;
-    }).build(),
+        .build(),
   );
 
-  print(response.value!.first!.id);
+  WordpressResponse<List<User>?> userResponse = await client.users.list(
+    WordpressRequest(
+      requestData: ListUserRequest()
+        ..page = 1
+        ..perPage = 10
+        ..order = Order.asc,
+    ),
+  );
 
-  // initialize custom interface
-  await client.initInterface<MyCustomInterface>(
-      MyCustomInterface(), 'my_custom_interface');
+  userResponse = await client.users.list(
+    WordpressRequest(
+      requestData: ListUserRequest()
+        ..page = 1
+        ..perPage = 10
+        ..order = Order.asc,
+    ),
+  );
 
-  // to use it...
-  await client
-      .getCustomInterface<MyCustomInterface>()
-      .create((p1) => p1.build());
+  print(userResponse.message);
+
+  if (userResponse.isSuccess) {
+    for (final user in userResponse.data!) {
+      print(user.name);
+    }
+  }
 }

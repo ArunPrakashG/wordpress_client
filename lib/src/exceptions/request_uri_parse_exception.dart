@@ -1,5 +1,7 @@
-class RequestUriParsingFailedException implements Exception {
-  final String reason;
+import '../enums.dart';
+import 'wordpress_exception_base.dart';
 
-  RequestUriParsingFailedException(this.reason);
+class RequestUriParsingFailedException extends WordpressException {
+  RequestUriParsingFailedException(String message)
+      : super(ErrorType.requestUriParsingFailed, message);
 }

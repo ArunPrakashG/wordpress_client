@@ -1,5 +1,7 @@
-class FileDoesntExistException implements Exception {
-  final String reason;
+import '../enums.dart';
+import 'wordpress_exception_base.dart';
 
-  FileDoesntExistException(this.reason);
+class FileDoesntExistException extends WordpressException {
+  const FileDoesntExistException(String message)
+      : super(ErrorType.fileDoesntExist, message);
 }

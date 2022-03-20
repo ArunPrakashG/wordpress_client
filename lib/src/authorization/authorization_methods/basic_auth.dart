@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:dio/src/dio.dart';
-
-import '../../utilities/callback.dart';
 import '../../utilities/helpers.dart';
-import '../authorization_base.dart';
+import '../../utilities/wordpress_callback.dart';
+import '../../wordpress_client_base.dart';
 
 /// The most basic authentication system using username and password.
 ///
@@ -12,33 +10,26 @@ import '../authorization_base.dart';
 ///
 /// Make sure to only use this method for testing purposes as this isn't secure.
 class BasicAuth extends IAuthorization {
-  BasicAuth(String? username, String? password, {Callback? callback}) : super(username, password, callback: callback);
+  BasicAuth(
+    String username,
+    String password, {
+    WordpressCallback? callback,
+  }) : super(username, password, callback: callback);
 
-  bool _hasInit = false;
-
-  static final String scheme = 'Basic';
+  static const String scheme = 'Basic';
 
   @override
-  FutureOr<bool> authorize() {
+  Future<bool> authorize() async {
     return true;
   }
 
   @override
-  FutureOr<String?> generateAuthUrl() {
+  Future<String?> generateAuthUrl() async {
     return '$scheme ${base64Encode('$userName:$password')}';
   }
 
   @override
-  FutureOr<bool> init(Dio? client) {
-    if (_hasInit) {
-      return true;
-    }
-
-    return _hasInit = true;
-  }
-
-  @override
-  FutureOr<bool> isAuthenticated() {
+  Future<bool> isAuthenticated() async {
     return true;
   }
 
@@ -46,7 +37,7 @@ class BasicAuth extends IAuthorization {
   bool get isValidAuth => true;
 
   @override
-  FutureOr<bool> validate() {
+  Future<bool> validate() async {
     return true;
   }
 }

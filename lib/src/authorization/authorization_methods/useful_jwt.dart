@@ -2,24 +2,28 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
-import '../../../wordpress_client.dart';
+import '../../enums.dart';
 import '../../utilities/helpers.dart';
+import '../../utilities/wordpress_callback.dart';
+import '../../wordpress_client_base.dart';
+import 'basic_jwt.dart';
 
 /// Similar to [BasicJwtAuth], this plugin is in active development and has much more features than the previous one. It is recommended to use this plugin instead of the previous one.
 ///
 /// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
 class UsefulJwtAuth extends IAuthorization {
-  UsefulJwtAuth(String? username, String? password, {Callback? callback})
-      : super(username, password, callback: callback);
+  UsefulJwtAuth(
+    String username,
+    String password, {
+    WordpressCallback? callback,
+  }) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
   bool _hasValidatedOnce = false;
-  bool _hasInit = false;
-  Dio? _client;
 
-  static final int daysUntilTokenExpiry = 3;
-  static final String scheme = 'Bearer';
+  static const int kDaysUntilTokenExpiry = 3;
+  static const String kAuthScheme = 'Bearer';
 
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
@@ -27,16 +31,12 @@ class UsefulJwtAuth extends IAuthorization {
   bool get _isAuthExpiried =>
       _lastAuthorizedTime != null &&
       DateTime.now().difference(_lastAuthorizedTime!).inHours >
-          (daysUntilTokenExpiry * 24);
+          (kDaysUntilTokenExpiry * 24);
 
   @override
-  FutureOr<bool> authorize() async {
+  Future<bool> authorize() async {
     if (isValidAuth) {
       return true;
-    }
-
-    if (_client == null) {
-      return false;
     }
 
     if (!_isAuthExpiried &&
@@ -46,15 +46,17 @@ class UsefulJwtAuth extends IAuthorization {
     }
 
     try {
-      final response = await _client!.post(
-        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token'),
+      final response = await client.post<dynamic>(
+        'wp-json/jwt-auth/v1/token',
         data: {
           'username': userName,
           'password': password,
         },
         options: Options(
-          method: 'POST',
+          method: HttpMethod.post.name,
           contentType: 'application/x-www-form-urlencoded',
+          followRedirects: true,
+          maxRedirects: 10,
         ),
       );
 
@@ -69,7 +71,7 @@ class UsefulJwtAuth extends IAuthorization {
         return false;
       }
 
-      _encryptedAccessToken = response.data['data']['token'];
+      _encryptedAccessToken = response.data?['data']?['token'] as String?;
 
       if (_encryptedAccessToken != null) {
         _lastAuthorizedTime = DateTime.now();
@@ -77,28 +79,16 @@ class UsefulJwtAuth extends IAuthorization {
 
       return _hasValidatedOnce = !isNullOrEmpty(_encryptedAccessToken);
     } on DioError catch (e) {
-      callback?.invokeRequestErrorCallback(e);
+      callback?.invokeDioErrorCallback(e);
       return false;
     } catch (ex) {
-      callback?.invokeUnhandledExceptionCallback(ex as dynamic);
+      callback?.invokeUnhandledExceptionCallback(ex as Exception);
       return false;
     }
   }
 
   @override
-  FutureOr<bool> init(Dio? client) {
-    if (_hasInit) {
-      return true;
-    }
-
-    _client = client;
-    _encryptedAccessToken = '';
-    _hasValidatedOnce = false;
-    return _hasInit = true;
-  }
-
-  @override
-  FutureOr<bool> isAuthenticated() {
+  Future<bool> isAuthenticated() async {
     if (_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
       return true;
     }
@@ -107,17 +97,20 @@ class UsefulJwtAuth extends IAuthorization {
   }
 
   @override
-  FutureOr<bool> validate() async {
-    if (_client == null || isNullOrEmpty(_encryptedAccessToken)) {
+  Future<bool> validate() async {
+    if (isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
 
     try {
-      final response = await _client!.post(
-        parseUrl(WordpressClient.requestBaseUrl, 'jwt-auth/v1/token/validate'),
+      final authUrl = await generateAuthUrl();
+      final response = await client.post<dynamic>(
+        'wp-json/jwt-auth/v1/token/validate',
         options: Options(
           method: 'POST',
-          headers: {'Authorization': await generateAuthUrl()},
+          headers: <String, dynamic>{
+            'Authorization': authUrl,
+          },
         ),
       );
 
@@ -127,22 +120,22 @@ class UsefulJwtAuth extends IAuthorization {
 
       callback?.invokeResponseCallback(response.data);
       return _hasValidatedOnce =
-          ((response.data['code'] as String) == 'jwt_auth_valid_token');
+          (response.data['code'] as String) == 'jwt_auth_valid_token';
     } on DioError catch (e) {
-      callback?.invokeRequestErrorCallback(e);
+      callback?.invokeDioErrorCallback(e);
       return false;
     } catch (ex) {
-      callback?.invokeUnhandledExceptionCallback(ex as dynamic);
+      callback?.invokeUnhandledExceptionCallback(ex as Exception);
       return false;
     }
   }
 
   @override
-  FutureOr<String?> generateAuthUrl() async {
+  Future<String?> generateAuthUrl() async {
     if (!await isAuthenticated()) {
       return null;
     }
 
-    return '$scheme $_encryptedAccessToken';
+    return '$kAuthScheme $_encryptedAccessToken';
   }
 }

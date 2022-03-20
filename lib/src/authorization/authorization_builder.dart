@@ -1,22 +1,24 @@
+// ignore_for_file: avoid_returning_this
+
 import '../enums.dart';
-import '../utilities/callback.dart';
-import 'authorization_base.dart';
+import '../utilities/wordpress_callback.dart';
+import '../wordpress_client_base.dart';
 import 'authorization_methods/basic_auth.dart';
 import 'authorization_methods/basic_jwt.dart';
 import 'authorization_methods/useful_jwt.dart';
 
 class AuthorizationBuilder {
-  String? _userName;
-  String? _password;
+  String _userName = '';
+  String _password = '';
   AuthorizationType? _type;
-  Callback? _callback;
+  WordpressCallback? _callback;
 
-  AuthorizationBuilder withUserName(String? userName) {
+  AuthorizationBuilder withUserName(String userName) {
     _userName = userName;
     return this;
   }
 
-  AuthorizationBuilder withPassword(String? password) {
+  AuthorizationBuilder withPassword(String password) {
     _password = password;
     return this;
   }
@@ -26,22 +28,20 @@ class AuthorizationBuilder {
     return this;
   }
 
-  AuthorizationBuilder withCallback(Callback? callback) {
+  AuthorizationBuilder withCallback(WordpressCallback? callback) {
     callback = callback;
     return this;
   }
 
   IAuthorization build() {
-    if (_type == null) {
-      _type = AuthorizationType.USEFUL_JWT;
-    }
+    _type ??= AuthorizationType.useful_jwt;
 
     switch (_type!) {
-      case AuthorizationType.BASIC_JWT:
+      case AuthorizationType.basic_jwt:
         return BasicJwtAuth(_userName, _password, callback: _callback);
-      case AuthorizationType.USEFUL_JWT:
+      case AuthorizationType.useful_jwt:
         return UsefulJwtAuth(_userName, _password, callback: _callback);
-      case AuthorizationType.BASIC:
+      case AuthorizationType.basic:
         return BasicAuth(_userName, _password, callback: _callback);
     }
   }

@@ -1,8 +1,12 @@
-import '../builders/request.dart';
-import '../responses/response_container.dart';
+import '../requests/request_interface.dart';
+import '../requests/wordpress_request.dart';
+import '../responses/wordpress_response.dart';
+import '../wordpress_client_base.dart';
 
-abstract class IListOperation<T, Y> {
-  Future<ResponseContainer<List<T>?>> list(
-      Request<List<T>>? Function(Y) builder,
-      {bool shouldWaitWhileClientBusy = false});
+mixin ListMixin<T, E extends IRequest> {
+  InternalRequester get internalRequester;
+
+  Future<WordpressResponse<List<T>?>> list(WordpressRequest<E> request) async {
+    return internalRequester.listRequest<T>(request);
+  }
 }

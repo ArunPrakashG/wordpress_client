@@ -1,5 +1,7 @@
-class InterfaceDoNotExistException implements Exception {
-  final String message;
+import '../enums.dart';
+import 'wordpress_exception_base.dart';
 
-  InterfaceDoNotExistException(this.message);
+class InterfaceDoNotExistException extends WordpressException {
+  const InterfaceDoNotExistException(String message)
+      : super(ErrorType.interfaceDoNotExist, message);
 }

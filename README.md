@@ -17,18 +17,12 @@
 
 ## Features
 
-- Complete fluent system, Define request parameters with builder functions which allows to fluently create a request or add extra custom headers, authorization etc.
-- Most common 3 authorization systems are supported.
-- Response preprocessor functions to pre process the response before it gets returned in a ResponseContainer.
+- Support for 3 widely used authorization methods.
+- Response preprocessor callback support.
 - Provides statistics such as time taken for the request to complete.
 - Support for Custom Requests / Authorization systems.
+- Nullable support.
 - And many more!
-
-## NOTE
-
-**Interface API (the way you get posts/users etc) has been changed a lot internally in 5.2.1 (latest) build from previous 5.1.0 build.**
-The new system provides a standard structure for defining custom endpoint requests at the same time keeping request building fluidity.
-Checkout [Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Requests) section for changed API usage.
 
 ## Usage
 
@@ -42,12 +36,13 @@ dependencies:
 ```
 
 - Import the library to your project class in which you want to use the library.
+  Also, it is to note that imports are split between multiple files, this helps to keep Dart auto-completion less cluttered. i.e., All request classes are seperated into another file, same goes for responses. You can utilize Intellisense to import them easily.
 
 ```dart
 import 'package:wordpress_client/wordpress_client.dart';
 ```
 
-- Initializing the client can be done in two ways. It is recommended to initialize `WordpressClient` once and assign the instance to a variable for later use. Else, if you are using cookies, it may not work properly.
+- Initializing the client can be done in two ways. It is recommended to initialize `WordpressClient` once and assign the instance to a variable for later use. State of the properties are stored only in that particular instance of the client.
 
   - Simple method, Initialize with default values.
   - Advanced method (with Bootstrapper to configure various settings like User Agent, Authorization etc)
@@ -55,32 +50,35 @@ import 'package:wordpress_client/wordpress_client.dart';
 ### Simple method
 
 ```dart
-WordpressClient client = new WordpressClient('https://www.replaceme.com/wp-json', 'wp/v2');
+WordpressClient client = new WordpressClient('https://www.replaceme.com/', 'wp-json/wp/v2');
 ```
 
 You can read about advanced method in [Advanced Method](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#advanced-method) wiki page.
 
-- Now you are ready to send requests to Wordpress REST API. For example, to send request to get the latest 20 posts in your Wordpress site:
+- Now you are ready to send requests to Wordpress REST API. For example, to send request to get the latest 20 posts from your Wordpress site in Ascending order, you can use the following code.:
 
 ```dart
-ResponseContainer<List<Post>> response = await client.posts.list(
-    (builder) => builder
-        .withPerPage(20)
-        .withPageNumber(1)
-        .sortResultsBy(FilterPostSortOrder.DATE)
-        .build(),
+WordpressResponse<List<Post>?> postsResponse = await client.posts.list(
+    WordpressRequest(
+      requestData: ListPostRequest()
+        ..page = 1
+        ..perPage = 20
+        ..order = Order.asc,
+    ),
   );
 ```
 
-Here, the `ResponseContainer<T>` holds result `T` object, in this case, its `List<Post>` as we requested for list of latest posts, with some statistical data, like the time taken for the request to complete (it doesn't count the time taken to process the response information, just the raw request) as a `Duration()` object.
+`WordpressResponse` is a class which wraps around the actual result object. It also provides access to statistical data related to the response such as the time taken for the request to complete, status codes, Total number of pages etc.
+
+You can access the response object by calling `postsResponse.data`. It will be null if the request failed or if the library failed to parse the response.
 
 ## Supported Authorization methods
 
 This library has 3 authorization methods currently supported:
 
-- `BasicAuth` - [Basic Auth](https://github.com/WP-API/Basic-Auth) by The Wordpress Team
-- `BasicJwtAuth` - [Basic JWT Authentication](https://wordpress.org/plugins/jwt-authentication-for-wp-rest-api/) by Enrique Chavez
-- `UsefulJwtAuth` - [Useful JWT Authentication](https://github.com/usefulteam/jwt-auth) by Useful Team
+- **BasicAuth** - [Basic Auth](https://github.com/WP-API/Basic-Auth) by The Wordpress Team
+- **BasicJwtAuth** - [Basic JWT Authentication](https://wordpress.org/plugins/jwt-authentication-for-wp-rest-api/) by Enrique Chavez
+- **UsefulJwtAuth** - [Useful JWT Authentication](https://github.com/usefulteam/jwt-auth) by Useful Team
 
 For Custom Authorization implementation, Check out [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization#custom-authorization) wiki page.
 

@@ -1,5 +1,11 @@
-class InterfaceExistException implements Exception {
-  final String message;
+import '../enums.dart';
+import '../utilities/helpers.dart';
+import 'wordpress_exception_base.dart';
 
-  InterfaceExistException(this.message);
+class InterfaceExistException<T> implements WordpressException {
+  @override
+  ErrorType get errorType => ErrorType.interfaceExist;
+
+  @override
+  String? get message => 'An interface with ${typeOf<T>()} already exist!';
 }

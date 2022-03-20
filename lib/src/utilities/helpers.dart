@@ -1,11 +1,55 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
+
+import '../type_map.dart';
+
 // import 'package:html/parser.dart';
+
+extension MapExtensions on Map<String, dynamic> {
+  String toJsonString() {
+    return json.encode(this);
+  }
+
+  void addIfNotNull(String key, dynamic value) {
+    if (value == null) {
+      return;
+    }
+
+    this[key] = value?.toString();
+  }
+}
+
+extension HeaderExtension on Headers {
+  Map<String, String> getHeaderMap() {
+    return map.map<String, String>((key, value) {
+      return MapEntry(key, value.join(';'));
+    });
+  }
+}
+
+DateTime? parseDateIfNotNull(dynamic json) {
+  if (json == null) {
+    return null;
+  }
+
+  if (json is! String) {
+    return null;
+  }
+
+  final dateString = json;
+
+  if (dateString.isEmpty) {
+    return null;
+  }
+
+  return DateTime.tryParse(dateString);
+}
 
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
-bool isAlphaNumeric(String value) => RegExp(r"^[a-zA-Z0-9]*$").hasMatch(value);
+bool isAlphaNumeric(String value) => RegExp(r'^[a-zA-Z0-9]*$').hasMatch(value);
 
 String parseUrl(String? baseUrl, String? path) {
   if (baseUrl == null || path == null) {
@@ -68,7 +112,59 @@ bool isInRange(int value, int min, int max) => value >= min && value <= max;
 //String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
 String parseHtmlString(String htmlString) =>
-    htmlString.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+    htmlString.replaceAll(RegExp('<[^>]*>|&[^;]+;'), ' ');
+
+Type typeOf<T>() => T;
+
+/// Deserializes a JSON object by getting its decoder from [TypeMap]
+///
+/// You will need to initiate your custom interface first in order to deserialize using this method.
+T deserialize<T>(dynamic object) {
+  if (object is! Map<String, dynamic>) {
+    throw Exception('object is not a map. Cannot decode.');
+  }
+
+  final decoder = TypeMap.getDecoderForType<T>();
+  return decoder(object);
+}
+
+/// Serializes a Dart object by getting its encoder from [TypeMap]
+///
+/// You will need to initiate your custom interface first in order to serialize using this method.
+Map<String, dynamic> serialize<T>(T object) {
+  final encoder = TypeMap.getEncoderForType<T>();
+  return encoder(object);
+}
+
+List<T> mapIterableWithChecks<T>(
+  dynamic json,
+  T Function(dynamic json) decoder,
+) {
+  if (json == null || json is! Iterable<dynamic>) {
+    return [];
+  }
+
+  return json.map<T>((dynamic e) => decoder(e)).toList();
+}
+
+T? mapToTypeNoSafety<T>(dynamic json, T Function(dynamic json) decoder) {
+  if (json == null) {
+    return null;
+  }
+
+  return decoder(json);
+}
+
+T? mapToType<T>(
+  dynamic json,
+  T Function(Map<String, dynamic> json) decoder,
+) {
+  if (json == null || json is! Map<String, dynamic>) {
+    return null;
+  }
+
+  return decoder(json);
+}
 
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types

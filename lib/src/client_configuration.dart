@@ -1,32 +1,34 @@
-import 'authorization/authorization_base.dart';
-import 'utilities/pair.dart';
+import 'package:dio/dio.dart';
+
+import 'constants.dart';
+import 'wordpress_client_base.dart';
 
 class BootstrapConfiguration {
-  final int? requestTimeout;
-  final bool Function(dynamic)? responsePreprocessorDelegate;
-  final IAuthorization? defaultAuthorization;
-  final String? defaultUserAgent;
-  final List<Pair<String, String>>? defaultHeaders;
-  final bool? shouldFollowRedirects;
-  final int? maxRedirects;
-  final bool? useCookies;
-  final bool? waitWhileBusy;
-  final bool? cacheResponses;
-  final String? responseCachePath;
-  final void Function(String, String?, int?)? statisticsDelegate;
-
-  BootstrapConfiguration({
-    this.useCookies,
-    this.requestTimeout,
+  const BootstrapConfiguration({
+    this.useCookies = false,
+    this.requestTimeout = kDefaultRequestTimeout,
     this.responsePreprocessorDelegate,
     this.defaultAuthorization,
     this.defaultUserAgent,
     this.defaultHeaders,
-    this.shouldFollowRedirects,
-    this.maxRedirects,
-    this.waitWhileBusy,
+    this.shouldFollowRedirects = false,
+    this.maxRedirects = 5,
+    this.synchronized = false,
     this.statisticsDelegate,
-    this.cacheResponses,
-    this.responseCachePath,
+    this.interceptors,
+    this.enableDebugMode = false,
   });
+
+  final bool enableDebugMode;
+  final int requestTimeout;
+  final bool Function(dynamic)? responsePreprocessorDelegate;
+  final IAuthorization? defaultAuthorization;
+  final String? defaultUserAgent;
+  final Map<String, String>? defaultHeaders;
+  final bool shouldFollowRedirects;
+  final int maxRedirects;
+  final bool useCookies;
+  final List<Interceptor>? interceptors;
+  final bool synchronized;
+  final StatisticsCallback? statisticsDelegate;
 }

@@ -1,6 +1,7 @@
-import '../builders/request.dart';
-import '../responses/response_container.dart';
+import '../requests/request_interface.dart';
+import '../requests/wordpress_request.dart';
+import '../responses/wordpress_response.dart';
 
-abstract class ICustomOperation<T> {
-  Future<ResponseContainer<T?>> request(Request<T>? request, {bool shouldWaitWhileClientBusy = false});
+mixin ICustomOperation<T, E extends IRequest> {
+  Future<WordpressResponse<T?>> request(WordpressRequest<E> request);
 }

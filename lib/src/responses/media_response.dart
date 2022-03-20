@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import '../enums.dart';
-import '../utilities/serializable_instance.dart';
-import 'partial_responses/content.dart';
-import 'partial_responses/links.dart';
-import 'partial_responses/media_details.dart';
+import '../utilities/helpers.dart';
+import 'response_properties/content.dart';
+import 'response_properties/links.dart';
+import 'response_properties/media_details.dart';
 
-class Media implements ISerializable<Media> {
+class Media {
   Media({
     this.id,
     this.date,
@@ -24,7 +22,6 @@ class Media implements ISerializable<Media> {
     this.pingStatus,
     this.template,
     this.meta,
-    this.yoastHead,
     this.description,
     this.caption,
     this.altText,
@@ -35,6 +32,36 @@ class Media implements ISerializable<Media> {
     this.sourceUrl,
     this.links,
   });
+
+  factory Media.fromJson(dynamic json) {
+    return Media(
+      id: json['id'] as int?,
+      date: parseDateIfNotNull(json['date']),
+      dateGmt: parseDateIfNotNull(json['date_gmt']),
+      guid: Content.fromJson(json['guid']),
+      modified: parseDateIfNotNull(json['modified']),
+      modifiedGmt: parseDateIfNotNull(json['modified_gmt']),
+      slug: json['slug'] as String?,
+      status: getMediaFilterStatusFromValue(json['status'] as String?),
+      type: json['type'] as String?,
+      link: json['link'] as String?,
+      title: Content.fromJson(json['title']),
+      author: json['author'] as int?,
+      commentStatus: getStatusFromValue(json['comment_status'] as String?),
+      pingStatus: getStatusFromValue(json['ping_status'] as String?),
+      template: json['template'] as String?,
+      meta: json['meta'],
+      description: Content.fromJson(json['description']),
+      caption: Content.fromJson(json['caption']),
+      altText: json['alt_text'] as String?,
+      mediaType: json['media_type'] as String?,
+      mimeType: json['mime_type'] as String?,
+      mediaDetails: MediaDetails.fromJson(json['media_details']),
+      post: json['post'] as int?,
+      sourceUrl: json['source_url'] as String?,
+      links: Links.fromJson(json['_links']),
+    );
+  }
 
   final int? id;
   final DateTime? date;
@@ -52,7 +79,6 @@ class Media implements ISerializable<Media> {
   final Status? pingStatus;
   final String? template;
   final dynamic meta;
-  final String? yoastHead;
   final Content? description;
   final Content? caption;
   final String? altText;
@@ -63,69 +89,33 @@ class Media implements ISerializable<Media> {
   final String? sourceUrl;
   final Links? links;
 
-  factory Media.fromJson(String str) => Media.fromMap(json.decode(str));
-
-  factory Media.fromMap(Map<String, dynamic> json) => Media(
-        id: json["id"] == null ? null : json["id"],
-        date: json["date"] == null ? null : DateTime.parse(json["date"]),
-        dateGmt: json["date_gmt"] == null ? null : DateTime.parse(json["date_gmt"]),
-        guid: json["guid"] == null ? null : Content.fromMap(json["guid"]),
-        modified: json["modified"] == null ? null : DateTime.parse(json["modified"]),
-        modifiedGmt: json["modified_gmt"] == null ? null : DateTime.parse(json["modified_gmt"]),
-        slug: json["slug"] == null ? null : json["slug"],
-        status: json["status"] == null ? null : getMediaFilterStatusFromValue(json["status"]),
-        type: json["type"] == null ? null : json["type"],
-        link: json["link"] == null ? null : json["link"],
-        title: json["title"] == null ? null : Content.fromMap(json["title"]),
-        author: json["author"] == null ? null : json["author"],
-        commentStatus: json["comment_status"] == null ? null : getStatusFromValue(json["comment_status"]),
-        pingStatus: json["ping_status"] == null ? null : getStatusFromValue(json["ping_status"]),
-        template: json["template"] == null ? null : json["template"],
-        meta: json["meta"],
-        yoastHead: json["yoast_head"] == null ? null : json["yoast_head"],
-        description: json["description"] == null ? null : Content.fromMap(json["description"]),
-        caption: json["caption"] == null ? null : Content.fromMap(json["caption"]),
-        altText: json["alt_text"] == null ? null : json["alt_text"],
-        mediaType: json["media_type"] == null ? null : json["media_type"],
-        mimeType: json["mime_type"] == null ? null : json["mime_type"],
-        mediaDetails: json["media_details"] == null ? null : MediaDetails.fromMap(json["media_details"]),
-        post: json["post"] == null ? null : json["post"],
-        sourceUrl: json["source_url"] == null ? null : json["source_url"],
-        links: json["_links"] == null ? null : Links.fromMap(json["_links"]),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "id": id == null ? null : id,
-        "date": date == null ? null : date!.toIso8601String(),
-        "date_gmt": dateGmt == null ? null : dateGmt!.toIso8601String(),
-        "guid": guid == null ? null : guid!.toMap(),
-        "modified": modified == null ? null : modified!.toIso8601String(),
-        "modified_gmt": modifiedGmt == null ? null : modifiedGmt!.toIso8601String(),
-        "slug": slug == null ? null : slug,
-        "status": status == null ? null : status.toString().split('.').last.toLowerCase(),
-        "type": type == null ? null : type,
-        "link": link == null ? null : link,
-        "title": title == null ? null : title!.toMap(),
-        "author": author == null ? null : author,
-        "comment_status": commentStatus == null ? null : commentStatus.toString().split('.').last.toLowerCase(),
-        "ping_status": pingStatus == null ? null : pingStatus.toString().split('.').last.toLowerCase(),
-        "template": template == null ? null : template,
-        "meta": meta,
-        "yoast_head": yoastHead == null ? null : yoastHead,
-        "description": description == null ? null : description!.toMap(),
-        "caption": caption == null ? null : caption!.toMap(),
-        "alt_text": altText == null ? null : altText,
-        "media_type": mediaType == null ? null : mediaType,
-        "mime_type": mimeType == null ? null : mimeType,
-        "media_details": mediaDetails == null ? null : mediaDetails!.toMap(),
-        "post": post == null ? null : post,
-        "source_url": sourceUrl == null ? null : sourceUrl,
-        "_links": links == null ? null : links!.toMap(),
-      };
-
-  @override
-  Media fromJson(Map<String, dynamic>? json) => Media.fromMap(json!);
-
-  @override
-  Map<String, dynamic> toJson() => toMap();
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'id': id,
+      'date': date?.toIso8601String(),
+      'date_gmt': dateGmt?.toIso8601String(),
+      'guid': guid?.toJson(),
+      'modified': modified?.toIso8601String(),
+      'modified_gmt': modifiedGmt?.toIso8601String(),
+      'slug': slug,
+      'status': status?.name,
+      'type': type,
+      'link': link,
+      'title': title?.toJson(),
+      'author': author,
+      'comment_status': commentStatus?.name,
+      'ping_status': pingStatus?.name,
+      'template': template,
+      'meta': meta,
+      'description': description?.toJson(),
+      'caption': caption?.toJson(),
+      'alt_text': altText,
+      'media_type': mediaType,
+      'mime_type': mimeType,
+      'media_details': mediaDetails?.toJson(),
+      'post': post,
+      'source_url': sourceUrl,
+      '_links': links?.toJson(),
+    };
+  }
 }
