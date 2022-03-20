@@ -1,6 +1,15 @@
 import '../../../wordpress_client.dart';
 
 class ListSearchRequest extends IRequest {
+  ListSearchRequest({
+    this.context,
+    required this.page,
+    required this.perPage,
+    this.search,
+    this.type,
+    this.subType,
+  });
+
   RequestContext? context;
   int page = 1;
   int perPage = 10;
