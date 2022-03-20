@@ -13,8 +13,6 @@
 
 ---
 
-## 80% of API in this library is being reworked in a different [branch](https://github.com/ArunPrakashG/wordpress_client/tree/feature/request-classes). If you are using this on an app you have currently deployed, kindly, migrate to pre release version of the package available on pub.dev. Entire requesting API has been reworked including much better support for Caching, Logging and Request control.
-
 ## Features
 
 - Support for 3 widely used authorization methods.
