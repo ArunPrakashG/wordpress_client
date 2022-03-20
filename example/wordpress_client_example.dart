@@ -3,6 +3,7 @@
 import 'package:wordpress_client/authorization.dart';
 import 'package:wordpress_client/requests.dart';
 import 'package:wordpress_client/responses.dart';
+import 'package:wordpress_client/src/requests/list/list_search.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 Future<void> main() async {
@@ -12,43 +13,15 @@ Future<void> main() async {
   client = WordpressClient.initialize(
     'https://example.com/',
     'wp-json/wp/v2',
-    bootstrapper: (bootstrapper) => bootstrapper
-        .withDebugMode(true)
-        .withDefaultAuthorization(
-          UsefulJwtAuth(
-            'username',
-            'password',
-            callback: WordpressCallback(
-              unhandledExceptionCallback: (dynamic unhandledException) {
-                print('Unhandled Exception: $unhandledException');
-              },
-              requestErrorCallback: (errorContainer) {
-                print('Request Error: ${errorContainer.errorResponse}');
-              },
-              responseCallback: (dynamic response) {
-                print('Response: $response');
-              },
-            ),
-          ),
-        )
-        .build(),
+    bootstrapper: (bootstrapper) => bootstrapper.withDebugMode(true).build(),
   );
 
-  WordpressResponse<List<User>?> userResponse = await client.users.list(
+  WordpressResponse<List<Search>?> userResponse = await client.search.list(
     WordpressRequest(
-      requestData: ListUserRequest()
+      requestData: ListSearchRequest()
         ..page = 1
         ..perPage = 10
-        ..order = Order.asc,
-    ),
-  );
-
-  userResponse = await client.users.list(
-    WordpressRequest(
-      requestData: ListUserRequest()
-        ..page = 1
-        ..perPage = 10
-        ..order = Order.asc,
+        ..search = 'test',
     ),
   );
 
@@ -56,7 +29,7 @@ Future<void> main() async {
 
   if (userResponse.isSuccess) {
     for (final user in userResponse.data!) {
-      print(user.name);
+      print(user.title);
     }
   }
 }
