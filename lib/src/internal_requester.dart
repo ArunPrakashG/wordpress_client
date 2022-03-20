@@ -9,10 +9,10 @@ typedef StatisticsCallback = void Function(
 class InternalRequester {
   InternalRequester.configure(
     this._baseUrl,
-    this._path, {
-    BootstrapConfiguration configuration = const BootstrapConfiguration(),
-  }) {
-    configure(configuration);
+    this._path, [
+    this._configuration = const BootstrapConfiguration(),
+  ]) {
+    configure(_configuration);
   }
 
   final Dio _client = Dio();
@@ -25,6 +25,7 @@ class InternalRequester {
   static StatisticsCallback? _statisticsCallback;
   bool _synchronized = false;
   bool _isDebugMode = false;
+  final BootstrapConfiguration _configuration;
 
   /// The request base url.
   ///
@@ -63,11 +64,13 @@ class InternalRequester {
     _client.options.maxRedirects = configuration.maxRedirects;
     _client.options.baseUrl = _baseUrl;
 
-    if (configuration.useCookies) {
+    if (configuration.useCookies &&
+        !_client.interceptors.any((i) => i is CookieManager)) {
       _client.interceptors.add(CookieManager(CookieJar()));
     }
 
-    if (configuration.enableDebugMode) {
+    if (configuration.enableDebugMode &&
+        !_client.interceptors.any((i) => i is LogInterceptor)) {
       _client.interceptors.add(
         LogInterceptor(
           requestBody: true,
@@ -78,7 +81,13 @@ class InternalRequester {
 
     if (configuration.interceptors != null &&
         configuration.interceptors!.isNotEmpty) {
-      _client.interceptors.addAll(configuration.interceptors!);
+      for (final interceptor in configuration.interceptors!) {
+        if (_client.interceptors.contains(interceptor)) {
+          continue;
+        }
+
+        _client.interceptors.add(interceptor);
+      }
     }
   }
 
@@ -225,7 +234,7 @@ class InternalRequester {
     }
   }
 
-  Future<WordpressResponse<T?>> deleteRequest<T>(
+  Future<WordpressResponse<bool>> deleteRequest(
     WordpressRequest request,
   ) async {
     if (!request.isRequestExecutable) {
@@ -238,8 +247,8 @@ class InternalRequester {
       final dioResponse = await _requestAsync(request, watch);
 
       if (!isInRange(dioResponse.statusCode!, 200, 399)) {
-        return WordpressResponse<T?>.failed(
-          null,
+        return WordpressResponse<bool>.failed(
+          false,
           requestDuration: watch.elapsed,
           responseCode: dioResponse.statusCode!,
           responseHeaders: dioResponse.headers.getHeaderMap(),
@@ -250,9 +259,9 @@ class InternalRequester {
 
       request.callback?.invokeResponseCallback(dioResponse.data);
 
-      if (!_validateResponse<T>(request, null)) {
-        return WordpressResponse<T?>.failed(
-          null,
+      if (!_validateResponse<bool>(request, true)) {
+        return WordpressResponse<bool>.failed(
+          false,
           requestDuration: watch.elapsed,
           responseHeaders: dioResponse.headers.getHeaderMap(),
           responseCode: dioResponse.statusCode!,
@@ -260,8 +269,8 @@ class InternalRequester {
         );
       }
 
-      return WordpressResponse<T?>(
-        null,
+      return WordpressResponse<bool>(
+        true,
         responseCode: dioResponse.statusCode!,
         responseHeaders: dioResponse.headers.getHeaderMap(),
         requestDuration: watch.elapsed,
@@ -274,8 +283,8 @@ class InternalRequester {
         request.callback?.invokeUnhandledExceptionCallback(e as Exception);
       }
 
-      return WordpressResponse<T?>.failed(
-        null,
+      return WordpressResponse<bool>.failed(
+        false,
         requestDuration: watch.elapsed,
         message: 'Exception occured. (${e.toString()})',
       );
@@ -317,7 +326,7 @@ class InternalRequester {
       }
 
       final response = (dioResponse.data as Iterable<dynamic>)
-          .map<T>(deserialize<T>)
+          .map<T>((dynamic e) => deserialize<T>(e))
           .toList();
 
       if (!_validateResponse<List<T>>(request, response)) {
@@ -493,17 +502,34 @@ class InternalRequester {
     required IAuthorization auth,
     WordpressCallback? callback,
   }) async {
-    if (!auth.isValidAuth) {
-      return false;
-    }
-
-    if (await request.authorization!.isAuthenticated()) {
+    if (await auth.isAuthenticated()) {
       request.headers['Authorization'] = (await auth.generateAuthUrl())!;
       return true;
     }
 
+    final dioAuthClient = Dio(
+      BaseOptions(
+        baseUrl: _baseUrl,
+        headers: _client.options.headers,
+        connectTimeout: _client.options.connectTimeout,
+        receiveTimeout: _client.options.receiveTimeout,
+        sendTimeout: _client.options.sendTimeout,
+        followRedirects: _client.options.followRedirects,
+        maxRedirects: _client.options.maxRedirects,
+      ),
+    );
+
+    if (_isDebugMode) {
+      dioAuthClient.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+        ),
+      );
+    }
+
     await auth._init(
-      dioClient: _client,
+      dioClient: dioAuthClient,
       baseUrl: _baseUrl,
       path: _path,
     );
@@ -537,24 +563,34 @@ class InternalRequester {
 
 /// Base class for all authorization types.
 ///
-/// To create a custom authorization system, simply extend from this abstract class, then implement its functions
-/// then pass base class to Authorization builder function!
+/// To implement a custom authorization system, You _must_ extend this class.
 ///
-/// There is no storage system to store the nounce inside the client, therefore the base class has the responsibility to handle this mechanism.
+/// There is no storage system internally to store and retrive
 abstract class IAuthorization {
   /// Default constructor, used to pass username and password.
   IAuthorization(this.userName, this.password, {this.callback});
 
+  /// The base url of the wordpress site passed on [WordpressClient] constructor.
+  ///
+  /// eg: www.example.com
   late final String baseUrl;
+
+  /// The path of the wordpress site passed on [WordpressClient] constructor.
+  ///
+  /// eg: /wp-json/wp/v2
   late final String path;
+
+  /// Combines [baseUrl] and [path] to form the full url.
   String get requestBaseUrl => parseUrl(baseUrl, path);
+
+  /// The [Dio] instance which can be used to make requests.
   late final Dio client;
 
   /// The username
-  String? userName;
+  final String userName;
 
   /// The password
-  String? password;
+  final String password;
 
   // A Callback, if assigned, will help with logging of data of requests send and received on this instance.
   WordpressCallback? callback;
@@ -568,11 +604,9 @@ abstract class IAuthorization {
   /// Helps to initialize authorization instance with internal requesting client passed as a parameter.
   ///
   /// This function is called only if there is no valid nounce available ie., when isAuthenticated() returns false.
-  /// Internal client will be passed as a parameter to this function which you can store inside the instance for internal authorization requests.
+  /// A new instance of [Dio] client will be passed as a parameter to this function which you can store inside the instance for internal authorization requests.
   ///
-  /// authorize() / validate() functions will not be called before calling init() function.
-  ///
-  /// If you require Http request calls inside isAuthenticated() / generateAuthUrl() calls, then you will need to implement your own requesting mechanism  ///
+  /// `authorize()` / `validate()` functions will not be called before calling `_init()` function.
   Future<bool> _init({
     required Dio dioClient,
     required String baseUrl,
@@ -594,7 +628,7 @@ abstract class IAuthorization {
   /// Example 2: Basic Auth does not require any validation, therefore you can simply return true or if still require some custom logic, you can implement that as well!
   Future<bool> validate();
 
-  /// Called to check if this instance has a valid authentication nounce and generateAuthUrl() won't return false.
+  /// Called to check if this instance has a valid authentication nounce and generateAuthUrl() won't return null.
   ///
   /// This function will be called before init() function, therefore if you are using client instance passed through init() then there will be NullReferenceException.
   ///
@@ -606,16 +640,15 @@ abstract class IAuthorization {
   /// Returning true means the request should be authorized, false means authorization failed.
   Future<bool> authorize();
 
-  /// After authorize() is called, to get the authorization header string, (ie, '{scheme} {token}') the client calls this method to generate the raw string.
+  /// After `authorize()` is called, to get the authorization header string, (ie, '{scheme} {token}') the client calls this method to generate the raw string.
   ///
   /// The returning string formate must always be like
   ///
   /// {scheme} {token}
   ///
-  /// Example 1: In case of JWT
-  /// Bearer {jwt_token}
+  /// - Example 1: In case of JWT, `Bearer {jwt_token}`
   ///
-  /// Example 2: In case of Basic Auth
-  /// Basic {base64 encoded username and password}
+  /// - Example 2: In case of Basic Auth, `Basic {Base64UsernamePassword}`
+  ///
   Future<String?> generateAuthUrl();
 }

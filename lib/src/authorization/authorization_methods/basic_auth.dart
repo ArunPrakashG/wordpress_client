@@ -11,8 +11,8 @@ import '../../wordpress_client_base.dart';
 /// Make sure to only use this method for testing purposes as this isn't secure.
 class BasicAuth extends IAuthorization {
   BasicAuth(
-    String? username,
-    String? password, {
+    String username,
+    String password, {
     WordpressCallback? callback,
   }) : super(username, password, callback: callback);
 

@@ -6,7 +6,7 @@ import '../../wordpress_client.dart';
 class TagInterface extends IInterface
     with
         CreateMixin<Tag, CreateTagRequest>,
-        DeleteMixin<Tag, DeleteTagRequest>,
-        RetriveMixin<Tag, RetriveTagRequest>,
+        DeleteMixin<DeleteTagRequest>,
+        RetrieveMixin<Tag, RetriveTagRequest>,
         UpdateMixin<Tag, UpdateTagRequest>,
         ListMixin<Tag, ListTagRequest> {}

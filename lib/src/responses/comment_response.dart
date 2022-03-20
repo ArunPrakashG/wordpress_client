@@ -1,4 +1,5 @@
 import '../enums.dart';
+import '../utilities/helpers.dart';
 import 'response_properties/content.dart';
 import 'response_properties/links.dart';
 
@@ -35,8 +36,8 @@ class Comment {
       authorUrl: json['author_url'] as String?,
       authorIp: json['author_ip'] as String?,
       authorUserAgent: json['author_user_agent'] as String?,
-      date: DateTime.tryParse(json['date'] as String? ?? ''),
-      dateGmt: DateTime.tryParse(json['date_gmt'] as String? ?? ''),
+      date: parseDateIfNotNull(json['date']),
+      dateGmt: parseDateIfNotNull(json['date_gmt']),
       content: Content.fromJson(json['content'] as Map<String, dynamic>?),
       link: json['link'] as String?,
       status: getCommentStatusFromValue(json['status'] as String?),
@@ -45,7 +46,7 @@ class Comment {
           ? null
           : Map<String, String>.from(
                   json['author_avatar_urls'] as Map<String, dynamic>)
-              .map(MapEntry<String, String>.new),
+              .map((k, v) => MapEntry(k, v)),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
     );
@@ -89,8 +90,8 @@ class Comment {
       'type': type,
       'author_avatar_urls': authorAvatarUrls == null
           ? null
-          : Map<String, dynamic>.from(authorAvatarUrls!)
-              .map<String, dynamic>(MapEntry<String, dynamic>.new),
+          : Map<String, dynamic>.from(authorAvatarUrls!).map<String, dynamic>(
+              (key, dynamic value) => MapEntry<String, dynamic>(key, value)),
       'meta': meta,
       '_links': links?.toJson(),
     };

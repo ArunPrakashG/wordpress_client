@@ -1,13 +1,12 @@
 name: wordpress_client
 description: A library written purely in dart to interact with Wordpress REST API in a fluent manner. Supports Authorization as well.
-version: 6.2.1-pre
+version: 6.3.0
 repository: https://github.com/ArunPrakashG/wordpress_client
 
 environment:
-  sdk: ">=2.16.1 <3.0.0"
+  sdk: ">=2.14.0 <3.0.0"
 
 dev_dependencies:
-  pedantic: ^1.11.1
   temp_mail_gen: ^2.0.0
   path_provider: ^2.0.9
 
@@ -16,6 +15,5 @@ dependencies:
   dio: ^4.0.4
   dio_cookie_manager: ^2.0.0
   http_parser: ^4.0.0
-  meta: ^1.7.0
-  path: ^1.8.0
+  path: ^1.8.1
   synchronized: ^3.0.0

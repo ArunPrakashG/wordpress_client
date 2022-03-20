@@ -20,47 +20,47 @@ class Links {
     return Links(
       self: mapIterableWithChecks<LinkContainer>(
         json['self'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       collection: mapIterableWithChecks<LinkContainer>(
         json['collection'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       about: mapIterableWithChecks<LinkContainer>(
         json['about'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       author: mapIterableWithChecks<LinkContainer>(
         json['author'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       replies: mapIterableWithChecks<LinkContainer>(
         json['replies'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       versionHistory: mapIterableWithChecks<LinkContainer>(
         json['version-history'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       predecessorVersion: mapIterableWithChecks<LinkContainer>(
         json['predecessor-version'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpFeaturedmedia: mapIterableWithChecks<LinkContainer>(
         json['wp:featuredmedia'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpAttachment: mapIterableWithChecks<LinkContainer>(
         json['wp:attachment'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpTerm: mapIterableWithChecks<LinkContainer>(
         json['wp:term'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
       curies: mapIterableWithChecks<LinkContainer>(
         json['curies'],
-        LinkContainer.fromJson,
+        (dynamic v) => LinkContainer.fromJson(v),
       ),
     );
   }

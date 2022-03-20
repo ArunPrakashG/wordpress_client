@@ -118,3 +118,8 @@
 # 6.2.1-pre
 
 - Misc
+
+# 6.3.0
+
+- Lots of changes in the API
+- Please check the wiki for setting up and usage to know about the changed API

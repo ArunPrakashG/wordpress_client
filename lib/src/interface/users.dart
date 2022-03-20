@@ -6,7 +6,7 @@ import '../../wordpress_client.dart';
 class UsersInterface extends IInterface
     with
         CreateMixin<User, CreateUserRequest>,
-        DeleteMixin<User, DeleteUserRequest>,
-        RetriveMixin<User, RetriveUserRequest>,
+        DeleteMixin<DeleteUserRequest>,
+        RetrieveMixin<User, RetriveUserRequest>,
         UpdateMixin<User, UpdateUserRequest>,
         ListMixin<User, ListUserRequest> {}

@@ -8,17 +8,17 @@ import 'authorization_methods/basic_jwt.dart';
 import 'authorization_methods/useful_jwt.dart';
 
 class AuthorizationBuilder {
-  String? _userName;
-  String? _password;
+  String _userName = '';
+  String _password = '';
   AuthorizationType? _type;
   WordpressCallback? _callback;
 
-  AuthorizationBuilder withUserName(String? userName) {
+  AuthorizationBuilder withUserName(String userName) {
     _userName = userName;
     return this;
   }
 
-  AuthorizationBuilder withPassword(String? password) {
+  AuthorizationBuilder withPassword(String password) {
     _password = password;
     return this;
   }

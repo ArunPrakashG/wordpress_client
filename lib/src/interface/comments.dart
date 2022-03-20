@@ -6,7 +6,7 @@ import '../../wordpress_client.dart';
 class CommentInterface extends IInterface
     with
         CreateMixin<Comment, CreateCommentRequest>,
-        DeleteMixin<Comment, DeleteCommentRequest>,
-        RetriveMixin<Comment, RetriveCommentRequest>,
+        DeleteMixin<DeleteCommentRequest>,
+        RetrieveMixin<Comment, RetriveCommentRequest>,
         UpdateMixin<Comment, UpdateCommentRequest>,
         ListMixin<Comment, ListCommentRequest> {}

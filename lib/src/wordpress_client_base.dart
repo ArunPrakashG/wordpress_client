@@ -37,8 +37,8 @@ class WordpressClient {
   ///
   /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
   WordpressClient(
-    this.baseUrl,
-    this.path, {
+    String baseUrl,
+    String path, {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
@@ -47,6 +47,10 @@ class WordpressClient {
 
     if (isNullOrEmpty(path)) {
       throw NullReferenceException('Path is invalid.');
+    }
+
+    if (baseUrl.contains('www.')) {
+      baseUrl = baseUrl.replaceFirst('www.', '');
     }
 
     var configuration = const BootstrapConfiguration();
@@ -58,7 +62,7 @@ class WordpressClient {
     _requester = InternalRequester.configure(
       baseUrl,
       path,
-      configuration: configuration,
+      configuration,
     );
   }
 
@@ -69,8 +73,8 @@ class WordpressClient {
   /// [bootstrapper] is a builder method for initializing the client.
   ///
   WordpressClient.initialize(
-    this.baseUrl,
-    this.path, {
+    String baseUrl,
+    String path, {
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
     if (isNullOrEmpty(baseUrl)) {
@@ -79,6 +83,10 @@ class WordpressClient {
 
     if (isNullOrEmpty(path)) {
       throw NullReferenceException('Path is invalid.');
+    }
+
+    if (baseUrl.contains('www.')) {
+      baseUrl = baseUrl.replaceFirst('www.', '');
     }
 
     var configuration = const BootstrapConfiguration();
@@ -90,19 +98,19 @@ class WordpressClient {
     _requester = InternalRequester.configure(
       baseUrl,
       path,
-      configuration: configuration,
+      configuration,
     );
 
-    Timer.run(initialize);
+    initialize();
   }
 
   late final InternalRequester _requester;
 
   /// Base url supplied through constructor.
-  final String baseUrl;
+  String get baseUrl => _requester._baseUrl;
 
   /// Base url path supplied through constructor.
-  final String path;
+  String get path => _requester._path;
 
   /// Returns true if this instance of [WordpressClient] is running in debug mode.
   ///
@@ -114,16 +122,16 @@ class WordpressClient {
   /// i.e., Only a single request is allowed at a time.
   bool get isSynchronizedMode => _requester._synchronized;
 
+  /// Returns true if we have valid default authorization which is to be used for all requests.
+  bool get hasValidDefaultAuthorization =>
+      _requester._defaultAuthorization != null &&
+      _requester._defaultAuthorization!.isValidAuth;
+
   /// Combined url of [baseUrl] and [path]
-  String get requestUrl => parseUrl(baseUrl, path);
+  String get requestUrl => _requester.requestBaseUrl;
 
   /// Stores data on how to decode & encode responses.
   final TypeMap _typeMap = TypeMap();
-
-  /// Request Base Url.
-  ///
-  /// Basically, [baseUrl] + [path]
-  String get requestBaseUrl => baseUrl;
 
   /// The current user interface.
   ///
@@ -242,49 +250,49 @@ class WordpressClient {
     initInterface<MeInterface, User>(
       interface: MeInterface(),
       key: 'me',
-      responseDecoder: User.fromJson,
+      responseDecoder: (map) => User.fromJson(map),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
     initInterface<PostsInterface, Post>(
       interface: PostsInterface(),
       key: 'posts',
-      responseDecoder: Post.fromJson,
+      responseDecoder: (map) => Post.fromJson(map),
       responseEncoder: (dynamic post) => (post as Post).toJson(),
     );
 
     initInterface<CategoryInterface, Category>(
       interface: CategoryInterface(),
       key: 'categories',
-      responseDecoder: Category.fromJson,
+      responseDecoder: (map) => Category.fromJson(map),
       responseEncoder: (dynamic category) => (category as Category).toJson(),
     );
 
     initInterface<CommentInterface, Comment>(
       interface: CommentInterface(),
       key: 'comments',
-      responseDecoder: Comment.fromJson,
+      responseDecoder: (map) => Comment.fromJson(map),
       responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
     initInterface<MediaInterface, Media>(
       interface: MediaInterface(),
       key: 'media',
-      responseDecoder: Media.fromJson,
+      responseDecoder: (map) => Media.fromJson(map),
       responseEncoder: (dynamic media) => (media as Media).toJson(),
     );
 
     initInterface<TagInterface, Tag>(
       interface: TagInterface(),
       key: 'tags',
-      responseDecoder: Tag.fromJson,
+      responseDecoder: (map) => Tag.fromJson(map),
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
     initInterface<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
-      responseDecoder: User.fromJson,
+      responseDecoder: (map) => User.fromJson(map),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
   }
@@ -422,10 +430,20 @@ class WordpressClient {
   void clearDefaultAuthorization() => _requester._removeDefaultAuthorization();
 
   /// Called to reconfigure the client with new settings.
-  void reconfigureRequester(
+  ///
+  /// The default builder will contain all the previous settings.
+  ///
+  /// Only the settings that have changed since will be updated.
+  void reconfigureClient(
     BootstrapConfiguration Function(BootstrapBuilder) bootstrapper,
   ) {
-    return _requester.configure(bootstrapper(BootstrapBuilder()));
+    return _requester.configure(
+      bootstrapper(
+        BootstrapBuilder.fromConfiguration(
+          _requester._configuration,
+        ),
+      ),
+    );
   }
 }
 

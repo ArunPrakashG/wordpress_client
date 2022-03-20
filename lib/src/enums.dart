@@ -27,15 +27,33 @@ enum CommentStatus {
   pending,
 }
 
+/// Different HTTP Methods which is supported by the client.
 enum HttpMethod {
+  /// Put Method
   put,
+
+  /// Post Method
   post,
+
+  /// Get Method
   get,
+
+  /// Delete Method
   delete,
+
+  /// Update Method
   update,
+
+  /// Head Method
   head,
+
+  /// Options Method
   options,
+
+  /// Patch Method
   patch,
+
+  /// Trace Method
   trace,
 }
 

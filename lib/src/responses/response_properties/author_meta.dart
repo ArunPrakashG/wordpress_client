@@ -1,3 +1,5 @@
+import '../../utilities/helpers.dart';
+
 class AuthorMeta {
   AuthorMeta({
     this.id,
@@ -10,9 +12,7 @@ class AuthorMeta {
     return AuthorMeta(
       id: json?['ID'] as String?,
       userNicename: json?['user_nicename'] as String?,
-      userRegistered: json?['user_registered'] == null
-          ? null
-          : DateTime.parse(json?['user_registered'] as String),
+      userRegistered: parseDateIfNotNull(json?['user_registered']),
       displayName: json?['display_name'] as String?,
     );
   }

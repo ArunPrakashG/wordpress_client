@@ -6,7 +6,7 @@ import '../../wordpress_client.dart';
 class MediaInterface extends IInterface
     with
         CreateMixin<Media, CreateMediaRequest>,
-        DeleteMixin<Media, DeleteMediaRequest>,
-        RetriveMixin<Media, RetriveMediaRequest>,
+        DeleteMixin<DeleteMediaRequest>,
+        RetrieveMixin<Media, RetriveMediaRequest>,
         UpdateMixin<Media, UpdateMediaRequest>,
         ListMixin<Media, ListMediaRequest> {}

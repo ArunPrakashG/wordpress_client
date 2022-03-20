@@ -29,6 +29,24 @@ extension HeaderExtension on Headers {
   }
 }
 
+DateTime? parseDateIfNotNull(dynamic json) {
+  if (json == null) {
+    return null;
+  }
+
+  if (json is! String) {
+    return null;
+  }
+
+  final dateString = json;
+
+  if (dateString.isEmpty) {
+    return null;
+  }
+
+  return DateTime.tryParse(dateString);
+}
+
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
 bool isAlphaNumeric(String value) => RegExp(r'^[a-zA-Z0-9]*$').hasMatch(value);

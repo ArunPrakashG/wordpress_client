@@ -16,8 +16,8 @@ import 'useful_jwt.dart';
 /// This plugin isn't in active development and may contain lots of bugs/issues. It is recommended to use [UsefulJwtAuth] instead.
 class BasicJwtAuth extends IAuthorization {
   BasicJwtAuth(
-    String? username,
-    String? password, {
+    String username,
+    String password, {
     WordpressCallback? callback,
   }) : super(username, password, callback: callback);
 
@@ -55,7 +55,7 @@ class BasicJwtAuth extends IAuthorization {
 
     try {
       final response = await _client!.post<dynamic>(
-        parseUrl(requestBaseUrl, 'jwt-auth/v1/token'),
+        'wp-json/jwt-auth/v1/token',
         data: {
           'username': userName,
           'password': password,
@@ -111,7 +111,7 @@ class BasicJwtAuth extends IAuthorization {
     try {
       final authUrl = await generateAuthUrl();
       final response = await _client!.post<dynamic>(
-        parseUrl(requestBaseUrl, 'jwt-auth/v1/token/validate'),
+        'wp-json/jwt-auth/v1/token/validate',
         options: Options(
           method: 'POST',
           headers: <String, dynamic>{

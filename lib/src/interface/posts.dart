@@ -6,7 +6,7 @@ import '../../wordpress_client.dart';
 class PostsInterface extends IInterface
     with
         CreateMixin<Post, CreatePostRequest>,
-        DeleteMixin<Post, DeletePostRequest>,
-        RetriveMixin<Post, RetrivePostRequest>,
+        DeleteMixin<DeletePostRequest>,
+        RetrieveMixin<Post, RetrivePostRequest>,
         UpdateMixin<Post, UpdatePostRequest>,
         ListMixin<Post, ListPostRequest> {}

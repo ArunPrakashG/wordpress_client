@@ -7,6 +7,23 @@ import 'client_configuration.dart';
 import 'wordpress_client_base.dart';
 
 class BootstrapBuilder {
+  BootstrapBuilder();
+
+  BootstrapBuilder.fromConfiguration(BootstrapConfiguration config) {
+    _debugMode = config.enableDebugMode;
+    _statisticsDelegate = config.statisticsDelegate;
+    _useCookies = config.useCookies;
+    _defaultAuthorization = config.defaultAuthorization;
+    _defaultUserAgent = config.defaultUserAgent;
+    _defaultHeaders = config.defaultHeaders;
+    _interceptors = config.interceptors;
+    _responsePreprocessorDelegate = config.responsePreprocessorDelegate;
+    _synchronized = config.synchronized;
+    _defaultMaxRedirects = config.maxRedirects;
+    _defaultRequestTimeout = config.requestTimeout;
+    _followRedirects = config.shouldFollowRedirects;
+  }
+
   int _defaultRequestTimeout = 60 * 1000; // 60 seconds
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;

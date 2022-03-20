@@ -32,12 +32,11 @@ class User {
       firstName: json['first_name'] as String?,
       lastName: json['last_name'] as String?,
       email: json['email'] as String?,
-      registeredDate:
-          DateTime.tryParse(json['registered_date'] as String? ?? ''),
+      registeredDate: parseDateIfNotNull(json['registered_date']),
       capabilities: json['capabilities'] == null
           ? null
           : Map<String, bool>.from(json['capabilities'] as Map<String, dynamic>)
-              .map(MapEntry<String, bool>.new),
+              .map((k, v) => MapEntry(k, v)),
       extraCapabilities: ExtraCapabilities.fromJson(json['extra_capabilities']),
       url: json['url'] as String?,
       description: json['description'] as String?,
@@ -49,7 +48,7 @@ class User {
           ? null
           : Map<String, String>.from(
                   json['avatar_urls'] as Map<String, dynamic>)
-              .map(MapEntry<String, String>.new),
+              .map((k, v) => MapEntry(k, v)),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
     );

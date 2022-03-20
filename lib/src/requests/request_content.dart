@@ -25,11 +25,17 @@ class RequestContent {
   /// The endpoint to use for this request
   ///
   /// This must be filled at the build method of the request.
+  ///
+  /// If this is not filled, the request will be send to the URL which is generated when combining the Base URL and the Path. If that's what you want, You can ignore this property.
   String endpoint = '';
 
   /// The path to use for this request
   ///
   /// This is optional. If path is null, it will default back to the path passed in [WordpressClient] constructor.
+  ///
+  /// In normal cases, the default API path for wordpress is `/wp-json/wp/v2/`.
+  ///
+  /// Unless you wish to use a different API path, you can ignore this.
   String? path;
 
   /// The HTTP method to use for this request

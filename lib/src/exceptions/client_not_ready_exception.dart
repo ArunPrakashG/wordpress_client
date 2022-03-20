@@ -7,5 +7,5 @@ class ClientNotReadyException implements WordpressException {
 
   @override
   String? get message =>
-      'Client is currently in the process of initializing Interfaces and internal processes.';
+      'Client has not been initialized. You might have forgotten to call `WordpressClient.initialize()` method or you please use the factory constructor `WordpressClient.initialize()` to initialize client with the constructor.';
 }

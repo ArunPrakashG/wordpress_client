@@ -5,6 +5,6 @@ import '../../wordpress_client.dart';
 
 class MeInterface extends IInterface
     with
-        DeleteMixin<User, DeleteMeRequest>,
-        RetriveMixin<User, RetriveMeRequest>,
+        DeleteMixin<DeleteMeRequest>,
+        RetrieveMixin<User, RetriveMeRequest>,
         UpdateMixin<User, UpdateMeRequest> {}

@@ -4,7 +4,7 @@ class ExtraCapabilities {
   });
 
   factory ExtraCapabilities.fromJson(dynamic json) {
-    return ExtraCapabilities(administrator: json['administrator'] as bool?);
+    return ExtraCapabilities(administrator: json?['administrator'] as bool?);
   }
 
   final bool? administrator;

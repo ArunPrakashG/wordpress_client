@@ -1,4 +1,5 @@
 import '../enums.dart';
+import '../utilities/helpers.dart';
 import 'response_properties/content.dart';
 import 'response_properties/links.dart';
 import 'response_properties/media_details.dart';
@@ -35,11 +36,11 @@ class Media {
   factory Media.fromJson(dynamic json) {
     return Media(
       id: json['id'] as int?,
-      date: DateTime.tryParse(json['date'] as String? ?? ''),
-      dateGmt: DateTime.tryParse(json['date_gmt'] as String? ?? ''),
+      date: parseDateIfNotNull(json['date']),
+      dateGmt: parseDateIfNotNull(json['date_gmt']),
       guid: Content.fromJson(json['guid']),
-      modified: DateTime.tryParse(json['modified'] as String? ?? ''),
-      modifiedGmt: DateTime.tryParse(json['modified_gmt'] as String? ?? ''),
+      modified: parseDateIfNotNull(json['modified']),
+      modifiedGmt: parseDateIfNotNull(json['modified_gmt']),
       slug: json['slug'] as String?,
       status: getMediaFilterStatusFromValue(json['status'] as String?),
       type: json['type'] as String?,

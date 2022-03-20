@@ -13,5 +13,7 @@ abstract class IRequest {
   /// Request body, headers and other request properties are set by appending on to request content properties.
   ///
   /// Consider using [addIfNotNull] extension method to add a value to a map if it is not null.
+  ///
+  /// It is not recommended to run functions which takes time to complete in the `build()` method. This can affect entire client performence as this method is invoked from a constructor.
   void build(RequestContent requestContent);
 }

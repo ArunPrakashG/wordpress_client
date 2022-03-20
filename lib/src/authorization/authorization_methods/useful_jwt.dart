@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
+import '../../enums.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/wordpress_callback.dart';
 import '../../wordpress_client_base.dart';
@@ -12,15 +13,14 @@ import 'basic_jwt.dart';
 /// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
 class UsefulJwtAuth extends IAuthorization {
   UsefulJwtAuth(
-    String? username,
-    String? password, {
+    String username,
+    String password, {
     WordpressCallback? callback,
   }) : super(username, password, callback: callback);
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
   bool _hasValidatedOnce = false;
-  Dio? _client;
 
   static const int kDaysUntilTokenExpiry = 3;
   static const String kAuthScheme = 'Bearer';
@@ -39,10 +39,6 @@ class UsefulJwtAuth extends IAuthorization {
       return true;
     }
 
-    if (_client == null) {
-      return false;
-    }
-
     if (!_isAuthExpiried &&
         !_hasValidatedOnce &&
         !isNullOrEmpty(_encryptedAccessToken)) {
@@ -50,15 +46,17 @@ class UsefulJwtAuth extends IAuthorization {
     }
 
     try {
-      final response = await _client!.post<dynamic>(
-        parseUrl(requestBaseUrl, 'jwt-auth/v1/token'),
+      final response = await client.post<dynamic>(
+        'wp-json/jwt-auth/v1/token',
         data: {
           'username': userName,
           'password': password,
         },
         options: Options(
-          method: 'POST',
+          method: HttpMethod.post.name,
           contentType: 'application/x-www-form-urlencoded',
+          followRedirects: true,
+          maxRedirects: 10,
         ),
       );
 
@@ -100,14 +98,14 @@ class UsefulJwtAuth extends IAuthorization {
 
   @override
   Future<bool> validate() async {
-    if (_client == null || isNullOrEmpty(_encryptedAccessToken)) {
+    if (isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
 
     try {
       final authUrl = await generateAuthUrl();
-      final response = await _client!.post<dynamic>(
-        parseUrl(requestBaseUrl, 'jwt-auth/v1/token/validate'),
+      final response = await client.post<dynamic>(
+        'wp-json/jwt-auth/v1/token/validate',
         options: Options(
           method: 'POST',
           headers: <String, dynamic>{

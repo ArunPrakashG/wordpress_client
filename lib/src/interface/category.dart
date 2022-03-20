@@ -14,7 +14,7 @@ import '../wordpress_client_base.dart';
 class CategoryInterface extends IInterface
     with
         CreateMixin<Category, CreateCategoryRequest>,
-        DeleteMixin<Category, DeleteCategoryRequest>,
-        RetriveMixin<Category, RetriveCategoryRequest>,
+        DeleteMixin<DeleteCategoryRequest>,
+        RetrieveMixin<Category, RetriveCategoryRequest>,
         UpdateMixin<Category, UpdateCategoryRequest>,
         ListMixin<Category, ListCategoryRequest> {}
