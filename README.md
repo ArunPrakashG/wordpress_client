@@ -26,11 +26,11 @@
 
 You can use this library just like any other Dart package.
 
-- Add `wordpress_client` as a dependency on `pubspec.yaml` file on your project root. At the time of this writing, the latest package version is 5.1.0. Do check [Package Page](https://pub.dev/packages/wordpress_client) to get latest version.
+- Add `wordpress_client` as a dependency on `pubspec.yaml` file on your project root. At the time of this writing, the latest package version is 6.3.3. Do check [Package Page](https://pub.dev/packages/wordpress_client) to get latest version.
 
 ```dart
 dependencies:
-  wordpress_client: {latest}
+  wordpress_client: ^6.3.3
 ```
 
 - Import the library to your project class in which you want to use the library.
