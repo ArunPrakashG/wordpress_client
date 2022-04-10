@@ -19,6 +19,7 @@
 - Response preprocessor callback support.
 - Provides statistics such as time taken for the request to complete.
 - Support for Custom Requests / Authorization systems.
+- Request Synchronization using lock objects
 - Nullable support.
 - And many more!
 
