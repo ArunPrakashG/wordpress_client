@@ -92,6 +92,7 @@ For Custom Authorization implementation, Check out [Authorization](https://githu
 | **Users**          | yes    | yes  | yes    | yes    |
 | **Me**             | yes    | yes  | yes    | yes    |
 | **Media**          | yes    | yes  | yes    | yes    |
+| **Search**         | ---    | yes  | ---    | ---    |
 | **Post Revisions** | ---    | ---  | ---    | ---    |
 | **Taxonomies**     | ---    | ---  | ---    | ---    |
 | **Post Types**     | ---    | ---  | ---    | ---    |
