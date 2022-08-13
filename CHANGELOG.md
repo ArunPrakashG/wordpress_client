@@ -123,3 +123,7 @@
 
 - Lots of changes in the API
 - Please check the wiki for setting up and usage to know about the changed API
+
+# 6.3.1
+
+- Implemented search endpoint

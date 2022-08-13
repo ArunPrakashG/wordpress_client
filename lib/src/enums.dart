@@ -17,6 +17,12 @@ enum ErrorType {
   requestUriParsingFailed,
 }
 
+enum SearchType {
+  post,
+  term,
+  postFormat,
+}
+
 enum Status {
   open,
   closed,

@@ -12,6 +12,7 @@ import 'interface/comments.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/posts.dart';
+import 'interface/search.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'interface_key.dart';
@@ -223,6 +224,15 @@ class WordpressClient {
   ///
   UsersInterface get users => getInterface<UsersInterface>('users');
 
+  /// The search interface.
+  ///
+  /// Provides functionality to search posts, terms, post-formats.
+  ///
+  /// Available Operations:
+  /// - List
+  ///
+  SearchInterface get search => getInterface<SearchInterface>('search');
+
   final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
       <InterfaceKey<dynamic>, dynamic>{};
 
@@ -295,6 +305,13 @@ class WordpressClient {
       responseDecoder: (map) => User.fromJson(map),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
+
+    initInterface<SearchInterface, Search>(
+      interface: SearchInterface(),
+      key: 'search',
+      responseDecoder: (map) => Search.fromJson(map),
+      responseEncoder: (dynamic search) => (search as Search).toJson(),
+    );
   }
 
   /// Called to initialize an interface.
@@ -319,6 +336,7 @@ class WordpressClient {
   /// - `media`
   /// - `tags`
   /// - `users`
+  /// - `search`
   ///
   /// Example usage:
   ///

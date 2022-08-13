@@ -15,6 +15,7 @@ export 'list/list_category.dart';
 export 'list/list_comment.dart';
 export 'list/list_media.dart';
 export 'list/list_post.dart';
+export 'list/list_search.dart';
 export 'list/list_tag.dart';
 export 'list/list_user.dart';
 export 'retrive/retrive_category.dart';
