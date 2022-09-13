@@ -19,47 +19,47 @@ class Links {
   factory Links.fromJson(dynamic json) {
     return Links(
       self: mapIterableWithChecks<LinkContainer>(
-        json['self'],
+        json?['self'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       collection: mapIterableWithChecks<LinkContainer>(
-        json['collection'],
+        json?['collection'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       about: mapIterableWithChecks<LinkContainer>(
-        json['about'],
+        json?['about'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       author: mapIterableWithChecks<LinkContainer>(
-        json['author'],
+        json?['author'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       replies: mapIterableWithChecks<LinkContainer>(
-        json['replies'],
+        json?['replies'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       versionHistory: mapIterableWithChecks<LinkContainer>(
-        json['version-history'],
+        json?['version-history'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       predecessorVersion: mapIterableWithChecks<LinkContainer>(
-        json['predecessor-version'],
+        json?['predecessor-version'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpFeaturedmedia: mapIterableWithChecks<LinkContainer>(
-        json['wp:featuredmedia'],
+        json?['wp:featuredmedia'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpAttachment: mapIterableWithChecks<LinkContainer>(
-        json['wp:attachment'],
+        json?['wp:attachment'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       wpTerm: mapIterableWithChecks<LinkContainer>(
-        json['wp:term'],
+        json?['wp:term'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
       curies: mapIterableWithChecks<LinkContainer>(
-        json['curies'],
+        json?['curies'],
         (dynamic v) => LinkContainer.fromJson(v),
       ),
     );

@@ -127,3 +127,7 @@
 # 6.3.1
 
 - Implemented search endpoint
+
+# 6.3.4
+
+- Bug fix with media endpoint
