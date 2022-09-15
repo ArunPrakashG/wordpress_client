@@ -191,7 +191,7 @@ PostFormat getFormatFromValue(String? value) {
 }
 
 Status getStatusFromValue(String? value) {
-  if (value == null) {
+  if (value == null || value.isEmpty) {
     return Status.open;
   }
 
