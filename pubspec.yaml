@@ -8,12 +8,12 @@ environment:
 
 dev_dependencies:
   temp_mail_gen: ^2.0.0
-  path_provider: ^2.0.9
+  path_provider: ^2.0.11
 
 dependencies:
   cookie_jar: ^3.0.1
-  dio: ^4.0.4
+  dio: ^4.0.6
   dio_cookie_manager: ^2.0.0
-  http_parser: ^4.0.0
-  path: ^1.8.1
-  synchronized: ^3.0.0
+  http_parser: ^4.0.2
+  path: ^1.8.3
+  synchronized: ^3.0.0+3
