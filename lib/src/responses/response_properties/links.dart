@@ -79,17 +79,17 @@ class Links {
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'self': self?.map((e) => e.toMap()),
-      'collection': collection?.map((e) => e.toMap()),
-      'about': about?.map((e) => e.toMap()),
-      'author': author?.map((e) => e.toMap()),
-      'replies': replies?.map((e) => e.toMap()),
-      'version-history': versionHistory?.map((e) => e.toMap()),
-      'predecessor-version': predecessorVersion?.map((e) => e.toMap()),
-      'wp:featuredmedia': wpFeaturedmedia?.map((e) => e.toMap()),
-      'wp:attachment': wpAttachment?.map((e) => e.toMap()),
-      'wp:term': wpTerm?.map((e) => e.toMap()),
-      'curies': curies?.map((e) => e.toMap()),
+      'self': self?.map((e) => e.toMap()).toList(),
+      'collection': collection?.map((e) => e.toMap()).toList(),
+      'about': about?.map((e) => e.toMap()).toList(),
+      'author': author?.map((e) => e.toMap()).toList(),
+      'replies': replies?.map((e) => e.toMap()).toList(),
+      'version-history': versionHistory?.map((e) => e.toMap()).toList(),
+      'predecessor-version': predecessorVersion?.map((e) => e.toMap()).toList(),
+      'wp:featuredmedia': wpFeaturedmedia?.map((e) => e.toMap()).toList(),
+      'wp:attachment': wpAttachment?.map((e) => e.toMap()).toList(),
+      'wp:term': wpTerm?.map((e) => e.toMap()).toList(),
+      'curies': curies?.map((e) => e.toMap()).toList(),
     };
   }
 }
