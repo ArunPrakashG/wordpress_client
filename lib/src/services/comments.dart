@@ -3,7 +3,7 @@ import '../../requests.dart';
 import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class CommentInterface extends IInterface
+class CommentService extends IWordpressService
     with
         CreateMixin<Comment, CreateCommentRequest>,
         DeleteMixin<DeleteCommentRequest>,

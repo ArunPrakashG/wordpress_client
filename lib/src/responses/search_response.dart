@@ -1,4 +1,4 @@
-import 'response_properties/links.dart';
+import 'properties/links.dart';
 
 class Search {
   Search({

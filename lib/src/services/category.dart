@@ -11,7 +11,7 @@ import '../requests/update/update_category.dart';
 import '../responses/category_response.dart';
 import '../wordpress_client_base.dart';
 
-class CategoryInterface extends IInterface
+class CategoryService extends IWordpressService
     with
         CreateMixin<Category, CreateCategoryRequest>,
         DeleteMixin<DeleteCategoryRequest>,

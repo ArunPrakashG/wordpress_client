@@ -3,7 +3,7 @@ import '../../requests.dart';
 import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class PostsInterface extends IInterface
+class PostsService extends IWordpressService
     with
         CreateMixin<Post, CreatePostRequest>,
         DeleteMixin<DeletePostRequest>,

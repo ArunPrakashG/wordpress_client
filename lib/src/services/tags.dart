@@ -3,7 +3,7 @@ import '../../requests.dart';
 import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class TagInterface extends IInterface
+class TagService extends IWordpressService
     with
         CreateMixin<Tag, CreateTagRequest>,
         DeleteMixin<DeleteTagRequest>,

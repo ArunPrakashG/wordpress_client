@@ -1,9 +1,10 @@
+import '../interfaces/serializable_base.dart';
 import '../utilities/helpers.dart';
-import 'response_properties/extra_capabilities.dart';
-import 'response_properties/links.dart';
+import 'properties/extra_capabilities.dart';
+import 'properties/links.dart';
 
-class User {
-  User({
+class User extends ISerializable<User> {
+  const User({
     this.id,
     this.name,
     this.url,
@@ -93,5 +94,80 @@ class User {
       'meta': meta,
       '_links': links?.toJson(),
     };
+  }
+
+  @override
+  User fromMap(Map<String, dynamic> map) {
+    return User.fromJson(map);
+  }
+
+  @override
+  List<Object?> get props {
+    return [
+      id,
+      name,
+      url,
+      username,
+      firstName,
+      lastName,
+      email,
+      description,
+      link,
+      slug,
+      registeredDate,
+      capabilities,
+      extraCapabilities,
+      roles,
+      meta,
+      avatarUrls,
+      links,
+    ];
+  }
+
+  @override
+  Map<String, dynamic> toMap() {
+    return toJson();
+  }
+
+  User copyWith({
+    int? id,
+    String? username,
+    String? name,
+    String? firstName,
+    String? lastName,
+    String? nickname,
+    String? email,
+    DateTime? registeredDate,
+    Map<String, bool>? capabilities,
+    ExtraCapabilities? extraCapabilities,
+    String? url,
+    String? description,
+    String? link,
+    String? slug,
+    List<String>? roles,
+    Map<String, String>? avatarUrls,
+    dynamic meta,
+    Links? links,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      name: name ?? this.name,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      nickname: nickname ?? this.nickname,
+      email: email ?? this.email,
+      registeredDate: registeredDate ?? this.registeredDate,
+      capabilities: capabilities ?? this.capabilities,
+      extraCapabilities: extraCapabilities ?? this.extraCapabilities,
+      url: url ?? this.url,
+      description: description ?? this.description,
+      link: link ?? this.link,
+      slug: slug ?? this.slug,
+      roles: roles ?? this.roles,
+      avatarUrls: avatarUrls ?? this.avatarUrls,
+      meta: meta ?? this.meta,
+      links: links ?? this.links,
+    );
   }
 }

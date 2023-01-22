@@ -3,7 +3,7 @@ import '../../requests.dart';
 import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class MeInterface extends IInterface
+class MeService extends IWordpressService
     with
         DeleteMixin<DeleteMeRequest>,
         RetrieveMixin<User, RetriveMeRequest>,

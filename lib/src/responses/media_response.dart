@@ -1,8 +1,8 @@
 import '../enums.dart';
 import '../utilities/helpers.dart';
-import 'response_properties/content.dart';
-import 'response_properties/links.dart';
-import 'response_properties/media_details.dart';
+import 'properties/content.dart';
+import 'properties/links.dart';
+import 'properties/media_details.dart';
 
 class Media {
   Media({

@@ -131,3 +131,8 @@
 # 6.3.4
 
 - Bug fix with media endpoint
+
+# 6.4.0
+
+- IInterface has been renamed to IWordpresService
+- All Interfaces have been renamed to Services. i.e., CategoryInterface is now CategoryService.

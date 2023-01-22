@@ -1,7 +1,7 @@
 import '../enums.dart';
 import '../utilities/helpers.dart';
-import 'response_properties/content.dart';
-import 'response_properties/links.dart';
+import 'properties/content.dart';
+import 'properties/links.dart';
 
 class Comment {
   Comment({

@@ -3,7 +3,7 @@ import '../../requests.dart';
 import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class MediaInterface extends IInterface
+class MediaService extends IWordpressService
     with
         CreateMixin<Media, CreateMediaRequest>,
         DeleteMixin<DeleteMediaRequest>,

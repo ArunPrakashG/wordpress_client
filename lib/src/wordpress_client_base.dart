@@ -7,21 +7,22 @@ import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
 import 'exceptions/exceptions_export.dart';
-import 'interface/category.dart';
-import 'interface/comments.dart';
-import 'interface/me.dart';
-import 'interface/media.dart';
-import 'interface/posts.dart';
-import 'interface/search.dart';
-import 'interface/tags.dart';
-import 'interface/users.dart';
 import 'interface_key.dart';
 import 'library_exports.dart';
 import 'responses/responses_export.dart';
+import 'services/category.dart';
+import 'services/comments.dart';
+import 'services/me.dart';
+import 'services/media.dart';
+import 'services/posts.dart';
+import 'services/search.dart';
+import 'services/tags.dart';
+import 'services/users.dart';
 import 'type_map.dart';
 import 'utilities/helpers.dart';
 import 'utilities/utility_export.dart';
 
+part 'authorization/authorization_base.dart';
 part 'internal_requester.dart';
 
 /// The main class for [WordpressClient].
@@ -143,7 +144,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  MeInterface get me => getInterface<MeInterface>('me');
+  MeService get me => getInterface<MeService>('me');
 
   /// The posts interface.
   ///
@@ -156,7 +157,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  PostsInterface get posts => getInterface<PostsInterface>('posts');
+  PostsService get posts => getInterface<PostsService>('posts');
 
   /// The categories interface.
   ///
@@ -169,8 +170,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  CategoryInterface get categories =>
-      getInterface<CategoryInterface>('categories');
+  CategoryService get categories => getInterface<CategoryService>('categories');
 
   /// The comments interface.
   ///
@@ -183,7 +183,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  CommentInterface get comments => getInterface<CommentInterface>('comments');
+  CommentService get comments => getInterface<CommentService>('comments');
 
   /// The media interface.
   ///
@@ -196,7 +196,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  MediaInterface get media => getInterface<MediaInterface>('media');
+  MediaService get media => getInterface<MediaService>('media');
 
   /// The tags interface.
   ///
@@ -209,7 +209,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  TagInterface get tags => getInterface<TagInterface>('tags');
+  TagService get tags => getInterface<TagService>('tags');
 
   /// The users interface.
   ///
@@ -222,7 +222,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  UsersInterface get users => getInterface<UsersInterface>('users');
+  UsersService get users => getInterface<UsersService>('users');
 
   /// The search interface.
   ///
@@ -231,7 +231,7 @@ class WordpressClient {
   /// Available Operations:
   /// - List
   ///
-  SearchInterface get search => getInterface<SearchInterface>('search');
+  SearchService get search => getInterface<SearchService>('search');
 
   final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
       <InterfaceKey<dynamic>, dynamic>{};
@@ -257,57 +257,57 @@ class WordpressClient {
   }
 
   void _initInternalInterfaces() {
-    initInterface<MeInterface, User>(
-      interface: MeInterface(),
+    initInterface<MeService, User>(
+      interface: MeService(),
       key: 'me',
       responseDecoder: (map) => User.fromJson(map),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
-    initInterface<PostsInterface, Post>(
-      interface: PostsInterface(),
+    initInterface<PostsService, Post>(
+      interface: PostsService(),
       key: 'posts',
       responseDecoder: (map) => Post.fromJson(map),
       responseEncoder: (dynamic post) => (post as Post).toJson(),
     );
 
-    initInterface<CategoryInterface, Category>(
-      interface: CategoryInterface(),
+    initInterface<CategoryService, Category>(
+      interface: CategoryService(),
       key: 'categories',
       responseDecoder: (map) => Category.fromJson(map),
       responseEncoder: (dynamic category) => (category as Category).toJson(),
     );
 
-    initInterface<CommentInterface, Comment>(
-      interface: CommentInterface(),
+    initInterface<CommentService, Comment>(
+      interface: CommentService(),
       key: 'comments',
       responseDecoder: (map) => Comment.fromJson(map),
       responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
-    initInterface<MediaInterface, Media>(
-      interface: MediaInterface(),
+    initInterface<MediaService, Media>(
+      interface: MediaService(),
       key: 'media',
       responseDecoder: (map) => Media.fromJson(map),
       responseEncoder: (dynamic media) => (media as Media).toJson(),
     );
 
-    initInterface<TagInterface, Tag>(
-      interface: TagInterface(),
+    initInterface<TagService, Tag>(
+      interface: TagService(),
       key: 'tags',
       responseDecoder: (map) => Tag.fromJson(map),
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
-    initInterface<UsersInterface, User>(
-      interface: UsersInterface(),
+    initInterface<UsersService, User>(
+      interface: UsersService(),
       key: 'users',
       responseDecoder: (map) => User.fromJson(map),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
-    initInterface<SearchInterface, Search>(
-      interface: SearchInterface(),
+    initInterface<SearchService, Search>(
+      interface: SearchService(),
       key: 'search',
       responseDecoder: (map) => Search.fromJson(map),
       responseEncoder: (dynamic search) => (search as Search).toJson(),
@@ -315,7 +315,7 @@ class WordpressClient {
   }
 
   /// Called to initialize an interface.
-  /// All interfaces inherit from [IInterface] abstract class, which provides internal requester instance and other functions.
+  /// All interfaces inherit from [IWordpressService] abstract class, which provides internal requester instance and other functions.
   ///
   /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance & the response type used by the interface requests.
   ///
@@ -349,7 +349,7 @@ class WordpressClient {
   /// );
   /// ```
   ///
-  void initInterface<T extends IInterface, E>({
+  void initInterface<T extends IWordpressService, E>({
     required T interface,
     required String key,
     required JsonEncoderCallback responseEncoder,
@@ -407,7 +407,7 @@ class WordpressClient {
   ///
   /// [key] parameter is optional. However, getting result by specifing key is faster.
   ///
-  /// All custom interfaces must inherit from [IInterface] interface.
+  /// All custom interfaces must inherit from [IWordpressService] interface.
   ///
   /// Calling this method without initializing the custom interface using `initCustomInterface<T>(...)` will result in `InterfaceNotInitializedException`
   ///
@@ -417,7 +417,7 @@ class WordpressClient {
   /// await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
   /// ```
   ///
-  T getInterface<T extends IInterface>([String? key]) {
+  T getInterface<T extends IWordpressService>([String? key]) {
     if (!isReady) {
       throw ClientNotReadyException();
     }
@@ -467,7 +467,7 @@ class WordpressClient {
 
 /// The base of all request interfaces.
 /// You must extend from this interface to define custom requests.
-abstract class IInterface {
+abstract class IWordpressService {
   /// The internal requester instance.
   ///
   /// This variable is assigned on init method automatically.

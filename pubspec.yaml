@@ -14,6 +14,7 @@ dependencies:
   cookie_jar: ^3.0.1
   dio: ^4.0.6
   dio_cookie_manager: ^2.0.0
+  equatable: ^2.0.5
   http_parser: ^4.0.2
   path: ^1.8.3
   synchronized: ^3.0.0+3
