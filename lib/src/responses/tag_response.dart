@@ -11,6 +11,7 @@ class Tag {
     this.taxonomy,
     this.meta,
     this.links,
+    this.json,
   });
 
   factory Tag.fromJson(dynamic json) {
@@ -24,6 +25,7 @@ class Tag {
       taxonomy: json['taxonomy'] as String?,
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
+      json: json as Map<String, dynamic>,
     );
   }
 
@@ -36,6 +38,7 @@ class Tag {
   final String? taxonomy;
   final dynamic meta;
   final Links? links;
+  final Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

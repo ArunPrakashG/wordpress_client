@@ -31,6 +31,7 @@ class Media {
     this.post,
     this.sourceUrl,
     this.links,
+    this.json,
   });
 
   factory Media.fromJson(dynamic json) {
@@ -60,6 +61,7 @@ class Media {
       post: json['post'] as int?,
       sourceUrl: json['source_url'] as String?,
       links: Links.fromJson(json['_links']),
+      json: json as Map<String, dynamic>,
     );
   }
 
@@ -88,6 +90,7 @@ class Media {
   final int? post;
   final String? sourceUrl;
   final Links? links;
+  final Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
