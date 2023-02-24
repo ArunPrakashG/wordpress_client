@@ -12,6 +12,7 @@ class Category {
     this.parent,
     this.meta,
     this.links,
+    this.json,
   });
 
   factory Category.fromJson(dynamic json) => Category(
@@ -24,9 +25,8 @@ class Category {
         taxonomy: json['taxonomy'] as String?,
         parent: json['parent'] as int?,
         meta: json['meta'],
-        links: json['_links'] == null
-            ? null
-            : Links.fromJson(json['_links'] as Map<String, dynamic>),
+        links: json['_links'] == null ? null : Links.fromJson(json['_links'] as Map<String, dynamic>),
+        json: json as Map<String, dynamic>,
       );
 
   final int? id;
@@ -39,6 +39,7 @@ class Category {
   final int? parent;
   final dynamic meta;
   final Links? links;
+  final Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

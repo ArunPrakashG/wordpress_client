@@ -22,6 +22,7 @@ class User {
     this.extraCapabilities,
     this.registeredDate,
     this.username,
+    this.json,
   });
 
   factory User.fromJson(dynamic json) {
@@ -51,6 +52,7 @@ class User {
               .map((k, v) => MapEntry(k, v)),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
+      json: json as Map<String, dynamic>,
     );
   }
 
@@ -72,6 +74,7 @@ class User {
   final Map<String, String>? avatarUrls;
   final dynamic meta;
   final Links? links;
+  final Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

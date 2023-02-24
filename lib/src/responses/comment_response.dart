@@ -23,6 +23,7 @@ class Comment {
     this.authorAvatarUrls,
     this.meta,
     this.links,
+    this.json,
   });
 
   factory Comment.fromJson(dynamic json) {
@@ -49,6 +50,7 @@ class Comment {
               .map((k, v) => MapEntry(k, v)),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
+      json: json as Map<String, dynamic>,
     );
   }
 
@@ -70,6 +72,7 @@ class Comment {
   final Map<String, String>? authorAvatarUrls;
   final dynamic meta;
   final Links? links;
+  final Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

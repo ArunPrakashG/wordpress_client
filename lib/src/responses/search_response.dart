@@ -17,6 +17,7 @@ class Search {
     subType = json?['subtype'] as String?;
     url = json?['url'] as String?;
     links = json?['_links'] != null ? Links.fromJson(json['_links']) : null;
+    json = json as Map<String, dynamic>?;
   }
 
   int? id;
@@ -25,15 +26,9 @@ class Search {
   String? subType;
   Links? links;
   String? url;
+  Map<String, dynamic>? json;
 
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'title': title,
-      'type': type,
-      'subtype': subType,
-      'url': url,
-      '_links': links?.toJson()
-    };
+    return <String, dynamic>{'id': id, 'title': title, 'type': type, 'subtype': subType, 'url': url, '_links': links?.toJson()};
   }
 }
