@@ -20,7 +20,7 @@ class BootstrapConfiguration {
   });
 
   final bool enableDebugMode;
-  final int requestTimeout;
+  final Duration requestTimeout;
   final bool Function(dynamic)? responsePreprocessorDelegate;
   final IAuthorization? defaultAuthorization;
   final String? defaultUserAgent;
