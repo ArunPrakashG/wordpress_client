@@ -34,8 +34,8 @@ class WordpressRequest<T extends IRequest> {
   final ValidatorCallback? responseValidationCallback;
   final CancelToken? cancelToken;
   final IAuthorization? authorization;
-  final int sendTimeout;
-  final int receiveTimeout;
+  final Duration sendTimeout;
+  final Duration receiveTimeout;
 
   String get endpoint => _endpoint ?? '';
   String? get path => _path;

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
+import 'constants.dart';
 import 'wordpress_client_base.dart';
 
 class BootstrapBuilder {
@@ -24,7 +25,7 @@ class BootstrapBuilder {
     _followRedirects = config.shouldFollowRedirects;
   }
 
-  int _defaultRequestTimeout = 60 * 1000; // 60 seconds
+  Duration _defaultRequestTimeout = kDefaultRequestTimeout; // 60 seconds
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
   String? _defaultUserAgent;
@@ -64,8 +65,8 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withRequestTimeout(int timeoutInSeconds) {
-    _defaultRequestTimeout = timeoutInSeconds * 1000;
+  BootstrapBuilder withRequestTimeout(Duration timeout) {
+    _defaultRequestTimeout = timeout;
     return this;
   }
 
