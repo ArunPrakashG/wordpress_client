@@ -1,11 +1,5 @@
 part of 'wordpress_client_base.dart';
 
-typedef StatisticsCallback = void Function(
-  String baseUrl,
-  String endpoint,
-  int requestCount,
-);
-
 class InternalRequester {
   InternalRequester.configure(
     this._baseUrl,
@@ -168,8 +162,9 @@ class InternalRequester {
     watch.stop();
 
     if (response.statusCode == null) {
-      throw NullReferenceException(
-          'Response status code is null. This means the request never reached the server. Please check your internet connection.');
+      throw NullStatusCodeException(
+        'Response status code is null. This means the request never reached the server. Please check your internet connection.',
+      );
     }
 
     return response;

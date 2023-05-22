@@ -1,8 +1,12 @@
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
 import '../../utilities/helpers.dart';
 import 'link_container.dart';
 
+@immutable
 class Links {
-  Links({
+  const Links({
     this.self,
     this.collection,
     this.about,
@@ -20,47 +24,47 @@ class Links {
     return Links(
       self: mapIterableWithChecks<LinkContainer>(
         json?['self'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       collection: mapIterableWithChecks<LinkContainer>(
         json?['collection'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       about: mapIterableWithChecks<LinkContainer>(
         json?['about'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       author: mapIterableWithChecks<LinkContainer>(
         json?['author'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       replies: mapIterableWithChecks<LinkContainer>(
         json?['replies'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       versionHistory: mapIterableWithChecks<LinkContainer>(
         json?['version-history'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       predecessorVersion: mapIterableWithChecks<LinkContainer>(
         json?['predecessor-version'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       wpFeaturedmedia: mapIterableWithChecks<LinkContainer>(
         json?['wp:featuredmedia'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       wpAttachment: mapIterableWithChecks<LinkContainer>(
         json?['wp:attachment'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       wpTerm: mapIterableWithChecks<LinkContainer>(
         json?['wp:term'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
       curies: mapIterableWithChecks<LinkContainer>(
         json?['curies'],
-        (dynamic v) => LinkContainer.fromJson(v),
+        LinkContainer.fromJson,
       ),
     );
   }
@@ -91,5 +95,46 @@ class Links {
       'wp:term': wpTerm?.map((e) => e.toMap()).toList(),
       'curies': curies?.map((e) => e.toMap()).toList(),
     };
+  }
+
+  @override
+  bool operator ==(covariant Links other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return listEquals(other.self, self) &&
+        listEquals(other.collection, collection) &&
+        listEquals(other.about, about) &&
+        listEquals(other.author, author) &&
+        listEquals(other.replies, replies) &&
+        listEquals(other.versionHistory, versionHistory) &&
+        listEquals(other.predecessorVersion, predecessorVersion) &&
+        listEquals(other.wpFeaturedmedia, wpFeaturedmedia) &&
+        listEquals(other.wpAttachment, wpAttachment) &&
+        listEquals(other.wpTerm, wpTerm) &&
+        listEquals(other.curies, curies);
+  }
+
+  @override
+  int get hashCode {
+    return self.hashCode ^
+        collection.hashCode ^
+        about.hashCode ^
+        author.hashCode ^
+        replies.hashCode ^
+        versionHistory.hashCode ^
+        predecessorVersion.hashCode ^
+        wpFeaturedmedia.hashCode ^
+        wpAttachment.hashCode ^
+        wpTerm.hashCode ^
+        curies.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Links(self: $self, collection: $collection, about: $about, author: $author, replies: $replies, versionHistory: $versionHistory, predecessorVersion: $predecessorVersion, wpFeaturedmedia: $wpFeaturedmedia, wpAttachment: $wpAttachment, wpTerm: $wpTerm, curies: $curies)';
   }
 }

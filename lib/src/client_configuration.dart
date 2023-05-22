@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'constants.dart';
+import 'typedefs.dart';
 import 'wordpress_client_base.dart';
 
 class BootstrapConfiguration {

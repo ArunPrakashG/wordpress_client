@@ -1,8 +1,12 @@
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
 import 'image_meta.dart';
 import 'media_size_value.dart';
 
+@immutable
 class MediaDetails {
-  MediaDetails({
+  const MediaDetails({
     this.width,
     this.height,
     this.file,
@@ -51,5 +55,34 @@ class MediaDetails {
             ),
       'image_meta': imageMeta?.toJson(),
     };
+  }
+
+  @override
+  bool operator ==(covariant MediaDetails other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return other.width == width &&
+        other.height == height &&
+        other.file == file &&
+        mapEquals(other.sizes, sizes) &&
+        other.imageMeta == imageMeta;
+  }
+
+  @override
+  int get hashCode {
+    return width.hashCode ^
+        height.hashCode ^
+        file.hashCode ^
+        sizes.hashCode ^
+        imageMeta.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'MediaDetails(width: $width, height: $height, file: $file, sizes: $sizes, imageMeta: $imageMeta)';
   }
 }

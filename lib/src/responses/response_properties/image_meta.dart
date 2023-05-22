@@ -1,5 +1,9 @@
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
+@immutable
 class ImageMeta {
-  ImageMeta({
+  const ImageMeta({
     this.aperture,
     this.credit,
     this.camera,
@@ -59,5 +63,48 @@ class ImageMeta {
       'orientation': orientation,
       'keywords': keywords,
     };
+  }
+
+  @override
+  bool operator ==(covariant ImageMeta other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return other.aperture == aperture &&
+        other.credit == credit &&
+        other.camera == camera &&
+        other.caption == caption &&
+        other.createdTimestamp == createdTimestamp &&
+        other.copyright == copyright &&
+        other.focalLength == focalLength &&
+        other.iso == iso &&
+        other.shutterSpeed == shutterSpeed &&
+        other.title == title &&
+        other.orientation == orientation &&
+        listEquals(other.keywords, keywords);
+  }
+
+  @override
+  int get hashCode {
+    return aperture.hashCode ^
+        credit.hashCode ^
+        camera.hashCode ^
+        caption.hashCode ^
+        createdTimestamp.hashCode ^
+        copyright.hashCode ^
+        focalLength.hashCode ^
+        iso.hashCode ^
+        shutterSpeed.hashCode ^
+        title.hashCode ^
+        orientation.hashCode ^
+        keywords.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'ImageMeta(aperture: $aperture, credit: $credit, camera: $camera, caption: $caption, createdTimestamp: $createdTimestamp, copyright: $copyright, focalLength: $focalLength, iso: $iso, shutterSpeed: $shutterSpeed, title: $title, orientation: $orientation, keywords: $keywords)';
   }
 }

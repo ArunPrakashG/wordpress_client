@@ -1,10 +1,15 @@
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
 import '../enums.dart';
 import '../utilities/helpers.dart';
+import '../utilities/self_representive_base.dart';
 import 'response_properties/content.dart';
 import 'response_properties/links.dart';
 
-class Comment {
-  Comment({
+@immutable
+class Comment implements ISelfRespresentive {
+  const Comment({
     this.id,
     this.post,
     this.parent,
@@ -23,7 +28,7 @@ class Comment {
     this.authorAvatarUrls,
     this.meta,
     this.links,
-    this.json,
+    required this.self,
   });
 
   factory Comment.fromJson(dynamic json) {
@@ -47,10 +52,10 @@ class Comment {
           ? null
           : Map<String, String>.from(
                   json['author_avatar_urls'] as Map<String, dynamic>)
-              .map((k, v) => MapEntry(k, v)),
+              .map(MapEntry.new),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
-      json: json as Map<String, dynamic>,
+      self: json as Map<String, dynamic>,
     );
   }
 
@@ -72,7 +77,9 @@ class Comment {
   final Map<String, String>? authorAvatarUrls;
   final dynamic meta;
   final Links? links;
-  final Map<String, dynamic>? json;
+
+  @override
+  final Map<String, dynamic> self;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -93,10 +100,67 @@ class Comment {
       'type': type,
       'author_avatar_urls': authorAvatarUrls == null
           ? null
-          : Map<String, dynamic>.from(authorAvatarUrls!).map<String, dynamic>(
-              (key, dynamic value) => MapEntry<String, dynamic>(key, value)),
+          : Map<String, dynamic>.from(authorAvatarUrls!)
+              .map<String, dynamic>(MapEntry<String, dynamic>.new),
       'meta': meta,
       '_links': links?.toJson(),
     };
+  }
+
+  @override
+  bool operator ==(covariant Comment other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return other.id == id &&
+        other.post == post &&
+        other.parent == parent &&
+        other.author == author &&
+        other.authorName == authorName &&
+        other.authorEmail == authorEmail &&
+        other.authorUrl == authorUrl &&
+        other.authorIp == authorIp &&
+        other.authorUserAgent == authorUserAgent &&
+        other.date == date &&
+        other.dateGmt == dateGmt &&
+        other.content == content &&
+        other.link == link &&
+        other.status == status &&
+        other.type == type &&
+        mapEquals(other.authorAvatarUrls, authorAvatarUrls) &&
+        other.meta == meta &&
+        other.links == links &&
+        mapEquals(other.self, self);
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        post.hashCode ^
+        parent.hashCode ^
+        author.hashCode ^
+        authorName.hashCode ^
+        authorEmail.hashCode ^
+        authorUrl.hashCode ^
+        authorIp.hashCode ^
+        authorUserAgent.hashCode ^
+        date.hashCode ^
+        dateGmt.hashCode ^
+        content.hashCode ^
+        link.hashCode ^
+        status.hashCode ^
+        type.hashCode ^
+        authorAvatarUrls.hashCode ^
+        meta.hashCode ^
+        links.hashCode ^
+        self.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Comment(id: $id, post: $post, parent: $parent, author: $author, authorName: $authorName, authorEmail: $authorEmail, authorUrl: $authorUrl, authorIp: $authorIp, authorUserAgent: $authorUserAgent, date: $date, dateGmt: $dateGmt, content: $content, link: $link, status: $status, type: $type, authorAvatarUrls: $authorAvatarUrls, meta: $meta, links: $links, self: $self)';
   }
 }

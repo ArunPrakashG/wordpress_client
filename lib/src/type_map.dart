@@ -1,9 +1,7 @@
-// ignore_for_file: avoid_positional_boolean_parameters
-
+import 'exceptions/type_map/map_does_not_exist_exception.dart';
+import 'exceptions/type_map/map_exist_exception.dart';
 import 'type_key.dart';
-
-typedef JsonEncoderCallback = Map<String, dynamic> Function(dynamic instance);
-typedef JsonDecoderCallback<T> = T Function(Map<String, dynamic> json);
+import 'typedefs.dart';
 
 class TypeMap {
   static final Map<TypeKey<dynamic>, JsonDecoderCallback> _decoders = {};
@@ -22,7 +20,8 @@ class TypeMap {
     if (!overwrite && containsDecoderForType<T>()) {
       if (throwIfExists) {
         throw MapAlreadyExistException(
-            'Decoder for type ${typeKey.toString()} already exists');
+          'Decoder for type ${typeKey.toString()} already exists',
+        );
       }
 
       return;
@@ -34,7 +33,8 @@ class TypeMap {
   void removeDecoderForType<T>() {
     if (!containsDecoderForType<T>()) {
       throw MapDoesNotExistException(
-          'Map of type: ${TypeKey<T>()} does not exist!');
+        'Map of type: ${TypeKey<T>()} does not exist!',
+      );
     }
 
     _decoders.remove(TypeKey<T>());
@@ -43,7 +43,8 @@ class TypeMap {
   static JsonDecoderCallback<T> getDecoderForType<T>() {
     if (_decoders[TypeKey<T>()] == null) {
       throw MapDoesNotExistException(
-          'Map of type: ${TypeKey<T>()} does not exist!');
+        'Map of type: ${TypeKey<T>()} does not exist!',
+      );
     }
 
     return _decoders[TypeKey<T>()] as T Function(Map<String, dynamic> instance);
@@ -57,7 +58,8 @@ class TypeMap {
     if (!overwrite && containsEncoderForType<T>()) {
       if (throwIfExists) {
         throw MapAlreadyExistException(
-            'Encoder for type ${TypeKey<T>().toString()} already exists');
+          'Encoder for type ${TypeKey<T>().toString()} already exists',
+        );
       }
 
       return;
@@ -69,7 +71,8 @@ class TypeMap {
   void removeEncoderForType<T>() {
     if (!containsEncoderForType<T>()) {
       throw MapDoesNotExistException(
-          'Map of type: ${TypeKey<T>()} does not exist!');
+        'Map of type: ${TypeKey<T>()} does not exist!',
+      );
     }
 
     _encoders.remove(TypeKey<T>());
@@ -78,7 +81,8 @@ class TypeMap {
   static JsonEncoderCallback getEncoderForType<T>() {
     if (_encoders[TypeKey<T>()] == null) {
       throw MapDoesNotExistException(
-          'Map of type: ${TypeKey<T>()} does not exist!');
+        'Map of type: ${TypeKey<T>()} does not exist!',
+      );
     }
 
     return _encoders[TypeKey<T>()] as JsonEncoderCallback;
@@ -101,22 +105,4 @@ class TypeMap {
       throwIfExists: throwIfExists,
     );
   }
-}
-
-class MapDoesNotExistException implements Exception {
-  MapDoesNotExistException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
-}
-
-class MapAlreadyExistException implements Exception {
-  MapAlreadyExistException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
 }

@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
+
 import '../../utilities/helpers.dart';
 
+@immutable
 class Content {
-  Content({
+  const Content({
     this.rendered,
     this.protected,
   });
@@ -23,4 +26,19 @@ class Content {
       'protected': protected,
     };
   }
+
+  @override
+  String toString() => 'Content(rendered: $rendered, protected: $protected)';
+
+  @override
+  bool operator ==(covariant Content other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other.rendered == rendered && other.protected == protected;
+  }
+
+  @override
+  int get hashCode => rendered.hashCode ^ protected.hashCode;
 }

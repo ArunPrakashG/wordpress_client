@@ -1,11 +1,16 @@
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
 import '../enums.dart';
 import '../utilities/helpers.dart';
+import '../utilities/self_representive_base.dart';
 import 'response_properties/content.dart';
 import 'response_properties/links.dart';
 import 'response_properties/media_details.dart';
 
-class Media {
-  Media({
+@immutable
+class Media implements ISelfRespresentive {
+  const Media({
     this.id,
     this.date,
     this.dateGmt,
@@ -31,7 +36,7 @@ class Media {
     this.post,
     this.sourceUrl,
     this.links,
-    this.json,
+    required this.self,
   });
 
   factory Media.fromJson(dynamic json) {
@@ -61,7 +66,7 @@ class Media {
       post: json['post'] as int?,
       sourceUrl: json['source_url'] as String?,
       links: Links.fromJson(json['_links']),
-      json: json as Map<String, dynamic>,
+      self: json as Map<String, dynamic>,
     );
   }
 
@@ -90,7 +95,9 @@ class Media {
   final int? post;
   final String? sourceUrl;
   final Links? links;
-  final Map<String, dynamic>? json;
+
+  @override
+  final Map<String, dynamic> self;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -120,5 +127,76 @@ class Media {
       'source_url': sourceUrl,
       '_links': links?.toJson(),
     };
+  }
+
+  @override
+  bool operator ==(covariant Media other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return other.id == id &&
+        other.date == date &&
+        other.dateGmt == dateGmt &&
+        other.guid == guid &&
+        other.modified == modified &&
+        other.modifiedGmt == modifiedGmt &&
+        other.slug == slug &&
+        other.status == status &&
+        other.type == type &&
+        other.link == link &&
+        other.title == title &&
+        other.author == author &&
+        other.commentStatus == commentStatus &&
+        other.pingStatus == pingStatus &&
+        other.template == template &&
+        other.meta == meta &&
+        other.description == description &&
+        other.caption == caption &&
+        other.altText == altText &&
+        other.mediaType == mediaType &&
+        other.mimeType == mimeType &&
+        other.mediaDetails == mediaDetails &&
+        other.post == post &&
+        other.sourceUrl == sourceUrl &&
+        other.links == links &&
+        mapEquals(other.self, self);
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        date.hashCode ^
+        dateGmt.hashCode ^
+        guid.hashCode ^
+        modified.hashCode ^
+        modifiedGmt.hashCode ^
+        slug.hashCode ^
+        status.hashCode ^
+        type.hashCode ^
+        link.hashCode ^
+        title.hashCode ^
+        author.hashCode ^
+        commentStatus.hashCode ^
+        pingStatus.hashCode ^
+        template.hashCode ^
+        meta.hashCode ^
+        description.hashCode ^
+        caption.hashCode ^
+        altText.hashCode ^
+        mediaType.hashCode ^
+        mimeType.hashCode ^
+        mediaDetails.hashCode ^
+        post.hashCode ^
+        sourceUrl.hashCode ^
+        links.hashCode ^
+        self.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'Media(id: $id, date: $date, dateGmt: $dateGmt, guid: $guid, modified: $modified, modifiedGmt: $modifiedGmt, slug: $slug, status: $status, type: $type, link: $link, title: $title, author: $author, commentStatus: $commentStatus, pingStatus: $pingStatus, template: $template, meta: $meta, description: $description, caption: $caption, altText: $altText, mediaType: $mediaType, mimeType: $mimeType, mediaDetails: $mediaDetails, post: $post, sourceUrl: $sourceUrl, links: $links, self: $self)';
   }
 }
