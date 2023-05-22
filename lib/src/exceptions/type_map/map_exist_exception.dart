@@ -1,5 +1,5 @@
 class MapAlreadyExistException implements Exception {
-  MapAlreadyExistException(this.message);
+  const MapAlreadyExistException(this.message);
 
   final String message;
 

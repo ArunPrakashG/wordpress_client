@@ -162,7 +162,7 @@ class InternalRequester {
     watch.stop();
 
     if (response.statusCode == null) {
-      throw NullStatusCodeException(
+      throw const NullStatusCodeException(
         'Response status code is null. This means the request never reached the server. Please check your internet connection.',
       );
     }

@@ -1,5 +1,5 @@
 class NullStatusCodeException implements Exception {
-  NullStatusCodeException(this.message);
+  const NullStatusCodeException(this.message);
 
   final String message;
 

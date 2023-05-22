@@ -1,5 +1,5 @@
 class MapDoesNotExistException implements Exception {
-  MapDoesNotExistException(this.message);
+  const MapDoesNotExistException(this.message);
 
   final String message;
 
