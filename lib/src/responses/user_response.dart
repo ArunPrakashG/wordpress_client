@@ -84,6 +84,9 @@ class User implements ISelfRespresentive {
   @override
   final Map<String, dynamic> self;
 
+  @override
+  Map<String, dynamic> get json => self;
+
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

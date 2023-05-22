@@ -107,4 +107,7 @@ class Category implements ISelfRespresentive {
   String toString() {
     return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, meta: $meta, links: $links, self: $self)';
   }
+
+  @override
+  Map<String, dynamic> get json => self;
 }

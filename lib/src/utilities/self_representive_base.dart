@@ -7,4 +7,7 @@ abstract class ISelfRespresentive {
   ///
   /// Usefull if you have extra fields in the response and would like to read them without writing a custom request/response workflow.
   final Map<String, dynamic> self;
+
+  @Deprecated('Use "self"')
+  Map<String, dynamic> get json => self;
 }

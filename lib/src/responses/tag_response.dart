@@ -45,6 +45,9 @@ class Tag implements ISelfRespresentive {
   final Links? links;
 
   @override
+  Map<String, dynamic> get json => self;
+
+  @override
   final Map<String, dynamic> self;
 
   Map<String, dynamic> toJson() {
