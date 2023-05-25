@@ -132,10 +132,10 @@
 
 - Bug fix with media endpoint
 
-# 6.3.6
+# 7.0.0
 
-- Added new "self" property for all response models. It will contain the entire JSON response as a Map. Thanks @mikhaelpurba (Previous syntax "json" has been deprecated)
-- All response classes now override equality and hashCode properties, along with toString() method.
 - [BREAKING] Upgraded minimum dart version to >= 2.18.0.
 - [BREAKING] Upgraded outdated dependencies.
+- Added new "self" property for all response models. It will contain the entire JSON response as a Map. Thanks @mikhaelpurba (Previous syntax "json" has been deprecated)
+- All response classes now override equality and hashCode properties, along with toString() method.
 - Usual amount of code refactors and fixes.
