@@ -19,6 +19,7 @@ import 'interface_key.dart';
 import 'library_exports.dart';
 import 'responses/responses_export.dart';
 import 'type_map.dart';
+import 'typedefs.dart';
 import 'utilities/helpers.dart';
 import 'utilities/utility_export.dart';
 
@@ -246,7 +247,6 @@ class WordpressClient {
   /// Initializes all the built in interfaces and other services
   ///
   /// This method should be called before any other method.
-  ///
   void initialize() {
     if (_hasInitialized) {
       return;
@@ -260,56 +260,56 @@ class WordpressClient {
     initInterface<MeInterface, User>(
       interface: MeInterface(),
       key: 'me',
-      responseDecoder: (map) => User.fromJson(map),
+      responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
     initInterface<PostsInterface, Post>(
       interface: PostsInterface(),
       key: 'posts',
-      responseDecoder: (map) => Post.fromJson(map),
+      responseDecoder: Post.fromJson,
       responseEncoder: (dynamic post) => (post as Post).toJson(),
     );
 
     initInterface<CategoryInterface, Category>(
       interface: CategoryInterface(),
       key: 'categories',
-      responseDecoder: (map) => Category.fromJson(map),
+      responseDecoder: Category.fromJson,
       responseEncoder: (dynamic category) => (category as Category).toJson(),
     );
 
     initInterface<CommentInterface, Comment>(
       interface: CommentInterface(),
       key: 'comments',
-      responseDecoder: (map) => Comment.fromJson(map),
+      responseDecoder: Comment.fromJson,
       responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
     initInterface<MediaInterface, Media>(
       interface: MediaInterface(),
       key: 'media',
-      responseDecoder: (map) => Media.fromJson(map),
+      responseDecoder: Media.fromJson,
       responseEncoder: (dynamic media) => (media as Media).toJson(),
     );
 
     initInterface<TagInterface, Tag>(
       interface: TagInterface(),
       key: 'tags',
-      responseDecoder: (map) => Tag.fromJson(map),
+      responseDecoder: Tag.fromJson,
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
     initInterface<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
-      responseDecoder: (map) => User.fromJson(map),
+      responseDecoder: User.fromJson,
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
     initInterface<SearchInterface, Search>(
       interface: SearchInterface(),
       key: 'search',
-      responseDecoder: (map) => Search.fromJson(map),
+      responseDecoder: Search.fromJson,
       responseEncoder: (dynamic search) => (search as Search).toJson(),
     );
   }
@@ -432,7 +432,8 @@ class WordpressClient {
 
     if (interfacesOfType.isEmpty) {
       throw InterfaceDoNotExistException(
-          'The specified interface do not exist. (${typeOf<T>()}_$key)');
+        'The specified interface do not exist. (${typeOf<T>()}_$key)',
+      );
     }
 
     final interface = interfacesOfType.first;

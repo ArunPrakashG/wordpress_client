@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class SizeValue {
-  SizeValue({
+  const SizeValue({
     this.file,
     this.width,
     this.height,
@@ -31,5 +34,32 @@ class SizeValue {
       'mime_type': mimeType,
       'source_url': sourceUrl,
     };
+  }
+
+  @override
+  bool operator ==(covariant SizeValue other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other.file == file &&
+        other.width == width &&
+        other.height == height &&
+        other.mimeType == mimeType &&
+        other.sourceUrl == sourceUrl;
+  }
+
+  @override
+  int get hashCode {
+    return file.hashCode ^
+        width.hashCode ^
+        height.hashCode ^
+        mimeType.hashCode ^
+        sourceUrl.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'SizeValue(file: $file, width: $width, height: $height, mimeType: $mimeType, sourceUrl: $sourceUrl)';
   }
 }

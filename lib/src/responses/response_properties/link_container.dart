@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class LinkContainer {
-  LinkContainer({
+  const LinkContainer({
     this.id,
     this.name,
     this.taxonomy,
@@ -35,5 +38,34 @@ class LinkContainer {
       'embeddable': embeddable,
       'href': href,
     };
+  }
+
+  @override
+  String toString() {
+    return 'LinkContainer(id: $id, name: $name, taxonomy: $taxonomy, embeddable: $embeddable, count: $count, href: $href)';
+  }
+
+  @override
+  bool operator ==(covariant LinkContainer other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other.id == id &&
+        other.name == name &&
+        other.taxonomy == taxonomy &&
+        other.embeddable == embeddable &&
+        other.count == count &&
+        other.href == href;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        taxonomy.hashCode ^
+        embeddable.hashCode ^
+        count.hashCode ^
+        href.hashCode;
   }
 }

@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
 import 'constants.dart';
+import 'typedefs.dart';
 import 'wordpress_client_base.dart';
 
 class BootstrapBuilder {
@@ -71,7 +72,8 @@ class BootstrapBuilder {
   }
 
   BootstrapBuilder withResponsePreprocessor(
-      bool Function(dynamic) responsePreprocessor) {
+    bool Function(dynamic) responsePreprocessor,
+  ) {
     _responsePreprocessorDelegate = responsePreprocessor;
     return this;
   }
@@ -82,7 +84,8 @@ class BootstrapBuilder {
   }
 
   BootstrapBuilder withDefaultAuthorizationBuilder(
-      IAuthorization Function(AuthorizationBuilder) builder) {
+    IAuthorization Function(AuthorizationBuilder) builder,
+  ) {
     _defaultAuthorization = builder(AuthorizationBuilder());
     return this;
   }

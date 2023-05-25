@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
+
 import '../../utilities/helpers.dart';
 
+@immutable
 class AuthorMeta {
-  AuthorMeta({
+  const AuthorMeta({
     this.id,
     this.userNicename,
     this.userRegistered,
@@ -29,5 +32,30 @@ class AuthorMeta {
       'user_registered': userRegistered?.toIso8601String(),
       'display_name': displayName,
     };
+  }
+
+  @override
+  bool operator ==(covariant AuthorMeta other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other.id == id &&
+        other.userNicename == userNicename &&
+        other.userRegistered == userRegistered &&
+        other.displayName == displayName;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        userNicename.hashCode ^
+        userRegistered.hashCode ^
+        displayName.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'AuthorMeta(id: $id, userNicename: $userNicename, userRegistered: $userRegistered, displayName: $displayName)';
   }
 }

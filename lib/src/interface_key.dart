@@ -1,9 +1,10 @@
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
+import 'package:meta/meta.dart';
 
 import 'utilities/helpers.dart';
 
+@immutable
 class InterfaceKey<T> {
-  InterfaceKey([this._key = '']);
+  const InterfaceKey([this._key = '']);
 
   Type get _type => typeOf<T>();
   final String? _key;
