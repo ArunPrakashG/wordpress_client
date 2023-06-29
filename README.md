@@ -47,7 +47,7 @@ import 'package:wordpress_client/wordpress_client.dart';
 ### Simple method
 
 ```dart
-WordpressClient client = new WordpressClient('https://www.replaceme.com/', 'wp-json/wp/v2');
+WordpressClient client = new WordpressClient.initialize('https://www.replaceme.com/', 'wp-json/wp/v2');
 ```
 
 You can read about advanced method in [Advanced Method](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#advanced-method) wiki page.
