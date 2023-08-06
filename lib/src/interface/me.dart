@@ -1,10 +1,7 @@
-import '../../operations.dart';
-import '../../requests.dart';
-import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class MeInterface extends IInterface
+final class MeInterface extends IRequestInterface
     with
-        DeleteMixin<DeleteMeRequest>,
-        RetrieveMixin<User, RetriveMeRequest>,
-        UpdateMixin<User, UpdateMeRequest> {}
+        DeleteOperation<DeleteMeRequest>,
+        RetriveOperation<User, RetriveMeRequest>,
+        UpdateOperation<User, UpdateMeRequest> {}

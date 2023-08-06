@@ -1,9 +1,11 @@
+export 'extensions/post_extensions.dart';
+export 'extensions/self_representive_extensions.dart';
 export 'helpers.dart'
     show
         MapExtensions,
         deserialize,
         serialize,
+        castOrElse,
         parseDateIfNotNull,
         getMIMETypeFromExtension;
-export 'response_extensions/post_extensions.dart';
-export 'wordpress_callback.dart';
+export 'wordpress_events.dart';

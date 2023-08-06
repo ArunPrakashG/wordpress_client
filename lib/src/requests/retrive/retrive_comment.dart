@@ -1,13 +1,21 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class RetriveCommentRequest implements IRequest {
+final class RetriveCommentRequest extends IRequest {
   RetriveCommentRequest({
     this.context,
     this.password,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -15,12 +23,22 @@ class RetriveCommentRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('password', password);
 
-    requestContent.endpoint = 'comments';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      method: HttpMethod.get,
+      url: RequestUrl.relativeParts(['comments', id]),
+      queryParams: queryParameters,
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

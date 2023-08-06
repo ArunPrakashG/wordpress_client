@@ -1,12 +1,9 @@
-import '../../operations.dart';
-import '../../requests.dart';
-import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class CommentInterface extends IInterface
+final class CommentInterface extends IRequestInterface
     with
-        CreateMixin<Comment, CreateCommentRequest>,
-        DeleteMixin<DeleteCommentRequest>,
-        RetrieveMixin<Comment, RetriveCommentRequest>,
-        UpdateMixin<Comment, UpdateCommentRequest>,
-        ListMixin<Comment, ListCommentRequest> {}
+        CreateOperation<Comment, CreateCommentRequest>,
+        DeleteOperation<DeleteCommentRequest>,
+        RetriveOperation<Comment, RetriveCommentRequest>,
+        UpdateOperation<Comment, UpdateCommentRequest>,
+        ListOperation<Comment, ListCommentRequest> {}

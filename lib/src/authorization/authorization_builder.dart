@@ -1,17 +1,17 @@
 // ignore_for_file: avoid_returning_this
 
 import '../enums.dart';
-import '../utilities/wordpress_callback.dart';
-import '../wordpress_client_base.dart';
-import 'authorization_methods/basic_auth.dart';
-import 'authorization_methods/basic_jwt.dart';
-import 'authorization_methods/useful_jwt.dart';
+import '../utilities/wordpress_events.dart';
+import 'authorization_base.dart';
+import 'methods/basic_auth.dart';
+import 'methods/basic_jwt.dart';
+import 'methods/useful_jwt.dart';
 
-class AuthorizationBuilder {
+final class AuthorizationBuilder {
   String _userName = '';
   String _password = '';
   AuthorizationType? _type;
-  WordpressCallback? _callback;
+  WordpressEvents? _events;
 
   AuthorizationBuilder withUserName(String userName) {
     _userName = userName;
@@ -28,8 +28,8 @@ class AuthorizationBuilder {
     return this;
   }
 
-  AuthorizationBuilder withCallback(WordpressCallback? callback) {
-    callback = callback;
+  AuthorizationBuilder withEvents(WordpressEvents events) {
+    _events = events;
     return this;
   }
 
@@ -38,11 +38,23 @@ class AuthorizationBuilder {
 
     switch (_type!) {
       case AuthorizationType.basic_jwt:
-        return BasicJwtAuth(_userName, _password, callback: _callback);
+        return BasicJwtAuth(
+          userName: _userName,
+          password: _password,
+          events: _events,
+        );
       case AuthorizationType.useful_jwt:
-        return UsefulJwtAuth(_userName, _password, callback: _callback);
+        return UsefulJwtAuth(
+          userName: _userName,
+          password: _password,
+          events: _events,
+        );
       case AuthorizationType.basic:
-        return BasicAuth(_userName, _password, callback: _callback);
+        return BasicAuth(
+          userName: _userName,
+          password: _password,
+          events: _events,
+        );
     }
   }
 }

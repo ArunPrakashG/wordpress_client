@@ -1,11 +1,10 @@
-import '../../../requests.dart';
-import '../../../responses.dart';
 import '../../../wordpress_client.dart';
+import 'response_extensions.dart';
 
 extension PostExtensions on Post {
   Future<Media?> getMedia(
     WordpressClient client, {
-    WordpressCallback? callback,
+    WordpressEvents? callback,
     CancelToken? cancelToken,
   }) async {
     if (featuredMedia == null || !client.isReady) {
@@ -13,37 +12,37 @@ extension PostExtensions on Post {
     }
 
     final response = await client.media.retrive(
-      WordpressRequest(
-        requestData: RetriveMediaRequest(
-          id: featuredMedia!,
-        ),
-        callback: callback,
+      RetriveMediaRequest(
+        id: featuredMedia!,
+        events: callback,
         cancelToken: cancelToken,
       ),
     );
 
-    return response.data;
+    return response.mapOrNull<Media>(
+      onSuccess: (response) => response.data,
+    );
   }
 
   Future<User?> getAuthor(
     WordpressClient client, {
-    WordpressCallback? callback,
+    WordpressEvents? callback,
     CancelToken? cancelToken,
   }) async {
-    if (author == null || !client.isReady) {
+    if (!client.isReady) {
       return null;
     }
 
     final response = await client.users.retrive(
-      WordpressRequest(
-        requestData: RetriveUserRequest(
-          id: author!,
-        ),
-        callback: callback,
+      RetriveUserRequest(
+        id: author,
+        events: callback,
         cancelToken: cancelToken,
       ),
     );
 
-    return response.data;
+    return response.mapOrNull<User>(
+      onSuccess: (response) => response.data,
+    );
   }
 }

@@ -1,9 +1,10 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class UpdateCommentRequest implements IRequest {
+final class UpdateCommentRequest extends IRequest {
   UpdateCommentRequest({
     this.author,
     this.authorIp,
@@ -16,6 +17,13 @@ class UpdateCommentRequest implements IRequest {
     this.post,
     this.status,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   int? author;
@@ -31,8 +39,8 @@ class UpdateCommentRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('author', author)
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('author_ip', authorIp)
@@ -44,7 +52,17 @@ class UpdateCommentRequest implements IRequest {
       ..addIfNotNull('content', content)
       ..addIfNotNull('post', post);
 
-    requestContent.endpoint = 'comments/$id';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relativeParts(['comments', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../../utilities/helpers.dart';
+
 @immutable
 class ImageMeta {
   const ImageMeta({
@@ -15,23 +17,29 @@ class ImageMeta {
     this.shutterSpeed,
     this.title,
     this.orientation,
-    this.keywords,
+    this.keywords = const [],
   });
 
-  factory ImageMeta.fromJson(dynamic json) {
+  factory ImageMeta.fromJson(Map<String, dynamic> json) {
     return ImageMeta(
-      aperture: json['aperture'] as String?,
-      credit: json['credit'] as String?,
-      camera: json['camera'] as String?,
-      caption: json['caption'] as String?,
-      createdTimestamp: json['created_timestamp'] as String?,
-      copyright: json['copyright'] as String?,
-      focalLength: json['focal_length'] as String?,
-      iso: json['iso'] as String?,
-      shutterSpeed: json['shutter_speed'] as String?,
-      title: json['title'] as String?,
-      orientation: json['orientation'] as String?,
-      keywords: (json['keywords'] as Iterable<dynamic>?)?.toList(),
+      aperture: castOrElse(json['aperture']),
+      credit: castOrElse(json['credit']),
+      camera: castOrElse(json['camera']),
+      caption: castOrElse(json['caption']),
+      createdTimestamp: castOrElse(json['created_timestamp']),
+      copyright: castOrElse(json['copyright']),
+      focalLength: castOrElse(json['focal_length']),
+      iso: castOrElse(json['iso']),
+      shutterSpeed: castOrElse(json['shutter_speed']),
+      title: castOrElse(json['title']),
+      orientation: castOrElse(json['orientation']),
+      keywords: castOrElse(
+        json['keywords'],
+        transformer: (value) {
+          return (value as Iterable<dynamic>).toList(growable: false);
+        },
+        orElse: () => const <dynamic>[],
+      )!,
     );
   }
 
@@ -46,7 +54,7 @@ class ImageMeta {
   final String? shutterSpeed;
   final String? title;
   final String? orientation;
-  final List<dynamic>? keywords;
+  final List<dynamic> keywords;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

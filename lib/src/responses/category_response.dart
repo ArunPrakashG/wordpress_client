@@ -1,20 +1,21 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/links.dart';
+import 'properties/links.dart';
 
 @immutable
 class Category implements ISelfRespresentive {
   const Category({
-    this.id,
-    this.count,
-    this.description,
-    this.link,
+    required this.id,
+    required this.count,
+    required this.description,
+    required this.link,
     this.name,
-    this.slug,
-    this.taxonomy,
-    this.parent,
+    required this.slug,
+    required this.taxonomy,
+    required this.parent,
     this.meta,
     this.links,
     required this.self,
@@ -22,30 +23,31 @@ class Category implements ISelfRespresentive {
 
   factory Category.fromJson(dynamic json) {
     return Category(
-      id: json['id'] as int?,
-      count: json['count'] as int?,
-      description: json['description'] as String?,
-      link: json['link'] as String?,
-      name: json['name'] as String?,
-      slug: json['slug'] as String?,
-      taxonomy: json['taxonomy'] as String?,
-      parent: json['parent'] as int?,
+      id: castOrElse(json['id']),
+      count: castOrElse(json['count'], orElse: () => 0)!,
+      description: castOrElse(json['description'], orElse: () => '')!,
+      link: castOrElse(json['link'], orElse: () => '')!,
+      name: castOrElse(json['name'], orElse: () => '')!,
+      slug: castOrElse(json['slug'], orElse: () => '')!,
+      taxonomy: castOrElse(json['taxonomy'], orElse: () => '')!,
+      parent: castOrElse(json['parent'], orElse: () => 0)!,
       meta: json['meta'],
-      links: json['_links'] == null
-          ? null
-          : Links.fromJson(json['_links'] as Map<String, dynamic>),
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
       self: json as Map<String, dynamic>,
     );
   }
 
-  final int? id;
-  final int? count;
-  final String? description;
-  final String? link;
+  final int id;
+  final int count;
+  final String description;
+  final String link;
   final String? name;
-  final String? slug;
-  final String? taxonomy;
-  final int? parent;
+  final String slug;
+  final String taxonomy;
+  final int parent;
   final dynamic meta;
   final Links? links;
 
@@ -107,7 +109,4 @@ class Category implements ISelfRespresentive {
   String toString() {
     return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, meta: $meta, links: $links, self: $self)';
   }
-
-  @override
-  Map<String, dynamic> get json => self;
 }

@@ -1,22 +1,40 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class DeleteCategoryRequest implements IRequest {
+final class DeleteCategoryRequest extends IRequest {
   DeleteCategoryRequest({
     this.force,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   bool? force;
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body.addIfNotNull('force', force);
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}..addIfNotNull('force', force);
 
-    requestContent.endpoint = 'categories/$id';
-    requestContent.method = HttpMethod.delete;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.delete,
+      url: RequestUrl.relativeParts(['categories', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

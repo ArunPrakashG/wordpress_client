@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class UpdatePostRequest implements IRequest {
+final class UpdatePostRequest extends IRequest {
   UpdatePostRequest({
     this.slug,
     this.title,
@@ -16,6 +17,13 @@ class UpdatePostRequest implements IRequest {
     this.categories,
     this.tags,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String? slug;
@@ -34,8 +42,8 @@ class UpdatePostRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('title', title)
       ..addIfNotNull('content', content)
@@ -51,7 +59,17 @@ class UpdatePostRequest implements IRequest {
       ..addIfNotNull('tags', tags?.join(','))
       ..addIfNotNull('slug', slug);
 
-    requestContent.endpoint = 'posts/$id';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relativeParts(['posts', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

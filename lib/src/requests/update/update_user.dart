@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class UpdateUserRequest implements IRequest {
+final class UpdateUserRequest extends IRequest {
   UpdateUserRequest({
     required this.username,
     this.name,
@@ -15,6 +16,13 @@ class UpdateUserRequest implements IRequest {
     this.slug,
     this.roles,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String username;
@@ -32,8 +40,8 @@ class UpdateUserRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('username', username)
       ..addIfNotNull('name', name)
       ..addIfNotNull('email', email)
@@ -47,7 +55,17 @@ class UpdateUserRequest implements IRequest {
       ..addIfNotNull('password', password)
       ..addIfNotNull('roles', roles?.join(','));
 
-    requestContent.endpoint = 'users/$id';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relativeParts(['users', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

@@ -1,12 +1,9 @@
-import '../../operations.dart';
-import '../../requests.dart';
-import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class MediaInterface extends IInterface
+final class MediaInterface extends IRequestInterface
     with
-        CreateMixin<Media, CreateMediaRequest>,
-        DeleteMixin<DeleteMediaRequest>,
-        RetrieveMixin<Media, RetriveMediaRequest>,
-        UpdateMixin<Media, UpdateMediaRequest>,
-        ListMixin<Media, ListMediaRequest> {}
+        CreateOperation<Media, CreateMediaRequest>,
+        DeleteOperation<DeleteMediaRequest>,
+        RetriveOperation<Media, RetriveMediaRequest>,
+        UpdateOperation<Media, UpdateMediaRequest>,
+        ListOperation<Media, ListMediaRequest> {}

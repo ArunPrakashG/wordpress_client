@@ -1,45 +1,46 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/links.dart';
+import 'properties/links.dart';
 
 @immutable
 class Search implements ISelfRespresentive {
   const Search({
-    this.id,
+    required this.id,
     this.title,
-    this.type,
-    this.subType,
+    required this.type,
+    required this.subType,
     this.links,
-    this.url,
+    required this.url,
     required this.self,
   });
 
-  factory Search.fromJson(dynamic json) {
+  factory Search.fromJson(Map<String, dynamic> json) {
     return Search(
-      id: json?['id'] as int?,
-      title: json?['title'] as String?,
-      type: json?['type'] as String?,
-      subType: json?['subtype'] as String?,
-      url: json?['url'] as String?,
-      links: json?['_links'] != null ? Links.fromJson(json['_links']) : null,
-      self: json as Map<String, dynamic>,
+      id: castOrElse(json['id']),
+      title: castOrElse(json['title']),
+      type: castOrElse(json['type']),
+      subType: castOrElse(json['subtype']),
+      url: castOrElse(json['url']),
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
+      self: json,
     );
   }
 
-  final int? id;
+  final int id;
   final String? title;
-  final String? type;
-  final String? subType;
+  final String type;
+  final String subType;
   final Links? links;
-  final String? url;
+  final String url;
 
   @override
   final Map<String, dynamic> self;
-
-  @override
-  Map<String, dynamic> get json => self;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

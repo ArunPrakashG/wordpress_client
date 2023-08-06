@@ -1,11 +1,30 @@
-// ignore: one_member_abstracts
 // ignore_for_file: comment_references
 
-import 'request_content.dart';
+import 'dart:async';
+
+import '../../wordpress_client.dart';
+import '../utilities/typedefs.dart';
 
 /// Base class of all requests.
-// ignore: one_member_abstracts
-abstract class IRequest {
+abstract base class IRequest {
+  const IRequest({
+    this.requireAuth = true,
+    this.cancelToken,
+    this.authorization,
+    this.sendTimeout = const Duration(seconds: 30),
+    this.receiveTimeout = const Duration(seconds: 30),
+    this.events,
+    this.validator,
+  });
+
+  final bool requireAuth;
+  final CancelToken? cancelToken;
+  final IAuthorization? authorization;
+  final Duration sendTimeout;
+  final Duration receiveTimeout;
+  final WordpressEvents? events;
+  final ValidatorCallback? validator;
+
   /// Builds the request content.
   ///
   /// This method is invoked when the request is ready to be send.
@@ -15,5 +34,6 @@ abstract class IRequest {
   /// Consider using [addIfNotNull] extension method to add a value to a map if it is not null.
   ///
   /// It is not recommended to run functions which takes time to complete in the `build()` method. This can affect entire client performence as this method is invoked from a constructor.
-  void build(RequestContent requestContent);
+
+  FutureOr<WordpressRequest> build(Uri baseUrl);
 }

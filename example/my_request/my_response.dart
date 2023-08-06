@@ -1,5 +1,7 @@
-class MyResponse {
-  MyResponse({
+import 'package:wordpress_client/src/utilities/helpers.dart';
+
+final class MyResponse {
+  const MyResponse({
     this.id,
     this.post,
     this.parent,
@@ -8,10 +10,10 @@ class MyResponse {
 
   factory MyResponse.fromJson(dynamic json) {
     return MyResponse(
-      id: json['id'] as int?,
-      post: json['post'] as int?,
-      parent: json['parent'] as int?,
-      author: json['author'] as int?,
+      id: castOrElse(json['id']),
+      post: castOrElse(json['post']),
+      parent: castOrElse(json['parent']),
+      author: castOrElse(json['author']),
     );
   }
 

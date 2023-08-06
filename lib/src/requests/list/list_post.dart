@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class ListPostRequest implements IRequest {
+final class ListPostRequest extends IRequest {
   ListPostRequest({
     this.context,
     this.page = 1,
@@ -23,6 +24,13 @@ class ListPostRequest implements IRequest {
     this.sticky,
     this.slug,
     this.status,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -48,8 +56,8 @@ class ListPostRequest implements IRequest {
   ContentStatus? status;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -72,7 +80,17 @@ class ListPostRequest implements IRequest {
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status?.name);
 
-    requestContent.endpoint = 'posts';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParams: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('posts'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

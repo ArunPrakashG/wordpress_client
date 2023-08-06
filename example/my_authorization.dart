@@ -1,11 +1,11 @@
 import 'package:wordpress_client/wordpress_client.dart';
 
-class CustomAuth extends IAuthorization {
-  CustomAuth(
-    String userName,
-    String password, {
-    WordpressCallback? callback,
-  }) : super(userName, password, callback: callback);
+final class CustomAuth extends IAuthorization {
+  CustomAuth({
+    required super.userName,
+    required super.password,
+    super.events,
+  });
 
   @override
   Future<bool> authorize() {
@@ -29,4 +29,12 @@ class CustomAuth extends IAuthorization {
   Future<bool> validate() {
     throw UnimplementedError();
   }
+
+  @override
+  void clientFactoryProvider(Dio client) {
+    throw UnimplementedError();
+  }
+
+  @override
+  String get scheme => throw UnimplementedError();
 }

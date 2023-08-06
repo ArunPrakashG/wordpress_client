@@ -1,12 +1,9 @@
-import '../requests/request_interface.dart';
-import '../requests/wordpress_request.dart';
-import '../responses/wordpress_response.dart';
-import '../wordpress_client_base.dart';
+import '../library_exports.dart';
 
-mixin CreateMixin<T, E extends IRequest> {
-  InternalRequester get internalRequester;
+base mixin CreateOperation<T, R extends IRequest> on IRequestInterface {
+  Future<WordpressResponse<T>> create(R request) async {
+    final wpRequest = await request.build(baseUrl);
 
-  Future<WordpressResponse<T?>> create(WordpressRequest<E> request) async {
-    return internalRequester.createRequest<T>(request);
+    return executor.create<T>(wpRequest);
   }
 }

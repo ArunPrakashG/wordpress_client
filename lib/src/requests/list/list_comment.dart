@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class ListCommentRequest implements IRequest {
+final class ListCommentRequest extends IRequest {
   ListCommentRequest({
     this.context,
     this.page = 1,
@@ -21,6 +22,13 @@ class ListCommentRequest implements IRequest {
     this.status = CommentStatus.approved,
     this.type = 'comment',
     this.password,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -44,8 +52,8 @@ class ListCommentRequest implements IRequest {
   String? password;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -66,7 +74,17 @@ class ListCommentRequest implements IRequest {
       ..addIfNotNull('type', type)
       ..addIfNotNull('password', password);
 
-    requestContent.endpoint = 'comments';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParams: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('comments'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

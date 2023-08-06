@@ -1,8 +1,12 @@
+export 'authorization/authorization_export.dart';
 export 'client_configuration.dart';
 export 'enums.dart';
-export 'requests/request_content.dart';
+export 'exceptions/exceptions_export.dart';
+export 'operations/operations_export.dart';
 export 'requests/request_interface.dart';
+export 'requests/requests_export.dart';
 export 'requests/wordpress_request.dart';
+export 'responses/responses_export.dart';
 export 'responses/wordpress_response.dart';
-export 'wordpress_client_base.dart'
-    show IAuthorization, IInterface, WordpressClient;
+export 'utilities/utility_export.dart';
+export 'wordpress_client_base.dart' show IRequestInterface, WordpressClient;

@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class ListTagRequest implements IRequest {
+final class ListTagRequest extends IRequest {
   ListTagRequest({
     this.context,
     this.page = 1,
@@ -14,6 +15,13 @@ class ListTagRequest implements IRequest {
     this.slug,
     this.post,
     this.hideEmpty,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -30,8 +38,8 @@ class ListTagRequest implements IRequest {
   bool? hideEmpty;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -45,7 +53,17 @@ class ListTagRequest implements IRequest {
       ..addIfNotNull('post', post)
       ..addIfNotNull('hide_empty', hideEmpty);
 
-    requestContent.endpoint = 'tags';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParams: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('tags'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

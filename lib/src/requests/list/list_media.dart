@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class ListMediaRequest implements IRequest {
+final class ListMediaRequest extends IRequest {
   ListMediaRequest({
     this.context,
     this.page = 1,
@@ -21,6 +22,13 @@ class ListMediaRequest implements IRequest {
     this.mediaType,
     this.mimeType,
     this.status,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -44,8 +52,8 @@ class ListMediaRequest implements IRequest {
   MediaFilterStatus? status;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -66,7 +74,17 @@ class ListMediaRequest implements IRequest {
       ..addIfNotNull('mime_type', mimeType)
       ..addIfNotNull('status', status?.name);
 
-    requestContent.endpoint = 'media';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParams: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('media'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

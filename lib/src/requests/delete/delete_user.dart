@@ -1,10 +1,18 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class DeleteUserRequest implements IRequest {
+final class DeleteUserRequest extends IRequest {
   DeleteUserRequest({
     this.force,
     required this.reassign,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   bool? force;
@@ -12,12 +20,22 @@ class DeleteUserRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('force', force)
       ..addIfNotNull('reassign', reassign);
 
-    requestContent.endpoint = 'users/$id';
-    requestContent.method = HttpMethod.delete;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.delete,
+      url: RequestUrl.relativeParts(['users', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

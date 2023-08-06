@@ -14,12 +14,12 @@ class MediaDetails {
     this.imageMeta,
   });
 
-  factory MediaDetails.fromJson(dynamic json) {
+  factory MediaDetails.fromJson(Map<String, dynamic> json) {
     return MediaDetails(
-      width: json?['width'] as int?,
-      height: json?['height'] as int?,
-      file: json?['file'] as String?,
-      sizes: json?['sizes'] == null
+      width: json['width'] as int?,
+      height: json['height'] as int?,
+      file: json['file'] as String?,
+      sizes: json['sizes'] == null
           ? null
           : Map<String, dynamic>.from(json['sizes'] as Map<String, dynamic>)
               .map(
@@ -28,7 +28,7 @@ class MediaDetails {
                 SizeValue.fromJson(v as Map<String, dynamic>),
               ),
             ),
-      imageMeta: json?['image_meta'] == null
+      imageMeta: json['image_meta'] == null
           ? null
           : ImageMeta.fromJson(json['image_meta'] as Map<String, dynamic>),
     );

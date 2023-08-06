@@ -4,9 +4,9 @@ import 'package:meta/meta.dart';
 import '../enums.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/content.dart';
-import 'response_properties/links.dart';
-import 'response_properties/media_details.dart';
+import 'properties/content.dart';
+import 'properties/links.dart';
+import 'properties/media_details.dart';
 
 @immutable
 class Media implements ISelfRespresentive {
@@ -39,7 +39,7 @@ class Media implements ISelfRespresentive {
     required this.self,
   });
 
-  factory Media.fromJson(dynamic json) {
+  factory Media.fromJson(Map<String, dynamic> json) {
     return Media(
       id: json['id'] as int?,
       date: parseDateIfNotNull(json['date']),
@@ -66,7 +66,7 @@ class Media implements ISelfRespresentive {
       post: json['post'] as int?,
       sourceUrl: json['source_url'] as String?,
       links: Links.fromJson(json['_links']),
-      self: json as Map<String, dynamic>,
+      self: json,
     );
   }
 
@@ -95,9 +95,6 @@ class Media implements ISelfRespresentive {
   final int? post;
   final String? sourceUrl;
   final Links? links;
-
-  @override
-  Map<String, dynamic> get json => self;
 
   @override
   final Map<String, dynamic> self;

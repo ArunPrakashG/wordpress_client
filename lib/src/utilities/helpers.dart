@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 
-import '../type_map.dart';
+import '../codable_map.dart';
 
 // import 'package:html/parser.dart';
 
@@ -45,6 +45,30 @@ DateTime? parseDateIfNotNull(dynamic json) {
   }
 
   return DateTime.tryParse(dateString);
+}
+
+T? castOrElse<T>(
+  dynamic json, {
+  T? Function(Object value)? transformer,
+  T Function()? orElse,
+}) {
+  try {
+    if (json == null) {
+      return orElse?.call();
+    }
+
+    if (transformer != null) {
+      return transformer(json);
+    }
+
+    if (json is! T) {
+      return orElse?.call();
+    }
+
+    return json;
+  } catch (_) {
+    return orElse?.call();
+  }
 }
 
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
@@ -116,23 +140,19 @@ String parseHtmlString(String htmlString) =>
 
 Type typeOf<T>() => T;
 
-/// Deserializes a JSON object by getting its decoder from [TypeMap]
+/// Deserializes a JSON object by getting its decoder from [CodableMap]
 ///
 /// You will need to initiate your custom interface first in order to deserialize using this method.
 T deserialize<T>(dynamic object) {
-  if (object is! Map<String, dynamic>) {
-    throw Exception('object is not a map. Cannot decode.');
-  }
-
-  final decoder = TypeMap.getDecoderForType<T>();
+  final decoder = CodableMap.getDecoder<T>();
   return decoder(object);
 }
 
-/// Serializes a Dart object by getting its encoder from [TypeMap]
+/// Serializes a Dart object by getting its encoder from [CodableMap]
 ///
 /// You will need to initiate your custom interface first in order to serialize using this method.
 Map<String, dynamic> serialize<T>(T object) {
-  final encoder = TypeMap.getEncoderForType<T>();
+  final encoder = CodableMap.getEncoder<T>();
   return encoder(object);
 }
 

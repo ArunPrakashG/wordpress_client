@@ -1,19 +1,37 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class DeleteMediaRequest implements IRequest {
+final class DeleteMediaRequest extends IRequest {
   DeleteMediaRequest({
     required this.id,
     this.force,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   int id;
   bool? force;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body.addIfNotNull('force', force);
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}..addIfNotNull('force', force);
 
-    requestContent.endpoint = 'media/$id';
-    requestContent.method = HttpMethod.delete;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.delete,
+      url: RequestUrl.relativeParts(['media', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

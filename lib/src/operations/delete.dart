@@ -1,12 +1,9 @@
-import '../requests/request_interface.dart';
-import '../requests/wordpress_request.dart';
-import '../responses/wordpress_response.dart';
-import '../wordpress_client_base.dart';
+import '../library_exports.dart';
 
-mixin DeleteMixin<E extends IRequest> {
-  InternalRequester get internalRequester;
+base mixin DeleteOperation<R extends IRequest> on IRequestInterface {
+  Future<WordpressResponse<bool>> delete(R request) async {
+    final wpRequest = await request.build(baseUrl);
 
-  Future<WordpressResponse<bool>> delete(WordpressRequest<E> request) async {
-    return internalRequester.deleteRequest(request);
+    return executor.delete(wpRequest);
   }
 }

@@ -1,81 +1,44 @@
 import 'package:dio/dio.dart';
 
+import '../../authorization.dart';
 import '../constants.dart';
 import '../enums.dart';
-import '../utilities/wordpress_callback.dart';
+import '../utilities/request_url.dart';
+import '../utilities/typedefs.dart';
+import '../utilities/wordpress_events.dart';
 import '../wordpress_client_base.dart';
-import 'request_content.dart';
-import 'request_interface.dart';
-
-typedef ValidatorCallback = bool Function(dynamic response);
 
 /// Wraps over all requests to be send from this [WordpressClient] instance.
-class WordpressRequest<T extends IRequest> {
-  WordpressRequest({
-    required this.requestData,
-    this.callback,
+final class WordpressRequest {
+  const WordpressRequest({
+    required this.url,
+    required this.method,
+    this.headers = const {},
+    this.queryParams = const {},
+    this.body,
+    this.events,
     this.cancelToken,
+    this.requireAuth = false,
     this.authorization,
-    this.responseValidationCallback,
+    this.validator,
     this.sendTimeout = kDefaultRequestTimeout,
     this.receiveTimeout = kDefaultRequestTimeout,
-  }) {
-    _buildRequest();
-  }
+  });
 
-  String? _endpoint;
-  String? _path;
-  HttpMethod? _method;
-  Map<String, String>? _headers;
-  dynamic _body;
-  Map<String, String>? _queryParams;
-  final T requestData;
-  final WordpressCallback? callback;
-  final ValidatorCallback? responseValidationCallback;
+  final RequestUrl url;
+  final HttpMethod method;
+  final Map<String, String> headers;
+  final Map<String, String> queryParams;
+  final dynamic body;
+  final bool requireAuth;
   final CancelToken? cancelToken;
   final IAuthorization? authorization;
   final Duration sendTimeout;
   final Duration receiveTimeout;
+  final WordpressEvents? events;
+  final ValidatorCallback? validator;
 
-  String get endpoint => _endpoint ?? '';
-  String? get path => _path;
-  HttpMethod get method => _method ?? HttpMethod.get;
-  Map<String, String> get headers => _headers ?? const {};
-  Map<String, String> get queryParams => _queryParams ?? const {};
-  dynamic get body => _body;
-
-  bool get hasHeaders => headers.isNotEmpty;
-  bool get hasCustomPath => path != null;
-  bool get hasFormContent => body != null;
-  bool get isRequestExecutable => endpoint.isNotEmpty;
-  bool get shouldValidateResponse => responseValidationCallback != null;
-  bool get shouldAuthorize =>
-      authorization != null && !authorization!.isDefault;
-  bool get hasValidExceptionCallback =>
-      callback != null && callback!.unhandledExceptionCallback != null;
-  bool get hasValidCallbacks =>
-      hasValidExceptionCallback &&
-      callback!.responseCallback != null &&
-      callback!.onReceiveProgress != null &&
-      callback!.onSendProgress != null;
-
-  bool get _hasBuild =>
-      endpoint.isNotEmpty &&
-      (headers.isNotEmpty || body != null || queryParams.isNotEmpty);
-
-  void _buildRequest() {
-    if (_hasBuild) {
-      return;
-    }
-
-    final requestContent = RequestContent();
-    requestData.build(requestContent);
-
-    _endpoint = requestContent.endpoint;
-    _method = requestContent.method;
-    _headers = requestContent.headers;
-    _body = requestContent.body;
-    _path = requestContent.path;
-    _queryParams = requestContent.queryParameters;
-  }
+  bool get hasEvents => events != null;
+  bool get hasValidator => validator != null;
+  bool get hasAuthorization => authorization != null;
 }

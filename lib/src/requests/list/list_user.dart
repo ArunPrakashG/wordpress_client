@@ -1,9 +1,10 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class ListUserRequest implements IRequest {
+final class ListUserRequest extends IRequest {
   ListUserRequest({
     this.context,
     this.page = 1,
@@ -17,6 +18,13 @@ class ListUserRequest implements IRequest {
     this.slug,
     this.roles,
     this.who,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -33,8 +41,8 @@ class ListUserRequest implements IRequest {
   String? who;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -48,7 +56,17 @@ class ListUserRequest implements IRequest {
       ..addIfNotNull('roles', roles)
       ..addIfNotNull('who', who);
 
-    requestContent.endpoint = 'users';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParams: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('users'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

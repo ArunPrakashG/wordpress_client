@@ -7,4 +7,3 @@ library wordpress_client;
 export 'package:dio/dio.dart';
 
 export 'src/library_exports.dart';
-export 'src/utilities/utility_export.dart';

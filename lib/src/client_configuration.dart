@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 
+import 'authorization/authorization_base.dart';
 import 'constants.dart';
 import 'typedefs.dart';
-import 'wordpress_client_base.dart';
 
 class BootstrapConfiguration {
   const BootstrapConfiguration({
