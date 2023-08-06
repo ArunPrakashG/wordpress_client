@@ -4,7 +4,7 @@ import 'package:wordpress_client/src/utilities/extensions/response_extensions.da
 import 'package:wordpress_client/wordpress_client.dart';
 
 Future<void> main() async {
-  final baseUrl = Uri.parse('https://pathanamthittamedia.com/wp-json/wp/v2');
+  final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
 
   // Simple Usage
   final client = WordpressClient(
