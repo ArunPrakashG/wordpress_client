@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:test/test.dart';
-import 'package:wordpress_client/src/utilities/extensions/response_extensions.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 String getRandString(int len) {

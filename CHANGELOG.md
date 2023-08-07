@@ -155,3 +155,7 @@
 # 8.0.2
 
 - Downgrade collection version
+
+# 8.0.3
+
+- Export response extensions

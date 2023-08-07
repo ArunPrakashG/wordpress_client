@@ -28,7 +28,7 @@ You can use this library just like any other Dart package.
 
 ```dart
 dependencies:
-  wordpress_client: ^8.0.2
+  wordpress_client: ^8.0.3
 ```
 
 - Import the library to your project class in which you want to use the library.

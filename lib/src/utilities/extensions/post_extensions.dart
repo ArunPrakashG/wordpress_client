@@ -1,5 +1,4 @@
 import '../../../wordpress_client.dart';
-import 'response_extensions.dart';
 
 extension PostExtensions on Post {
   Future<Media?> getMedia(

@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'package:wordpress_client/src/utilities/extensions/response_extensions.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 import 'my_request/my_interface.dart';
