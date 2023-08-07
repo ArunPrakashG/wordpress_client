@@ -159,15 +159,9 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    final response = await () {
-      if (_synchronized) {
-        return _syncLock.synchronized<Response<dynamic>>(
-          () async => _request(),
-        );
-      }
-
-      return _request();
-    }();
+    final response = _synchronized
+        ? await _syncLock.synchronized(_request)
+        : await _request();
 
     final statusCode = response.statusCode ?? -2;
     request.events?.onResponse?.call(response.data);
