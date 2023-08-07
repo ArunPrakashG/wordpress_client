@@ -1,5 +1,6 @@
 import '../../wordpress_client.dart';
 
+/// Represents the post interface.
 final class PostsInterface extends IRequestInterface
     with
         CreateOperation<Post, CreatePostRequest>,

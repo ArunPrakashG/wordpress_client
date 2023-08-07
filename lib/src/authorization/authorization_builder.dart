@@ -7,6 +7,7 @@ import 'methods/basic_auth.dart';
 import 'methods/basic_jwt.dart';
 import 'methods/useful_jwt.dart';
 
+/// Creates a new instance of [AuthorizationBuilder].
 final class AuthorizationBuilder {
   String _userName = '';
   String _password = '';
@@ -33,6 +34,7 @@ final class AuthorizationBuilder {
     return this;
   }
 
+  /// Builds the authorization instance.
   IAuthorization build() {
     _type ??= AuthorizationType.useful_jwt;
 

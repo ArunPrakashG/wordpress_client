@@ -55,7 +55,7 @@ final class BasicJwtAuth extends IAuthorization {
     }
 
     final response = await _client!.post<dynamic>(
-      'wp-json/jwt-auth/v1/token',
+      baseUrl.replace(path: 'wp-json/jwt-auth/v1/token').toString(),
       data: {
         'username': userName,
         'password': password,

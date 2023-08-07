@@ -81,7 +81,7 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('status', status?.name);
 
     return WordpressRequest(
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relative('posts'),
       requireAuth: requireAuth || context == RequestContext.edit,

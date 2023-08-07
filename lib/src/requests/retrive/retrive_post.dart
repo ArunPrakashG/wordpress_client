@@ -31,7 +31,7 @@ final class RetrivePostRequest extends IRequest {
     return WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(['posts', id]),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,
       cancelToken: cancelToken,
       authorization: authorization,

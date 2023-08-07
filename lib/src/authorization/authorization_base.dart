@@ -7,15 +7,17 @@ import '../utilities/helpers.dart';
 ///
 /// To implement a custom authorization system, You _must_ extend this class.
 ///
-/// There is no storage system internally to store and retrive
+/// Note that, there is no storage system internally to store and retrive
 abstract base class IAuthorization {
-  /// Default constructor, used to pass username and password.
+  /// Creates a new instance of [IAuthorization] with the given username and password.
   IAuthorization({
     required this.userName,
     required this.password,
+    this.headerKey = 'Authorization',
     this.events,
   });
 
+  /// The base url of the wordpress site.
   late final Uri baseUrl;
 
   /// The username
@@ -24,7 +26,10 @@ abstract base class IAuthorization {
   /// The password
   final String password;
 
-  // A Callback, if assigned, will help with logging of data of requests send and received on this instance.
+  /// The header key to use for authorization.
+  final String headerKey;
+
+  /// The events to listen to.
   WordpressEvents? events;
 
   /// Gets if this authorization instance has valid authentication nounce. (token/encryptedToken)
@@ -33,14 +38,14 @@ abstract base class IAuthorization {
   /// Gets if this is an invalid or default authorization instance without username or password fields.
   bool get isDefault => isNullOrEmpty(userName) || isNullOrEmpty(password);
 
+  /// Gets the authorization scheme.
   String get scheme;
 
   /// Helps to initialize authorization instance with internal requesting client passed as a parameter.
   ///
-  /// This function is called only if there is no valid nounce available ie., when isAuthenticated() returns false.
-  /// A new instance of [Dio] client will be passed as a parameter to this function which you can store inside the instance for internal authorization requests.
+  /// This function is called only if there is no valid nounce available i.e., when isAuthenticated() returns false.
   ///
-  /// `authorize()` / `validate()` functions will not be called before calling `_init()` function.
+  /// `authorize()` / `validate()` functions will not be called before calling `initialize()` function.
   @mustCallSuper
   Future<bool> initialize({
     required Uri baseUrl,
@@ -49,6 +54,7 @@ abstract base class IAuthorization {
     return true;
   }
 
+  /// Provides this instance of [IAuthorization] with the Dio client instance for requests.
   void clientFactoryProvider(Dio client);
 
   /// Called to validate token. (such as in JWT auth)

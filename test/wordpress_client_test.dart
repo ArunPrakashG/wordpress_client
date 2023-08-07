@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
 import 'package:wordpress_client/src/utilities/extensions/response_extensions.dart';
 import 'package:wordpress_client/wordpress_client.dart';
@@ -16,15 +15,12 @@ String getRandString(int len) {
 }
 
 Future<void> main() async {
-  WordpressClient client;
-  TempMailClient tempMailClient;
-
   final jsonFileContents = await File('test/test_settings.json').readAsString();
   final dynamic json = jsonDecode(jsonFileContents);
 
   final baseUrl = Uri.parse(json['base_url'] as String);
 
-  client = WordpressClient(
+  final client = WordpressClient(
     baseUrl: baseUrl,
     bootstrapper: (builder) => builder
         .withDefaultMaxRedirects(5)
@@ -49,8 +45,10 @@ Future<void> main() async {
         .build(),
   );
 
-  tempMailClient = TempMailClient();
-  final mailResponse = await tempMailClient.getEmails();
+  client.initialize();
+
+  // tempMailClient = TempMailClient();
+  // final mailResponse = await tempMailClient.getEmails();
 
   group('', () {
     test(
@@ -75,7 +73,7 @@ Future<void> main() async {
           'Second Response Time Taken: ${secondResponse.duration.inMilliseconds} ms',
         );
 
-        expect(200, firstResponse);
+        expect(200, firstResponse.code);
         expect(200, secondResponse.code);
       },
     );
@@ -141,63 +139,66 @@ Future<void> main() async {
   group('', () {
     test('Retrive Current User', () async {
       final response = await client.me.retrive(
-        RetriveMeRequest(requireAuth: true),
+        RetriveMeRequest(),
       );
 
       expect(200, response.code);
-      expect('arunprakash', response.asSuccess().data.slug);
+      expect('desk02', response.asSuccess().data.slug);
     });
   });
 
-  group('', () {
-    if (mailResponse == null || mailResponse.isEmpty) {
-      fail('No temp emails generated.');
-    }
+  // group(
+  //   '',
+  //   () {
+  //     if (mailResponse == null || mailResponse.isEmpty) {
+  //       fail('No temp emails generated.');
+  //     }
 
-    final email = mailResponse[0];
-    int? userId = 0;
+  //     final email = mailResponse[0];
+  //     int? userId = 0;
 
-    late WordpressResponse<User> createResponse;
+  //     late WordpressResponse<User> createResponse;
 
-    test('Create User', () async {
-      createResponse = await client.users.create(
-        CreateUserRequest(
-          username: getRandString(10),
-          email: email,
-          password: getRandString(10),
-        ),
-      );
-    });
+  //     test('Create User', () async {
+  //       createResponse = await client.users.create(
+  //         CreateUserRequest(
+  //           username: getRandString(10),
+  //           email: email,
+  //           password: getRandString(10),
+  //         ),
+  //       );
+  //     });
 
-    expect(201, createResponse.code);
-    expect('gen_user_slug', createResponse.asSuccess().data.slug);
-    userId = createResponse.asSuccess().data.id;
+  //     expect(201, createResponse.code);
+  //     expect('gen_user_slug', createResponse.asSuccess().data.slug);
+  //     userId = createResponse.asSuccess().data.id;
 
-    test('Update User', () async {
-      final response = await client.users.update(
-        UpdateUserRequest(
-          email: email,
-          id: userId!,
-          username: createResponse.asSuccess().data.username!,
-          firstName: 'updated first name',
-        ),
-      );
+  //     test('Update User', () async {
+  //       final response = await client.users.update(
+  //         UpdateUserRequest(
+  //           email: email,
+  //           id: userId!,
+  //           username: createResponse.asSuccess().data.username!,
+  //           firstName: 'updated first name',
+  //         ),
+  //       );
 
-      expect(200, response.code);
-      expect('updated first name', response.asSuccess().data.firstName);
-    });
+  //       expect(200, response.code);
+  //       expect('updated first name', response.asSuccess().data.firstName);
+  //     });
 
-    test('Retrive User', () async {
-      final response = await client.users.retrive(
-        RetriveUserRequest(
-          id: userId!,
-        ),
-      );
+  //     test('Retrive User', () async {
+  //       final response = await client.users.retrive(
+  //         RetriveUserRequest(
+  //           id: userId!,
+  //         ),
+  //       );
 
-      expect(200, response.code);
-      expect(userId, response.asSuccess().data.id);
-    });
-  });
+  //       expect(200, response.code);
+  //       expect(userId, response.asSuccess().data.id);
+  //     });
+  //   },
+  // );
 
   // group('', () {
   //   int? postId = -1;

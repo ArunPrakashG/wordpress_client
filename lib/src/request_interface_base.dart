@@ -13,6 +13,7 @@ abstract base class IRequestInterface {
 
   bool _hasInitilizedAlready = false;
 
+  /// Gets the base url of the wordpress site.
   Uri get baseUrl => executor.baseUrl;
 
   /// This method is used to initialize the interface by passing [InternalRequester] instance from the core to the interface.

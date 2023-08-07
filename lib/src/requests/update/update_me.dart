@@ -19,7 +19,7 @@ final class UpdateMeRequest extends IRequest {
     super.authorization,
     super.events,
     super.receiveTimeout,
-    super.requireAuth,
+    super.requireAuth = true,
     super.sendTimeout,
     super.validator,
   });

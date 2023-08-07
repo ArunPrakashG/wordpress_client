@@ -1,5 +1,6 @@
 import '../../wordpress_client.dart';
 
+/// Represents the comment interface.
 final class CommentInterface extends IRequestInterface
     with
         CreateOperation<Comment, CreateCommentRequest>,

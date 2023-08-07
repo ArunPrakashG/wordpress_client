@@ -7,6 +7,7 @@ import '../operations/update.dart';
 import '../responses/category_response.dart';
 import '../wordpress_client_base.dart';
 
+/// Represents the category interface.
 final class CategoryInterface extends IRequestInterface
     with
         CreateOperation<Category, CreateCategoryRequest>,

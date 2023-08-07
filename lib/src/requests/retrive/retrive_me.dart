@@ -11,7 +11,7 @@ final class RetriveMeRequest extends IRequest {
     super.authorization,
     super.events,
     super.receiveTimeout,
-    super.requireAuth = false,
+    super.requireAuth = true,
     super.sendTimeout,
     super.validator,
   });
@@ -26,7 +26,7 @@ final class RetriveMeRequest extends IRequest {
     return WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(const ['users', 'me']),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,
       cancelToken: cancelToken,
       authorization: authorization,

@@ -34,6 +34,7 @@ final class WordpressRawResponse {
   bool get isSuccessful => isInRange(code, 200, 399);
   bool get isFailure => !isSuccessful;
 
+  /// Returns a new [WordpressResponse] instance with the given [decoder].
   WordpressResponse<T> asResponse<T>({
     required T Function(dynamic data) decoder,
   }) {
@@ -56,6 +57,7 @@ final class WordpressRawResponse {
     );
   }
 
+  /// Maps this instance to a [WordpressResponse] instance.
   WordpressResponse<T> map<T>({
     required OnSuccess<T> onSuccess,
     required OnFailure<T> onFailure,

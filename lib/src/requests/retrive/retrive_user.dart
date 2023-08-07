@@ -28,7 +28,7 @@ final class RetriveUserRequest extends IRequest {
     return WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(['users', id]),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,
       cancelToken: cancelToken,
       authorization: authorization,

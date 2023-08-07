@@ -110,8 +110,8 @@ abstract base class IRequestExecutor {
 
     return rawResponse.map<List<T>>(
       onSuccess: (response) {
-        final decoder = CodableMap.getDecoder<List<T>>();
-        final data = decoder(response.data);
+        final decoder = CodableMap.getDecoder<T>();
+        final data = (response.data as Iterable<dynamic>).map(decoder).toList();
 
         return WordpressSuccessResponse<List<T>>(
           data: data,

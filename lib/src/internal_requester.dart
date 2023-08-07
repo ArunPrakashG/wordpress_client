@@ -61,11 +61,6 @@ final class InternalRequester extends IRequestExecutor {
     _client.options.maxRedirects = configuration.maxRedirects;
     _client.options.baseUrl = _baseUrl.toString();
 
-    if (configuration.useCookies &&
-        !_client.interceptors.any((i) => i is CookieManager)) {
-      _client.interceptors.add(CookieManager(CookieJar()));
-    }
-
     if (configuration.enableDebugMode &&
         !_client.interceptors.any((i) => i is LogInterceptor)) {
       _client.interceptors.add(
@@ -94,6 +89,8 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
+    final headers = request.headers ?? <String, String>{};
+
     if (request.requireAuth) {
       final authorizer = () {
         if (request.authorization != null &&
@@ -112,19 +109,19 @@ final class InternalRequester extends IRequestExecutor {
         );
       }
 
-      final authResult = await _authorize(
-        request: request,
+      final authResult = await _processAuthorization(
         auth: authorizer,
-        events: request.events,
       );
 
-      if (!authResult) {
+      if (authResult == null) {
         return const WordpressRawResponse(
           data: null,
           code: -3,
           message: 'Failed to authorize with the provided authorization.',
         );
       }
+
+      headers[authResult.key] = authResult.value;
     }
 
     final requestUrl = () {
@@ -147,14 +144,14 @@ final class InternalRequester extends IRequestExecutor {
           requestUrl,
           data: request.body,
           cancelToken: request.cancelToken,
-          queryParameters: request.queryParams,
+          queryParameters: request.queryParameters,
           onSendProgress: request.events?.onSend,
           onReceiveProgress: request.events?.onReceive,
           options: Options(
             method: request.method.name,
             sendTimeout: request.sendTimeout,
             receiveTimeout: request.receiveTimeout,
-            headers: request.headers,
+            headers: headers,
           ),
         );
       } finally {
@@ -210,28 +207,26 @@ final class InternalRequester extends IRequestExecutor {
     return client;
   }
 
-  Future<bool> _authorize({
-    required WordpressRequest request,
+  Future<({String key, String value})?> _processAuthorization({
     required IAuthorization auth,
-    WordpressEvents? events,
   }) async {
     if (await auth.isAuthenticated()) {
-      request.headers['Authorization'] = (await auth.generateAuthUrl())!;
-      return true;
+      return (key: auth.headerKey, value: (await auth.generateAuthUrl())!);
     }
 
     auth.clientFactoryProvider(_createDioClient());
 
-    await auth.initialize(
-      baseUrl: _baseUrl,
-    );
+    await auth.initialize(baseUrl: _baseUrl);
 
-    if (await auth.authorize()) {
-      request.headers['Authorization'] = (await auth.generateAuthUrl())!;
-      return auth.isAuthenticated();
+    if (await auth.authorize() && await auth.isAuthenticated()) {
+      final authUrl = await auth.generateAuthUrl();
+
+      if (authUrl != null && await auth.isAuthenticated()) {
+        return (key: auth.headerKey, value: authUrl);
+      }
     }
 
-    return false;
+    return null;
   }
 
   void _triggerStatistics(String requestUrl) {

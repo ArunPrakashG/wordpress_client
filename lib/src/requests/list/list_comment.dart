@@ -75,7 +75,7 @@ final class ListCommentRequest extends IRequest {
       ..addIfNotNull('password', password);
 
     return WordpressRequest(
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relative('comments'),
       requireAuth: requireAuth || context == RequestContext.edit,

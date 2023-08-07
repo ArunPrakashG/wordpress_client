@@ -4,6 +4,8 @@ import 'package:meta/meta.dart';
 import 'wordpress_error.dart';
 
 @immutable
+
+/// Represents a successful response.
 final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
   const WordpressSuccessResponse({
     super.code = 200,
@@ -54,6 +56,8 @@ final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
 }
 
 @immutable
+
+/// Represents a failure response.
 final class WordpressFailureResponse<T> extends WordpressResponse<T> {
   const WordpressFailureResponse({
     required this.error,

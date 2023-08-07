@@ -8,6 +8,7 @@ final class MyRequest extends IRequest {
     this.context,
     this.page = 1,
     this.perPage = 10,
+    super.cancelToken,
   });
 
   RequestContext? context;
@@ -29,8 +30,15 @@ final class MyRequest extends IRequest {
         Uri(path: 'wp-json/custom_path/my_path/my_endpoint'),
         baseUrl,
       ),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
+      cancelToken: cancelToken,
+      events: events,
+      requireAuth: requireAuth,
+      authorization: authorization,
+      validator: validator,
+      sendTimeout: sendTimeout,
+      receiveTimeout: receiveTimeout,
     );
   }
 }

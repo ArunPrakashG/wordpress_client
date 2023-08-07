@@ -54,7 +54,7 @@ final class ListTagRequest extends IRequest {
       ..addIfNotNull('hide_empty', hideEmpty);
 
     return WordpressRequest(
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relative('tags'),
       requireAuth: requireAuth || context == RequestContext.edit,

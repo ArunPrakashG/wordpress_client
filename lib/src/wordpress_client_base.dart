@@ -2,9 +2,7 @@
 
 import 'dart:async';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path/path.dart';
 import 'package:synchronized/synchronized.dart' as sync;
 
@@ -353,12 +351,12 @@ final class WordpressClient {
       overriteIfExists: overriteIfTypeExists,
     );
 
-    _registerResponseType<List<E>>(
-      decoder: (response) =>
-          (response as List<dynamic>).map((e) => responseDecoder(e)).toList(),
-      encoder: responseEncoder,
-      overriteIfExists: true,
-    );
+    // _registerResponseType<List<E>>(
+    //   decoder: (response) =>
+    //       (response as List<dynamic>).map((e) => responseDecoder(e)).toList(),
+    //   encoder: responseEncoder,
+    //   overriteIfExists: true,
+    // );
 
     interface._initInterface(
       requester: _requester,

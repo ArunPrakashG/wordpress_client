@@ -57,7 +57,7 @@ final class ListUserRequest extends IRequest {
       ..addIfNotNull('who', who);
 
     return WordpressRequest(
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relative('users'),
       requireAuth: requireAuth || context == RequestContext.edit,

@@ -36,7 +36,7 @@ final class ListSearchRequest extends IRequest {
       ..addIfNotNull('subtype', subType);
 
     return WordpressRequest(
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relative('search'),
       requireAuth: requireAuth || context == RequestContext.edit,

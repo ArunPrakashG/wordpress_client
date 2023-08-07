@@ -28,7 +28,7 @@ final class RetriveCategoryRequest extends IRequest {
     return WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(['categories', id]),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,
       cancelToken: cancelToken,
       authorization: authorization,

@@ -1,12 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:meta/meta.dart';
 
 import 'authorization/authorization_base.dart';
 import 'constants.dart';
 import 'typedefs.dart';
 
-class BootstrapConfiguration {
+@immutable
+final class BootstrapConfiguration {
   const BootstrapConfiguration({
-    this.useCookies = false,
     this.requestTimeout = kDefaultRequestTimeout,
     this.responsePreprocessorDelegate,
     this.defaultAuthorization,
@@ -28,8 +30,72 @@ class BootstrapConfiguration {
   final Map<String, String>? defaultHeaders;
   final bool shouldFollowRedirects;
   final int maxRedirects;
-  final bool useCookies;
   final List<Interceptor>? interceptors;
   final bool synchronized;
   final StatisticsCallback? statisticsDelegate;
+
+  @override
+  bool operator ==(covariant BootstrapConfiguration other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    final collectionEquals = const DeepCollectionEquality().equals;
+
+    return other.enableDebugMode == enableDebugMode &&
+        other.requestTimeout == requestTimeout &&
+        other.responsePreprocessorDelegate == responsePreprocessorDelegate &&
+        other.defaultAuthorization == defaultAuthorization &&
+        other.defaultUserAgent == defaultUserAgent &&
+        collectionEquals(other.defaultHeaders, defaultHeaders) &&
+        other.shouldFollowRedirects == shouldFollowRedirects &&
+        other.maxRedirects == maxRedirects &&
+        collectionEquals(other.interceptors, interceptors) &&
+        other.synchronized == synchronized &&
+        other.statisticsDelegate == statisticsDelegate;
+  }
+
+  @override
+  int get hashCode {
+    return enableDebugMode.hashCode ^
+        requestTimeout.hashCode ^
+        responsePreprocessorDelegate.hashCode ^
+        defaultAuthorization.hashCode ^
+        defaultUserAgent.hashCode ^
+        defaultHeaders.hashCode ^
+        shouldFollowRedirects.hashCode ^
+        maxRedirects.hashCode ^
+        interceptors.hashCode ^
+        synchronized.hashCode ^
+        statisticsDelegate.hashCode;
+  }
+
+  BootstrapConfiguration copyWith({
+    bool? enableDebugMode,
+    Duration? requestTimeout,
+    bool Function(dynamic)? responsePreprocessorDelegate,
+    IAuthorization? defaultAuthorization,
+    String? defaultUserAgent,
+    Map<String, String>? defaultHeaders,
+    bool? shouldFollowRedirects,
+    int? maxRedirects,
+    List<Interceptor>? interceptors,
+    bool? synchronized,
+    StatisticsCallback? statisticsDelegate,
+  }) {
+    return BootstrapConfiguration(
+      enableDebugMode: enableDebugMode ?? this.enableDebugMode,
+      requestTimeout: requestTimeout ?? this.requestTimeout,
+      responsePreprocessorDelegate:
+          responsePreprocessorDelegate ?? this.responsePreprocessorDelegate,
+      defaultAuthorization: defaultAuthorization ?? this.defaultAuthorization,
+      defaultUserAgent: defaultUserAgent ?? this.defaultUserAgent,
+      defaultHeaders: defaultHeaders ?? this.defaultHeaders,
+      shouldFollowRedirects:
+          shouldFollowRedirects ?? this.shouldFollowRedirects,
+      maxRedirects: maxRedirects ?? this.maxRedirects,
+      interceptors: interceptors ?? this.interceptors,
+      synchronized: synchronized ?? this.synchronized,
+      statisticsDelegate: statisticsDelegate ?? this.statisticsDelegate,
+    );
+  }
 }

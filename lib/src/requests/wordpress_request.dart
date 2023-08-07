@@ -6,15 +6,14 @@ import '../enums.dart';
 import '../utilities/request_url.dart';
 import '../utilities/typedefs.dart';
 import '../utilities/wordpress_events.dart';
-import '../wordpress_client_base.dart';
 
-/// Wraps over all requests to be send from this [WordpressClient] instance.
+/// Represents a request to the Wordpress REST API.
 final class WordpressRequest {
   const WordpressRequest({
     required this.url,
     required this.method,
-    this.headers = const {},
-    this.queryParams = const {},
+    this.headers,
+    this.queryParameters,
     this.body,
     this.events,
     this.cancelToken,
@@ -25,20 +24,48 @@ final class WordpressRequest {
     this.receiveTimeout = kDefaultRequestTimeout,
   });
 
+  /// The request url.
   final RequestUrl url;
+
+  /// The request method.
   final HttpMethod method;
-  final Map<String, String> headers;
-  final Map<String, String> queryParams;
+
+  /// The request headers.
+  final Map<String, String>? headers;
+
+  /// The request query parameters.
+  final Map<String, String>? queryParameters;
+
+  /// The request body.
   final dynamic body;
+
+  /// Specifies if this request requires authentication.
   final bool requireAuth;
+
+  /// The cancel token.
   final CancelToken? cancelToken;
+
+  /// The authorization instance.
   final IAuthorization? authorization;
+
+  /// The request send timeout.
   final Duration sendTimeout;
+
+  /// The request receive timeout.
   final Duration receiveTimeout;
+
+  /// The events instance.
   final WordpressEvents? events;
+
+  /// The validator callback.
   final ValidatorCallback? validator;
 
+  /// Gets if this request has events.
   bool get hasEvents => events != null;
+
+  /// Gets if this request has a validator overload.
   bool get hasValidator => validator != null;
+
+  /// Gets if this request has a authorization module.
   bool get hasAuthorization => authorization != null;
 }

@@ -1,5 +1,6 @@
 import '../../wordpress_client.dart';
 
+/// Represents the tag interface.
 final class TagInterface extends IRequestInterface
     with
         CreateOperation<Tag, CreateTagRequest>,

@@ -28,7 +28,7 @@ final class RetriveTagRequest extends IRequest {
     return WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(['tags', id]),
-      queryParams: queryParameters,
+      queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,
       cancelToken: cancelToken,
       authorization: authorization,
