@@ -1,11 +1,4 @@
-import '../../requests.dart';
-import '../operations/create.dart';
-import '../operations/delete.dart';
-import '../operations/list.dart';
-import '../operations/retrieve.dart';
-import '../operations/update.dart';
-import '../responses/category_response.dart';
-import '../wordpress_client_base.dart';
+import '../../wordpress_client.dart';
 
 /// Represents the category interface.
 final class CategoryInterface extends IRequestInterface

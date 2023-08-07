@@ -243,57 +243,57 @@ final class WordpressClient {
     register<MeInterface, User>(
       interface: MeInterface(),
       key: 'me',
-      responseDecoder: (json) => User.fromJson(json),
-      responseEncoder: (dynamic user) => (user as User).toJson(),
+      decoder: (json) => User.fromJson(json),
+      encoder: (dynamic user) => (user as User).toJson(),
     );
 
     register<PostsInterface, Post>(
       interface: PostsInterface(),
       key: 'posts',
-      responseDecoder: (json) => Post.fromJson(json),
-      responseEncoder: (dynamic post) => (post as Post).toJson(),
+      decoder: (json) => Post.fromJson(json),
+      encoder: (dynamic post) => (post as Post).toJson(),
     );
 
     register<CategoryInterface, Category>(
       interface: CategoryInterface(),
       key: 'categories',
-      responseDecoder: Category.fromJson,
-      responseEncoder: (dynamic category) => (category as Category).toJson(),
+      decoder: Category.fromJson,
+      encoder: (dynamic category) => (category as Category).toJson(),
     );
 
     register<CommentInterface, Comment>(
       interface: CommentInterface(),
       key: 'comments',
-      responseDecoder: (json) => Comment.fromJson(json),
-      responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
+      decoder: (json) => Comment.fromJson(json),
+      encoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
     register<MediaInterface, Media>(
       interface: MediaInterface(),
       key: 'media',
-      responseDecoder: (json) => Media.fromJson(json),
-      responseEncoder: (dynamic media) => (media as Media).toJson(),
+      decoder: (json) => Media.fromJson(json),
+      encoder: (dynamic media) => (media as Media).toJson(),
     );
 
     register<TagInterface, Tag>(
       interface: TagInterface(),
       key: 'tags',
-      responseDecoder: (json) => Tag.fromJson(json),
-      responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
+      decoder: (json) => Tag.fromJson(json),
+      encoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
     register<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
-      responseDecoder: (json) => User.fromJson(json),
-      responseEncoder: (dynamic user) => (user as User).toJson(),
+      decoder: (json) => User.fromJson(json),
+      encoder: (dynamic user) => (user as User).toJson(),
     );
 
     register<SearchInterface, Search>(
       interface: SearchInterface(),
       key: 'search',
-      responseDecoder: (json) => Search.fromJson(json),
-      responseEncoder: (dynamic search) => (search as Search).toJson(),
+      decoder: (json) => Search.fromJson(json),
+      encoder: (dynamic search) => (search as Search).toJson(),
     );
   }
 
@@ -304,9 +304,9 @@ final class WordpressClient {
   ///
   /// [interface] is instance of interface type [T]
   ///
-  /// [responseDecoder] is a function that takes a json object and returns an instance of [T]
+  /// [decoder] is a function that takes a json object and returns an instance of [T]
   ///
-  /// [responseEncoder] is a function that takes an instance of [T] and returns a json object
+  /// [encoder] is a function that takes an instance of [T] and returns a json object
   /// These are required to decode and encode responses for this interface.
   ///
   /// [overriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
@@ -334,8 +334,8 @@ final class WordpressClient {
   ///
   void register<T extends IRequestInterface, E>({
     required T interface,
-    required JsonEncoderCallback responseEncoder,
-    required JsonDecoderCallback<E> responseDecoder,
+    required JsonEncoderCallback encoder,
+    required JsonDecoderCallback<E> decoder,
     String? key,
     bool overriteIfTypeExists = false,
   }) {
@@ -346,8 +346,8 @@ final class WordpressClient {
     }
 
     _registerResponseType<E>(
-      decoder: responseDecoder,
-      encoder: responseEncoder,
+      decoder: decoder,
+      encoder: encoder,
       overriteIfExists: overriteIfTypeExists,
     );
 
@@ -445,7 +445,7 @@ final class WordpressClient {
   ///
   /// Only the settings that have changed since will be updated.
   void reconfigureClient(
-    BootstrapConfiguration Function(BootstrapBuilder) bootstrapper,
+    BootstrapConfiguration Function(BootstrapBuilder builder) bootstrapper,
   ) {
     return _requester.configure(
       bootstrapper(

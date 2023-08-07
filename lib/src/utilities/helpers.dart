@@ -1,35 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:dio/dio.dart';
-
 import '../codable_map.dart';
-
-// import 'package:html/parser.dart';
-
-extension MapExtensions on Map<String, dynamic> {
-  String toJsonString() {
-    return json.encode(this);
-  }
-
-  /// Adds the given [value] to the map if the value is not null.
-  void addIfNotNull(String key, dynamic value) {
-    if (value == null) {
-      return;
-    }
-
-    this[key] = value?.toString();
-  }
-}
-
-extension HeaderExtension on Headers {
-  /// Gets all the headers as a map.
-  Map<String, String> getHeaderMap() {
-    return map.map<String, String>((key, value) {
-      return MapEntry(key, value.join(';'));
-    });
-  }
-}
 
 DateTime? parseDateIfNotNull(dynamic json) {
   if (json == null) {

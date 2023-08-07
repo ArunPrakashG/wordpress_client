@@ -8,6 +8,12 @@ final class CustomAuth extends IAuthorization {
   });
 
   @override
+  bool get isValidAuth => throw UnimplementedError();
+
+  @override
+  String get scheme => throw UnimplementedError();
+
+  @override
   Future<bool> authorize() {
     throw UnimplementedError();
   }
@@ -23,9 +29,6 @@ final class CustomAuth extends IAuthorization {
   }
 
   @override
-  bool get isValidAuth => throw UnimplementedError();
-
-  @override
   Future<bool> validate() {
     throw UnimplementedError();
   }
@@ -34,7 +37,4 @@ final class CustomAuth extends IAuthorization {
   void clientFactoryProvider(Dio client) {
     throw UnimplementedError();
   }
-
-  @override
-  String get scheme => throw UnimplementedError();
 }
