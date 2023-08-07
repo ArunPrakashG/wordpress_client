@@ -1,11 +1,11 @@
 <div align="center">
-<h1>WordpressClient</h1>
-  
-[pub.dev](https://pub.dev/packages/wordpress_client)
+<h1>wordpress_client</h1>
+
+[![Pub Version](https://img.shields.io/pub/v/badges?color=blueviolet)](https://pub.dev/packages/wordpress_client)
 
 ![Dart](https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white) ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white) ![WordPress](https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white)
 
-**wordpress_client** is a library written purely in Dart to interact with Wordpress REST API in a fluent pattern.
+A library to interact with the Wordpress REST API. Supports most of the common endpoints and all of the CRUD operations on the endpoints.
 
 </div>
 
@@ -14,11 +14,10 @@
 ## Features
 
 - Support for 3 widely used authorization methods.
-- Response preprocessor callback support.
+- Events for preprocessing operations on the response
 - Provides statistics such as time taken for the request to complete.
-- Support for Custom Requests / Authorization systems.
-- Request Synchronization using lock objects
-- Nullable support.
+- Support for Custom Requests & Authorization systems.
+- Request Synchronization
 - And many more!
 
 ## Usage
@@ -29,11 +28,10 @@ You can use this library just like any other Dart package.
 
 ```dart
 dependencies:
-  wordpress_client: ^7.0.0
+  wordpress_client: ^8.0.0
 ```
 
 - Import the library to your project class in which you want to use the library.
-  Also, it is to note that imports are split between multiple files, this helps to keep Dart auto-completion less cluttered. i.e., All request classes are seperated into another file, same goes for responses. You can utilize Intellisense to import them easily.
 
 ```dart
 import 'package:wordpress_client/wordpress_client.dart';
@@ -47,27 +45,55 @@ import 'package:wordpress_client/wordpress_client.dart';
 ### Simple method
 
 ```dart
-WordpressClient client = new WordpressClient.initialize('https://www.replaceme.com/', 'wp-json/wp/v2');
+final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
+final client = WordpressClient(baseUrl: baseUrl);
+
+// Call this on splash screen / or anywhere where you have your initializing logic
+client.initialize();
 ```
 
 You can read about advanced method in [Advanced Method](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#advanced-method) wiki page.
 
-- Now you are ready to send requests to Wordpress REST API. For example, to send request to get the latest 20 posts from your Wordpress site in Ascending order, you can use the following code.:
+- You are now prepared to send requests to the WordPress REST API. For instance, to retrieve the 20 most recent posts from your WordPress site in ascending order, you can use the following code snippet:
 
 ```dart
-WordpressResponse<List<Post>?> postsResponse = await client.posts.list(
-    WordpressRequest(
-      requestData: ListPostRequest()
-        ..page = 1
-        ..perPage = 20
-        ..order = Order.asc,
-    ),
-  );
+final request = ListPostRequest(
+  page: 1,
+  perPage: 20,
+  order = Order.asc,
+);
+
+final wpResponse = await client.posts.list(request);
+
+// Dart 3 style
+switch (wpResponse) {
+    case WordpressSuccessResponse():
+      final data = wpResponse.data; // List<Post>
+      break;
+    case WordpressFailureResponse():
+      final error = wpResponse.error; // WordpressError
+      break;
+}
+
+// or
+// wordpress_client style
+final result = postsResponse.map(
+    onSuccess: (response) {
+      print(response.message);
+      return response.data;
+    },
+    onFailure: (response) {
+      print(response.error.toString());
+      return <Post>[];
+    },
+);
 ```
 
-`WordpressResponse` is a class which wraps around the actual result object. It also provides access to statistical data related to the response such as the time taken for the request to complete, status codes, Total number of pages etc.
+`WordpressResponse` is a class that encapsulates the actual result object (or error, depending on the result) and provides access to statistical data related to the response, such as the time taken for the request to complete, status codes, and the total number of pages.
 
-You can access the response object by calling `postsResponse.data`. It will be null if the request failed or if the library failed to parse the response.
+Once `WordpressResponse` is received, It is important to compare the underlying type to `WordpressSuccessResponse` or `WordpressFailureResponse` to determine the actual result of the request. In order to do this, there are various getters and methods available on the type.
+
+Once mapped, if the response is of type `WordpressSuccessResponse`, the resuling data of the response can be accessed on the `data` property. If the result is of type `WordpressFailureResponse`, the error details can be accessed on the `error` property.
 
 ## Supported Authorization methods
 
