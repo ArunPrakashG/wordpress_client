@@ -4,8 +4,8 @@ import 'package:meta/meta.dart';
 import '../enums.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/content.dart';
-import 'response_properties/links.dart';
+import 'properties/content.dart';
+import 'properties/links.dart';
 
 @immutable
 class Comment implements ISelfRespresentive {
@@ -31,7 +31,7 @@ class Comment implements ISelfRespresentive {
     required this.self,
   });
 
-  factory Comment.fromJson(dynamic json) {
+  factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
       id: json['id'] as int?,
       post: json['post'] as int?,
@@ -44,7 +44,7 @@ class Comment implements ISelfRespresentive {
       authorUserAgent: json['author_user_agent'] as String?,
       date: parseDateIfNotNull(json['date']),
       dateGmt: parseDateIfNotNull(json['date_gmt']),
-      content: Content.fromJson(json['content'] as Map<String, dynamic>?),
+      content: Content.fromJson(json['content']),
       link: json['link'] as String?,
       status: getCommentStatusFromValue(json['status'] as String?),
       type: json['type'] as String?,
@@ -55,7 +55,7 @@ class Comment implements ISelfRespresentive {
               .map(MapEntry.new),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
-      self: json as Map<String, dynamic>,
+      self: json,
     );
   }
 
@@ -77,9 +77,6 @@ class Comment implements ISelfRespresentive {
   final Map<String, String>? authorAvatarUrls;
   final dynamic meta;
   final Links? links;
-
-  @override
-  Map<String, dynamic> get json => self;
 
   @override
   final Map<String, dynamic> self;

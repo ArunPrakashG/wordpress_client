@@ -1,9 +1,10 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class CreateCommentRequest implements IRequest {
+final class CreateCommentRequest extends IRequest {
   CreateCommentRequest({
     this.author,
     this.authorIp,
@@ -14,6 +15,13 @@ class CreateCommentRequest implements IRequest {
     this.authorUserAgent,
     this.parent,
     this.post,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   int? author;
@@ -27,8 +35,8 @@ class CreateCommentRequest implements IRequest {
   String? post;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('author', author)
       ..addIfNotNull('author_ip', authorIp)
       ..addIfNotNull('author_url', authorUrl)
@@ -39,7 +47,17 @@ class CreateCommentRequest implements IRequest {
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('post', post);
 
-    requestContent.endpoint = 'comments';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('comments'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

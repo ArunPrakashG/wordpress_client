@@ -1,12 +1,12 @@
-import '../requests/request_interface.dart';
-import '../requests/wordpress_request.dart';
-import '../responses/wordpress_response.dart';
-import '../wordpress_client_base.dart';
+import '../../wordpress_client.dart';
 
-mixin ListMixin<T, E extends IRequest> {
-  InternalRequester get internalRequester;
+/// Represents the list operation.
+base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
+  Future<WordpressResponse<List<T>>> list(
+    R request,
+  ) async {
+    final wpRequest = await request.build(baseUrl);
 
-  Future<WordpressResponse<List<T>?>> list(WordpressRequest<E> request) async {
-    return internalRequester.listRequest<T>(request);
+    return executor.list<T>(wpRequest);
   }
 }

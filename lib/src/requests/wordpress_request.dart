@@ -1,81 +1,71 @@
 import 'package:dio/dio.dart';
 
+import '../../authorization.dart';
 import '../constants.dart';
 import '../enums.dart';
-import '../utilities/wordpress_callback.dart';
-import '../wordpress_client_base.dart';
-import 'request_content.dart';
-import 'request_interface.dart';
+import '../utilities/request_url.dart';
+import '../utilities/typedefs.dart';
+import '../utilities/wordpress_events.dart';
 
-typedef ValidatorCallback = bool Function(dynamic response);
-
-/// Wraps over all requests to be send from this [WordpressClient] instance.
-class WordpressRequest<T extends IRequest> {
-  WordpressRequest({
-    required this.requestData,
-    this.callback,
+/// Represents a request to the Wordpress REST API.
+final class WordpressRequest {
+  const WordpressRequest({
+    required this.url,
+    required this.method,
+    this.headers,
+    this.queryParameters,
+    this.body,
+    this.events,
     this.cancelToken,
+    this.requireAuth = false,
     this.authorization,
-    this.responseValidationCallback,
+    this.validator,
     this.sendTimeout = kDefaultRequestTimeout,
     this.receiveTimeout = kDefaultRequestTimeout,
-  }) {
-    _buildRequest();
-  }
+  });
 
-  String? _endpoint;
-  String? _path;
-  HttpMethod? _method;
-  Map<String, String>? _headers;
-  dynamic _body;
-  Map<String, String>? _queryParams;
-  final T requestData;
-  final WordpressCallback? callback;
-  final ValidatorCallback? responseValidationCallback;
+  /// The request url.
+  final RequestUrl url;
+
+  /// The request method.
+  final HttpMethod method;
+
+  /// The request headers.
+  final Map<String, String>? headers;
+
+  /// The request query parameters.
+  final Map<String, String>? queryParameters;
+
+  /// The request body.
+  final dynamic body;
+
+  /// Specifies if this request requires authentication.
+  final bool requireAuth;
+
+  /// The cancel token.
   final CancelToken? cancelToken;
+
+  /// The authorization instance.
   final IAuthorization? authorization;
+
+  /// The request send timeout.
   final Duration sendTimeout;
+
+  /// The request receive timeout.
   final Duration receiveTimeout;
 
-  String get endpoint => _endpoint ?? '';
-  String? get path => _path;
-  HttpMethod get method => _method ?? HttpMethod.get;
-  Map<String, String> get headers => _headers ?? const {};
-  Map<String, String> get queryParams => _queryParams ?? const {};
-  dynamic get body => _body;
+  /// The events instance.
+  final WordpressEvents? events;
 
-  bool get hasHeaders => headers.isNotEmpty;
-  bool get hasCustomPath => path != null;
-  bool get hasFormContent => body != null;
-  bool get isRequestExecutable => endpoint.isNotEmpty;
-  bool get shouldValidateResponse => responseValidationCallback != null;
-  bool get shouldAuthorize =>
-      authorization != null && !authorization!.isDefault;
-  bool get hasValidExceptionCallback =>
-      callback != null && callback!.unhandledExceptionCallback != null;
-  bool get hasValidCallbacks =>
-      hasValidExceptionCallback &&
-      callback!.responseCallback != null &&
-      callback!.onReceiveProgress != null &&
-      callback!.onSendProgress != null;
+  /// The validator callback.
+  final ValidatorCallback? validator;
 
-  bool get _hasBuild =>
-      endpoint.isNotEmpty &&
-      (headers.isNotEmpty || body != null || queryParams.isNotEmpty);
+  /// Gets if this request has events.
+  bool get hasEvents => events != null;
 
-  void _buildRequest() {
-    if (_hasBuild) {
-      return;
-    }
+  /// Gets if this request has a validator overload.
+  bool get hasValidator => validator != null;
 
-    final requestContent = RequestContent();
-    requestData.build(requestContent);
-
-    _endpoint = requestContent.endpoint;
-    _method = requestContent.method;
-    _headers = requestContent.headers;
-    _body = requestContent.body;
-    _path = requestContent.path;
-    _queryParams = requestContent.queryParameters;
-  }
+  /// Gets if this request has a authorization module.
+  bool get hasAuthorization => authorization != null;
 }

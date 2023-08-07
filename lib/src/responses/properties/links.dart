@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_lambdas
+
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
@@ -20,51 +22,51 @@ class Links {
     this.curies,
   });
 
-  factory Links.fromJson(dynamic json) {
+  factory Links.fromJson(Map<String, dynamic> json) {
     return Links(
       self: mapIterableWithChecks<LinkContainer>(
-        json?['self'],
-        LinkContainer.fromJson,
+        json['self'],
+        (json) => LinkContainer.fromJson(json),
       ),
       collection: mapIterableWithChecks<LinkContainer>(
-        json?['collection'],
-        LinkContainer.fromJson,
+        json['collection'],
+        (json) => LinkContainer.fromJson(json),
       ),
       about: mapIterableWithChecks<LinkContainer>(
-        json?['about'],
-        LinkContainer.fromJson,
+        json['about'],
+        (json) => LinkContainer.fromJson(json),
       ),
       author: mapIterableWithChecks<LinkContainer>(
-        json?['author'],
-        LinkContainer.fromJson,
+        json['author'],
+        (json) => LinkContainer.fromJson(json),
       ),
       replies: mapIterableWithChecks<LinkContainer>(
-        json?['replies'],
-        LinkContainer.fromJson,
+        json['replies'],
+        (json) => LinkContainer.fromJson(json),
       ),
       versionHistory: mapIterableWithChecks<LinkContainer>(
-        json?['version-history'],
-        LinkContainer.fromJson,
+        json['version-history'],
+        (json) => LinkContainer.fromJson(json),
       ),
       predecessorVersion: mapIterableWithChecks<LinkContainer>(
-        json?['predecessor-version'],
-        LinkContainer.fromJson,
+        json['predecessor-version'],
+        (json) => LinkContainer.fromJson(json),
       ),
       wpFeaturedmedia: mapIterableWithChecks<LinkContainer>(
-        json?['wp:featuredmedia'],
-        LinkContainer.fromJson,
+        json['wp:featuredmedia'],
+        (json) => LinkContainer.fromJson(json),
       ),
       wpAttachment: mapIterableWithChecks<LinkContainer>(
-        json?['wp:attachment'],
-        LinkContainer.fromJson,
+        json['wp:attachment'],
+        (json) => LinkContainer.fromJson(json),
       ),
       wpTerm: mapIterableWithChecks<LinkContainer>(
-        json?['wp:term'],
-        LinkContainer.fromJson,
+        json['wp:term'],
+        (json) => LinkContainer.fromJson(json),
       ),
       curies: mapIterableWithChecks<LinkContainer>(
-        json?['curies'],
-        LinkContainer.fromJson,
+        json['curies'],
+        (json) => LinkContainer.fromJson(json),
       ),
     );
   }

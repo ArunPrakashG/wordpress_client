@@ -1,10 +1,18 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class CreateTagRequest implements IRequest {
+final class CreateTagRequest extends IRequest {
   CreateTagRequest({
     this.description,
     required this.name,
     required this.slug,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String? description;
@@ -12,13 +20,23 @@ class CreateTagRequest implements IRequest {
   String slug;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('description', description)
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug);
 
-    requestContent.endpoint = 'tags';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('tags'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

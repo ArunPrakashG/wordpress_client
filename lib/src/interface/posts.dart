@@ -1,12 +1,10 @@
-import '../../operations.dart';
-import '../../requests.dart';
-import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class PostsInterface extends IInterface
+/// Represents the post interface.
+final class PostsInterface extends IRequestInterface
     with
-        CreateMixin<Post, CreatePostRequest>,
-        DeleteMixin<DeletePostRequest>,
-        RetrieveMixin<Post, RetrivePostRequest>,
-        UpdateMixin<Post, UpdatePostRequest>,
-        ListMixin<Post, ListPostRequest> {}
+        CreateOperation<Post, CreatePostRequest>,
+        DeleteOperation<DeletePostRequest>,
+        RetriveOperation<Post, RetrivePostRequest>,
+        UpdateOperation<Post, UpdatePostRequest>,
+        ListOperation<Post, ListPostRequest> {}

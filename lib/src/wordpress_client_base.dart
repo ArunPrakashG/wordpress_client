@@ -1,12 +1,13 @@
+// ignore_for_file: unnecessary_lambdas
+
 import 'dart:async';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:path/path.dart';
 import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
-import 'exceptions/exceptions_export.dart';
+import 'codable_map.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
@@ -16,17 +17,17 @@ import 'interface/search.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'interface_key.dart';
+import 'internal_requester_base.dart';
 import 'library_exports.dart';
-import 'responses/responses_export.dart';
-import 'type_map.dart';
+import 'responses/wordpress_raw_response.dart';
 import 'typedefs.dart';
 import 'utilities/helpers.dart';
-import 'utilities/utility_export.dart';
 
 part 'internal_requester.dart';
+part 'request_interface_base.dart';
 
 /// The main class for [WordpressClient].
-class WordpressClient {
+final class WordpressClient {
   /// Default Constructor.
   ///
   /// [baseUrl] is the base url of the wordpress site.
@@ -38,21 +39,15 @@ class WordpressClient {
   /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
   ///
   /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
-  WordpressClient(
-    String baseUrl,
-    String path, {
+  WordpressClient({
+    required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
-    if (isNullOrEmpty(baseUrl)) {
-      throw NullReferenceException('Base URL is invalid.');
-    }
-
-    if (isNullOrEmpty(path)) {
-      throw NullReferenceException('Path is invalid.');
-    }
-
-    if (baseUrl.contains('www.')) {
-      baseUrl = baseUrl.replaceFirst('www.', '');
+    if (!baseUrl.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Base URLs should always be an absolute URL.',
+        'baseUrl',
+      );
     }
 
     var configuration = const BootstrapConfiguration();
@@ -63,7 +58,6 @@ class WordpressClient {
 
     _requester = InternalRequester.configure(
       baseUrl,
-      path,
       configuration,
     );
   }
@@ -74,21 +68,15 @@ class WordpressClient {
   /// [path] is the path of the url appended to your REST API.
   /// [bootstrapper] is a builder method for initializing the client.
   ///
-  WordpressClient.initialize(
-    String baseUrl,
-    String path, {
+  WordpressClient.initialize({
+    required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
   }) {
-    if (isNullOrEmpty(baseUrl)) {
-      throw NullReferenceException('Base URL is invalid.');
-    }
-
-    if (isNullOrEmpty(path)) {
-      throw NullReferenceException('Path is invalid.');
-    }
-
-    if (baseUrl.contains('www.')) {
-      baseUrl = baseUrl.replaceFirst('www.', '');
+    if (!baseUrl.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Base URLs should always be an absolute URL.',
+        'baseUrl',
+      );
     }
 
     var configuration = const BootstrapConfiguration();
@@ -99,7 +87,6 @@ class WordpressClient {
 
     _requester = InternalRequester.configure(
       baseUrl,
-      path,
       configuration,
     );
 
@@ -109,10 +96,10 @@ class WordpressClient {
   late final InternalRequester _requester;
 
   /// Base url supplied through constructor.
-  String get baseUrl => _requester._baseUrl;
+  Uri get baseUrl => _requester._baseUrl;
 
-  /// Base url path supplied through constructor.
-  String get path => _requester._path;
+  /// Base url path.
+  String get path => baseUrl.path;
 
   /// Returns true if this instance of [WordpressClient] is running in debug mode.
   ///
@@ -129,11 +116,8 @@ class WordpressClient {
       _requester._defaultAuthorization != null &&
       _requester._defaultAuthorization!.isValidAuth;
 
-  /// Combined url of [baseUrl] and [path]
-  String get requestUrl => _requester.requestBaseUrl;
-
   /// Stores data on how to decode & encode responses.
-  final TypeMap _typeMap = TypeMap();
+  final CodableMap _typeMap = CodableMap();
 
   /// The current user interface.
   ///
@@ -144,7 +128,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  MeInterface get me => getInterface<MeInterface>('me');
+  MeInterface get me => get<MeInterface>('me');
 
   /// The posts interface.
   ///
@@ -157,7 +141,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  PostsInterface get posts => getInterface<PostsInterface>('posts');
+  PostsInterface get posts => get<PostsInterface>('posts');
 
   /// The categories interface.
   ///
@@ -170,8 +154,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  CategoryInterface get categories =>
-      getInterface<CategoryInterface>('categories');
+  CategoryInterface get categories => get<CategoryInterface>('categories');
 
   /// The comments interface.
   ///
@@ -184,7 +167,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  CommentInterface get comments => getInterface<CommentInterface>('comments');
+  CommentInterface get comments => get<CommentInterface>('comments');
 
   /// The media interface.
   ///
@@ -197,7 +180,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  MediaInterface get media => getInterface<MediaInterface>('media');
+  MediaInterface get media => get<MediaInterface>('media');
 
   /// The tags interface.
   ///
@@ -210,7 +193,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  TagInterface get tags => getInterface<TagInterface>('tags');
+  TagInterface get tags => get<TagInterface>('tags');
 
   /// The users interface.
   ///
@@ -223,7 +206,7 @@ class WordpressClient {
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
-  UsersInterface get users => getInterface<UsersInterface>('users');
+  UsersInterface get users => get<UsersInterface>('users');
 
   /// The search interface.
   ///
@@ -232,7 +215,7 @@ class WordpressClient {
   /// Available Operations:
   /// - List
   ///
-  SearchInterface get search => getInterface<SearchInterface>('search');
+  SearchInterface get search => get<SearchInterface>('search');
 
   final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
       <InterfaceKey<dynamic>, dynamic>{};
@@ -252,70 +235,70 @@ class WordpressClient {
       return;
     }
 
-    _initInternalInterfaces();
+    _registerInternalInterfaces();
     _hasInitialized = true;
   }
 
-  void _initInternalInterfaces() {
-    initInterface<MeInterface, User>(
+  void _registerInternalInterfaces() {
+    register<MeInterface, User>(
       interface: MeInterface(),
       key: 'me',
-      responseDecoder: User.fromJson,
+      responseDecoder: (json) => User.fromJson(json),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
-    initInterface<PostsInterface, Post>(
+    register<PostsInterface, Post>(
       interface: PostsInterface(),
       key: 'posts',
-      responseDecoder: Post.fromJson,
+      responseDecoder: (json) => Post.fromJson(json),
       responseEncoder: (dynamic post) => (post as Post).toJson(),
     );
 
-    initInterface<CategoryInterface, Category>(
+    register<CategoryInterface, Category>(
       interface: CategoryInterface(),
       key: 'categories',
       responseDecoder: Category.fromJson,
       responseEncoder: (dynamic category) => (category as Category).toJson(),
     );
 
-    initInterface<CommentInterface, Comment>(
+    register<CommentInterface, Comment>(
       interface: CommentInterface(),
       key: 'comments',
-      responseDecoder: Comment.fromJson,
+      responseDecoder: (json) => Comment.fromJson(json),
       responseEncoder: (dynamic comment) => (comment as Comment).toJson(),
     );
 
-    initInterface<MediaInterface, Media>(
+    register<MediaInterface, Media>(
       interface: MediaInterface(),
       key: 'media',
-      responseDecoder: Media.fromJson,
+      responseDecoder: (json) => Media.fromJson(json),
       responseEncoder: (dynamic media) => (media as Media).toJson(),
     );
 
-    initInterface<TagInterface, Tag>(
+    register<TagInterface, Tag>(
       interface: TagInterface(),
       key: 'tags',
-      responseDecoder: Tag.fromJson,
+      responseDecoder: (json) => Tag.fromJson(json),
       responseEncoder: (dynamic tag) => (tag as Tag).toJson(),
     );
 
-    initInterface<UsersInterface, User>(
+    register<UsersInterface, User>(
       interface: UsersInterface(),
       key: 'users',
-      responseDecoder: User.fromJson,
+      responseDecoder: (json) => User.fromJson(json),
       responseEncoder: (dynamic user) => (user as User).toJson(),
     );
 
-    initInterface<SearchInterface, Search>(
+    register<SearchInterface, Search>(
       interface: SearchInterface(),
       key: 'search',
-      responseDecoder: Search.fromJson,
+      responseDecoder: (json) => Search.fromJson(json),
       responseEncoder: (dynamic search) => (search as Search).toJson(),
     );
   }
 
   /// Called to initialize an interface.
-  /// All interfaces inherit from [IInterface] abstract class, which provides internal requester instance and other functions.
+  /// All interfaces inherit from [IRequestInterface] abstract class, which provides internal requester instance and other functions.
   ///
   /// [key] must be unique to this instance of [WordpressClient] as this will be used to indentify the instance & the response type used by the interface requests.
   ///
@@ -349,11 +332,11 @@ class WordpressClient {
   /// );
   /// ```
   ///
-  void initInterface<T extends IInterface, E>({
+  void register<T extends IRequestInterface, E>({
     required T interface,
-    required String key,
     required JsonEncoderCallback responseEncoder,
     required JsonDecoderCallback<E> responseDecoder,
+    String? key,
     bool overriteIfTypeExists = false,
   }) {
     final interfaceKey = InterfaceKey<T>(key);
@@ -368,21 +351,29 @@ class WordpressClient {
       overriteIfExists: overriteIfTypeExists,
     );
 
+    // _registerResponseType<List<E>>(
+    //   decoder: (response) =>
+    //       (response as List<dynamic>).map((e) => responseDecoder(e)).toList(),
+    //   encoder: responseEncoder,
+    //   overriteIfExists: true,
+    // );
+
     interface._initInterface(
-      _requester,
-      interfaceKey,
+      requester: _requester,
+      key: interfaceKey,
     );
 
     _interfaces[interfaceKey] = interface;
   }
 
   /// Checks if an interface with the given Type [T] and [key] exists.
-  bool interfaceExists<T>([String? key]) =>
-      _interfaces[InterfaceKey<T>(key)] != null;
+  bool exists<T>([String? key]) {
+    return _interfaces[InterfaceKey<T>(key)] != null;
+  }
 
   /// Registers a type to be used in [WordpressClient] Responses.
   ///
-  /// This is called automatically on [initInterface], During initializing of an interface.
+  /// This is called automatically on [register], During initializing of an interface.
   ///
   /// By default, all respones used inside [WordpressClient] library is registered. If you try to register them again, it will throw [MapAlreadyExistException] exception.
   ///
@@ -396,7 +387,7 @@ class WordpressClient {
     required JsonDecoderCallback<E> decoder,
     bool overriteIfExists = false,
   }) {
-    _typeMap.addJsonPairForType<E>(
+    _typeMap.addCodablePair<E>(
       decoder: decoder,
       encoder: encoder,
       overwrite: overriteIfExists,
@@ -407,7 +398,7 @@ class WordpressClient {
   ///
   /// [key] parameter is optional. However, getting result by specifing key is faster.
   ///
-  /// All custom interfaces must inherit from [IInterface] interface.
+  /// All custom interfaces must inherit from [IRequestInterface] interface.
   ///
   /// Calling this method without initializing the custom interface using `initCustomInterface<T>(...)` will result in `InterfaceNotInitializedException`
   ///
@@ -417,14 +408,14 @@ class WordpressClient {
   /// await client.getCustomInterface<MyCustomInterface>().create((p1) => p1.build());
   /// ```
   ///
-  T getInterface<T extends IInterface>([String? key]) {
+  T get<T extends IRequestInterface>([String? key]) {
     if (!isReady) {
       throw ClientNotReadyException();
     }
 
     final interfaceKey = InterfaceKey<T>(key);
 
-    if (interfaceExists<T>(key)) {
+    if (exists<T>(key)) {
       return _interfaces[interfaceKey] as T;
     }
 
@@ -464,52 +455,4 @@ class WordpressClient {
       ),
     );
   }
-}
-
-/// The base of all request interfaces.
-/// You must extend from this interface to define custom requests.
-abstract class IInterface {
-  /// The internal requester instance.
-  ///
-  /// This variable is assigned on init method automatically.
-  late final InternalRequester internalRequester;
-
-  /// The interface key, this must be unique and will act as a unique identifier for this interface.
-  late final InterfaceKey<dynamic> interfaceKey;
-
-  bool _hasInitilizedAlready = false;
-
-  /// This method is used to initialize the interface by passing [InternalRequester] instance from the core to the interface.
-  ///
-  /// This method is called only once in interface lifecycle.
-  ///
-  /// It should always call super init() if it is overriden like so `super.init(requester, key)`.
-  /// Failing to call super init() method means [internalRequester] variable will be null and therefore none of the requests will go through and throws exception.
-  ///
-  /// Or you have to handle default init process by:
-  ///
-  /// ```dart
-  /// if(!hasInitilizedAlready){
-  ///   internalRequester = requester;
-  ///   interfaceKey = key;
-  ///   hasInitilizedAlready = true;
-  /// }
-  /// ```
-  ///
-  void _initInterface(
-    InternalRequester requester,
-    InterfaceKey<dynamic> key,
-  ) {
-    if (_hasInitilizedAlready) {
-      return;
-    }
-
-    internalRequester = requester;
-    interfaceKey = key;
-    _hasInitilizedAlready = true;
-    onInit();
-  }
-
-  /// This method is called right after internal initialization process of the interface completes.
-  void onInit() {}
 }

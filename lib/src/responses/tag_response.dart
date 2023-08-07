@@ -1,51 +1,52 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/links.dart';
+import 'properties/links.dart';
 
 @immutable
 class Tag implements ISelfRespresentive {
   const Tag({
-    this.id,
-    this.count,
+    required this.id,
+    required this.count,
     this.description,
-    this.link,
+    required this.link,
     this.name,
-    this.slug,
-    this.taxonomy,
+    required this.slug,
+    required this.taxonomy,
     this.meta,
     this.links,
     required this.self,
   });
 
-  factory Tag.fromJson(dynamic json) {
+  factory Tag.fromJson(Map<String, dynamic> json) {
     return Tag(
-      id: json['id'] as int?,
-      count: json['count'] as int?,
-      description: json['description'] as String?,
-      link: json['link'] as String?,
-      name: json['name'] as String?,
-      slug: json['slug'] as String?,
-      taxonomy: json['taxonomy'] as String?,
+      id: castOrElse(json['id']),
+      count: castOrElse(json['count']),
+      description: castOrElse(json['description']),
+      link: castOrElse(json['link']),
+      name: castOrElse(json['name']),
+      slug: castOrElse(json['slug']),
+      taxonomy: castOrElse(json['taxonomy']),
       meta: json['meta'],
-      links: json?['_links'] != null ? Links.fromJson(json['_links']) : null,
-      self: json as Map<String, dynamic>,
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
+      self: json,
     );
   }
 
-  final int? id;
-  final int? count;
+  final int id;
+  final int count;
   final String? description;
-  final String? link;
+  final String link;
   final String? name;
-  final String? slug;
-  final String? taxonomy;
+  final String slug;
+  final String taxonomy;
   final dynamic meta;
   final Links? links;
-
-  @override
-  Map<String, dynamic> get json => self;
 
   @override
   final Map<String, dynamic> self;

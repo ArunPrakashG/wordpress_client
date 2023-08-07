@@ -1,12 +1,10 @@
-import '../../operations.dart';
-import '../../requests.dart';
-import '../../responses.dart';
 import '../../wordpress_client.dart';
 
-class UsersInterface extends IInterface
+/// Represents the user interface.
+final class UsersInterface extends IRequestInterface
     with
-        CreateMixin<User, CreateUserRequest>,
-        DeleteMixin<DeleteUserRequest>,
-        RetrieveMixin<User, RetriveUserRequest>,
-        UpdateMixin<User, UpdateUserRequest>,
-        ListMixin<User, ListUserRequest> {}
+        CreateOperation<User, CreateUserRequest>,
+        DeleteOperation<DeleteUserRequest>,
+        RetriveOperation<User, RetriveUserRequest>,
+        UpdateOperation<User, UpdateUserRequest>,
+        ListOperation<User, ListUserRequest> {}

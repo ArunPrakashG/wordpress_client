@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 
-import '../type_map.dart';
+import '../codable_map.dart';
 
 // import 'package:html/parser.dart';
 
@@ -12,6 +12,7 @@ extension MapExtensions on Map<String, dynamic> {
     return json.encode(this);
   }
 
+  /// Adds the given [value] to the map if the value is not null.
   void addIfNotNull(String key, dynamic value) {
     if (value == null) {
       return;
@@ -22,6 +23,7 @@ extension MapExtensions on Map<String, dynamic> {
 }
 
 extension HeaderExtension on Headers {
+  /// Gets all the headers as a map.
   Map<String, String> getHeaderMap() {
     return map.map<String, String>((key, value) {
       return MapEntry(key, value.join(';'));
@@ -47,50 +49,38 @@ DateTime? parseDateIfNotNull(dynamic json) {
   return DateTime.tryParse(dateString);
 }
 
+/// Casts the given dynamic JSON value to the specified type [T].
+///
+/// Optionally, you can provide a [transformer] function to transform the value manually if it is not null.
+///
+/// If the value is null, the [orElse] function is called to return a default value.
+T? castOrElse<T>(
+  dynamic json, {
+  T? Function(Object value)? transformer,
+  T Function()? orElse,
+}) {
+  try {
+    if (json == null) {
+      return orElse?.call();
+    }
+
+    if (transformer != null) {
+      return transformer(json);
+    }
+
+    if (json is! T) {
+      return orElse?.call();
+    }
+
+    return json;
+  } catch (_) {
+    return orElse?.call();
+  }
+}
+
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
 bool isAlphaNumeric(String value) => RegExp(r'^[a-zA-Z0-9]*$').hasMatch(value);
-
-String parseUrl(String? baseUrl, String? path) {
-  if (baseUrl == null || path == null) {
-    return '';
-  }
-
-  if (!baseUrl.endsWith('/')) {
-    baseUrl = '$baseUrl/';
-  }
-
-  if (path.startsWith('/')) {
-    path = path.substring(1, path.length);
-  }
-
-  if (path.endsWith('/')) {
-    path = path.substring(0, path.length - 1);
-  }
-
-  return '$baseUrl$path';
-}
-
-String getJoiningChar(String? baseUrl) {
-  if (baseUrl == null || baseUrl.isEmpty) {
-    return '';
-  }
-
-  if ((baseUrl.contains('?') && !baseUrl.contains('&')) ||
-      baseUrl.contains('?') && baseUrl.contains('&')) {
-    return '&';
-  }
-
-  if (baseUrl.contains('?') && baseUrl.contains('&')) {
-    return '&';
-  }
-
-  if (!baseUrl.contains('?')) {
-    return '?';
-  }
-
-  return '&';
-}
 
 String base64Encode(String text) {
   if (isNullOrEmpty(text)) {
@@ -106,33 +96,27 @@ String getRandString(int len) {
   return base64UrlEncode(values);
 }
 
-// check if the number is within the specified range
+/// Checks if the provided integer value is in the range of [min] and [max].
 bool isInRange(int value, int min, int max) => value >= min && value <= max;
-
-//String parseHtmlString(String htmlString) => parse(parse(htmlString).body.text).documentElement.text;
 
 String parseHtmlString(String htmlString) =>
     htmlString.replaceAll(RegExp('<[^>]*>|&[^;]+;'), ' ');
 
 Type typeOf<T>() => T;
 
-/// Deserializes a JSON object by getting its decoder from [TypeMap]
+/// Deserializes a JSON object by getting its decoder from [CodableMap]
 ///
 /// You will need to initiate your custom interface first in order to deserialize using this method.
 T deserialize<T>(dynamic object) {
-  if (object is! Map<String, dynamic>) {
-    throw Exception('object is not a map. Cannot decode.');
-  }
-
-  final decoder = TypeMap.getDecoderForType<T>();
+  final decoder = CodableMap.getDecoder<T>();
   return decoder(object);
 }
 
-/// Serializes a Dart object by getting its encoder from [TypeMap]
+/// Serializes a Dart object by getting its encoder from [CodableMap]
 ///
 /// You will need to initiate your custom interface first in order to serialize using this method.
 Map<String, dynamic> serialize<T>(T object) {
-  final encoder = TypeMap.getEncoderForType<T>();
+  final encoder = CodableMap.getEncoder<T>();
   return encoder(object);
 }
 

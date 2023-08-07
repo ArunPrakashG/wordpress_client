@@ -1,19 +1,37 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class DeleteTagRequest implements IRequest {
+final class DeleteTagRequest extends IRequest {
   DeleteTagRequest({
     this.force,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   bool? force;
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body.addIfNotNull('force', force);
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}..addIfNotNull('force', force);
 
-    requestContent.endpoint = 'tags/$id';
-    requestContent.method = HttpMethod.delete;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.delete,
+      url: RequestUrl.relativeParts(['tags', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

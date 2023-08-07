@@ -1,12 +1,10 @@
-import '../requests/request_interface.dart';
-import '../requests/wordpress_request.dart';
-import '../responses/wordpress_response.dart';
-import '../wordpress_client_base.dart';
+import '../../wordpress_client.dart';
 
-mixin UpdateMixin<T, E extends IRequest> {
-  InternalRequester get internalRequester;
+/// Represents the update operation.
+base mixin UpdateOperation<T, R extends IRequest> on IRequestInterface {
+  Future<WordpressResponse<T>> update(R request) async {
+    final wpRequest = await request.build(baseUrl);
 
-  Future<WordpressResponse<T?>> update(WordpressRequest<E> request) async {
-    return internalRequester.updateRequest<T>(request);
+    return executor.update<T>(wpRequest);
   }
 }

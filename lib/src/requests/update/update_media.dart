@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class UpdateMediaRequest implements IRequest {
+final class UpdateMediaRequest extends IRequest {
   UpdateMediaRequest({
     this.slug,
     this.status,
@@ -13,6 +14,13 @@ class UpdateMediaRequest implements IRequest {
     this.description,
     this.post,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String? slug;
@@ -28,8 +36,8 @@ class UpdateMediaRequest implements IRequest {
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('title', title)
@@ -41,7 +49,17 @@ class UpdateMediaRequest implements IRequest {
       ..addIfNotNull('description', description)
       ..addIfNotNull('post', post);
 
-    requestContent.endpoint = 'media/$id';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relativeParts(['media', id]),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

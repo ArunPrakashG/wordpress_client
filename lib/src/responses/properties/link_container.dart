@@ -1,5 +1,7 @@
 import 'package:meta/meta.dart';
 
+import '../../utilities/helpers.dart';
+
 @immutable
 class LinkContainer {
   const LinkContainer({
@@ -11,14 +13,14 @@ class LinkContainer {
     this.href,
   });
 
-  factory LinkContainer.fromJson(dynamic json) {
+  factory LinkContainer.fromJson(Map<String, dynamic> json) {
     return LinkContainer(
-      id: json['id'] as int?,
-      count: json['count'] as int?,
-      name: json['name'] as String?,
-      taxonomy: json['taxonomy'] as String?,
-      embeddable: json['embeddable'] as bool?,
-      href: json['href'] as String?,
+      id: castOrElse(json['id']),
+      count: castOrElse(json['count']),
+      name: castOrElse(json['name']),
+      taxonomy: castOrElse(json['taxonomy']),
+      embeddable: castOrElse(json['embeddable']),
+      href: castOrElse(json['href']),
     );
   }
 

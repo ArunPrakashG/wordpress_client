@@ -3,23 +3,23 @@ import 'package:meta/meta.dart';
 
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'response_properties/extra_capabilities.dart';
-import 'response_properties/links.dart';
+import 'properties/extra_capabilities.dart';
+import 'properties/links.dart';
 
 @immutable
 class User implements ISelfRespresentive {
   const User({
-    this.id,
+    required this.id,
     this.name,
-    this.url,
+    required this.url,
     this.description,
-    this.link,
-    this.slug,
-    this.roles,
+    required this.link,
+    required this.slug,
+    required this.roles,
     this.avatarUrls,
     this.meta,
     this.links,
-    this.capabilities,
+    required this.capabilities,
     this.email,
     this.firstName,
     this.lastName,
@@ -30,39 +30,51 @@ class User implements ISelfRespresentive {
     required this.self,
   });
 
-  factory User.fromJson(dynamic json) {
+  factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as int?,
-      name: json['name'] as String?,
-      username: json['username'] as String?,
-      firstName: json['first_name'] as String?,
-      lastName: json['last_name'] as String?,
-      email: json['email'] as String?,
-      nickname: json['nick_name'] as String?,
-      registeredDate: parseDateIfNotNull(json['registered_date']),
+      id: castOrElse(json['id']),
+      name: castOrElse(json['name']),
+      username: castOrElse(json['username']),
+      firstName: castOrElse(json['first_name']),
+      lastName: castOrElse(json['last_name']),
+      email: castOrElse(json['email']),
+      nickname: castOrElse(json['nick_name']),
+      registeredDate: castOrElse(
+        json['registered_date'],
+        transformer: parseDateIfNotNull,
+      ),
       capabilities: json['capabilities'] == null
-          ? null
+          ? const <String, bool>{}
           : Map<String, bool>.from(json['capabilities'] as Map<String, dynamic>)
               .map(MapEntry.new),
-      extraCapabilities: ExtraCapabilities.fromJson(json['extra_capabilities']),
-      url: json['url'] as String?,
-      description: json['description'] as String?,
-      link: json['link'] as String?,
-      slug: json['slug'] as String?,
+      extraCapabilities: castOrElse(
+        json['extra_capabilities'],
+        transformer: (value) => ExtraCapabilities.fromJson(
+          value as Map<String, dynamic>,
+        ),
+      ),
+      url: castOrElse(json['url']),
+      description: castOrElse(json['description']),
+      link: castOrElse(json['link']),
+      slug: castOrElse(json['slug']),
       roles: mapIterableWithChecks<String>(
           json['roles'], (dynamic value) => value as String),
-      avatarUrls: json['avatar_urls'] == null
-          ? null
-          : Map<String, String>.from(
-                  json['avatar_urls'] as Map<String, dynamic>)
-              .map(MapEntry.new),
+      avatarUrls: castOrElse(
+        json['avatar_urls'],
+        transformer: (dynamic value) => Map<String, String>.from(
+          value as Map<String, dynamic>,
+        ).map(MapEntry.new),
+      ),
       meta: json['meta'],
-      links: Links.fromJson(json['_links']),
-      self: json as Map<String, dynamic>,
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
+      self: json,
     );
   }
 
-  final int? id;
+  final int id;
   final String? username;
   final String? name;
   final String? firstName;
@@ -70,22 +82,19 @@ class User implements ISelfRespresentive {
   final String? nickname;
   final String? email;
   final DateTime? registeredDate;
-  final Map<String, bool>? capabilities;
+  final Map<String, bool> capabilities;
   final ExtraCapabilities? extraCapabilities;
-  final String? url;
+  final String url;
   final String? description;
-  final String? link;
-  final String? slug;
-  final List<String>? roles;
+  final String link;
+  final String slug;
+  final List<String> roles;
   final Map<String, String>? avatarUrls;
   final dynamic meta;
   final Links? links;
 
   @override
   final Map<String, dynamic> self;
-
-  @override
-  Map<String, dynamic> get json => self;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

@@ -2,11 +2,11 @@
 
 import 'package:dio/dio.dart';
 
+import 'authorization/authorization_base.dart';
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
 import 'constants.dart';
 import 'typedefs.dart';
-import 'wordpress_client_base.dart';
 
 class BootstrapBuilder {
   BootstrapBuilder();
@@ -14,7 +14,6 @@ class BootstrapBuilder {
   BootstrapBuilder.fromConfiguration(BootstrapConfiguration config) {
     _debugMode = config.enableDebugMode;
     _statisticsDelegate = config.statisticsDelegate;
-    _useCookies = config.useCookies;
     _defaultAuthorization = config.defaultAuthorization;
     _defaultUserAgent = config.defaultUserAgent;
     _defaultHeaders = config.defaultHeaders;
@@ -33,7 +32,6 @@ class BootstrapBuilder {
   Map<String, String>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  bool _useCookies = false;
   bool _synchronized = false;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
@@ -58,11 +56,6 @@ class BootstrapBuilder {
 
   BootstrapBuilder withStatisticDelegate(StatisticsCallback? delegate) {
     _statisticsDelegate = delegate;
-    return this;
-  }
-
-  BootstrapBuilder withCookies(bool value) {
-    _useCookies = value;
     return this;
   }
 
@@ -112,7 +105,6 @@ class BootstrapBuilder {
 
   BootstrapConfiguration build() {
     return BootstrapConfiguration(
-      useCookies: _useCookies,
       requestTimeout: _defaultRequestTimeout,
       responsePreprocessorDelegate: _responsePreprocessorDelegate,
       defaultAuthorization: _defaultAuthorization,

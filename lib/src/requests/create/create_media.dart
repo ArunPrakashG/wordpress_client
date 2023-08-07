@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_slow_async_io
+
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -7,10 +9,11 @@ import 'package:path/path.dart';
 import '../../enums.dart' show Status, HttpMethod;
 import '../../exceptions/file_not_exist_exception.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class CreateMediaRequest implements IRequest {
+final class CreateMediaRequest extends IRequest {
   CreateMediaRequest({
     required this.mediaFilePath,
     this.altText,
@@ -22,6 +25,13 @@ class CreateMediaRequest implements IRequest {
     this.authorId,
     this.commentStatus,
     this.pingStatus,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String mediaFilePath;
@@ -36,10 +46,10 @@ class CreateMediaRequest implements IRequest {
   Status? pingStatus;
 
   @override
-  void build(RequestContent requestContent) {
+  Future<WordpressRequest> build(Uri baseUrl) async {
     final file = File(mediaFilePath);
 
-    if (!file.existsSync()) {
+    if (!await file.exists()) {
       throw FileDoesntExistException(
         'The file at path "$mediaFilePath" doesn\'t exist.',
       );
@@ -48,12 +58,12 @@ class CreateMediaRequest implements IRequest {
     final fileName = basename(file.path);
     final mediaType = getMIMETypeFromExtension(fileName);
     final multipartFile = MultipartFile.fromBytes(
-      file.readAsBytesSync(),
+      await file.readAsBytes(),
       filename: fileName,
       contentType: MediaType.parse(mediaType),
     );
 
-    requestContent.body
+    final body = <String, dynamic>{}
       ..addIfNotNull('alt_text', altText)
       ..addIfNotNull('caption', caption)
       ..addIfNotNull('description', description)
@@ -68,7 +78,17 @@ class CreateMediaRequest implements IRequest {
           'attachment; filename=${multipartFile.filename}')
       ..addIfNotNull('file', multipartFile);
 
-    requestContent.endpoint = 'media';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('media'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

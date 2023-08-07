@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class CreateUserRequest implements IRequest {
+final class CreateUserRequest extends IRequest {
   CreateUserRequest({
     required this.username,
     this.displayName,
@@ -14,6 +15,13 @@ class CreateUserRequest implements IRequest {
     this.nickName,
     this.slug,
     this.roles,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String username;
@@ -30,8 +38,8 @@ class CreateUserRequest implements IRequest {
   List<String>? roles;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('username', username)
       ..addIfNotNull('email', email)
       ..addIfNotNull('name', displayName)
@@ -45,7 +53,17 @@ class CreateUserRequest implements IRequest {
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('roles', roles?.join(','));
 
-    requestContent.endpoint = 'users';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('users'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

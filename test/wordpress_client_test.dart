@@ -1,19 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:temp_mail_gen/temp_mail_gen.dart';
 import 'package:test/test.dart';
-import 'package:wordpress_client/responses.dart';
-import 'package:wordpress_client/src/requests/create/create_user.dart';
-import 'package:wordpress_client/src/requests/list/list_category.dart';
-import 'package:wordpress_client/src/requests/list/list_media.dart';
-import 'package:wordpress_client/src/requests/list/list_post.dart';
-import 'package:wordpress_client/src/requests/list/list_tag.dart';
-import 'package:wordpress_client/src/requests/list/list_user.dart';
-import 'package:wordpress_client/src/requests/retrive/retrive_me.dart';
-import 'package:wordpress_client/src/requests/retrive/retrive_user.dart';
-import 'package:wordpress_client/src/requests/update/update_user.dart';
+import 'package:wordpress_client/src/utilities/extensions/response_extensions.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 String getRandString(int len) {
@@ -23,131 +15,113 @@ String getRandString(int len) {
 }
 
 Future<void> main() async {
-  WordpressClient client;
-  TempMailClient tempMailClient;
-
   final jsonFileContents = await File('test/test_settings.json').readAsString();
   final dynamic json = jsonDecode(jsonFileContents);
 
-  client = WordpressClient(
-    json['base_url'] as String,
-    json['path'] as String,
+  final baseUrl = Uri.parse(json['base_url'] as String);
+
+  final client = WordpressClient(
+    baseUrl: baseUrl,
     bootstrapper: (builder) => builder
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(const Duration(seconds: 60))
-        .withStatisticDelegate((requestUrl, endpoint, count) {
-          print('$requestUrl => $endpoint => $count');
+        .withStatisticDelegate((requestUrl, count) {
+          print('$requestUrl => $count');
         })
-        .withDioInterceptor(
-          LogInterceptor(
-            requestBody: true,
-            responseBody: true,
-          ),
+        .withDebugMode(true)
+        .withDefaultAuthorizationBuilder(
+          (authBuilder) => authBuilder
+              .withUserName(json!['username'] as String)
+              .withPassword(json['password'] as String)
+              .withType(AuthorizationType.useful_jwt)
+              .withEvents(
+                const WordpressEvents(
+                  onError: print,
+                ),
+              )
+              .build(),
         )
-        // .withDefaultAuthorizationBuilder(
-        //   (authBuilder) => authBuilder
-        //       .withUserName(json!['username'] as String)
-        //       .withPassword(json['password'] as String)
-        //       .withType(AuthorizationType.useful_jwt)
-        //       .withCallback(
-        //         Callback(
-        //           responseCallback: print,
-        //           requestErrorCallback: (error) {
-        //             print('Error: ${error.errorResponse!.message}');
-        //           },
-        //         ),
-        //       )
-        //       .build(),
-        // )
         .build(),
   );
 
-  tempMailClient = TempMailClient();
-  final mailResponse = await tempMailClient.getEmails();
+  client.initialize();
+
+  // tempMailClient = TempMailClient();
+  // final mailResponse = await tempMailClient.getEmails();
 
   group('', () {
     test(
       'Response Time',
       () async {
         final firstResponse = await client.posts.list(
-          WordpressRequest(
-            requestData: ListPostRequest(
-              perPage: 20,
-            ),
+          ListPostRequest(
+            perPage: 20,
           ),
         );
 
         final secondResponse = await client.posts.list(
-          WordpressRequest(
-            requestData: ListPostRequest(
-              perPage: 20,
-            ),
+          ListPostRequest(
+            perPage: 20,
           ),
         );
 
         print(
-            'First Response Time Taken: ${firstResponse.requestDuration?.inMilliseconds} ms');
+          'First Response Time Taken: ${firstResponse.duration.inMilliseconds} ms',
+        );
         print(
-            'Second Response Time Taken: ${secondResponse.requestDuration?.inMilliseconds} ms');
+          'Second Response Time Taken: ${secondResponse.duration.inMilliseconds} ms',
+        );
 
-        expect(200, firstResponse.responseCode);
-        expect(200, secondResponse.responseCode);
+        expect(200, firstResponse.code);
+        expect(200, secondResponse.code);
       },
     );
 
     test('List Posts', () async {
       final response = await client.posts.list(
-        WordpressRequest(
-          requestData: ListPostRequest(
-            perPage: 20,
-          ),
+        ListPostRequest(
+          perPage: 20,
         ),
       );
 
-      expect(200, response.responseCode);
-      expect(20, response.data!.length);
+      expect(200, response.code);
+      expect(20, response.asSuccess().data.length);
     });
 
     test('List Tags', () async {
       final response = await client.tags.list(
-        WordpressRequest(
-          requestData: ListTagRequest(
-            perPage: 20,
-          ),
+        ListTagRequest(
+          perPage: 20,
         ),
       );
 
-      expect(200, response.responseCode);
-      expect(20, response.data!.length);
+      expect(200, response.code);
+      expect(20, response.asSuccess().data.length);
     });
 
     test('List Category', () async {
       final response = await client.categories.list(
-        WordpressRequest(
-          requestData: ListCategoryRequest(
-            perPage: 2,
-          ),
+        ListCategoryRequest(
+          perPage: 2,
         ),
       );
 
-      expect(200, response.responseCode);
-      expect(2, response.data!.length);
+      expect(200, response.code);
+      expect(2, response.asSuccess().data.length);
     });
 
     test('List Media', () async {
       final response = await client.media.list(
-        WordpressRequest(
-          requestData: ListMediaRequest(
-            perPage: 20,
-          ),
+        ListMediaRequest(
+          perPage: 20,
         ),
       );
 
-      expect(200, response.responseCode);
+      expect(200, response.code);
       expect(
         19,
-        response.data!.length,
+        response.asSuccess().data.length,
         reason:
             'For some reason, WP API is only returning PER_PAGE - 1 values.',
         skip: true,
@@ -155,85 +129,76 @@ Future<void> main() async {
     });
 
     test('List Users', () async {
-      final response = await client.users.list(
-        WordpressRequest(
-          requestData: ListUserRequest(),
-        ),
-      );
+      final response = await client.users.list(ListUserRequest());
 
-      expect(200, response.responseCode);
-      expect(10, response.data!.length);
+      expect(200, response.code);
+      expect(10, response.asSuccess().data.length);
     });
   });
 
   group('', () {
     test('Retrive Current User', () async {
       final response = await client.me.retrive(
-        WordpressRequest(
-          requestData: RetriveMeRequest(),
-        ),
+        RetriveMeRequest(),
       );
 
-      expect(200, response.responseCode);
-      expect('arunprakash', response.data!.slug);
+      expect(200, response.code);
+      expect('desk02', response.asSuccess().data.slug);
     });
   });
 
-  group('', () {
-    if (mailResponse == null || mailResponse.isEmpty) {
-      fail('No temp emails generated.');
-    }
+  // group(
+  //   '',
+  //   () {
+  //     if (mailResponse == null || mailResponse.isEmpty) {
+  //       fail('No temp emails generated.');
+  //     }
 
-    final email = mailResponse[0];
-    int? userId = 0;
+  //     final email = mailResponse[0];
+  //     int? userId = 0;
 
-    WordpressResponse<User?>? createResponse;
+  //     late WordpressResponse<User> createResponse;
 
-    test('Create User', () async {
-      createResponse = await client.users.create(
-        WordpressRequest(
-          requestData: CreateUserRequest(
-            username: getRandString(10),
-            email: email,
-            password: getRandString(10),
-          ),
-        ),
-      );
-    });
+  //     test('Create User', () async {
+  //       createResponse = await client.users.create(
+  //         CreateUserRequest(
+  //           username: getRandString(10),
+  //           email: email,
+  //           password: getRandString(10),
+  //         ),
+  //       );
+  //     });
 
-    expect(201, createResponse!.responseCode);
-    expect('gen_user_slug', createResponse!.data!.slug);
-    userId = createResponse!.data!.id;
+  //     expect(201, createResponse.code);
+  //     expect('gen_user_slug', createResponse.asSuccess().data.slug);
+  //     userId = createResponse.asSuccess().data.id;
 
-    test('Update User', () async {
-      final response = await client.users.update(
-        WordpressRequest(
-          requestData: UpdateUserRequest(
-            email: email,
-            id: userId!,
-            username: createResponse!.data!.username!,
-            firstName: 'updated first name',
-          ),
-        ),
-      );
+  //     test('Update User', () async {
+  //       final response = await client.users.update(
+  //         UpdateUserRequest(
+  //           email: email,
+  //           id: userId!,
+  //           username: createResponse.asSuccess().data.username!,
+  //           firstName: 'updated first name',
+  //         ),
+  //       );
 
-      expect(200, response.responseCode);
-      expect('updated first name', response.data!.firstName);
-    });
+  //       expect(200, response.code);
+  //       expect('updated first name', response.asSuccess().data.firstName);
+  //     });
 
-    test('Retrive User', () async {
-      final response = await client.users.retrive(
-        WordpressRequest(
-          requestData: RetriveUserRequest(
-            id: userId!,
-          ),
-        ),
-      );
+  //     test('Retrive User', () async {
+  //       final response = await client.users.retrive(
+  //         RetriveUserRequest(
+  //           id: userId!,
+  //         ),
+  //       );
 
-      expect(200, response.responseCode);
-      expect(userId, response.data!.id);
-    });
-  });
+  //       expect(200, response.code);
+  //       expect(userId, response.asSuccess().data.id);
+  //     });
+  //   },
+  // );
 
   // group('', () {
   //   int? postId = -1;

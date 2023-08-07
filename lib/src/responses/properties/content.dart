@@ -6,18 +6,19 @@ import '../../utilities/helpers.dart';
 class Content {
   const Content({
     this.rendered,
-    this.protected,
+    required this.protected,
   });
 
-  factory Content.fromJson(dynamic json) {
+  factory Content.fromJson(Map<String, dynamic> json) {
     return Content(
-      rendered: json?['rendered'] as String?,
-      protected: json?['protected'] as bool?,
+      rendered: castOrElse(json['rendered']),
+      protected: castOrElse(json['protected'], orElse: () => false)!,
     );
   }
 
   final String? rendered;
-  final bool? protected;
+  final bool protected;
+
   String get parsedText => parseHtmlString(rendered!);
 
   Map<String, dynamic> toJson() {

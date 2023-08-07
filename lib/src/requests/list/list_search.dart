@@ -1,6 +1,7 @@
 import '../../../wordpress_client.dart';
+import '../../utilities/request_url.dart';
 
-class ListSearchRequest extends IRequest {
+final class ListSearchRequest extends IRequest {
   ListSearchRequest({
     this.context,
     this.page = 1,
@@ -8,6 +9,13 @@ class ListSearchRequest extends IRequest {
     this.search,
     this.type,
     this.subType,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
@@ -18,8 +26,8 @@ class ListSearchRequest extends IRequest {
   String? subType;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)
@@ -27,7 +35,17 @@ class ListSearchRequest extends IRequest {
       ..addIfNotNull('type', type?.name)
       ..addIfNotNull('subtype', subType);
 
-    requestContent.endpoint = 'search';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      queryParameters: queryParameters,
+      method: HttpMethod.get,
+      url: RequestUrl.relative('search'),
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

@@ -1,18 +1,20 @@
 import 'package:meta/meta.dart';
 
+import '../../utilities/helpers.dart';
+
 @immutable
 class ExtraCapabilities {
   const ExtraCapabilities({
-    this.administrator,
+    required this.administrator,
   });
 
-  factory ExtraCapabilities.fromJson(dynamic json) {
+  factory ExtraCapabilities.fromJson(Map<String, dynamic> json) {
     return ExtraCapabilities(
-      administrator: json?['administrator'] as bool?,
+      administrator: castOrElse(json['administrator'], orElse: () => false)!,
     );
   }
 
-  final bool? administrator;
+  final bool administrator;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{

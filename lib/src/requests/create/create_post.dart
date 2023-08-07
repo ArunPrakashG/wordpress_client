@@ -1,9 +1,10 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class CreatePostRequest implements IRequest {
+final class CreatePostRequest extends IRequest {
   CreatePostRequest({
     this.slug,
     this.title,
@@ -19,6 +20,13 @@ class CreatePostRequest implements IRequest {
     this.sticky,
     this.categories,
     this.tags,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String? slug;
@@ -37,8 +45,8 @@ class CreatePostRequest implements IRequest {
   List<int>? tags;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('title', title)
       ..addIfNotNull('content', content)
       ..addIfNotNull('excerpt', excerpt)
@@ -54,7 +62,17 @@ class CreatePostRequest implements IRequest {
       ..addIfNotNull('tags', tags?.join(','))
       ..addIfNotNull('slug', slug);
 
-    requestContent.endpoint = 'posts';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('posts'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

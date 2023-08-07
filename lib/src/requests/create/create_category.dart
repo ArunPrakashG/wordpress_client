@@ -1,14 +1,22 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class CreateCategoryRequest extends IRequest {
+final class CreateCategoryRequest extends IRequest {
   CreateCategoryRequest({
     this.name,
     this.description,
     this.slug,
     this.parentId,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth,
+    super.sendTimeout,
+    super.validator,
   });
 
   String? name;
@@ -17,14 +25,24 @@ class CreateCategoryRequest extends IRequest {
   int? parentId;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.body
+  WordpressRequest build(Uri baseUrl) {
+    final body = <String, dynamic>{}
       ..addIfNotNull('name', name)
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('parent_id', parentId);
 
-    requestContent.endpoint = 'categories';
-    requestContent.method = HttpMethod.post;
+    return WordpressRequest(
+      body: body,
+      method: HttpMethod.post,
+      url: RequestUrl.relative('categories'),
+      requireAuth: requireAuth,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }

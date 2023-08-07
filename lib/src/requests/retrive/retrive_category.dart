@@ -1,22 +1,41 @@
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
-import '../request_content.dart';
+import '../../utilities/request_url.dart';
 import '../request_interface.dart';
+import '../wordpress_request.dart';
 
-class RetriveCategoryRequest implements IRequest {
+final class RetriveCategoryRequest extends IRequest {
   RetriveCategoryRequest({
     this.context,
     required this.id,
+    super.cancelToken,
+    super.authorization,
+    super.events,
+    super.receiveTimeout,
+    super.requireAuth = false,
+    super.sendTimeout,
+    super.validator,
   });
 
   RequestContext? context;
   int id;
 
   @override
-  void build(RequestContent requestContent) {
-    requestContent.queryParameters.addIfNotNull('context', context?.name);
+  WordpressRequest build(Uri baseUrl) {
+    final queryParameters = <String, String>{}
+      ..addIfNotNull('context', context?.name);
 
-    requestContent.endpoint = 'categories/$id';
-    requestContent.method = HttpMethod.get;
+    return WordpressRequest(
+      method: HttpMethod.get,
+      url: RequestUrl.relativeParts(['categories', id]),
+      queryParameters: queryParameters,
+      requireAuth: requireAuth || context == RequestContext.edit,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout,
+      sendTimeout: sendTimeout,
+      validator: validator,
+    );
   }
 }
