@@ -3,7 +3,6 @@
 import 'dart:async';
 
 import '../../wordpress_client.dart';
-import '../utilities/typedefs.dart';
 
 /// Base class of all requests.
 abstract base class IRequest {

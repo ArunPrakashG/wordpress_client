@@ -8,6 +8,7 @@ import 'package:path/path.dart';
 
 import '../../enums.dart' show Status, HttpMethod;
 import '../../exceptions/file_not_exist_exception.dart';
+import '../../utilities/extensions/map_extensions.dart';
 import '../../utilities/helpers.dart';
 import '../../utilities/request_url.dart';
 import '../request_interface.dart';

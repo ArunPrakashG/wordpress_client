@@ -139,3 +139,15 @@
 - Added new "self" property for all response models. It will contain the entire JSON response as a Map. Thanks @mikhaelpurba (Previous syntax "json" has been deprecated)
 - All response classes now override equality and hashCode properties, along with toString() method.
 - Usual amount of code refactors and fixes.
+
+# 8.0.0
+
+- [BREAKING] Upgraded minimum dart version to >= 3.0.0
+- [BREAKING] Upgraded outdated dependencies.
+- [BREAKING] Removed all deprecated methods and classes.
+- [BREAKING] The library API has been reworked and improved. Please check the wiki for setting up and usage to know about the changed API.
+- [BREAKING] Usual amount of code refactors and fixes.
+
+# 8.0.1
+
+- Docs update

@@ -1,11 +1,5 @@
-import 'package:dio/dio.dart';
-
-import '../../authorization.dart';
+import '../../wordpress_client.dart';
 import '../constants.dart';
-import '../enums.dart';
-import '../utilities/request_url.dart';
-import '../utilities/typedefs.dart';
-import '../utilities/wordpress_events.dart';
 
 /// Represents a request to the Wordpress REST API.
 final class WordpressRequest {

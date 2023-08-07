@@ -55,6 +55,14 @@ class RequestUrl {
   /// Gets if this instance holds an absolute URL.
   bool get isAbsolute => !isRelative;
 
+  Uri get uri {
+    if (isRelative) {
+      throw StateError('This instance holds a relative URL.');
+    }
+
+    return _uri!;
+  }
+
   @override
   String toString() {
     if (isRelative) {

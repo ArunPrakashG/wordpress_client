@@ -1,5 +1,4 @@
 import '../../../wordpress_client.dart';
-import '../../utilities/request_url.dart';
 
 final class UpdateMediaRequest extends IRequest {
   UpdateMediaRequest({

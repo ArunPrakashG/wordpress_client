@@ -1,8 +1,4 @@
-import '../../enums.dart';
-import '../../utilities/helpers.dart';
-import '../../utilities/request_url.dart';
-import '../request_interface.dart';
-import '../wordpress_request.dart';
+import '../../../wordpress_client.dart';
 
 final class RetriveCommentRequest extends IRequest {
   RetriveCommentRequest({

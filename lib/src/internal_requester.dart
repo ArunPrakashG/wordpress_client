@@ -126,7 +126,7 @@ final class InternalRequester extends IRequestExecutor {
 
     final requestUrl = () {
       if (request.url.isAbsolute) {
-        return request.url.toString();
+        return request.url.uri.replace(host: baseUrl.host).toString();
       }
 
       return join(baseUrl.toString(), request.url.toString());

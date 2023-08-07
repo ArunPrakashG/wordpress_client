@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:wordpress_client/src/utilities/request_url.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 final class MyRequest extends IRequest {
@@ -26,6 +25,9 @@ final class MyRequest extends IRequest {
       ..addIfNotNull('per_page', perPage);
 
     return WordpressRequest(
+      // Note that we can provide a full url to the request by using RequestUrl.absolute factory constructor.
+      // Note that you cannot change the host of the URL. In case if there is a change in host,
+      // the new host is replaced by using the Base Url provided on the WordpressClient instance.
       url: RequestUrl.absoluteMerge(
         Uri(path: 'wp-json/custom_path/my_path/my_endpoint'),
         baseUrl,
