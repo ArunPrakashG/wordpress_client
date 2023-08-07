@@ -151,3 +151,7 @@
 # 8.0.1
 
 - Docs update
+
+# 8.0.2
+
+- Downgrade collection version
