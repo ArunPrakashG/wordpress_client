@@ -57,12 +57,15 @@ final class CreateMediaRequest extends IRequest {
     }
 
     final fileName = basename(file.path);
-    final mediaType = getMIMETypeFromExtension(fileName);
+    final mediaType = getMIMETypeFromExtension(
+      extension(fileName).replaceFirst('.', ''),
+    );
     final multipartFile = MultipartFile.fromBytes(
       await file.readAsBytes(),
       filename: fileName,
       contentType: MediaType.parse(mediaType),
     );
+    final mimeType = multipartFile.contentType!.mimeType;
 
     final body = <String, dynamic>{}
       ..addIfNotNull('alt_text', altText)
@@ -74,17 +77,20 @@ final class CreateMediaRequest extends IRequest {
       ..addIfNotNull('author_id', authorId)
       ..addIfNotNull('comment_status', commentStatus?.name)
       ..addIfNotNull('ping_status', pingStatus?.name)
-      ..addIfNotNull('Content-Type', multipartFile.contentType!.mimeType)
-      ..addIfNotNull('Content-Disposition',
-          'attachment; filename=${multipartFile.filename}')
       ..addIfNotNull('file', multipartFile);
 
+    final headers = <String, String>{}
+      ..addIfNotNull('Content-Disposition',
+          'attachment; filename="${multipartFile.filename}"')
+      ..addIfNotNull('Content-Type', mimeType);
+
     return WordpressRequest(
-      body: body,
+      body: FormData.fromMap(body),
       method: HttpMethod.post,
       url: RequestUrl.relative('media'),
       requireAuth: requireAuth,
       cancelToken: cancelToken,
+      headers: headers,
       authorization: authorization,
       events: events,
       receiveTimeout: receiveTimeout,

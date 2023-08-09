@@ -19,6 +19,7 @@ final class WordpressRawResponse {
     required this.data,
     required this.code,
     this.headers = const {},
+    this.requestHeaders = const {},
     this.duration = Duration.zero,
     this.extra = const {},
     this.message,
@@ -27,6 +28,7 @@ final class WordpressRawResponse {
   final dynamic data;
   final int code;
   final Map<String, dynamic> headers;
+  final Map<String, dynamic> requestHeaders;
   final Map<String, dynamic> extra;
   final Duration duration;
   final String? message;
@@ -45,6 +47,8 @@ final class WordpressRawResponse {
         headers: headers,
         duration: duration,
         message: message,
+        extra: extra,
+        requestHeaders: requestHeaders,
       );
     }
 
@@ -52,6 +56,8 @@ final class WordpressRawResponse {
       data: decoder(data),
       code: code,
       headers: headers,
+      requestHeaders: requestHeaders,
+      extra: extra,
       duration: duration,
       message: message,
     );

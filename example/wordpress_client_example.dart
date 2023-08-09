@@ -15,19 +15,21 @@ Future<void> main() async {
 
   client.initialize();
 
-  final response = await client.media.list(
-    ListMediaRequest(
-      events: WordpressEvents(
-        onError: (error) {
-          print(error.toString());
-        },
+  final response = await client.media.create(
+    CreateMediaRequest(
+      mediaFilePath: 'sample.jpg',
+      authorization: UsefulJwtAuth(
+        userName: 'john_doe',
+        password: 'password',
       ),
     ),
   );
 
   response.map<void>(
     onSuccess: (response) {},
-    onFailure: (response) {},
+    onFailure: (response) {
+      print(response.error.toString());
+    },
   );
 
   client.register<MyInterface, MyResponse>(

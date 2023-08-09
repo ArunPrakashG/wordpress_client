@@ -11,6 +11,6 @@ extension MapExtensions on Map<String, dynamic> {
       return;
     }
 
-    this[key] = value?.toString();
+    this[key] = value;
   }
 }

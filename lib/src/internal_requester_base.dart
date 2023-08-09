@@ -4,6 +4,7 @@ import 'codable_map.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
 import 'responses/wordpress_raw_response.dart';
+import 'utilities/helpers.dart';
 
 abstract base class IRequestExecutor {
   Uri get baseUrl;
@@ -13,7 +14,16 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> create<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await execute(request);
+    final rawResponse = await executeGuarded<WordpressRawResponse>(
+      function: () async => execute(request),
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: const {},
+          code: -7,
+          message: '${error.toString()}\n\n$stackTrace',
+        );
+      },
+    );
 
     return rawResponse.map<T>(
       onSuccess: (response) {
@@ -23,6 +33,8 @@ abstract base class IRequestExecutor {
         return WordpressSuccessResponse<T>(
           data: data,
           code: response.code,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           headers: response.headers,
           duration: response.duration,
           message: response.message,
@@ -36,6 +48,8 @@ abstract base class IRequestExecutor {
           code: response.code,
           headers: response.headers,
           duration: response.duration,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           message: response.message,
         );
       },
@@ -45,7 +59,16 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> retrive<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await execute(request);
+    final rawResponse = await executeGuarded<WordpressRawResponse>(
+      function: () async => execute(request),
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: const {},
+          code: -7,
+          message: '${error.toString()}\n\n$stackTrace',
+        );
+      },
+    );
 
     return rawResponse.map<T>(
       onSuccess: (response) {
@@ -56,6 +79,8 @@ abstract base class IRequestExecutor {
           data: data,
           code: response.code,
           headers: response.headers,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           duration: response.duration,
           message: response.message,
         );
@@ -68,6 +93,8 @@ abstract base class IRequestExecutor {
           code: response.code,
           headers: response.headers,
           duration: response.duration,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           message: response.message,
         );
       },
@@ -77,7 +104,16 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<bool>> delete(
     WordpressRequest request,
   ) async {
-    final rawResponse = await execute(request);
+    final rawResponse = await executeGuarded<WordpressRawResponse>(
+      function: () async => execute(request),
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: const {},
+          code: -7,
+          message: '${error.toString()}\n\n$stackTrace',
+        );
+      },
+    );
 
     return rawResponse.map(
       onSuccess: (response) {
@@ -85,6 +121,8 @@ abstract base class IRequestExecutor {
           data: true,
           code: response.code,
           headers: response.headers,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           duration: response.duration,
           message: response.message,
         );
@@ -97,6 +135,8 @@ abstract base class IRequestExecutor {
           code: response.code,
           headers: response.headers,
           duration: response.duration,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           message: response.message,
         );
       },
@@ -106,7 +146,16 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<List<T>>> list<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await execute(request);
+    final rawResponse = await executeGuarded<WordpressRawResponse>(
+      function: () async => execute(request),
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: const {},
+          code: -7,
+          message: '${error.toString()}\n\n$stackTrace',
+        );
+      },
+    );
 
     return rawResponse.map<List<T>>(
       onSuccess: (response) {
@@ -116,6 +165,8 @@ abstract base class IRequestExecutor {
         return WordpressSuccessResponse<List<T>>(
           data: data,
           code: response.code,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           headers: response.headers,
           duration: response.duration,
           message: response.message,
@@ -128,6 +179,8 @@ abstract base class IRequestExecutor {
           error: error,
           code: response.code,
           headers: response.headers,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           duration: response.duration,
           message: response.message,
         );
@@ -138,7 +191,16 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> update<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await execute(request);
+    final rawResponse = await executeGuarded<WordpressRawResponse>(
+      function: () async => execute(request),
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: const {},
+          code: -7,
+          message: '${error.toString()}\n\n$stackTrace',
+        );
+      },
+    );
 
     return rawResponse.map(
       onSuccess: (response) {
@@ -148,6 +210,8 @@ abstract base class IRequestExecutor {
         return WordpressSuccessResponse<T>(
           data: data,
           code: response.code,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           headers: response.headers,
           duration: response.duration,
           message: response.message,
@@ -161,6 +225,8 @@ abstract base class IRequestExecutor {
           code: response.code,
           headers: response.headers,
           duration: response.duration,
+          extra: response.extra,
+          requestHeaders: response.requestHeaders,
           message: response.message,
         );
       },

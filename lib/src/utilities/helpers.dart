@@ -21,6 +21,17 @@ DateTime? parseDateIfNotNull(dynamic json) {
   return DateTime.tryParse(dateString);
 }
 
+Future<T> executeGuarded<T>({
+  required Future<T> Function() function,
+  required Future<T> Function(Object error, StackTrace stackTrace) onError,
+}) async {
+  try {
+    return await function();
+  } catch (error, stackTrace) {
+    return onError(error, stackTrace);
+  }
+}
+
 /// Casts the given dynamic JSON value to the specified type [T].
 ///
 /// Optionally, you can provide a [transformer] function to transform the value manually if it is not null.

@@ -159,3 +159,14 @@
 # 8.0.3
 
 - Export response extensions
+
+# 8.0.4
+
+- Bug fix for media.create endpoint
+- Usual amounts of code refactors and fixes
+
+# 8.0.5
+
+- Bug fix for media.create endpoint
+- Better error handling
+- Usual amounts of code refactors and fixes

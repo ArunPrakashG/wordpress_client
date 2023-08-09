@@ -12,6 +12,8 @@ final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
     required super.headers,
     required super.duration,
     required this.data,
+    required super.requestHeaders,
+    super.extra,
     super.message,
   });
 
@@ -63,6 +65,8 @@ final class WordpressFailureResponse<T> extends WordpressResponse<T> {
     required this.error,
     required super.code,
     super.headers = const {},
+    super.requestHeaders = const {},
+    super.extra,
     super.duration = Duration.zero,
     super.message,
   });
@@ -97,11 +101,15 @@ abstract interface class WordpressResponse<T> {
     required this.code,
     required this.headers,
     required this.duration,
+    required this.requestHeaders,
+    this.extra,
     this.message,
   });
 
   final int code;
   final Map<String, dynamic> headers;
+  final Map<String, dynamic> requestHeaders;
+  final Map<String, dynamic>? extra;
   final Duration duration;
   final String? message;
 

@@ -37,7 +37,7 @@ final class WordpressError {
   int get hashCode => code.hashCode ^ message.hashCode ^ status.hashCode;
 
   @override
-  String toString() => 'Request failed - $code | $message | Status: $status';
+  String toString() => '($status - $code) $message';
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

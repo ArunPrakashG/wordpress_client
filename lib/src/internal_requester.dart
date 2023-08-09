@@ -148,6 +148,8 @@ final class InternalRequester extends IRequestExecutor {
           onSendProgress: request.events?.onSend,
           onReceiveProgress: request.events?.onReceive,
           options: Options(
+            receiveDataWhenStatusError: true,
+            validateStatus: (status) => true,
             method: request.method.name,
             sendTimeout: request.sendTimeout,
             receiveTimeout: request.receiveTimeout,
@@ -171,6 +173,7 @@ final class InternalRequester extends IRequestExecutor {
       code: statusCode,
       headers: response.headers.getHeaderMap(),
       duration: watch.elapsed,
+      requestHeaders: response.requestOptions.headers,
       extra: response.extra,
       message: response.statusMessage,
     );

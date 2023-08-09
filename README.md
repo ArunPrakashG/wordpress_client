@@ -24,11 +24,11 @@ A library to interact with the Wordpress REST API. Supports most of the common e
 
 You can use this library just like any other Dart package.
 
-- Add `wordpress_client` as a dependency on `pubspec.yaml` file on your project root. At the time of this writing, the latest package version is 6.3.3. Do check [Package Page](https://pub.dev/packages/wordpress_client) to get latest version.
+- Add `wordpress_client` as a dependency on `pubspec.yaml` file on your project root. At the time of this writing, the latest package version is 8.0.5. Do check [Package Page](https://pub.dev/packages/wordpress_client) to get latest version.
 
 ```dart
 dependencies:
-  wordpress_client: ^8.0.3
+  wordpress_client: ^8.0.5
 ```
 
 - Import the library to your project class in which you want to use the library.
