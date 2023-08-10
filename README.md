@@ -47,7 +47,7 @@ final client = WordpressClient(baseUrl: baseUrl);
 
 client.initialize();
 ```
-> 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#advanced-method).
+> 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage#-advanced-method).
 
 ### **3. Sending Requests**
 Example to retrieve 20 recent WordPress posts in ascending order:
@@ -84,7 +84,7 @@ final result = postsResponse.map(
     },
 );
 ```
-Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage) for more request examples.
+Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage) for more request examples.
 
 ## 🔒 Supported Authorization
 
@@ -97,7 +97,7 @@ Developed by Enrique Chavez, it involves JSON Web Token (JWT) authentication whe
 ### 3. **UsefulJwtAuth** 
 By Useful Team, this is another implementation using JWT for authentication purposes. [Details](https://github.com/usefulteam/jwt-auth)
 
-> For custom authorization, check the [Authorization Wiki](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization#custom-authorization).
+> For custom authorization, check the [Authorization Wiki](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%9B%A1-Authorization).
 
 ## 📋 Supported REST Methods
 
@@ -119,7 +119,7 @@ By Useful Team, this is another implementation using JWT for authentication purp
 | Settings         |   ❌   |  ❌  |   ❌   |   ❌   |
 
 ## 📢 Custom Response Types
-Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Requests).
+Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%9A%80-Using-Custom-Requests).
 
 ## 📣 Feedback
 
