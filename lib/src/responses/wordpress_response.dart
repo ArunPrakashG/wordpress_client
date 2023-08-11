@@ -71,7 +71,10 @@ final class WordpressFailureResponse<T> extends WordpressResponse<T> {
     super.message,
   });
 
-  final WordpressError error;
+  final WordpressError? error;
+
+  Object? get exception => extra?['error'];
+  StackTrace? get stackTrace => extra?['stackTrace'];
 
   @override
   bool operator ==(covariant WordpressFailureResponse other) {

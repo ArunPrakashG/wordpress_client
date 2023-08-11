@@ -1,7 +1,7 @@
-import 'exceptions/type_map/map_does_not_exist_exception.dart';
-import 'exceptions/type_map/map_exist_exception.dart';
+import '../../exceptions/type_map/map_does_not_exist_exception.dart';
+import '../../exceptions/type_map/map_exist_exception.dart';
+import '../typedefs.dart';
 import 'type_key.dart';
-import 'typedefs.dart';
 
 class CodableMap {
   static final Map<TypeKey<dynamic>, JsonDecoderCallback> _decoders = {};

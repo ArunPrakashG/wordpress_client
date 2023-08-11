@@ -7,7 +7,6 @@ import 'package:path/path.dart';
 import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
-import 'codable_map.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
@@ -20,11 +19,11 @@ import 'interface_key.dart';
 import 'internal_requester_base.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_raw_response.dart';
-import 'typedefs.dart';
+import 'utilities/codable_map/codable_map.dart';
 import 'utilities/helpers.dart';
 
 part 'internal_requester.dart';
-part 'request_interface_base.dart';
+part 'requests/request_interface_base.dart';
 
 /// The main class for [WordpressClient].
 final class WordpressClient {

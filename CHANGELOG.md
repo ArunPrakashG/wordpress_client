@@ -108,6 +108,13 @@
 ## 📖 8.0.6
 - 📚 Docs update
 
+## 📖 8.0.7
+- 🐛 Bug fixes
+- ➕ Introduced `RequestErrorType` for failure responses and optional `exception` & `stackTrace` properties
+- ➕ Introduced `mapGuarded(...)` method to safely map a list of objects
+- ➕ Introduced `executeGuarded(...)` method to safely execute a function
+- 🔧 Usual amounts of refactors and improvements
+
 ## Legend
 - 🎉 New features or major changes
 - 🐛 Bug fixes

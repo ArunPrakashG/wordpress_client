@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 
 import 'authorization/authorization_base.dart';
 import 'constants.dart';
-import 'typedefs.dart';
+import 'utilities/typedefs.dart';
 
 @immutable
 final class BootstrapConfiguration {
@@ -27,7 +27,7 @@ final class BootstrapConfiguration {
   final bool Function(dynamic)? responsePreprocessorDelegate;
   final IAuthorization? defaultAuthorization;
   final String? defaultUserAgent;
-  final Map<String, String>? defaultHeaders;
+  final Map<String, dynamic>? defaultHeaders;
   final bool shouldFollowRedirects;
   final int maxRedirects;
   final List<Interceptor>? interceptors;
@@ -75,7 +75,7 @@ final class BootstrapConfiguration {
     bool Function(dynamic)? responsePreprocessorDelegate,
     IAuthorization? defaultAuthorization,
     String? defaultUserAgent,
-    Map<String, String>? defaultHeaders,
+    Map<String, dynamic>? defaultHeaders,
     bool? shouldFollowRedirects,
     int? maxRedirects,
     List<Interceptor>? interceptors,

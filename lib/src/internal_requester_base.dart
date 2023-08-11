@@ -1,10 +1,9 @@
 import 'package:meta/meta.dart';
 
-import 'codable_map.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
 import 'responses/wordpress_raw_response.dart';
-import 'utilities/helpers.dart';
+import 'utilities/codable_map/codable_map.dart';
 
 abstract base class IRequestExecutor {
   Uri get baseUrl;
@@ -18,8 +17,12 @@ abstract base class IRequestExecutor {
       function: () async => execute(request),
       onError: (error, stackTrace) async {
         return WordpressRawResponse(
-          data: const {},
-          code: -7,
+          data: null,
+          code: -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
           message: '${error.toString()}\n\n$stackTrace',
         );
       },
@@ -41,7 +44,10 @@ abstract base class IRequestExecutor {
         );
       },
       onFailure: (response) {
-        final error = WordpressError.fromMap(response.data);
+        final error = mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: response.data,
+        );
 
         return WordpressFailureResponse<T>(
           error: error,
@@ -63,8 +69,12 @@ abstract base class IRequestExecutor {
       function: () async => execute(request),
       onError: (error, stackTrace) async {
         return WordpressRawResponse(
-          data: const {},
-          code: -7,
+          data: null,
+          code: -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
           message: '${error.toString()}\n\n$stackTrace',
         );
       },
@@ -86,7 +96,10 @@ abstract base class IRequestExecutor {
         );
       },
       onFailure: (response) {
-        final error = WordpressError.fromMap(response.data);
+        final error = mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: response.data,
+        );
 
         return WordpressFailureResponse<T>(
           error: error,
@@ -108,8 +121,12 @@ abstract base class IRequestExecutor {
       function: () async => execute(request),
       onError: (error, stackTrace) async {
         return WordpressRawResponse(
-          data: const {},
-          code: -7,
+          data: null,
+          code: -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
           message: '${error.toString()}\n\n$stackTrace',
         );
       },
@@ -128,7 +145,10 @@ abstract base class IRequestExecutor {
         );
       },
       onFailure: (response) {
-        final error = WordpressError.fromMap(response.data);
+        final error = mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: response.data,
+        );
 
         return WordpressFailureResponse(
           error: error,
@@ -150,8 +170,12 @@ abstract base class IRequestExecutor {
       function: () async => execute(request),
       onError: (error, stackTrace) async {
         return WordpressRawResponse(
-          data: const {},
-          code: -7,
+          data: null,
+          code: -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
           message: '${error.toString()}\n\n$stackTrace',
         );
       },
@@ -173,7 +197,10 @@ abstract base class IRequestExecutor {
         );
       },
       onFailure: (response) {
-        final error = WordpressError.fromMap(response.data);
+        final error = mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: response.data,
+        );
 
         return WordpressFailureResponse(
           error: error,
@@ -195,8 +222,12 @@ abstract base class IRequestExecutor {
       function: () async => execute(request),
       onError: (error, stackTrace) async {
         return WordpressRawResponse(
-          data: const {},
-          code: -7,
+          data: null,
+          code: -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
           message: '${error.toString()}\n\n$stackTrace',
         );
       },
@@ -218,7 +249,10 @@ abstract base class IRequestExecutor {
         );
       },
       onFailure: (response) {
-        final error = WordpressError.fromMap(response.data);
+        final error = mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: response.data,
+        );
 
         return WordpressFailureResponse(
           error: error,

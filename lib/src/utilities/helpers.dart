@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import '../codable_map.dart';
+import 'codable_map/codable_map.dart';
 
 DateTime? parseDateIfNotNull(dynamic json) {
   if (json == null) {
@@ -19,6 +19,21 @@ DateTime? parseDateIfNotNull(dynamic json) {
   }
 
   return DateTime.tryParse(dateString);
+}
+
+T? mapGuarded<T>({
+  required T Function(Map<String, dynamic> json) mapper,
+  required dynamic json,
+}) {
+  if (json == null || json is! Map<String, dynamic>) {
+    return null;
+  }
+
+  try {
+    return mapper(json);
+  } catch (_) {
+    return null;
+  }
 }
 
 Future<T> executeGuarded<T>({

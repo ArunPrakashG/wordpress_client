@@ -19,7 +19,7 @@ final class MyRequest extends IRequest {
   FutureOr<WordpressRequest> build(Uri baseUrl) {
     // addIfNotNull is an extension on Map class.
     // It helps to easily add a value to a map if it is not null.
-    final queryParameters = <String, String>{}
+    final queryParameters = <String, dynamic>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage);

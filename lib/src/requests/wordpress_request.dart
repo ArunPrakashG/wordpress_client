@@ -25,10 +25,10 @@ final class WordpressRequest {
   final HttpMethod method;
 
   /// The request headers.
-  final Map<String, String>? headers;
+  final Map<String, dynamic>? headers;
 
   /// The request query parameters.
-  final Map<String, String>? queryParameters;
+  final Map<String, dynamic>? queryParameters;
 
   /// The request body.
   final dynamic body;
