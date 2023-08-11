@@ -60,11 +60,13 @@ final class CreateMediaRequest extends IRequest {
     final mediaType = getMIMETypeFromExtension(
       extension(fileName).replaceFirst('.', ''),
     );
+
     final multipartFile = MultipartFile.fromBytes(
       await file.readAsBytes(),
       filename: fileName,
       contentType: MediaType.parse(mediaType),
     );
+
     final mimeType = multipartFile.contentType!.mimeType;
 
     final body = <String, dynamic>{}
@@ -79,7 +81,7 @@ final class CreateMediaRequest extends IRequest {
       ..addIfNotNull('ping_status', pingStatus?.name)
       ..addIfNotNull('file', multipartFile);
 
-    final headers = <String, String>{}
+    final headers = <String, dynamic>{}
       ..addIfNotNull('Content-Disposition',
           'attachment; filename="${multipartFile.filename}"')
       ..addIfNotNull('Content-Type', mimeType);

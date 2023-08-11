@@ -1,6 +1,6 @@
 name: wordpress_client
 description: A library to interact with the Wordpress REST API. Supports most of the common endpoints and all of the CRUD operations on the endpoints.
-version: 8.0.6
+version: 8.0.7
 topics:
   - wordpress
   - fluent
@@ -8,7 +8,19 @@ topics:
   - rest
 homepage: https://github.com/ArunPrakashG/wordpress_client
 repository: https://github.com/ArunPrakashG/wordpress_client
+documentation: https://github.com/ArunPrakashG/wordpress_client/wiki
 issue_tracker: https://github.com/ArunPrakashG/wordpress_client/issues
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
+funding:
+ - https://www.buymeacoffee.com/arunprakashg
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

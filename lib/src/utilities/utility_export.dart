@@ -8,6 +8,8 @@ export 'helpers.dart'
         deserialize,
         serialize,
         castOrElse,
+        mapGuarded,
+        executeGuarded,
         parseDateIfNotNull,
         getMIMETypeFromExtension;
 export 'request_url.dart';

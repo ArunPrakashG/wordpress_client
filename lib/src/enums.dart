@@ -17,6 +17,17 @@ enum ErrorType {
   requestUriParsingFailed,
 }
 
+enum RequestErrorType {
+  noError,
+  unknown,
+  internalGenericError,
+  authorizationModuleNotFound,
+  authorizationFailedWithProvidedCredentials,
+  connectionFailed,
+  requestCancelled,
+  invalidStatusCode,
+}
+
 enum SearchType {
   post,
   term,

@@ -1,4 +1,4 @@
-part of 'wordpress_client_base.dart';
+part of '../wordpress_client_base.dart';
 
 /// The base of all request interfaces.
 /// You must extend from this interface to define custom requests.

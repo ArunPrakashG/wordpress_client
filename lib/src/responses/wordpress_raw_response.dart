@@ -25,6 +25,7 @@ final class WordpressRawResponse {
     this.message,
   });
 
+  /// The entire response body. Can be null.
   final dynamic data;
   final int code;
   final Map<String, dynamic> headers;
@@ -32,6 +33,18 @@ final class WordpressRawResponse {
   final Map<String, dynamic> extra;
   final Duration duration;
   final String? message;
+
+  RequestErrorType get errorType {
+    if (isSuccessful) {
+      return RequestErrorType.noError;
+    }
+
+    if (RequestErrorType.values.any((element) => -element.index == code)) {
+      return RequestErrorType.values[-code];
+    }
+
+    return RequestErrorType.unknown;
+  }
 
   bool get isSuccessful => isInRange(code, 200, 399);
   bool get isFailure => !isSuccessful;

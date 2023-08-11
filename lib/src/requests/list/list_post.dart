@@ -56,7 +56,7 @@ final class ListPostRequest extends IRequest {
 
   @override
   WordpressRequest build(Uri baseUrl) {
-    final queryParameters = <String, String>{}
+    final queryParameters = <String, dynamic>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('page', page)
       ..addIfNotNull('per_page', perPage)

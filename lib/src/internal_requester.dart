@@ -89,7 +89,7 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
-    final headers = request.headers ?? <String, String>{};
+    final headers = request.headers ?? <String, dynamic>{};
 
     if (request.requireAuth) {
       final authorizer = () {
@@ -102,9 +102,9 @@ final class InternalRequester extends IRequestExecutor {
       }();
 
       if (authorizer == null) {
-        return const WordpressRawResponse(
+        return WordpressRawResponse(
           data: null,
-          code: -3,
+          code: -RequestErrorType.authorizationModuleNotFound.index,
           message: 'No valid authorization module found.',
         );
       }
@@ -114,9 +114,10 @@ final class InternalRequester extends IRequestExecutor {
       );
 
       if (authResult == null) {
-        return const WordpressRawResponse(
+        return WordpressRawResponse(
           data: null,
-          code: -3,
+          code: -RequestErrorType
+              .authorizationFailedWithProvidedCredentials.index,
           message: 'Failed to authorize with the provided authorization.',
         );
       }
@@ -165,7 +166,8 @@ final class InternalRequester extends IRequestExecutor {
         ? await _syncLock.synchronized(_request)
         : await _request();
 
-    final statusCode = response.statusCode ?? -2;
+    final statusCode =
+        response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
     request.events?.onResponse?.call(response.data);
 
     return WordpressRawResponse(

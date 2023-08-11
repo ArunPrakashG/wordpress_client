@@ -6,7 +6,7 @@ import 'authorization/authorization_base.dart';
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
 import 'constants.dart';
-import 'typedefs.dart';
+import 'utilities/typedefs.dart';
 
 class BootstrapBuilder {
   BootstrapBuilder();
@@ -29,7 +29,7 @@ class BootstrapBuilder {
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
   String? _defaultUserAgent;
-  Map<String, String>? _defaultHeaders;
+  Map<String, dynamic>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
   bool _synchronized = false;
@@ -88,7 +88,7 @@ class BootstrapBuilder {
     return this;
   }
 
-  BootstrapBuilder withDefaultHeaders(Map<String, String> headers) {
+  BootstrapBuilder withDefaultHeaders(Map<String, dynamic> headers) {
     _defaultHeaders = headers;
     return this;
   }

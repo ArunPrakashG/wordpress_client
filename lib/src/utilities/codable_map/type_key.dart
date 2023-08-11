@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-import 'utilities/helpers.dart';
+import '../helpers.dart';
 
 @immutable
 class TypeKey<T> {
