@@ -7,6 +7,5 @@ abstract class WordpressException implements Exception {
   final ErrorType errorType;
 
   @override
-  String toString() =>
-      '[${DateTime.now().toString()}] ${errorType}Exception: $message';
+  String toString() => '[${DateTime.now()}] ${errorType}Exception: $message';
 }

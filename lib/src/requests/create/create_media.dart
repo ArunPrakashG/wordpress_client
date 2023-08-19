@@ -82,8 +82,10 @@ final class CreateMediaRequest extends IRequest {
       ..addIfNotNull('file', multipartFile);
 
     final headers = <String, dynamic>{}
-      ..addIfNotNull('Content-Disposition',
-          'attachment; filename="${multipartFile.filename}"')
+      ..addIfNotNull(
+        'Content-Disposition',
+        'attachment; filename="${multipartFile.filename}"',
+      )
       ..addIfNotNull('Content-Type', mimeType);
 
     return WordpressRequest(

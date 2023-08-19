@@ -2,6 +2,7 @@ import '../../../wordpress_client.dart';
 
 final class UpdateCommentRequest extends IRequest {
   UpdateCommentRequest({
+    required this.id,
     this.author,
     this.authorIp,
     this.authorUrl,
@@ -12,7 +13,6 @@ final class UpdateCommentRequest extends IRequest {
     this.content,
     this.post,
     this.status,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class DeleteCategoryRequest extends IRequest {
   DeleteCategoryRequest({
-    this.force,
     required this.id,
+    this.force,
     super.cancelToken,
     super.authorization,
     super.events,

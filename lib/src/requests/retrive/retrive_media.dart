@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class RetriveMediaRequest extends IRequest {
   RetriveMediaRequest({
-    this.context = RequestContext.view,
     required this.id,
+    this.context = RequestContext.view,
     super.cancelToken,
     super.authorization,
     super.events,

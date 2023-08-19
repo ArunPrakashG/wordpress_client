@@ -3,10 +3,11 @@ import '../../../wordpress_client.dart';
 final class UpdateUserRequest extends IRequest {
   UpdateUserRequest({
     required this.username,
+    required this.email,
+    required this.id,
     this.name,
     this.firstName,
     this.lastName,
-    required this.email,
     this.password,
     this.url,
     this.description,
@@ -14,7 +15,6 @@ final class UpdateUserRequest extends IRequest {
     this.nickName,
     this.slug,
     this.roles,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

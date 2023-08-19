@@ -8,8 +8,8 @@ import 'package:test/test.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 String getRandString(int len) {
-  var random = Random.secure();
-  var values = List<int>.generate(len, (i) => random.nextInt(255));
+  final random = Random.secure();
+  final values = List<int>.generate(len, (i) => random.nextInt(255));
   return base64UrlEncode(values);
 }
 

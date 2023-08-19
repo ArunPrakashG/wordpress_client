@@ -10,16 +10,17 @@ import 'properties/links.dart';
 class User implements ISelfRespresentive {
   const User({
     required this.id,
-    this.name,
     required this.url,
-    this.description,
     required this.link,
     required this.slug,
     required this.roles,
+    required this.capabilities,
+    required this.self,
+    this.name,
+    this.description,
     this.avatarUrls,
     this.meta,
     this.links,
-    required this.capabilities,
     this.email,
     this.firstName,
     this.lastName,
@@ -27,7 +28,6 @@ class User implements ISelfRespresentive {
     this.registeredDate,
     this.username,
     this.nickname,
-    required this.self,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -58,7 +58,9 @@ class User implements ISelfRespresentive {
       link: castOrElse(json['link']),
       slug: castOrElse(json['slug']),
       roles: mapIterableWithChecks<String>(
-          json['roles'], (dynamic value) => value as String),
+        json['roles'],
+        (dynamic value) => value as String,
+      ),
       avatarUrls: castOrElse(
         json['avatar_urls'],
         transformer: (dynamic value) => Map<String, String>.from(

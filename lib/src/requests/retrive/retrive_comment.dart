@@ -2,9 +2,9 @@ import '../../../wordpress_client.dart';
 
 final class RetriveCommentRequest extends IRequest {
   RetriveCommentRequest({
+    required this.id,
     this.context,
     this.password,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

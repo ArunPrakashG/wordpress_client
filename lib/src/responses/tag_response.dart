@@ -10,14 +10,14 @@ class Tag implements ISelfRespresentive {
   const Tag({
     required this.id,
     required this.count,
-    this.description,
     required this.link,
-    this.name,
     required this.slug,
     required this.taxonomy,
+    required this.self,
+    this.description,
+    this.name,
     this.meta,
     this.links,
-    required this.self,
   });
 
   factory Tag.fromJson(Map<String, dynamic> json) {

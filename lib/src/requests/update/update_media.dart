@@ -2,6 +2,7 @@ import '../../../wordpress_client.dart';
 
 final class UpdateMediaRequest extends IRequest {
   UpdateMediaRequest({
+    required this.id,
     this.slug,
     this.status,
     this.title,
@@ -12,7 +13,6 @@ final class UpdateMediaRequest extends IRequest {
     this.caption,
     this.description,
     this.post,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

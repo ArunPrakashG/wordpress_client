@@ -12,13 +12,13 @@ class Category implements ISelfRespresentive {
     required this.count,
     required this.description,
     required this.link,
-    this.name,
     required this.slug,
     required this.taxonomy,
     required this.parent,
+    required this.self,
+    this.name,
     this.meta,
     this.links,
-    required this.self,
   });
 
   factory Category.fromJson(dynamic json) {
@@ -27,7 +27,7 @@ class Category implements ISelfRespresentive {
       count: castOrElse(json['count'], orElse: () => 0)!,
       description: castOrElse(json['description'], orElse: () => '')!,
       link: castOrElse(json['link'], orElse: () => '')!,
-      name: castOrElse(json['name'], orElse: () => '')!,
+      name: castOrElse(json['name'], orElse: () => ''),
       slug: castOrElse(json['slug'], orElse: () => '')!,
       taxonomy: castOrElse(json['taxonomy'], orElse: () => '')!,
       parent: castOrElse(json['parent'], orElse: () => 0)!,

@@ -11,6 +11,7 @@ import 'properties/media_details.dart';
 @immutable
 class Media implements ISelfRespresentive {
   const Media({
+    required this.self,
     this.id,
     this.date,
     this.dateGmt,
@@ -36,7 +37,6 @@ class Media implements ISelfRespresentive {
     this.post,
     this.sourceUrl,
     this.links,
-    required this.self,
   });
 
   factory Media.fromJson(Map<String, dynamic> json) {

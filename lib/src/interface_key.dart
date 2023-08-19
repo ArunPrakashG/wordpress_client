@@ -24,6 +24,6 @@ class InterfaceKey<T> {
 
   String toDebugString() {
     final tag = _key == null ? '' : ', $_key';
-    return 'InterfaceKey<$_type>(${_type.toString()}$tag)';
+    return 'InterfaceKey<$_type>($_type$tag)';
   }
 }

@@ -10,6 +10,7 @@ import 'properties/links.dart';
 @immutable
 class Comment implements ISelfRespresentive {
   const Comment({
+    required this.self,
     this.id,
     this.post,
     this.parent,
@@ -28,7 +29,6 @@ class Comment implements ISelfRespresentive {
     this.authorAvatarUrls,
     this.meta,
     this.links,
-    required this.self,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -51,8 +51,8 @@ class Comment implements ISelfRespresentive {
       authorAvatarUrls: json['author_avatar_urls'] == null
           ? null
           : Map<String, String>.from(
-                  json['author_avatar_urls'] as Map<String, dynamic>)
-              .map(MapEntry.new),
+              json['author_avatar_urls'] as Map<String, dynamic>,
+            ).map(MapEntry.new),
       meta: json['meta'],
       links: Links.fromJson(json['_links']),
       self: json,

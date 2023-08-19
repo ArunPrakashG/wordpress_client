@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class DeleteCommentRequest extends IRequest {
   DeleteCommentRequest({
-    this.force,
     required this.id,
+    this.force,
     this.password,
     super.cancelToken,
     super.authorization,

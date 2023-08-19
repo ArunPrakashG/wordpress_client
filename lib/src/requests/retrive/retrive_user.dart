@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class RetriveUserRequest extends IRequest {
   RetriveUserRequest({
-    this.context,
     required this.id,
+    this.context,
     super.cancelToken,
     super.authorization,
     super.events,

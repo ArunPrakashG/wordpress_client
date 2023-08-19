@@ -9,12 +9,12 @@ import 'properties/links.dart';
 class Search implements ISelfRespresentive {
   const Search({
     required this.id,
-    this.title,
     required this.type,
     required this.subType,
-    this.links,
     required this.url,
     required this.self,
+    this.title,
+    this.links,
   });
 
   factory Search.fromJson(Map<String, dynamic> json) {
@@ -49,7 +49,7 @@ class Search implements ISelfRespresentive {
       'type': type,
       'subtype': subType,
       'url': url,
-      '_links': links?.toJson()
+      '_links': links?.toJson(),
     };
   }
 

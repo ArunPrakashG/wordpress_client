@@ -159,9 +159,11 @@ ContentStatus getContentStatusFromValue(String? value) {
   }
 
   return ContentStatus.values
-      .where((element) =>
-          element.toString().split('.').last.toLowerCase() ==
-          value.toLowerCase())
+      .where(
+        (element) =>
+            element.toString().split('.').last.toLowerCase() ==
+            value.toLowerCase(),
+      )
       .first;
 }
 
@@ -171,9 +173,11 @@ CommentStatus getCommentStatusFromValue(String? value) {
   }
 
   return CommentStatus.values
-      .where((element) =>
-          element.toString().split('.').last.toLowerCase() ==
-          value.toLowerCase())
+      .where(
+        (element) =>
+            element.toString().split('.').last.toLowerCase() ==
+            value.toLowerCase(),
+      )
       .first;
 }
 
@@ -183,9 +187,11 @@ MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
   }
 
   return MediaFilterStatus.values
-      .where((element) =>
-          element.toString().split('.').last.toLowerCase() ==
-          value.toLowerCase())
+      .where(
+        (element) =>
+            element.toString().split('.').last.toLowerCase() ==
+            value.toLowerCase(),
+      )
       .first;
 }
 
@@ -195,9 +201,11 @@ PostFormat getFormatFromValue(String? value) {
   }
 
   return PostFormat.values
-      .where((element) =>
-          element.toString().split('.').last.toLowerCase() ==
-          value.toLowerCase())
+      .where(
+        (element) =>
+            element.toString().split('.').last.toLowerCase() ==
+            value.toLowerCase(),
+      )
       .first;
 }
 
@@ -207,8 +215,10 @@ Status getStatusFromValue(String? value) {
   }
 
   return Status.values
-      .where((element) =>
-          element.toString().split('.').last.toLowerCase() ==
-          value.toLowerCase())
+      .where(
+        (element) =>
+            element.toString().split('.').last.toLowerCase() ==
+            value.toLowerCase(),
+      )
       .first;
 }

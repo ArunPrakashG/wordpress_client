@@ -3,10 +3,10 @@ import '../../../wordpress_client.dart';
 final class CreateUserRequest extends IRequest {
   CreateUserRequest({
     required this.username,
+    required this.email,
     this.displayName,
     this.firstName,
     this.lastName,
-    required this.email,
     this.password,
     this.url,
     this.description,

@@ -8,11 +8,11 @@ import 'wordpress_error.dart';
 /// Represents a successful response.
 final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
   const WordpressSuccessResponse({
-    super.code = 200,
     required super.headers,
     required super.duration,
     required this.data,
     required super.requestHeaders,
+    super.code = 200,
     super.extra,
     super.message,
   });

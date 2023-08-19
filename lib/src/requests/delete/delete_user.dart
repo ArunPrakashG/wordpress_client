@@ -2,9 +2,9 @@ import '../../../wordpress_client.dart';
 
 final class DeleteUserRequest extends IRequest {
   DeleteUserRequest({
-    this.force,
     required this.reassign,
     required this.id,
+    this.force,
     super.cancelToken,
     super.authorization,
     super.events,

@@ -2,11 +2,11 @@ import '../../../wordpress_client.dart';
 
 final class UpdateCategoryRequest extends IRequest {
   UpdateCategoryRequest({
+    required this.id,
     this.description,
     this.name,
     this.slug,
     this.parent,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

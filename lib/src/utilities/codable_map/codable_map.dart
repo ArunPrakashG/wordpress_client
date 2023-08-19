@@ -20,7 +20,7 @@ class CodableMap {
     if (!overwrite && decoderExists<T>()) {
       if (throwIfExists) {
         throw MapAlreadyExistException(
-          'Decoder for type ${typeKey.toString()} already exists',
+          'Decoder for type $typeKey already exists',
         );
       }
 
@@ -47,7 +47,7 @@ class CodableMap {
       );
     }
 
-    return _decoders[TypeKey<T>()] as T Function(dynamic instance);
+    return _decoders[TypeKey<T>()]! as T Function(dynamic instance);
   }
 
   void addEncoder<T>(
@@ -58,7 +58,7 @@ class CodableMap {
     if (!overwrite && encoderExists<T>()) {
       if (throwIfExists) {
         throw MapAlreadyExistException(
-          'Encoder for type ${TypeKey<T>().toString()} already exists',
+          'Encoder for type ${TypeKey<T>()} already exists',
         );
       }
 
@@ -85,7 +85,7 @@ class CodableMap {
       );
     }
 
-    return _encoders[TypeKey<T>()] as JsonEncoderCallback;
+    return _encoders[TypeKey<T>()]!;
   }
 
   void addCodablePair<T>({

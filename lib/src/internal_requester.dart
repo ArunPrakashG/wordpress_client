@@ -137,7 +137,7 @@ final class InternalRequester extends IRequestExecutor {
 
     final watch = Stopwatch();
 
-    Future<Response<dynamic>> _request() async {
+    Future<Response<dynamic>> run() async {
       watch.start();
 
       try {
@@ -162,9 +162,8 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    final response = _synchronized
-        ? await _syncLock.synchronized(_request)
-        : await _request();
+    final response =
+        _synchronized ? await _syncLock.synchronized(run) : await run();
 
     final statusCode =
         response.statusCode ?? -RequestErrorType.invalidStatusCode.index;

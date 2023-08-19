@@ -2,9 +2,9 @@ import '../../../wordpress_client.dart';
 
 final class CreateTagRequest extends IRequest {
   CreateTagRequest({
-    this.description,
     required this.name,
     required this.slug,
+    this.description,
     super.cancelToken,
     super.authorization,
     super.events,

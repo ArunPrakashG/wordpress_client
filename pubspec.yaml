@@ -1,6 +1,6 @@
 name: wordpress_client
 description: A library to interact with the Wordpress REST API. Supports most of the common endpoints and all of the CRUD operations on the endpoints.
-version: 8.0.7
+version: 8.0.8
 topics:
   - wordpress
   - fluent
@@ -20,7 +20,7 @@ platforms:
   windows:
 
 funding:
- - https://www.buymeacoffee.com/arunprakashg
+  - https://www.buymeacoffee.com/arunprakashg
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -28,6 +28,10 @@ environment:
 dev_dependencies:
   temp_mail_gen: ^2.0.0
   test: ^1.24.5
+  personal_flutter_lints:
+    git:
+      url: https://github.com/ArunPrakashG/personal_flutter_lints.git
+      ref: main
 
 dependencies:
   collection: ^1.17.1

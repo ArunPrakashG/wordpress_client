@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class DeleteMeRequest extends IRequest {
   DeleteMeRequest({
-    this.force,
     required this.reassign,
+    this.force,
     super.cancelToken,
     super.authorization,
     super.events,

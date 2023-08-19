@@ -2,6 +2,7 @@ import '../../../wordpress_client.dart';
 
 final class UpdatePostRequest extends IRequest {
   UpdatePostRequest({
+    required this.id,
     this.slug,
     this.title,
     this.content,
@@ -15,7 +16,6 @@ final class UpdatePostRequest extends IRequest {
     this.sticky,
     this.categories,
     this.tags,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,

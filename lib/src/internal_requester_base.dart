@@ -23,7 +23,7 @@ abstract base class IRequestExecutor {
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '${error.toString()}\n\n$stackTrace',
+          message: '$error\n\n$stackTrace',
         );
       },
     );
@@ -75,7 +75,7 @@ abstract base class IRequestExecutor {
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '${error.toString()}\n\n$stackTrace',
+          message: '$error\n\n$stackTrace',
         );
       },
     );
@@ -127,7 +127,7 @@ abstract base class IRequestExecutor {
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '${error.toString()}\n\n$stackTrace',
+          message: '$error\n\n$stackTrace',
         );
       },
     );
@@ -176,7 +176,7 @@ abstract base class IRequestExecutor {
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '${error.toString()}\n\n$stackTrace',
+          message: '$error\n\n$stackTrace',
         );
       },
     );
@@ -228,7 +228,7 @@ abstract base class IRequestExecutor {
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '${error.toString()}\n\n$stackTrace',
+          message: '$error\n\n$stackTrace',
         );
       },
     );

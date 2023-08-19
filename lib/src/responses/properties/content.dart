@@ -5,8 +5,8 @@ import '../../utilities/helpers.dart';
 @immutable
 class Content {
   const Content({
-    this.rendered,
     required this.protected,
+    this.rendered,
   });
 
   factory Content.fromJson(Map<String, dynamic> json) {

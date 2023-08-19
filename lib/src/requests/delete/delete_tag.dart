@@ -2,8 +2,8 @@ import '../../../wordpress_client.dart';
 
 final class DeleteTagRequest extends IRequest {
   DeleteTagRequest({
-    this.force,
     required this.id,
+    this.force,
     super.cancelToken,
     super.authorization,
     super.events,

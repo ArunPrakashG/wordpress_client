@@ -2,10 +2,10 @@ import '../../../wordpress_client.dart';
 
 final class UpdateTagRequest extends IRequest {
   UpdateTagRequest({
+    required this.id,
     this.description,
     this.name,
     this.slug,
-    required this.id,
     super.cancelToken,
     super.authorization,
     super.events,
