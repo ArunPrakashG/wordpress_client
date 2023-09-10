@@ -156,6 +156,10 @@
 
 - 🔧 Integrated new lint rules and code refactors
 
+## 📖 8.0.9
+
+- ➕ Added App Password support
+
 ## Legend
 
 - 🎉 New features or major changes

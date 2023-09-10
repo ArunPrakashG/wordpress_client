@@ -3,7 +3,7 @@
 import '../enums.dart';
 import '../utilities/wordpress_events.dart';
 import 'authorization_base.dart';
-import 'methods/basic_auth.dart';
+import 'methods/app_password.dart';
 import 'methods/basic_jwt.dart';
 import 'methods/useful_jwt.dart';
 
@@ -52,7 +52,7 @@ final class AuthorizationBuilder {
           events: _events,
         );
       case AuthorizationType.basic:
-        return BasicAuth(
+        return AppPasswordAuth(
           userName: _userName,
           password: _password,
           events: _events,
