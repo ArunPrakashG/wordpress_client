@@ -47,6 +47,32 @@ Future<T> executeGuarded<T>({
   }
 }
 
+/// Decodes a value from the given map by matching aganist given set of keys.
+///
+/// If any of the keys matches to a value in the map, the value is returned.
+T? decodeByMultiKeys<T>(
+  Map<String, dynamic> map,
+  List<String> keys, {
+  T? Function(Object value)? transformer,
+  T Function()? orElse,
+}) {
+  for (final key in keys) {
+    if (!map.containsKey(key)) {
+      continue;
+    }
+
+    final value = map[key];
+
+    if (transformer != null) {
+      return transformer(value);
+    }
+
+    return value;
+  }
+
+  return orElse?.call();
+}
+
 /// Casts the given dynamic JSON value to the specified type [T].
 ///
 /// Optionally, you can provide a [transformer] function to transform the value manually if it is not null.

@@ -2,7 +2,10 @@
   <h1>wordpress_client</h1>
 
   <p align="center">
-    <img src="https://img.shields.io/pub/v/wordpress_client?color=blueviolet" alt="Pub Version" />  <br>
+    <a href="https://pub.dev/packages/wordpress_client"> 
+      <img src="https://img.shields.io/pub/v/wordpress_client?color=blueviolet" alt="Pub Version"/> 
+    </a> 
+    <br>
     <img src="https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
     <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" />
     <img src="https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white" alt="WordPress" />
@@ -28,7 +31,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.0.7
+ wordpress_client: ^8.0.10
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).

@@ -11,6 +11,7 @@ export 'helpers.dart'
         mapGuarded,
         executeGuarded,
         parseDateIfNotNull,
+        decodeByMultiKeys,
         getMIMETypeFromExtension;
 export 'request_url.dart';
 export 'typedefs.dart';

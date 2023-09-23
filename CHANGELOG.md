@@ -160,6 +160,11 @@
 
 - ➕ Added App Password support
 
+## 📖 8.0.10
+
+- 🛠 `featured_media_src_url` key now decodes as expected
+- ➕ Added a new `decodeByMultiKeys` method to decode a value from JSON by matching aganist multiple keys. Any of the key matchs, the value is returned
+
 ## Legend
 
 - 🎉 New features or major changes
