@@ -1,19 +1,9 @@
-import 'dart:async';
-
-import 'package:dio/dio.dart';
-
+import '../../../wordpress_client.dart';
 import '../../utilities/helpers.dart';
-import '../authorization_base.dart';
 
-/// The most basic authentication system using username and password.
-///
-/// Implemented on basis of https://github.com/WP-API/Basic-Auth wordpress plugin.
-///
-/// Make sure to only use this method for testing purposes as this isn't secure.
-@Deprecated('Use AppPasswordAuth instead')
-final class BasicAuth extends IAuthorization {
-  @Deprecated('Use AppPasswordAuth instead')
-  BasicAuth({
+/// Authentication using Application Passwords which are supported on all Wordpress installations version 5.6 or higher.
+final class AppPasswordAuth extends IAuthorization {
+  AppPasswordAuth({
     required super.userName,
     required super.password,
     super.events,
@@ -35,7 +25,8 @@ final class BasicAuth extends IAuthorization {
   }
 
   @override
-  bool get isValidAuth => true;
+  bool get isValidAuth =>
+      super.password.isNotEmpty && super.userName.isNotEmpty;
 
   @override
   Future<bool> validate() async {
