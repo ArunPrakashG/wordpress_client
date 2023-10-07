@@ -12,6 +12,7 @@ final class DeleteCommentRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   bool? force;
@@ -22,7 +23,8 @@ final class DeleteCommentRequest extends IRequest {
   WordpressRequest build(Uri baseUrl) {
     final body = <String, dynamic>{}
       ..addIfNotNull('force', force)
-      ..addIfNotNull('password', password);
+      ..addIfNotNull('password', password)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

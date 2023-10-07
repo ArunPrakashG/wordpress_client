@@ -20,6 +20,7 @@ final class UpdateMediaRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? slug;
@@ -46,7 +47,8 @@ final class UpdateMediaRequest extends IRequest {
       ..addIfNotNull('alt_text', altText)
       ..addIfNotNull('caption', caption)
       ..addIfNotNull('description', description)
-      ..addIfNotNull('post', post);
+      ..addIfNotNull('post', post)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

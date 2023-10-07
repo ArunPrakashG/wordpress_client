@@ -23,6 +23,7 @@ final class CreatePostRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? slug;
@@ -56,7 +57,8 @@ final class CreatePostRequest extends IRequest {
       ..addIfNotNull('sticky', (sticky ?? false) ? '1' : null)
       ..addIfNotNull('categories', categories?.join(','))
       ..addIfNotNull('tags', tags?.join(','))
-      ..addIfNotNull('slug', slug);
+      ..addIfNotNull('slug', slug)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

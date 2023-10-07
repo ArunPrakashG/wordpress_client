@@ -21,6 +21,7 @@ final class ListUserRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -50,7 +51,8 @@ final class ListUserRequest extends IRequest {
       ..addIfNotNull('order_by', orderBy?.name)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('roles', roles)
-      ..addIfNotNull('who', who);
+      ..addIfNotNull('who', who)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,

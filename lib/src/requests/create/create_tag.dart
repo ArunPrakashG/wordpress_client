@@ -12,6 +12,7 @@ final class CreateTagRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? description;
@@ -23,7 +24,8 @@ final class CreateTagRequest extends IRequest {
     final body = <String, dynamic>{}
       ..addIfNotNull('description', description)
       ..addIfNotNull('name', name)
-      ..addIfNotNull('slug', slug);
+      ..addIfNotNull('slug', slug)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

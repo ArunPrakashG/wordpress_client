@@ -15,6 +15,7 @@ abstract base class IRequest {
     this.receiveTimeout = const Duration(seconds: 30),
     this.events,
     this.validator,
+    this.extra,
   });
 
   /// Whether the request requires authentication.
@@ -37,6 +38,18 @@ abstract base class IRequest {
 
   /// The validator to validate the response.
   final ValidatorCallback? validator;
+
+  /// Allows you to pass custom key value pairs with the requests.
+  ///
+  /// Eg: meta fields
+  /// ```
+  /// <String, dynamic>{
+  ///   'meta': <String, dynamic>{
+  ///     'footnotes': '',
+  ///   },
+  /// }
+  /// ```
+  final Map<String, dynamic>? extra;
 
   /// Builds the request content.
   ///

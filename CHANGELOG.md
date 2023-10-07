@@ -165,6 +165,11 @@
 - 🛠 `featured_media_src_url` key now decodes as expected
 - ➕ Added a new `decodeByMultiKeys` method to decode a value from JSON by matching aganist multiple keys. Any of the key matchs, the value is returned
 
+## 📖 8.0.11
+
+- ➕ Added `extra` property to all request classes. Now you can append (or override) custom fields into the request.
+- ➕ Added `addAllIfNotNull(...)` extension method to append valid key-values (not null) to existing map from another map.
+
 ## Legend
 
 - 🎉 New features or major changes

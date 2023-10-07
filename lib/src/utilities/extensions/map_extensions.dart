@@ -13,4 +13,18 @@ extension MapExtensions<T> on Map<String, T> {
 
     this[key] = value;
   }
+
+  void addAllIfNotNull(Map<String, T>? values) {
+    if (values == null) {
+      return;
+    }
+
+    for (final value in values.entries) {
+      if (value.value == null) {
+        continue;
+      }
+
+      this[value.key] = value.value;
+    }
+  }
 }

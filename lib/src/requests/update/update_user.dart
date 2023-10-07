@@ -22,6 +22,7 @@ final class UpdateUserRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String username;
@@ -52,7 +53,8 @@ final class UpdateUserRequest extends IRequest {
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('password', password)
-      ..addIfNotNull('roles', roles?.join(','));
+      ..addIfNotNull('roles', roles?.join(','))
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

@@ -30,6 +30,7 @@ final class ListPostRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -77,7 +78,8 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('tags_exclude', tagsExclude?.join(','))
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
-      ..addIfNotNull('status', status?.name);
+      ..addIfNotNull('status', status?.name)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,

@@ -11,6 +11,7 @@ final class RetriveCategoryRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -19,7 +20,8 @@ final class RetriveCategoryRequest extends IRequest {
   @override
   WordpressRequest build(Uri baseUrl) {
     final queryParameters = <String, dynamic>{}
-      ..addIfNotNull('context', context?.name);
+      ..addIfNotNull('context', context?.name)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       method: HttpMethod.get,
