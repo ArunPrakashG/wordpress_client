@@ -14,6 +14,7 @@ final class UpdateCategoryRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? description;
@@ -28,7 +29,8 @@ final class UpdateCategoryRequest extends IRequest {
       ..addIfNotNull('description', description)
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('parent', parent);
+      ..addIfNotNull('parent', parent)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

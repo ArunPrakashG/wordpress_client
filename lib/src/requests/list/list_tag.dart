@@ -21,6 +21,7 @@ final class ListTagRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -50,7 +51,8 @@ final class ListTagRequest extends IRequest {
       ..addIfNotNull('offset', offset)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('post', post)
-      ..addIfNotNull('hide_empty', hideEmpty);
+      ..addIfNotNull('hide_empty', hideEmpty)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,

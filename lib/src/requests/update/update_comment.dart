@@ -20,6 +20,7 @@ final class UpdateCommentRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   int? author;
@@ -46,7 +47,8 @@ final class UpdateCommentRequest extends IRequest {
       ..addIfNotNull('author_user_agent', authorUserAgent)
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('content', content)
-      ..addIfNotNull('post', post);
+      ..addIfNotNull('post', post)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

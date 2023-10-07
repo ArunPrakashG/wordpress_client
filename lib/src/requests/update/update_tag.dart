@@ -13,6 +13,7 @@ final class UpdateTagRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? description;
@@ -25,7 +26,8 @@ final class UpdateTagRequest extends IRequest {
     final body = <String, dynamic>{}
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('name', name);
+      ..addIfNotNull('name', name)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

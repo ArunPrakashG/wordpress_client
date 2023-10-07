@@ -33,6 +33,7 @@ final class CreateMediaRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String mediaFilePath;
@@ -79,7 +80,8 @@ final class CreateMediaRequest extends IRequest {
       ..addIfNotNull('author_id', authorId)
       ..addIfNotNull('comment_status', commentStatus?.name)
       ..addIfNotNull('ping_status', pingStatus?.name)
-      ..addIfNotNull('file', multipartFile);
+      ..addIfNotNull('file', multipartFile)
+      ..addAllIfNotNull(extra);
 
     final headers = <String, dynamic>{}
       ..addIfNotNull(

@@ -28,6 +28,7 @@ final class ListCommentRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -71,7 +72,8 @@ final class ListCommentRequest extends IRequest {
       ..addIfNotNull('post', post)
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('type', type)
-      ..addIfNotNull('password', password);
+      ..addIfNotNull('password', password)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,

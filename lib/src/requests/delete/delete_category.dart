@@ -11,6 +11,7 @@ final class DeleteCategoryRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   bool? force;
@@ -18,7 +19,9 @@ final class DeleteCategoryRequest extends IRequest {
 
   @override
   WordpressRequest build(Uri baseUrl) {
-    final body = <String, dynamic>{}..addIfNotNull('force', force);
+    final body = <String, dynamic>{}
+      ..addIfNotNull('force', force)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

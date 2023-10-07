@@ -11,6 +11,7 @@ final class DeleteMeRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   bool? force;
@@ -20,7 +21,8 @@ final class DeleteMeRequest extends IRequest {
   WordpressRequest build(Uri baseUrl) {
     final body = <String, dynamic>{}
       ..addIfNotNull('force', force)
-      ..addIfNotNull('reassign', reassign);
+      ..addIfNotNull('reassign', reassign)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

@@ -12,6 +12,7 @@ final class RetrivePostRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -22,7 +23,8 @@ final class RetrivePostRequest extends IRequest {
   WordpressRequest build(Uri baseUrl) {
     final queryParameters = <String, dynamic>{}
       ..addIfNotNull('context', context?.name)
-      ..addIfNotNull('password', password);
+      ..addIfNotNull('password', password)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       method: HttpMethod.get,

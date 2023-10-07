@@ -15,6 +15,7 @@ final class ListSearchRequest extends IRequest {
     super.requireAuth = false,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   RequestContext? context;
@@ -32,7 +33,8 @@ final class ListSearchRequest extends IRequest {
       ..addIfNotNull('per_page', perPage)
       ..addIfNotNull('search', search)
       ..addIfNotNull('type', type?.name)
-      ..addIfNotNull('subtype', subType);
+      ..addIfNotNull('subtype', subType)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,

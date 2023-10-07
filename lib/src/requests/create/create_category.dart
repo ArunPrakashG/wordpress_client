@@ -13,6 +13,7 @@ final class CreateCategoryRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String? name;
@@ -26,7 +27,8 @@ final class CreateCategoryRequest extends IRequest {
       ..addIfNotNull('name', name)
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('parent_id', parentId);
+      ..addIfNotNull('parent_id', parentId)
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,

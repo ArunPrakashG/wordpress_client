@@ -21,6 +21,7 @@ final class CreateUserRequest extends IRequest {
     super.requireAuth,
     super.sendTimeout,
     super.validator,
+    super.extra,
   });
 
   String username;
@@ -50,7 +51,8 @@ final class CreateUserRequest extends IRequest {
       ..addIfNotNull('locale', locale)
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('roles', roles?.join(','));
+      ..addIfNotNull('roles', roles?.join(','))
+      ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       body: body,
