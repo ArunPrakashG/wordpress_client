@@ -18,6 +18,7 @@ import 'interface/users.dart';
 import 'interface_key.dart';
 import 'internal_requester_base.dart';
 import 'library_exports.dart';
+import 'responses/wordpress_discovery_response.dart';
 import 'responses/wordpress_raw_response.dart';
 import 'utilities/codable_map/codable_map.dart';
 import 'utilities/helpers.dart';
@@ -40,7 +41,7 @@ final class WordpressClient {
   /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
   WordpressClient({
     required Uri baseUrl,
-    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
     if (!baseUrl.isAbsolute) {
       throw ArgumentError(
@@ -225,6 +226,10 @@ final class WordpressClient {
   ///
   /// This will be true if [initialize] method has been called and completed.
   bool get isReady => _hasInitialized;
+
+  WordpressDiscovery? get discovery => _discovery;
+
+  WordpressDiscovery? _discovery;
 
   /// Initializes all the built in interfaces and other services
   ///
@@ -454,4 +459,16 @@ final class WordpressClient {
       ),
     );
   }
+
+  Future<bool> discover() async {
+    if (_discovery != null) {
+      return true;
+    }
+
+    _discovery = await _requester.discover();
+
+    return _discovery != null;
+  }
+
+  void clearDiscovered() => _discovery = null;
 }
