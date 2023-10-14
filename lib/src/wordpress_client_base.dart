@@ -227,7 +227,13 @@ final class WordpressClient {
   /// This will be true if [initialize] method has been called and completed.
   bool get isReady => _hasInitialized;
 
-  WordpressDiscovery? get discovery => _discovery;
+  WordpressDiscovery get discovery {
+    if (_discovery == null) {
+      throw DiscoveryPendingException();
+    }
+
+    return _discovery!;
+  }
 
   WordpressDiscovery? _discovery;
 
@@ -460,14 +466,27 @@ final class WordpressClient {
     );
   }
 
+  /// Fetches the discovery URL of the associated wordpress site and caches the response and returns the status as a boolean.
+  ///
+  /// The response object may allocate a decent amount of memory, it may be possible you wish to deallocate it.
+  ///
+  /// In that case, call `clearDiscovered()` method to clear the cached discovery data.
   Future<bool> discover() async {
     if (_discovery != null) {
       return true;
     }
 
-    _discovery = await _requester.discover();
+    final response = await _requester.discover();
 
-    return _discovery != null;
+    return response.map(
+      onSuccess: (response) {
+        _discovery = response.data;
+        return _discovery != null;
+      },
+      onFailure: (response) {
+        return false;
+      },
+    )!;
   }
 
   void clearDiscovered() => _discovery = null;

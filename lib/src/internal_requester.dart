@@ -205,7 +205,7 @@ final class InternalRequester extends IRequestExecutor {
     return client;
   }
 
-  Future<WordpressDiscovery?> discover() async {
+  Future<WordpressResponse<WordpressDiscovery>> discover() async {
     final request = WordpressRequest(
       method: HttpMethod.get,
       url: RequestUrl.absolute(
@@ -220,12 +220,10 @@ final class InternalRequester extends IRequestExecutor {
 
     final response = await execute(request);
 
-    return response
-        .asResponse<WordpressDiscovery>(
-          // ignore: unnecessary_lambdas
-          decoder: (instance) => WordpressDiscovery.fromJson(instance),
-        )
-        .dataOrNull();
+    return response.asResponse<WordpressDiscovery>(
+      // ignore: unnecessary_lambdas
+      decoder: (instance) => WordpressDiscovery.fromJson(instance),
+    );
   }
 
   Future<({String key, String value})?> _processAuthorization({
