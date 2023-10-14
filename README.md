@@ -31,7 +31,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.0.11
+ wordpress_client: ^8.1.0
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
