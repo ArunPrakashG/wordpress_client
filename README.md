@@ -31,7 +31,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.0.11
+ wordpress_client: ^8.2.0
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
@@ -126,9 +126,9 @@ By Useful Team, this is another implementation using JWT for authentication purp
 | Users          |   ✅   |  ✅  |   ✅   |   ✅   |
 | Me             |   ✅   |  ✅  |   ✅   |   ✅   |
 | Media          |   ✅   |  ✅  |   ✅   |   ✅   |
+| Pages          |   ✅   |  ✅  |   ✅   |   ✅   |
 | Search         |   ❌   |  ✅  |   ❌   |   ❌   |
 | Post Revisions |   ❌   |  ❌  |   ❌   |   ❌   |
-| Pages          |   ❌   |  ❌  |   ❌   |   ❌   |
 | Taxonomies     |   ❌   |  ❌  |   ❌   |   ❌   |
 | Post Types     |   ❌   |  ❌  |   ❌   |   ❌   |
 | Post Statuses  |   ❌   |  ❌  |   ❌   |   ❌   |

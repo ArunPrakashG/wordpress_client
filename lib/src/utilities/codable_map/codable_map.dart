@@ -68,6 +68,11 @@ class CodableMap {
     _encoders[TypeKey<T>()] = encoder;
   }
 
+  void clear() {
+    _decoders.clear();
+    _encoders.clear();
+  }
+
   void removeEncoder<T>() {
     if (!encoderExists<T>()) {
       throw MapDoesNotExistException(

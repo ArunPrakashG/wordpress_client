@@ -49,6 +49,43 @@ Future<void> main() async {
   // tempMailClient = TempMailClient();
   // final mailResponse = await tempMailClient.getEmails();
 
+  group(
+    'Discovery',
+    () {
+      test(
+        'Discovery Request',
+        () async {
+          final result = await client.discover();
+
+          expect(true, result);
+        },
+      );
+
+      test(
+        'Discovery Data',
+        () async {
+          expect(json['base_host'] as String, client.discovery.home);
+        },
+      );
+    },
+  );
+
+  group('Pages', () {
+    test(
+      'List Pages',
+      () async {
+        final response = await client.pages.list(
+          ListPageRequest(
+            perPage: 2,
+          ),
+        );
+
+        expect(200, response.code);
+        expect(2, response.asSuccess().data.length);
+      },
+    );
+  });
+
   group('', () {
     test(
       'Response Time',

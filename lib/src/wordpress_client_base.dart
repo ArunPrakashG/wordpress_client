@@ -11,6 +11,7 @@ import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
+import 'interface/page.dart';
 import 'interface/posts.dart';
 import 'interface/search.dart';
 import 'interface/tags.dart';
@@ -18,6 +19,7 @@ import 'interface/users.dart';
 import 'interface_key.dart';
 import 'internal_requester_base.dart';
 import 'library_exports.dart';
+import 'responses/wordpress_discovery_response.dart';
 import 'responses/wordpress_raw_response.dart';
 import 'utilities/codable_map/codable_map.dart';
 import 'utilities/helpers.dart';
@@ -26,7 +28,7 @@ part 'internal_requester.dart';
 part 'requests/request_interface_base.dart';
 
 /// The main class for [WordpressClient].
-final class WordpressClient {
+final class WordpressClient implements IDisposable {
   /// Default Constructor.
   ///
   /// [baseUrl] is the base url of the wordpress site.
@@ -40,7 +42,7 @@ final class WordpressClient {
   /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
   WordpressClient({
     required Uri baseUrl,
-    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
     if (!baseUrl.isAbsolute) {
       throw ArgumentError(
@@ -100,6 +102,8 @@ final class WordpressClient {
   /// Base url path.
   String get path => baseUrl.path;
 
+  bool get disposed => _isDisposed;
+
   /// Returns true if this instance of [WordpressClient] is running in debug mode.
   ///
   /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
@@ -117,6 +121,7 @@ final class WordpressClient {
 
   /// Stores data on how to decode & encode responses.
   final CodableMap _typeMap = CodableMap();
+  bool _isDisposed = false;
 
   /// The current user interface.
   ///
@@ -141,6 +146,19 @@ final class WordpressClient {
   /// - Delete (Requires Authorization)
   ///
   PostsInterface get posts => get<PostsInterface>('posts');
+
+  /// The pages interface.
+  ///
+  /// Provides functionality to manipulate pages.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  PagesInterface get pages => get<PagesInterface>('pages');
 
   /// The categories interface.
   ///
@@ -226,6 +244,16 @@ final class WordpressClient {
   /// This will be true if [initialize] method has been called and completed.
   bool get isReady => _hasInitialized;
 
+  WordpressDiscovery get discovery {
+    if (_discovery == null) {
+      throw DiscoveryPendingException();
+    }
+
+    return _discovery!;
+  }
+
+  WordpressDiscovery? _discovery;
+
   /// Initializes all the built in interfaces and other services
   ///
   /// This method should be called before any other method.
@@ -293,6 +321,13 @@ final class WordpressClient {
       key: 'search',
       decoder: (json) => Search.fromJson(json),
       encoder: (dynamic search) => (search as Search).toJson(),
+    );
+
+    register<PagesInterface, Page>(
+      interface: PagesInterface(),
+      key: 'pages',
+      decoder: (json) => Page.fromJson(json),
+      encoder: (dynamic page) => (page as Page).toJson(),
     );
   }
 
@@ -453,5 +488,43 @@ final class WordpressClient {
         ),
       ),
     );
+  }
+
+  /// Fetches the discovery URL of the associated wordpress site and caches the response and returns the status as a boolean.
+  ///
+  /// The response object may allocate a decent amount of memory, it may be possible you wish to deallocate it.
+  ///
+  /// In that case, call `clearDiscovered()` method to clear the cached discovery data.
+  Future<bool> discover() async {
+    if (_discovery != null) {
+      return true;
+    }
+
+    final response = await _requester.discover();
+
+    return response.map(
+      onSuccess: (response) {
+        _discovery = response.data;
+        return _discovery != null;
+      },
+      onFailure: (response) {
+        return false;
+      },
+    )!;
+  }
+
+  /// Clears the stored discovery cache
+  void clearDiscoveryCache() => _discovery = null;
+
+  @override
+  void dispose() {
+    if (_isDisposed) {
+      return;
+    }
+
+    clearDefaultAuthorization();
+    clearDiscoveryCache();
+    _typeMap.clear();
+    _isDisposed = true;
   }
 }
