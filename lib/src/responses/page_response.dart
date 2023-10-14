@@ -148,7 +148,7 @@ final class Page implements ISelfRespresentive {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,
       'date': date?.millisecondsSinceEpoch,

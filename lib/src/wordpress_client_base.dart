@@ -11,6 +11,7 @@ import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
+import 'interface/page.dart';
 import 'interface/posts.dart';
 import 'interface/search.dart';
 import 'interface/tags.dart';
@@ -145,6 +146,19 @@ final class WordpressClient implements IDisposable {
   /// - Delete (Requires Authorization)
   ///
   PostsInterface get posts => get<PostsInterface>('posts');
+
+  /// The pages interface.
+  ///
+  /// Provides functionality to manipulate pages.
+  ///
+  /// Available Operations:
+  /// - List
+  /// - Retrive
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  PagesInterface get pages => get<PagesInterface>('pages');
 
   /// The categories interface.
   ///
@@ -307,6 +321,13 @@ final class WordpressClient implements IDisposable {
       key: 'search',
       decoder: (json) => Search.fromJson(json),
       encoder: (dynamic search) => (search as Search).toJson(),
+    );
+
+    register<PagesInterface, Page>(
+      interface: PagesInterface(),
+      key: 'pages',
+      decoder: (json) => Page.fromJson(json),
+      encoder: (dynamic page) => (page as Page).toJson(),
     );
   }
 

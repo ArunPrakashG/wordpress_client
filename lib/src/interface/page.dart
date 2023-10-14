@@ -1,8 +1,7 @@
 import '../../wordpress_client.dart';
-import '../responses/page_response.dart';
 
 /// Represents the page interface.
-final class PageInterface extends IRequestInterface
+final class PagesInterface extends IRequestInterface
     with
         CreateOperation<Page, CreatePageRequest>,
         DeleteOperation<DeletePageRequest>,
