@@ -489,5 +489,12 @@ final class WordpressClient {
     )!;
   }
 
-  void clearDiscovered() => _discovery = null;
+  /// Clears the stored discovery cache
+  void clearDiscoveryCache() => _discovery = null;
+
+  /// Clears this client by removing stored data on default authorization and the discovery cache.
+  void clear() {
+    clearDefaultAuthorization();
+    clearDiscoveryCache();
+  }
 }

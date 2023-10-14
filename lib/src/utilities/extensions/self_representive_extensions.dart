@@ -23,6 +23,14 @@ extension SelfRepresentiveExtensions on ISelfRespresentive {
   /// Returns the value of the key or null if it doesn't exist.
   dynamic operator [](String key) => self[key];
 
+  T? call<T>(
+    String key, {
+    T Function()? orElse,
+    T? Function(dynamic value)? transformer,
+  }) {
+    return getField<T>(key, orElse: orElse, transformer: transformer);
+  }
+
   @Deprecated('Use "self"')
   Map<String, dynamic> get json => self;
 }
