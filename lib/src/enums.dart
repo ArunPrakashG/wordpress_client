@@ -13,6 +13,7 @@ enum ErrorType {
   interfaceExist,
   interfaceNotInitialized,
   invalidInterface,
+  discoveryPending,
   nullReference,
   requestUriParsingFailed,
 }

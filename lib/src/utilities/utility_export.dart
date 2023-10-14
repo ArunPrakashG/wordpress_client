@@ -1,3 +1,4 @@
+export 'disposable_base.dart';
 export 'extensions/header_extensions.dart';
 export 'extensions/map_extensions.dart';
 export 'extensions/post_extensions.dart';
@@ -12,6 +13,7 @@ export 'helpers.dart'
         executeGuarded,
         parseDateIfNotNull,
         decodeByMultiKeys,
+        using,
         getMIMETypeFromExtension;
 export 'request_url.dart';
 export 'typedefs.dart';

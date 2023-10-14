@@ -49,6 +49,27 @@ Future<void> main() async {
   // tempMailClient = TempMailClient();
   // final mailResponse = await tempMailClient.getEmails();
 
+  group(
+    'Discovery',
+    () {
+      test(
+        'Discovery Request',
+        () async {
+          final result = await client.discover();
+
+          expect(true, result);
+        },
+      );
+
+      test(
+        'Discovery Data',
+        () async {
+          expect(json['base_host'] as String, client.discovery.home);
+        },
+      );
+    },
+  );
+
   group('', () {
     test(
       'Response Time',

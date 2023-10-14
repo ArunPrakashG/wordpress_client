@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../../utilities/helpers.dart';
 
 @immutable
-class LinkContainer {
+final class LinkContainer {
   const LinkContainer({
     this.id,
     this.name,
@@ -11,6 +11,7 @@ class LinkContainer {
     this.count,
     this.embeddable,
     this.href,
+    this.type,
   });
 
   factory LinkContainer.fromJson(Map<String, dynamic> json) {
@@ -21,6 +22,7 @@ class LinkContainer {
       taxonomy: castOrElse(json['taxonomy']),
       embeddable: castOrElse(json['embeddable']),
       href: castOrElse(json['href']),
+      type: castOrElse(json['type']),
     );
   }
 
@@ -30,6 +32,7 @@ class LinkContainer {
   final bool? embeddable;
   final int? count;
   final String? href;
+  final String? type;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -39,12 +42,13 @@ class LinkContainer {
       'taxonomy': taxonomy,
       'embeddable': embeddable,
       'href': href,
+      'type': type,
     };
   }
 
   @override
   String toString() {
-    return 'LinkContainer(id: $id, name: $name, taxonomy: $taxonomy, embeddable: $embeddable, count: $count, href: $href)';
+    return 'LinkContainer(id: $id, name: $name, taxonomy: $taxonomy, embeddable: $embeddable, count: $count, href: $href, type: $type)';
   }
 
   @override
@@ -58,6 +62,7 @@ class LinkContainer {
         other.taxonomy == taxonomy &&
         other.embeddable == embeddable &&
         other.count == count &&
+        other.type == type &&
         other.href == href;
   }
 
@@ -68,6 +73,7 @@ class LinkContainer {
         taxonomy.hashCode ^
         embeddable.hashCode ^
         count.hashCode ^
+        type.hashCode ^
         href.hashCode;
   }
 }

@@ -7,7 +7,7 @@ import '../../utilities/helpers.dart';
 import 'link_container.dart';
 
 @immutable
-class Links {
+final class Links {
   const Links({
     this.self,
     this.collection,
