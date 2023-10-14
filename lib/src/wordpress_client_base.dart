@@ -27,7 +27,7 @@ part 'internal_requester.dart';
 part 'requests/request_interface_base.dart';
 
 /// The main class for [WordpressClient].
-final class WordpressClient {
+final class WordpressClient implements IDisposable {
   /// Default Constructor.
   ///
   /// [baseUrl] is the base url of the wordpress site.
@@ -101,6 +101,8 @@ final class WordpressClient {
   /// Base url path.
   String get path => baseUrl.path;
 
+  bool get disposed => _isDisposed;
+
   /// Returns true if this instance of [WordpressClient] is running in debug mode.
   ///
   /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
@@ -118,6 +120,7 @@ final class WordpressClient {
 
   /// Stores data on how to decode & encode responses.
   final CodableMap _typeMap = CodableMap();
+  bool _isDisposed = false;
 
   /// The current user interface.
   ///
@@ -492,9 +495,15 @@ final class WordpressClient {
   /// Clears the stored discovery cache
   void clearDiscoveryCache() => _discovery = null;
 
-  /// Clears this client by removing stored data on default authorization and the discovery cache.
-  void clear() {
+  @override
+  void dispose() {
+    if (_isDisposed) {
+      return;
+    }
+
     clearDefaultAuthorization();
     clearDiscoveryCache();
+    _typeMap.clear();
+    _isDisposed = true;
   }
 }
