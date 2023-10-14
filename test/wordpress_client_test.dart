@@ -70,6 +70,22 @@ Future<void> main() async {
     },
   );
 
+  group('Pages', () {
+    test(
+      'List Pages',
+      () async {
+        final response = await client.pages.list(
+          ListPageRequest(
+            perPage: 2,
+          ),
+        );
+
+        expect(200, response.code);
+        expect(2, response.asSuccess().data.length);
+      },
+    );
+  });
+
   group('', () {
     test(
       'Response Time',

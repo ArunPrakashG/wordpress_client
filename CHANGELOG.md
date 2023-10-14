@@ -170,10 +170,14 @@
 - ➕ Added `extra` property to all request classes. Now you can append (or override) custom fields into the request.
 - ➕ Added `addAllIfNotNull(...)` extension method to append valid key-values (not null) to existing map from another map.
 
-## 📖 8.1.0
+## 🎉 8.1.0
 
 - 🎉 Added the ability to fetch the discovery endpoint of Wordpress REST API and cache the response.
   - This allows to access the site's identity details such as description and logo url, along with all the available endpoints and other details.
+
+## 🎉 8.2.0
+
+- 🎉 Added support for Pages endpoint
 
 ## Legend
 
