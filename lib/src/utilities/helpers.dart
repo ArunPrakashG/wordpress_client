@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import '../library_exports.dart';
 import 'codable_map/codable_map.dart';
 
 DateTime? parseDateIfNotNull(dynamic json) {
@@ -71,6 +73,17 @@ T? decodeByMultiKeys<T>(
   }
 
   return orElse?.call();
+}
+
+FutureOr<T?> using<T, E extends IDisposable>(
+  E disposable,
+  FutureOr<T?> Function(E instance) delegate,
+) async {
+  try {
+    return delegate(disposable);
+  } finally {
+    disposable.dispose();
+  }
 }
 
 /// Casts the given dynamic JSON value to the specified type [T].
