@@ -179,6 +179,10 @@
 
 - 🎉 Added support for Pages endpoint
 
+## 🛠 8.2.1
+
+- 🛠 Fixed exporting WordpressDiscovery class.
+
 ## Legend
 
 - 🎉 New features or major changes
