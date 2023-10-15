@@ -19,7 +19,6 @@ import 'interface/users.dart';
 import 'interface_key.dart';
 import 'internal_requester_base.dart';
 import 'library_exports.dart';
-import 'responses/wordpress_discovery_response.dart';
 import 'responses/wordpress_raw_response.dart';
 import 'utilities/codable_map/codable_map.dart';
 import 'utilities/helpers.dart';
