@@ -183,6 +183,10 @@
 
 - 🛠 Fixed exporting WordpressDiscovery class.
 
+## 🛠 8.2.2
+
+- 🛠 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes
