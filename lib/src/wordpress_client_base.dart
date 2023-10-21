@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
+import 'interface/application_passwords.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
@@ -233,6 +234,20 @@ final class WordpressClient implements IDisposable {
   ///
   SearchInterface get search => get<SearchInterface>('search');
 
+  /// The application password interface.
+  ///
+  /// Provides functionality to list, create and delete application passwords.
+  ///
+  /// Available Operations:
+  /// - List (Requires Authorization)
+  /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Retrive (Requires Authorization)
+  /// - Delete (Requires Authorization)
+  ///
+  ApplicationPasswordsInterface get applicationPasswords =>
+      get<ApplicationPasswordsInterface>('application-passwords');
+
   final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
       <InterfaceKey<dynamic>, dynamic>{};
 
@@ -328,6 +343,14 @@ final class WordpressClient implements IDisposable {
       decoder: (json) => Page.fromJson(json),
       encoder: (dynamic page) => (page as Page).toJson(),
     );
+
+    register<ApplicationPasswordsInterface, ApplicationPassword>(
+      interface: ApplicationPasswordsInterface(),
+      key: 'application-passwords',
+      decoder: (json) => ApplicationPassword.fromJson(json),
+      encoder: (dynamic appPassword) =>
+          (appPassword as ApplicationPassword).toJson(),
+    );
   }
 
   /// Called to initialize an interface.
@@ -383,13 +406,6 @@ final class WordpressClient implements IDisposable {
       encoder: encoder,
       overriteIfExists: overriteIfTypeExists,
     );
-
-    // _registerResponseType<List<E>>(
-    //   decoder: (response) =>
-    //       (response as List<dynamic>).map((e) => responseDecoder(e)).toList(),
-    //   encoder: responseEncoder,
-    //   overriteIfExists: true,
-    // );
 
     interface._initInterface(
       requester: _requester,

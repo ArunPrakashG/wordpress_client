@@ -183,6 +183,19 @@
 
 - 🛠 Fixed exporting WordpressDiscovery class.
 
+## 🛠 8.2.2
+
+- 🛠 Bug fixes
+
+## 🎉 8.3.0
+
+- 🎉 Supports Application Password endpoint
+- Packages update
+  - dio 5.3.2 -> 5.3.3
+  - collection 1.17.1 -> 1.18.0
+  - meta 1.9.1 -> 1.11.0
+  - test 1.24.5 -> 1.24.8
+
 ## Legend
 
 - 🎉 New features or major changes
