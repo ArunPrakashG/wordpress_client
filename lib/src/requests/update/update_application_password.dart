@@ -17,6 +17,8 @@ final class UpdateApplicationPasswordRequest extends IRequest {
   });
 
   int userId;
+
+  /// Can be generated using the uuid package available on pub.dev.
   String uuid;
   String name;
   String appId;
