@@ -10,6 +10,7 @@ Future<void> main() async {
     baseUrl: baseUrl,
     bootstrapper: (bootstrapper) => bootstrapper.withDebugMode(true).build(),
   );
+
   client.initialize();
 
   final response = await client.posts.list(

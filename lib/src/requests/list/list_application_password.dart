@@ -2,6 +2,7 @@ import '../../../wordpress_client.dart';
 
 final class ListApplicationPasswordRequest extends IRequest {
   ListApplicationPasswordRequest({
+    required this.userId,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -12,6 +13,8 @@ final class ListApplicationPasswordRequest extends IRequest {
     super.extra,
   });
 
+  int userId;
+
   @override
   WordpressRequest build(Uri baseUrl) {
     final queryParameters = <String, dynamic>{}..addAllIfNotNull(extra);
@@ -20,7 +23,11 @@ final class ListApplicationPasswordRequest extends IRequest {
       queryParameters: queryParameters,
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(
-        const ['users', 'me', 'application-passwords'],
+        [
+          'users',
+          userId.toString(),
+          'application-passwords',
+        ],
       ),
       requireAuth: requireAuth,
       cancelToken: cancelToken,

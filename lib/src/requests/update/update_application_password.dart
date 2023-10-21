@@ -1,10 +1,11 @@
 import '../../../wordpress_client.dart';
 
-final class CreateApplicationPasswordRequest extends IRequest {
-  CreateApplicationPasswordRequest({
-    required this.name,
+final class UpdateApplicationPasswordRequest extends IRequest {
+  UpdateApplicationPasswordRequest({
     required this.userId,
-    this.appId,
+    required this.uuid,
+    required this.name,
+    required this.appId,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -15,9 +16,10 @@ final class CreateApplicationPasswordRequest extends IRequest {
     super.extra,
   });
 
-  String? appId;
-  String name;
   int userId;
+  String uuid;
+  String name;
+  String appId;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -27,13 +29,13 @@ final class CreateApplicationPasswordRequest extends IRequest {
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(
-      body: body,
       method: HttpMethod.post,
+      body: body,
       url: RequestUrl.relativeParts(
         [
           'users',
           userId.toString(),
-          'application-passwords',
+          uuid,
         ],
       ),
       requireAuth: requireAuth,

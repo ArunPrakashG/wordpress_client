@@ -11,10 +11,10 @@ final class ApplicationPassword implements ISelfRespresentive {
     required this.appId,
     required this.name,
     required this.created,
-    required this.lastUsed,
-    required this.lastIp,
     required this.links,
     required this.self,
+    this.lastUsed,
+    this.lastIp,
     this.password,
   });
 
@@ -30,7 +30,7 @@ final class ApplicationPassword implements ISelfRespresentive {
       lastUsed: castOrElse(
         map['last_used'],
         transformer: (value) => DateTime.parse(value as String),
-      )!,
+      ),
       lastIp: castOrElse(map['last_ip']),
       password: castOrElse(map['password']),
       links: castOrElse(
@@ -42,11 +42,11 @@ final class ApplicationPassword implements ISelfRespresentive {
   }
 
   final String uuid;
-  final String appId;
+  final String? appId;
   final String name;
   final DateTime created;
-  final DateTime lastUsed;
-  final String lastIp;
+  final DateTime? lastUsed;
+  final String? lastIp;
   final Links? links;
   final String? password;
 
@@ -59,7 +59,7 @@ final class ApplicationPassword implements ISelfRespresentive {
       'app_id': appId,
       'name': name,
       'created': created.toIso8601String(),
-      'last_used': lastUsed.toIso8601String(),
+      'last_used': lastUsed?.toIso8601String(),
       'last_ip': lastIp,
       'password': password,
       '_links': links?.toJson(),
