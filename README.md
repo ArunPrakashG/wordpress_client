@@ -31,7 +31,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.2.2
+ wordpress_client: ^8.3.0
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
@@ -117,22 +117,23 @@ By Useful Team, this is another implementation using JWT for authentication purp
 
 ## 📋 Supported REST Methods
 
-| Endpoint       | Create | Read | Update | Delete |
-| -------------- | :----: | :--: | :----: | :----: |
-| Posts          |   ✅   |  ✅  |   ✅   |   ✅   |
-| Comments       |   ✅   |  ✅  |   ✅   |   ✅   |
-| Categories     |   ✅   |  ✅  |   ✅   |   ✅   |
-| Tags           |   ✅   |  ✅  |   ✅   |   ✅   |
-| Users          |   ✅   |  ✅  |   ✅   |   ✅   |
-| Me             |   ✅   |  ✅  |   ✅   |   ✅   |
-| Media          |   ✅   |  ✅  |   ✅   |   ✅   |
-| Pages          |   ✅   |  ✅  |   ✅   |   ✅   |
-| Search         |   ❌   |  ✅  |   ❌   |   ❌   |
-| Post Revisions |   ❌   |  ❌  |   ❌   |   ❌   |
-| Taxonomies     |   ❌   |  ❌  |   ❌   |   ❌   |
-| Post Types     |   ❌   |  ❌  |   ❌   |   ❌   |
-| Post Statuses  |   ❌   |  ❌  |   ❌   |   ❌   |
-| Settings       |   ❌   |  ❌  |   ❌   |   ❌   |
+| Endpoint              | Create | Read | Update | Delete |
+| --------------------- | :----: | :--: | :----: | :----: |
+| Posts                 |   ✅   |  ✅  |   ✅   |   ✅   |
+| Comments              |   ✅   |  ✅  |   ✅   |   ✅   |
+| Categories            |   ✅   |  ✅  |   ✅   |   ✅   |
+| Tags                  |   ✅   |  ✅  |   ✅   |   ✅   |
+| Users                 |   ✅   |  ✅  |   ✅   |   ✅   |
+| Me                    |   ✅   |  ✅  |   ✅   |   ✅   |
+| Media                 |   ✅   |  ✅  |   ✅   |   ✅   |
+| Pages                 |   ✅   |  ✅  |   ✅   |   ✅   |
+| Application Passwords |   ✅   |  ✅  |   ✅   |   ✅   |
+| Search                |   -    |  ✅  |   -    |   -    |
+| Post Revisions        |   ❌   |  ❌  |   ❌   |   ❌   |
+| Taxonomies            |   ❌   |  ❌  |   ❌   |   ❌   |
+| Post Types            |   ❌   |  ❌  |   ❌   |   ❌   |
+| Post Statuses         |   ❌   |  ❌  |   ❌   |   ❌   |
+| Settings              |   ❌   |  ❌  |   ❌   |   ❌   |
 
 ## 📢 Custom Response Types
 

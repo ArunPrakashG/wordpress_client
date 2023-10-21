@@ -241,6 +241,8 @@ final class WordpressClient implements IDisposable {
   /// Available Operations:
   /// - List (Requires Authorization)
   /// - Create (Requires Authorization)
+  /// - Update (Requires Authorization)
+  /// - Retrive (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
   ApplicationPasswordsInterface get applicationPasswords =>
