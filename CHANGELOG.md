@@ -198,9 +198,14 @@
 
 ## 🐛 8.3.1
 
-- Packages downgrate
+- Packages downgrade
   - test 1.24.8 -> 1.24.5
 - Added avatar urls model class for users response
+
+## 🐛 8.3.2
+
+- Packages downgrade
+  - meta 1.11.0 -> 1.9.1
 
 ## Legend
 
