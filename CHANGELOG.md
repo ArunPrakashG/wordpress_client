@@ -196,6 +196,12 @@
   - meta 1.9.1 -> 1.11.0
   - test 1.24.5 -> 1.24.8
 
+## 🐛 8.3.1
+
+- Packages downgrate
+  - test 1.24.8 -> 1.24.5
+- Added avatar urls model class for users response
+
 ## Legend
 
 - 🎉 New features or major changes

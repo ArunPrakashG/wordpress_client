@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
+import 'properties/avatar_urls.dart';
 import 'properties/extra_capabilities.dart';
 import 'properties/links.dart';
 
@@ -63,9 +64,9 @@ class User implements ISelfRespresentive {
       ),
       avatarUrls: castOrElse(
         json['avatar_urls'],
-        transformer: (dynamic value) => Map<String, String>.from(
-          value as Map<String, dynamic>,
-        ).map(MapEntry.new),
+        transformer: (dynamic value) {
+          return AvatarUrls.fromJson(value as Map<String, dynamic>);
+        },
       ),
       meta: json['meta'],
       links: castOrElse(
@@ -91,7 +92,7 @@ class User implements ISelfRespresentive {
   final String link;
   final String slug;
   final List<String> roles;
-  final Map<String, String>? avatarUrls;
+  final AvatarUrls? avatarUrls;
   final dynamic meta;
   final Links? links;
 
@@ -115,7 +116,7 @@ class User implements ISelfRespresentive {
       'capabilities': capabilities,
       'extra_capabilities': extraCapabilities?.toJson(),
       'roles': roles,
-      'avatar_urls': avatarUrls,
+      'avatar_urls': avatarUrls?.toJson(),
       'meta': meta,
       '_links': links?.toJson(),
     };

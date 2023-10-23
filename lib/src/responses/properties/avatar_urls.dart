@@ -1,16 +1,34 @@
 import 'package:meta/meta.dart';
 
+import '../../library_exports.dart';
+
 @immutable
-class AvatarUrls {
+final class AvatarUrls {
   const AvatarUrls({
     this.small24,
     this.medium48,
     this.large96,
   });
 
+  factory AvatarUrls.fromJson(Map<String, dynamic> json) {
+    return AvatarUrls(
+      small24: castOrElse(json['24']),
+      medium48: castOrElse(json['48']),
+      large96: castOrElse(json['96']),
+    );
+  }
+
   final String? small24;
   final String? medium48;
   final String? large96;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      '24': small24,
+      '48': medium48,
+      '96': large96,
+    };
+  }
 
   AvatarUrls copyWith({
     String? small24,
