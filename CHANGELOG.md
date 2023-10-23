@@ -205,7 +205,13 @@
 ## 🐛 8.3.2
 
 - Packages downgrade
+
   - meta 1.11.0 -> 1.9.1
+
+  ## 🐛 8.3.3
+
+- Packages downgrade
+  - collection 1.18.0 -> 1.17.2
 
 ## Legend
 
