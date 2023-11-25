@@ -41,31 +41,51 @@ class Media implements ISelfRespresentive {
 
   factory Media.fromJson(Map<String, dynamic> json) {
     return Media(
-      id: json['id'] as int?,
+      id: castOrElse(json['id']),
       date: parseDateIfNotNull(json['date']),
       dateGmt: parseDateIfNotNull(json['date_gmt']),
-      guid: Content.fromJson(json['guid']),
+      guid: castOrElse(
+        json['guid'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
       modified: parseDateIfNotNull(json['modified']),
       modifiedGmt: parseDateIfNotNull(json['modified_gmt']),
-      slug: json['slug'] as String?,
+      slug: castOrElse(json['slug']),
       status: getMediaFilterStatusFromValue(json['status'] as String?),
-      type: json['type'] as String?,
-      link: json['link'] as String?,
-      title: Content.fromJson(json['title']),
-      author: json['author'] as int?,
+      type: castOrElse(json['type']),
+      link: castOrElse(json['link']),
+      title: castOrElse(
+        json['title'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
+      author: castOrElse(json['author']),
       commentStatus: getStatusFromValue(json['comment_status'] as String?),
       pingStatus: getStatusFromValue(json['ping_status'] as String?),
-      template: json['template'] as String?,
-      meta: json['meta'],
-      description: Content.fromJson(json['description']),
-      caption: Content.fromJson(json['caption']),
-      altText: json['alt_text'] as String?,
-      mediaType: json['media_type'] as String?,
-      mimeType: json['mime_type'] as String?,
-      mediaDetails: MediaDetails.fromJson(json['media_details']),
-      post: json['post'] as int?,
-      sourceUrl: json['source_url'] as String?,
-      links: Links.fromJson(json['_links']),
+      template: castOrElse(json['template']),
+      meta: castOrElse(json['meta']),
+      description: castOrElse(
+        json['description'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
+      caption: castOrElse(
+        json['caption'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
+      altText: castOrElse(json['alt_text']),
+      mediaType: castOrElse(json['media_type']),
+      mimeType: castOrElse(json['mime_type']),
+      mediaDetails: castOrElse(
+        json['media_details'],
+        transformer: (value) {
+          return MediaDetails.fromJson(value as Map<String, dynamic>);
+        },
+      ),
+      post: castOrElse(json['post']),
+      sourceUrl: castOrElse(json['source_url']),
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
       self: json,
     );
   }

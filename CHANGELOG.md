@@ -208,10 +208,14 @@
 
   - meta 1.11.0 -> 1.9.1
 
-  ## 🐛 8.3.3
+## 🐛 8.3.3
 
 - Packages downgrade
   - collection 1.18.0 -> 1.17.2
+
+## 🐛 8.3.4
+
+- Media response model null exception when parsing if media details is empty. (while using embed=true)
 
 ## Legend
 

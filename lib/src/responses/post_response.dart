@@ -83,12 +83,19 @@ class Post implements ISelfRespresentive {
         (dynamic v) => v as int,
       ),
       tags: mapIterableWithChecks<int>(json['tags'], (dynamic v) => v as int),
-      authorMeta: AuthorMeta.fromJson(json['author_meta']),
+      authorMeta: castOrElse(
+        json['author_meta'],
+        transformer: (value) =>
+            AuthorMeta.fromJson(value as Map<String, dynamic>),
+      ),
       featuredImageUrl: decodeByMultiKeys(
         json,
         ['featured_image_url', 'featured_media_src_url'],
       ),
-      links: Links.fromJson(json['_links']),
+      links: castOrElse(
+        json['_links'],
+        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
+      ),
       self: json,
     );
   }
