@@ -41,6 +41,7 @@ enum Status {
 }
 
 enum CommentStatus {
+  approve,
   approved,
   pending,
 }

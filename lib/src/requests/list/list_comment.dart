@@ -18,7 +18,7 @@ final class ListCommentRequest extends IRequest {
     this.parent,
     this.parentExclude,
     this.post,
-    this.status = CommentStatus.approved,
+    this.status = CommentStatus.approve,
     this.type = 'comment',
     this.password,
     super.cancelToken,
