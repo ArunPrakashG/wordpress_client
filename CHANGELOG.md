@@ -217,6 +217,10 @@
 
 - Media response model null exception when parsing if media details is empty. (while using embed=true)
 
+## 🐛 8.3.5
+
+- 🩹 Bug fixes on comment list request.
+
 ## Legend
 
 - 🎉 New features or major changes
