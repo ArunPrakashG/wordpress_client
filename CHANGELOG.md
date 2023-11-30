@@ -221,6 +221,10 @@
 
 - 🩹 Bug fixes on comment list request.
 
+## 🐛 8.3.6
+
+- 🩹 Bug fixes on enum parsing.
+
 ## Legend
 
 - 🎉 New features or major changes
