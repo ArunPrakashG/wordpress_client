@@ -42,6 +42,7 @@ enum Status {
 
 enum CommentStatus {
   approve,
+  approved,
   pending,
 }
 
@@ -160,12 +161,9 @@ ContentStatus getContentStatusFromValue(String? value) {
   }
 
   return ContentStatus.values
-      .where(
-        (element) =>
-            element.toString().split('.').last.toLowerCase() ==
-            value.toLowerCase(),
-      )
-      .first;
+          .where((element) => element.name.toLowerCase() == value.toLowerCase())
+          .firstOrNull ??
+      ContentStatus.pending;
 }
 
 CommentStatus getCommentStatusFromValue(String? value) {
@@ -174,12 +172,9 @@ CommentStatus getCommentStatusFromValue(String? value) {
   }
 
   return CommentStatus.values
-      .where(
-        (element) =>
-            element.toString().split('.').last.toLowerCase() ==
-            value.toLowerCase(),
-      )
-      .first;
+          .where((element) => element.name.toLowerCase() == value.toLowerCase())
+          .firstOrNull ??
+      CommentStatus.pending;
 }
 
 MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
@@ -188,12 +183,9 @@ MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
   }
 
   return MediaFilterStatus.values
-      .where(
-        (element) =>
-            element.toString().split('.').last.toLowerCase() ==
-            value.toLowerCase(),
-      )
-      .first;
+          .where((element) => element.name.toLowerCase() == value.toLowerCase())
+          .firstOrNull ??
+      MediaFilterStatus.inherit;
 }
 
 PostFormat getFormatFromValue(String? value) {
@@ -202,12 +194,9 @@ PostFormat getFormatFromValue(String? value) {
   }
 
   return PostFormat.values
-      .where(
-        (element) =>
-            element.toString().split('.').last.toLowerCase() ==
-            value.toLowerCase(),
-      )
-      .first;
+          .where((e) => e.name.toLowerCase() == value.toLowerCase())
+          .firstOrNull ??
+      PostFormat.standard;
 }
 
 Status getStatusFromValue(String? value) {
@@ -216,10 +205,7 @@ Status getStatusFromValue(String? value) {
   }
 
   return Status.values
-      .where(
-        (element) =>
-            element.toString().split('.').last.toLowerCase() ==
-            value.toLowerCase(),
-      )
-      .first;
+          .where((element) => element.name.toLowerCase() == value.toLowerCase())
+          .firstOrNull ??
+      Status.open;
 }
