@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
-import 'responses/wordpress_raw_response.dart';
 import 'utilities/codable_map/codable_map.dart';
 
 abstract base class IRequestExecutor {
@@ -10,6 +9,7 @@ abstract base class IRequestExecutor {
 
   void configure(BootstrapConfiguration configuration);
 
+  @internal
   Future<WordpressResponse<T>> create<T>(
     WordpressRequest request,
   ) async {
@@ -62,6 +62,7 @@ abstract base class IRequestExecutor {
     );
   }
 
+  @internal
   Future<WordpressResponse<T>> retrive<T>(
     WordpressRequest request,
   ) async {
@@ -114,6 +115,7 @@ abstract base class IRequestExecutor {
     );
   }
 
+  @internal
   Future<WordpressResponse<bool>> delete(
     WordpressRequest request,
   ) async {
@@ -163,6 +165,7 @@ abstract base class IRequestExecutor {
     );
   }
 
+  @internal
   Future<WordpressResponse<List<T>>> list<T>(
     WordpressRequest request,
   ) async {
@@ -215,6 +218,7 @@ abstract base class IRequestExecutor {
     );
   }
 
+  @internal
   Future<WordpressResponse<T>> update<T>(
     WordpressRequest request,
   ) async {
@@ -267,6 +271,7 @@ abstract base class IRequestExecutor {
     );
   }
 
-  @protected
+  /// Executes the given [request] on the associated base url and returns the result in raw format.
+  @internal
   Future<WordpressRawResponse> execute(WordpressRequest request);
 }

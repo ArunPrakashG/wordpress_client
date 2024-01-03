@@ -9,4 +9,13 @@ base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
 
     return executor.list<T>(wpRequest);
   }
+
+  /// Returns the raw response for the given [request].
+  Future<WordpressRawResponse> listRaw(
+    R request,
+  ) async {
+    final wpRequest = await request.build(baseUrl);
+
+    return executor.execute(wpRequest);
+  }
 }
