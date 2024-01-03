@@ -7,4 +7,11 @@ base mixin CreateOperation<T, R extends IRequest> on IRequestInterface {
 
     return executor.create<T>(wpRequest);
   }
+
+  /// Returns the raw response for the given [request].
+  Future<WordpressRawResponse> createRaw(R request) async {
+    final wpRequest = await request.build(baseUrl);
+
+    return executor.execute(wpRequest);
+  }
 }
