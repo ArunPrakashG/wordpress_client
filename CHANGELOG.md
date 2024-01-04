@@ -225,6 +225,13 @@
 
 - 🩹 Bug fixes on enum parsing.
 
+## 🐛 8.3.7
+
+- 🎉 Support for raw requests
+  - Allows you to send requests but skip the parsing process. You can parse the response manually.
+  - This allows to integrate the package along with other database packages such as drift, hive etc by allowing you to create a custom model class and integrate for the response.
+- 🛠 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes
