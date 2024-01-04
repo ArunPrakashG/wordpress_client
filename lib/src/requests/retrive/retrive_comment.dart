@@ -13,6 +13,8 @@ final class RetriveCommentRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -24,10 +26,12 @@ final class RetriveCommentRequest extends IRequest {
     final queryParameters = <String, dynamic>{}
       ..addIfNotNull('context', context?.name)
       ..addIfNotNull('password', password)
+      ..addAllIfNotNull(this.queryParameters)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       method: HttpMethod.get,
+      headers: headers,
       url: RequestUrl.relativeParts(['comments', id]),
       queryParameters: queryParameters,
       requireAuth: requireAuth || context == RequestContext.edit,

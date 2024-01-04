@@ -22,6 +22,8 @@ final class UpdateMeRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String? username;
@@ -57,6 +59,8 @@ final class UpdateMeRequest extends IRequest {
     return WordpressRequest(
       body: body,
       method: HttpMethod.post,
+      headers: headers,
+      queryParameters: queryParameters,
       url: RequestUrl.relativeParts(const ['users', 'me']),
       requireAuth: requireAuth,
       cancelToken: cancelToken,

@@ -12,6 +12,8 @@ final class DeleteCategoryRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   bool? force;
@@ -25,6 +27,8 @@ final class DeleteCategoryRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.delete,
       url: RequestUrl.relativeParts(['categories', id]),
       requireAuth: requireAuth,

@@ -71,6 +71,18 @@ final class WordpressRawResponse {
   /// Returns true if the given [code] is not in between 200 to 399 range. A convenience method for `!isSuccessful`.
   bool get isFailure => !isSuccessful;
 
+  dynamic operator [](String key) {
+    if (data == null) {
+      throw NullReferenceException('Response is null.');
+    }
+
+    if (data is! Map) {
+      throw StateError('Response is not a map.');
+    }
+
+    return data[key];
+  }
+
   /// Maps this instance to a [WordpressResponse] instance.
   ///
   /// The [decoder] is used to decode the [data] to the desired type.

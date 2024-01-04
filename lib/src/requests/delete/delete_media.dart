@@ -12,6 +12,8 @@ final class DeleteMediaRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int id;
@@ -25,6 +27,8 @@ final class DeleteMediaRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.delete,
       url: RequestUrl.relativeParts(['media', id]),
       requireAuth: requireAuth,

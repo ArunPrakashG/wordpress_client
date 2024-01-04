@@ -16,7 +16,15 @@ abstract base class IRequest {
     this.events,
     this.validator,
     this.extra,
+    this.headers,
+    this.queryParameters,
   });
+
+  /// The extra headers to send with the request.
+  final Map<String, String>? headers;
+
+  /// The query parameters to send with the request.
+  final Map<String, dynamic>? queryParameters;
 
   /// Whether the request requires authentication.
   final bool requireAuth;

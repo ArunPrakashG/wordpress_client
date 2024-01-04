@@ -13,6 +13,8 @@ final class CreateApplicationPasswordRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String? appId;
@@ -28,6 +30,8 @@ final class CreateApplicationPasswordRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.post,
       url: RequestUrl.relativeParts(
         [

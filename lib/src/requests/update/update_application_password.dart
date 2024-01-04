@@ -14,6 +14,8 @@ final class UpdateApplicationPasswordRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int userId;
@@ -32,6 +34,8 @@ final class UpdateApplicationPasswordRequest extends IRequest {
 
     return WordpressRequest(
       method: HttpMethod.post,
+      headers: headers,
+      queryParameters: queryParameters,
       body: body,
       url: RequestUrl.relativeParts(
         [

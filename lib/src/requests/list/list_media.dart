@@ -29,6 +29,8 @@ final class ListMediaRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -73,10 +75,12 @@ final class ListMediaRequest extends IRequest {
       ..addIfNotNull('media_type', mediaType?.name)
       ..addIfNotNull('mime_type', mimeType)
       ..addIfNotNull('status', status?.name)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('media'),
       requireAuth: requireAuth || context == RequestContext.edit,

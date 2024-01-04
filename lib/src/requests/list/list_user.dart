@@ -22,6 +22,8 @@ final class ListUserRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -52,10 +54,12 @@ final class ListUserRequest extends IRequest {
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('roles', roles)
       ..addIfNotNull('who', who)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('users'),
       requireAuth: requireAuth || context == RequestContext.edit,
