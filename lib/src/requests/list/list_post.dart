@@ -31,6 +31,8 @@ final class ListPostRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -79,10 +81,12 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status?.name)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('posts'),
       requireAuth: requireAuth || context == RequestContext.edit,

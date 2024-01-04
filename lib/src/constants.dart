@@ -1,1 +1,1 @@
-const Duration kDefaultRequestTimeout = Duration(seconds: 60);
+const Duration kDefaultRequestTimeout = Duration(seconds: 30);

@@ -7,4 +7,11 @@ base mixin UpdateOperation<T, R extends IRequest> on IRequestInterface {
 
     return executor.update<T>(wpRequest);
   }
+
+  /// Returns the raw response for the given [request].
+  Future<WordpressRawResponse> updateRaw(R request) async {
+    final wpRequest = await request.build(baseUrl);
+
+    return executor.execute(wpRequest);
+  }
 }

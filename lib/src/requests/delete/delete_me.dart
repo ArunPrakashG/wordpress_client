@@ -12,6 +12,8 @@ final class DeleteMeRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   bool? force;
@@ -26,6 +28,8 @@ final class DeleteMeRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.delete,
       url: RequestUrl.relativeParts(const ['users', 'me']),
       requireAuth: requireAuth,

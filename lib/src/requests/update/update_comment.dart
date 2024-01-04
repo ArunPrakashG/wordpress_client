@@ -21,6 +21,8 @@ final class UpdateCommentRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int? author;
@@ -53,6 +55,8 @@ final class UpdateCommentRequest extends IRequest {
     return WordpressRequest(
       body: body,
       method: HttpMethod.post,
+      headers: headers,
+      queryParameters: queryParameters,
       url: RequestUrl.relativeParts(['comments', id]),
       requireAuth: requireAuth,
       cancelToken: cancelToken,

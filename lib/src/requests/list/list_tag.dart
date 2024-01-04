@@ -22,6 +22,8 @@ final class ListTagRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -52,10 +54,12 @@ final class ListTagRequest extends IRequest {
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('post', post)
       ..addIfNotNull('hide_empty', hideEmpty)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('tags'),
       requireAuth: requireAuth || context == RequestContext.edit,

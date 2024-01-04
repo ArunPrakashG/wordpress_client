@@ -16,6 +16,8 @@ final class ListSearchRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -34,10 +36,12 @@ final class ListSearchRequest extends IRequest {
       ..addIfNotNull('search', search)
       ..addIfNotNull('type', type?.name)
       ..addIfNotNull('subtype', subType)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('search'),
       requireAuth: requireAuth || context == RequestContext.edit,

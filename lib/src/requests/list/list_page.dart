@@ -29,6 +29,8 @@ final class ListPageRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -73,10 +75,12 @@ final class ListPageRequest extends IRequest {
       ..addIfNotNull('parent_exclude', parentExclude?.join(','))
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status?.name)
-      ..addAllIfNotNull(extra);
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('pages'),
       requireAuth: requireAuth || context == RequestContext.edit,

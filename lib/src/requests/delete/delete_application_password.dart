@@ -14,6 +14,8 @@ final class DeleteApplicationPasswordRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int userId;
@@ -31,6 +33,8 @@ final class DeleteApplicationPasswordRequest extends IRequest {
           uuid,
         ],
       ),
+      headers: headers,
+      queryParameters: queryParameters,
       requireAuth: requireAuth,
       cancelToken: cancelToken,
       authorization: authorization,

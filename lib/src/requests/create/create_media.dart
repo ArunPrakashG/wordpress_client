@@ -34,6 +34,8 @@ final class CreateMediaRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String mediaFilePath;
@@ -88,10 +90,12 @@ final class CreateMediaRequest extends IRequest {
         'Content-Disposition',
         'attachment; filename="${multipartFile.filename}"',
       )
-      ..addIfNotNull('Content-Type', mimeType);
+      ..addIfNotNull('Content-Type', mimeType)
+      ..addAllIfNotNull(this.headers);
 
     return WordpressRequest(
       body: FormData.fromMap(body),
+      queryParameters: queryParameters,
       method: HttpMethod.post,
       url: RequestUrl.relative('media'),
       requireAuth: requireAuth,

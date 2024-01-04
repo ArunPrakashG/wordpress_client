@@ -13,6 +13,8 @@ final class CreateTagRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String? description;
@@ -29,6 +31,8 @@ final class CreateTagRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.post,
       url: RequestUrl.relative('tags'),
       requireAuth: requireAuth,

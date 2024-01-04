@@ -14,6 +14,8 @@ final class UpdateTagRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String? description;
@@ -32,6 +34,8 @@ final class UpdateTagRequest extends IRequest {
     return WordpressRequest(
       body: body,
       method: HttpMethod.post,
+      headers: headers,
+      queryParameters: queryParameters,
       url: RequestUrl.relativeParts(['tags', id]),
       requireAuth: requireAuth,
       cancelToken: cancelToken,

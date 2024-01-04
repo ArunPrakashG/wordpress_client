@@ -12,6 +12,8 @@ final class RetriveApplicationPasswordRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int userId;
@@ -28,6 +30,8 @@ final class RetriveApplicationPasswordRequest extends IRequest {
           uuid,
         ],
       ),
+      queryParameters: queryParameters,
+      headers: headers,
       requireAuth: requireAuth,
       cancelToken: cancelToken,
       authorization: authorization,

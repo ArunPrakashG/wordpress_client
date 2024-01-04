@@ -5,6 +5,7 @@ import 'dart:math';
 import '../library_exports.dart';
 import 'codable_map/codable_map.dart';
 
+/// A convenience method to parse a date from a JSON object with error handling.
 DateTime? parseDateIfNotNull(dynamic json) {
   if (json == null) {
     return null;
@@ -23,6 +24,7 @@ DateTime? parseDateIfNotNull(dynamic json) {
   return DateTime.tryParse(dateString);
 }
 
+/// A convenience method to map a JSON object to a Dart object with error handling.
 T? mapGuarded<T>({
   required T Function(Map<String, dynamic> json) mapper,
   required dynamic json,
@@ -38,6 +40,7 @@ T? mapGuarded<T>({
   }
 }
 
+/// A convenience method to execute a function and handle any errors via [onError] callback.
 Future<T> executeGuarded<T>({
   required Future<T> Function() function,
   required Future<T> Function(Object error, StackTrace stackTrace) onError,
@@ -75,6 +78,7 @@ T? decodeByMultiKeys<T>(
   return orElse?.call();
 }
 
+/// A convenience method to execute a function and dispose the given [IDisposable] object.
 FutureOr<T?> using<T, E extends IDisposable>(
   E disposable,
   FutureOr<T?> Function(E instance) delegate,
@@ -115,10 +119,13 @@ T? castOrElse<T>(
   }
 }
 
+/// Returns true if the given [value] is null or empty.
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;
 
+/// Checks if the given [value] is alpha numeric.
 bool isAlphaNumeric(String value) => RegExp(r'^[a-zA-Z0-9]*$').hasMatch(value);
 
+/// Encodes the given [text] to Base64.
 String base64Encode(String text) {
   if (isNullOrEmpty(text)) {
     return '';
@@ -187,6 +194,7 @@ T? mapToType<T>(
   return decoder(json);
 }
 
+/// Returns the MIME type for the given file extension.
 String getMIMETypeFromExtension(String extension) {
   // list from https://codex.wordpress.org/Function_Reference/get_allowed_mime_types
   switch (extension.toLowerCase()) {

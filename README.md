@@ -14,14 +14,16 @@
 </p>
 </div>
 
-## 🚀 Features
+## ✨ Features
 
-- 🛡️ 3 Popular authorization methods.
-- 🎣 Events for preprocessing response operations.
-- ⏲️ Measures request completion time.
-- 🎨 Custom Requests & Authorization systems.
 - 🔄 Request Synchronization.
-- ✨ And much more!
+- 📦 API discovery support.
+- ⏲️ Measures request completion time.
+- 📝 Supports all CRUD operations.
+- 🌐 Supports all common endpoints.
+- 🎨 Custom Requests & Authorization systems.
+- 🔐 3 Popular authorization methods.
+- 🎣 Events for preprocessing response operations.
 
 ## 📖 How to Use
 
@@ -31,7 +33,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.3.6
+ wordpress_client: ^8.3.7
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).

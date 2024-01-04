@@ -11,16 +11,21 @@ final class ListApplicationPasswordRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int userId;
 
   @override
   WordpressRequest build(Uri baseUrl) {
-    final queryParameters = <String, dynamic>{}..addAllIfNotNull(extra);
+    final queryParameters = <String, dynamic>{}
+      ..addAllIfNotNull(extra)
+      ..addAllIfNotNull(this.queryParameters);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relativeParts(
         [

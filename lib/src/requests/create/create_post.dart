@@ -24,6 +24,8 @@ final class CreatePostRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String? slug;
@@ -62,6 +64,8 @@ final class CreatePostRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.post,
       url: RequestUrl.relative('posts'),
       requireAuth: requireAuth,

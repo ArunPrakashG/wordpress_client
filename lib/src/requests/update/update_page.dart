@@ -26,6 +26,8 @@ final class UpdatePageRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   int id;
@@ -68,6 +70,8 @@ final class UpdatePageRequest extends IRequest {
     return WordpressRequest(
       body: body,
       method: HttpMethod.post,
+      headers: headers,
+      queryParameters: queryParameters,
       url: RequestUrl.relativeParts(['pages', id]),
       requireAuth: requireAuth,
       cancelToken: cancelToken,

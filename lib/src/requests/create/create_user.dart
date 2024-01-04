@@ -22,6 +22,8 @@ final class CreateUserRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   String username;
@@ -56,6 +58,8 @@ final class CreateUserRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.post,
       url: RequestUrl.relative('users'),
       requireAuth: requireAuth,

@@ -13,6 +13,8 @@ final class DeleteCommentRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   bool? force;
@@ -28,6 +30,8 @@ final class DeleteCommentRequest extends IRequest {
 
     return WordpressRequest(
       body: body,
+      headers: headers,
+      queryParameters: queryParameters,
       method: HttpMethod.delete,
       url: RequestUrl.relativeParts(['comments', id]),
       requireAuth: requireAuth,

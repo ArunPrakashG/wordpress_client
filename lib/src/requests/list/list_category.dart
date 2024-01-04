@@ -22,6 +22,8 @@ final class ListCategoryRequest extends IRequest {
     super.sendTimeout,
     super.validator,
     super.extra,
+    super.headers,
+    super.queryParameters,
   });
 
   RequestContext? context;
@@ -52,10 +54,12 @@ final class ListCategoryRequest extends IRequest {
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('post', post)
       ..addIfNotNull('hide_empty', hideEmpty)
+      ..addAllIfNotNull(this.queryParameters)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(
       queryParameters: queryParameters,
+      headers: headers,
       method: HttpMethod.get,
       url: RequestUrl.relative('categories'),
       requireAuth: requireAuth || context == RequestContext.edit,
