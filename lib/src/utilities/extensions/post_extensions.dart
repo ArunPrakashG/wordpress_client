@@ -10,8 +10,8 @@ extension PostExtensions on Post {
       return null;
     }
 
-    final response = await client.media.retrive(
-      RetriveMediaRequest(
+    final response = await client.media.retrieve(
+      RetrieveMediaRequest(
         id: featuredMedia!,
         events: callback,
         cancelToken: cancelToken,
@@ -32,8 +32,8 @@ extension PostExtensions on Post {
       return null;
     }
 
-    final response = await client.users.retrive(
-      RetriveUserRequest(
+    final response = await client.users.retrieve(
+      RetrieveUserRequest(
         id: author,
         events: callback,
         cancelToken: cancelToken,

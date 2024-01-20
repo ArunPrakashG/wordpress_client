@@ -5,6 +5,6 @@ final class TagInterface extends IRequestInterface
     with
         CreateOperation<Tag, CreateTagRequest>,
         DeleteOperation<DeleteTagRequest>,
-        RetriveOperation<Tag, RetriveTagRequest>,
+        RetrieveOperation<Tag, RetrieveTagRequest>,
         UpdateOperation<Tag, UpdateTagRequest>,
         ListOperation<Tag, ListTagRequest> {}

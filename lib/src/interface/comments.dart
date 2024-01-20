@@ -5,6 +5,6 @@ final class CommentInterface extends IRequestInterface
     with
         CreateOperation<Comment, CreateCommentRequest>,
         DeleteOperation<DeleteCommentRequest>,
-        RetriveOperation<Comment, RetriveCommentRequest>,
+        RetrieveOperation<Comment, RetrieveCommentRequest>,
         UpdateOperation<Comment, UpdateCommentRequest>,
         ListOperation<Comment, ListCommentRequest> {}

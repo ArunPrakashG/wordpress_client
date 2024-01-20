@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 
-final class RetriveCategoryRequest extends IRequest {
-  RetriveCategoryRequest({
+final class RetrieveCategoryRequest extends IRequest {
+  RetrieveCategoryRequest({
     required this.id,
     this.context,
     super.cancelToken,
