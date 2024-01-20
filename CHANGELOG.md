@@ -232,6 +232,10 @@
   - This allows to integrate the package along with other database packages such as drift, hive etc by allowing you to create a custom model class and integrate for the response.
 - 🛠 Bug fixes
 
+## 🐛 8.3.8
+
+- 🐛 Renamed retrive -> retrieve. Fix the typo
+
 ## Legend
 
 - 🎉 New features or major changes
