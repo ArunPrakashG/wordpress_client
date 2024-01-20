@@ -5,6 +5,6 @@ final class CategoryInterface extends IRequestInterface
     with
         CreateOperation<Category, CreateCategoryRequest>,
         DeleteOperation<DeleteCategoryRequest>,
-        RetriveOperation<Category, RetriveCategoryRequest>,
+        RetrieveOperation<Category, RetrieveCategoryRequest>,
         UpdateOperation<Category, UpdateCategoryRequest>,
         ListOperation<Category, ListCategoryRequest> {}

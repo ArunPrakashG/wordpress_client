@@ -5,6 +5,6 @@ final class MediaInterface extends IRequestInterface
     with
         CreateOperation<Media, CreateMediaRequest>,
         DeleteOperation<DeleteMediaRequest>,
-        RetriveOperation<Media, RetriveMediaRequest>,
+        RetrieveOperation<Media, RetrieveMediaRequest>,
         UpdateOperation<Media, UpdateMediaRequest>,
         ListOperation<Media, ListMediaRequest> {}

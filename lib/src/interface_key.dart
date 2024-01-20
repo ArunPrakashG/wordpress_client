@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'utilities/helpers.dart';
 
 @immutable
-class InterfaceKey<T> {
+final class InterfaceKey<T> {
   const InterfaceKey([this._key = '']);
 
   Type get _type => typeOf<T>();

@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 
-final class RetrivePostRequest extends IRequest {
-  RetrivePostRequest({
+final class RetrievePostRequest extends IRequest {
+  RetrievePostRequest({
     required this.id,
     this.context,
     this.password,

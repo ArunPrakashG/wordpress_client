@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 
-final class RetriveMeRequest extends IRequest {
-  RetriveMeRequest({
+final class RetrieveMeRequest extends IRequest {
+  RetrieveMeRequest({
     this.context = RequestContext.view,
     super.cancelToken,
     super.authorization,

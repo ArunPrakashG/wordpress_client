@@ -5,6 +5,6 @@ final class UsersInterface extends IRequestInterface
     with
         CreateOperation<User, CreateUserRequest>,
         DeleteOperation<DeleteUserRequest>,
-        RetriveOperation<User, RetriveUserRequest>,
+        RetrieveOperation<User, RetrieveUserRequest>,
         UpdateOperation<User, UpdateUserRequest>,
         ListOperation<User, ListUserRequest> {}

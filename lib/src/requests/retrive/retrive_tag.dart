@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 
-final class RetriveTagRequest extends IRequest {
-  RetriveTagRequest({
+final class RetrieveTagRequest extends IRequest {
+  RetrieveTagRequest({
     required this.id,
     this.context,
     super.cancelToken,
