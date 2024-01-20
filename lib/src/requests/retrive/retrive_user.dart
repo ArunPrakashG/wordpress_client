@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 
-final class RetriveUserRequest extends IRequest {
-  RetriveUserRequest({
+final class RetrieveUserRequest extends IRequest {
+  RetrieveUserRequest({
     required this.id,
     this.context,
     super.cancelToken,

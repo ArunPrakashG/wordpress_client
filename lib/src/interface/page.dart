@@ -5,6 +5,6 @@ final class PagesInterface extends IRequestInterface
     with
         CreateOperation<Page, CreatePageRequest>,
         DeleteOperation<DeletePageRequest>,
-        RetriveOperation<Page, RetrivePageRequest>,
+        RetrieveOperation<Page, RetrievePageRequest>,
         UpdateOperation<Page, UpdatePageRequest>,
         ListOperation<Page, ListPageRequest> {}

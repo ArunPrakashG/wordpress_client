@@ -6,7 +6,7 @@ final class ApplicationPasswordsInterface extends IRequestInterface
         CreateOperation<ApplicationPassword, CreateApplicationPasswordRequest>,
         DeleteOperation<DeleteApplicationPasswordRequest>,
         ListOperation<ApplicationPassword, ListApplicationPasswordRequest>,
-        RetriveOperation<ApplicationPassword,
+        RetrieveOperation<ApplicationPassword,
             RetriveApplicationPasswordRequest>,
         UpdateOperation<ApplicationPassword,
             UpdateApplicationPasswordRequest> {}

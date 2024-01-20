@@ -174,8 +174,8 @@ Future<void> main() async {
 
   group('', () {
     test('Retrive Current User', () async {
-      final response = await client.me.retrive(
-        RetriveMeRequest(),
+      final response = await client.me.retrieve(
+        RetrieveMeRequest(),
       );
 
       expect(200, response.code);
