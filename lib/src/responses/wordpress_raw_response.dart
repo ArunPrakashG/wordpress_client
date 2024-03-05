@@ -71,13 +71,9 @@ final class WordpressRawResponse {
   /// Returns true if the given [code] is not in between 200 to 399 range. A convenience method for `!isSuccessful`.
   bool get isFailure => !isSuccessful;
 
-  dynamic operator [](String key) {
+  dynamic operator [](dynamic key) {
     if (data == null) {
       throw NullReferenceException('Response is null.');
-    }
-
-    if (data is! Map) {
-      throw StateError('Response is not a map.');
     }
 
     return data[key];
@@ -110,6 +106,7 @@ final class WordpressRawResponse {
         error: WordpressError.fromMap(data),
         code: code,
         headers: headers,
+        rawData: data,
         duration: duration,
         message: message,
         extra: extra,
@@ -120,6 +117,7 @@ final class WordpressRawResponse {
     return WordpressSuccessResponse<T>(
       data: decoder(data),
       code: code,
+      rawData: data,
       headers: headers,
       requestHeaders: requestHeaders,
       extra: extra,
@@ -146,8 +144,8 @@ final class WordpressRawResponse {
   ///   transformer: (data) => (data as Iterable<dynamic>).map((e) => Post.fromMap(e)).toList(),
   /// );
   /// ```
-  T? getField<T>(
-    String key, {
+  T? getField<T, R>(
+    R key, {
     bool throwIfError = false,
     T? Function(Object object)? transformer,
     T Function()? orElse,
@@ -155,14 +153,6 @@ final class WordpressRawResponse {
     if (isFailure) {
       if (throwIfError) {
         throw NullReferenceException('Response is a failure.');
-      }
-
-      return orElse?.call();
-    }
-
-    if (data is! Map) {
-      if (throwIfError) {
-        throw NullReferenceException('Response is not a map.');
       }
 
       return orElse?.call();

@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../../wordpress_client.dart';
 import 'wordpress_error.dart';
 
 @immutable
@@ -11,6 +12,7 @@ final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
     required super.headers,
     required super.duration,
     required this.data,
+    required super.rawData,
     required super.requestHeaders,
     super.code = 200,
     super.extra,
@@ -64,6 +66,7 @@ final class WordpressFailureResponse<T> extends WordpressResponse<T> {
   const WordpressFailureResponse({
     required this.error,
     required super.code,
+    required super.rawData,
     super.headers = const {},
     super.requestHeaders = const {},
     super.extra,
@@ -105,9 +108,10 @@ abstract interface class WordpressResponse<T> {
     required this.headers,
     required this.duration,
     required this.requestHeaders,
+    required dynamic rawData,
     this.extra,
     this.message,
-  });
+  }) : _rawData = rawData;
 
   final int code;
   final Map<String, dynamic> headers;
@@ -115,6 +119,15 @@ abstract interface class WordpressResponse<T> {
   final Map<String, dynamic>? extra;
   final Duration duration;
   final String? message;
+  final dynamic _rawData;
+
+  dynamic operator [](dynamic key) {
+    if (_rawData == null) {
+      throw NullReferenceException('Response is null.');
+    }
+
+    return _rawData[key];
+  }
 
   @override
   bool operator ==(covariant WordpressResponse other) {
