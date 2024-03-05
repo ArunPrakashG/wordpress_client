@@ -236,6 +236,11 @@
 
 - 🐛 Renamed retrive -> retrieve. Fix the typo
 
+## 🐛 8.3.9
+
+- 🩹 Bug fixes
+- 🎉 Iterate over the raw response of the endpoint from the final success or failure response model using [] operator.
+
 ## Legend
 
 - 🎉 New features or major changes
