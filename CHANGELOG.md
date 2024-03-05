@@ -241,6 +241,10 @@
 - 🩹 Bug fixes
 - 🎉 Iterate over the raw response of the endpoint from the final success or failure response model using [] operator.
 
+## 🐛 8.3.10
+
+- 🩹 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes

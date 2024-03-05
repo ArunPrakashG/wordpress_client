@@ -108,10 +108,10 @@ abstract interface class WordpressResponse<T> {
     required this.headers,
     required this.duration,
     required this.requestHeaders,
-    required this.rawData,
+    required dynamic rawData,
     this.extra,
     this.message,
-  });
+  }) : _rawData = rawData;
 
   final int code;
   final Map<String, dynamic> headers;
@@ -119,14 +119,14 @@ abstract interface class WordpressResponse<T> {
   final Map<String, dynamic>? extra;
   final Duration duration;
   final String? message;
-  final dynamic rawData;
+  final dynamic _rawData;
 
   dynamic operator [](dynamic key) {
-    if (rawData == null) {
+    if (_rawData == null) {
       throw NullReferenceException('Response is null.');
     }
 
-    return rawData[key];
+    return _rawData[key];
   }
 
   @override
