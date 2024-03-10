@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>wordpress_client</h1>
+  <h1>WordPress Client</h1>
 
   <p align="center">
     <a href="https://pub.dev/packages/wordpress_client"> 
@@ -10,7 +10,8 @@
     <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" />
     <img src="https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white" alt="WordPress" />
     <br>
-    Easily interact with the Wordpress REST API. Get support for most common endpoints & CRUD operations.
+    <b>A powerful and easy-to-use WordPress REST API client for Dart & Flutter.
+    </b>
 </p>
 </div>
 
@@ -23,6 +24,7 @@
 - 🌐 Supports all common endpoints.
 - 🎨 Custom Requests & Authorization systems.
 - 🔐 3 Popular authorization methods.
+- 📦 Third party DB integration.
 - 🎣 Events for preprocessing response operations.
 
 ## 📖 How to Use
@@ -58,6 +60,8 @@ final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
 final client = WordpressClient(baseUrl: baseUrl);
 
 client.initialize();
+// or
+// final client = WordpressClient.initialize(baseUrl: baseUrl);
 ```
 
 > 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage#-advanced-method).
@@ -73,30 +77,37 @@ final request = ListPostRequest(
   order = Order.asc,
 );
 
-final wpResponse = await client.posts.list(request);
+final response = await client.posts.list(request);
 
 // Dart 3 style
-switch (wpResponse) {
+switch (response) {
     case WordpressSuccessResponse():
-      final data = wpResponse.data; // List<Post>
+      final data = response.data; // List<Post>
       break;
     case WordpressFailureResponse():
-      final error = wpResponse.error; // WordpressError
+      final error = response.error; // WordpressError
       break;
 }
 
 // or
-// wordpress_client style
-final result = postsResponse.map(
+// using map method to handle both success and failure
+final result = response.map(
     onSuccess: (response) {
+      // response is a WordpressSuccessResponse<List<Post>>
+
       print(response.message);
       return response.data;
     },
     onFailure: (response) {
+      // response is a WordpressFailureResponse
       print(response.error.toString());
       return <Post>[];
     },
 );
+
+// or
+// you can cast to a state directly; this will throw an error if the response is of the wrong type
+final result = response.asSuccess(); // or response.asFailure();
 ```
 
 Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage) for more request examples.
