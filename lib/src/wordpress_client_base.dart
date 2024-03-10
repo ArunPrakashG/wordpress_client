@@ -508,7 +508,7 @@ final class WordpressClient implements IDisposable {
   ///
   /// The response object may allocate a decent amount of memory, it may be possible you wish to deallocate it.
   ///
-  /// In that case, call `clearDiscovered()` method to clear the cached discovery data.
+  /// In that case, call `clearDiscoveryCache()` method to clear the cached discovery data.
   Future<bool> discover() async {
     if (_discovery != null) {
       return true;
