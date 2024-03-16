@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
-import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
 import 'interface/application_passwords.dart';
@@ -107,11 +106,6 @@ final class WordpressClient implements IDisposable {
   ///
   /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
   bool get isDebugMode => _requester._isDebugMode;
-
-  /// Returns true if we have synchronized mode enabled.
-  ///
-  /// i.e., Only a single request is allowed at a time.
-  bool get isSynchronizedMode => _requester._synchronized;
 
   /// Returns true if we have valid default authorization which is to be used for all requests.
   bool get hasValidDefaultAuthorization =>

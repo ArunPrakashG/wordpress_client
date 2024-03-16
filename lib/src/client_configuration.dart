@@ -16,7 +16,6 @@ final class BootstrapConfiguration {
     this.defaultHeaders,
     this.shouldFollowRedirects = false,
     this.maxRedirects = 5,
-    this.synchronized = false,
     this.statisticsDelegate,
     this.interceptors,
     this.enableDebugMode = false,
@@ -31,7 +30,6 @@ final class BootstrapConfiguration {
   final bool shouldFollowRedirects;
   final int maxRedirects;
   final List<Interceptor>? interceptors;
-  final bool synchronized;
   final StatisticsCallback? statisticsDelegate;
 
   @override
@@ -50,7 +48,6 @@ final class BootstrapConfiguration {
         other.shouldFollowRedirects == shouldFollowRedirects &&
         other.maxRedirects == maxRedirects &&
         collectionEquals(other.interceptors, interceptors) &&
-        other.synchronized == synchronized &&
         other.statisticsDelegate == statisticsDelegate;
   }
 
@@ -65,7 +62,6 @@ final class BootstrapConfiguration {
         shouldFollowRedirects.hashCode ^
         maxRedirects.hashCode ^
         interceptors.hashCode ^
-        synchronized.hashCode ^
         statisticsDelegate.hashCode;
   }
 
@@ -94,7 +90,6 @@ final class BootstrapConfiguration {
           shouldFollowRedirects ?? this.shouldFollowRedirects,
       maxRedirects: maxRedirects ?? this.maxRedirects,
       interceptors: interceptors ?? this.interceptors,
-      synchronized: synchronized ?? this.synchronized,
       statisticsDelegate: statisticsDelegate ?? this.statisticsDelegate,
     );
   }

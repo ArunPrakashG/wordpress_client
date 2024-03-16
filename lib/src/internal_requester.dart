@@ -9,13 +9,10 @@ final class InternalRequester extends IRequestExecutor {
   }
 
   final Dio _client = Dio();
-
   final Uri _baseUrl;
-  final sync.Lock _syncLock = sync.Lock();
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
-  bool _synchronized = false;
   bool _isDebugMode = false;
   final BootstrapConfiguration _configuration;
 
@@ -32,7 +29,6 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   void configure(BootstrapConfiguration configuration) {
-    _synchronized = configuration.synchronized;
     _isDebugMode = configuration.enableDebugMode;
 
     if (configuration.defaultAuthorization != null &&
@@ -162,8 +158,7 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    final response =
-        _synchronized ? await _syncLock.synchronized(run) : await run();
+    final response = await run();
 
     final statusCode =
         response.statusCode ?? -RequestErrorType.invalidStatusCode.index;

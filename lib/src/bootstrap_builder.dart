@@ -19,7 +19,6 @@ class BootstrapBuilder {
     _defaultHeaders = config.defaultHeaders;
     _interceptors = config.interceptors;
     _responsePreprocessorDelegate = config.responsePreprocessorDelegate;
-    _synchronized = config.synchronized;
     _defaultMaxRedirects = config.maxRedirects;
     _defaultRequestTimeout = config.requestTimeout;
     _followRedirects = config.shouldFollowRedirects;
@@ -32,15 +31,9 @@ class BootstrapBuilder {
   Map<String, dynamic>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  bool _synchronized = false;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
   bool _debugMode = false;
-
-  BootstrapBuilder withSynchronizedRequests(bool value) {
-    _synchronized = value;
-    return this;
-  }
 
   /// Attaches [LogInterceptor] to the [Dio] instance.
   BootstrapBuilder withDebugMode(bool value) {
@@ -113,7 +106,6 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
-      synchronized: _synchronized,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
     );
