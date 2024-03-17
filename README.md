@@ -27,6 +27,9 @@
 - 🔧 Middlewares for request & response operations.
 - 🎣 Events for preprocessing response.
 
+## Future
+If you find any functionality which you require is missing from the package and you are not able to work it out using built in options like raw requests etc, then please share the functionality in details as a comment here: https://github.com/ArunPrakashG/wordpress_client/discussions/55
+
 ## 📖 How to Use
 
 ### **1. Setup**
