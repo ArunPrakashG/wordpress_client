@@ -2,13 +2,32 @@
 
 import 'package:wordpress_client/wordpress_client.dart';
 
+import 'auth_middleware.dart';
+
 Future<void> main() async {
   final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
 
   // Simple Usage
   final client = WordpressClient(
     baseUrl: baseUrl,
-    bootstrapper: (bootstrapper) => bootstrapper.withDebugMode(true).build(),
+    bootstrapper: (bootstrapper) => bootstrapper
+        .withDebugMode(true)
+        .withMiddleware(AuthMiddleware())
+        .withMiddleware(
+          DelegatedMiddleware(
+            onRequestDelegate: (request) async {
+              return request.copyWith(
+                headers: {
+                  'X-My-Custom-Header': 'My Custom Value',
+                },
+              );
+            },
+            onResponseDelegate: (response) async {
+              return response;
+            },
+          ),
+        )
+        .build(),
   );
 
   client.initialize();

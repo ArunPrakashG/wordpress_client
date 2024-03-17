@@ -495,6 +495,8 @@ final class WordpressClient implements IDisposable {
       return;
     }
 
+    unawaited(middleware.onLoad());
+
     _middlewares.add(middleware);
 
     reconfigureClient(
@@ -507,6 +509,7 @@ final class WordpressClient implements IDisposable {
       return;
     }
 
+    unawaited(middleware.onUnload());
     _middlewares.remove(middleware);
 
     reconfigureClient(
@@ -560,6 +563,18 @@ final class WordpressClient implements IDisposable {
   /// Clears the stored discovery cache
   void clearDiscoveryCache() => _discovery = null;
 
+  void clearMiddlewares() {
+    for (final middleware in _middlewares) {
+      unawaited(middleware.onUnload());
+    }
+
+    _middlewares.clear();
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
   @override
   void dispose() {
     if (_isDisposed) {
@@ -568,6 +583,7 @@ final class WordpressClient implements IDisposable {
 
     clearDefaultAuthorization();
     clearDiscoveryCache();
+    clearMiddlewares();
     _typeMap.clear();
     _isDisposed = true;
   }

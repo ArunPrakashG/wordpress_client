@@ -10,7 +10,8 @@ import 'utilities/extensions/iterable_extensions.dart';
 
 abstract base class IRequestExecutor {
   Uri get baseUrl;
-  List<IWordpressMiddleware> get middlewares;
+
+  Iterable<IWordpressMiddleware> get middlewares;
 
   void configure(BootstrapConfiguration configuration);
 
@@ -20,10 +21,7 @@ abstract base class IRequestExecutor {
   }) async {
     return middlewares.foldAsync(
       request,
-      (r, m) async {
-        await m.initialize();
-        return m.onRequest(r);
-      },
+      (r, m) async => m.onRequest(r),
     );
   }
 
@@ -33,10 +31,7 @@ abstract base class IRequestExecutor {
   }) async {
     return middlewares.foldAsync(
       response,
-      (r, m) async {
-        await m.initialize();
-        return m.onResponse(r);
-      },
+      (r, m) async => m.onResponse(r),
     );
   }
 
