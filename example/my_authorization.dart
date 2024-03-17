@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:wordpress_client/wordpress_client.dart';
 
 final class CustomAuth extends IAuthorization {

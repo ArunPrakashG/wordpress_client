@@ -2,6 +2,8 @@
 
 import 'dart:async';
 
+import 'package:dio/dio.dart';
+
 import '../../wordpress_client.dart';
 
 /// Base class of all requests.

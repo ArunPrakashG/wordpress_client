@@ -245,6 +245,18 @@
 
 - 🩹 Bug fixes
 
+## 🎉 8.4.1
+
+- 🎉 Added support for Middlewares!
+  - You can now create custom middlewares to intercept the request and response.
+  - The middleware can be used to modify the request, response or abort the process entirely by directly throwing an exception in their processing block.
+  - You can create multiple middlewares and add them to the client.
+  - The middlewares are executed in the order they are added to the client.
+  - Added `DelegatedMiddleware` if you do not wish to create a separate class for the middleware but just need to modify the request or response.
+- 💥 Removed dependency on `synchronised` package.
+  - This package was used to synchronise the request and response processing. This now needs to be handled by the user itself.
+  - it didn't make sense to restrict the requesting processing inside the library itself.
+
 ## Legend
 
 - 🎉 New features or major changes

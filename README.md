@@ -17,15 +17,15 @@
 
 ## ✨ Features
 
-- 🔄 Request Synchronization.
 - 📦 API discovery support.
 - ⏲️ Measures request completion time.
 - 📝 Supports all CRUD operations.
 - 🌐 Supports all common endpoints.
 - 🎨 Custom Requests & Authorization systems.
 - 🔐 3 Popular authorization methods.
-- 📦 Third party DB integration.
-- 🎣 Events for preprocessing response operations.
+- 📦 Third party Database integration.
+- 🔧 Middlewares for request & response operations.
+- 🎣 Events for preprocessing response.
 
 ## Future
 If you find any functionality which you require is missing from the package and you are not able to work it out using built in options like raw requests etc, then please share the functionality in details as a comment here: https://github.com/ArunPrakashG/wordpress_client/discussions/55
@@ -38,7 +38,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.3.10
+ wordpress_client: ^8.4.1
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
@@ -67,7 +67,7 @@ client.initialize();
 // final client = WordpressClient.initialize(baseUrl: baseUrl);
 ```
 
-> 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage#-advanced-method).
+> 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#-advanced-method).
 
 ### **3. Sending Requests**
 
@@ -113,7 +113,7 @@ final result = response.map(
 final result = response.asSuccess(); // or response.asFailure();
 ```
 
-Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%93%9A-Usage) for more request examples.
+Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage) for more request examples.
 
 ## 🔒 Supported Authorization
 
@@ -129,7 +129,7 @@ Developed by Enrique Chavez, it involves JSON Web Token (JWT) authentication whe
 
 By Useful Team, this is another implementation using JWT for authentication purposes. [Details](https://github.com/usefulteam/jwt-auth)
 
-> For custom authorization, check the [Authorization Wiki](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%9B%A1-Authorization).
+> For custom authorization, check the [Authorization Wiki](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
 ## 📋 Supported REST Methods
 

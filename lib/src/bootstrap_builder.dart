@@ -6,6 +6,7 @@ import 'authorization/authorization_base.dart';
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
 import 'constants.dart';
+import 'middleware/wordpress_middleware_base.dart';
 import 'utilities/typedefs.dart';
 
 class BootstrapBuilder {
@@ -19,10 +20,10 @@ class BootstrapBuilder {
     _defaultHeaders = config.defaultHeaders;
     _interceptors = config.interceptors;
     _responsePreprocessorDelegate = config.responsePreprocessorDelegate;
-    _synchronized = config.synchronized;
     _defaultMaxRedirects = config.maxRedirects;
     _defaultRequestTimeout = config.requestTimeout;
     _followRedirects = config.shouldFollowRedirects;
+    _middlewares = config.middlewares;
   }
 
   Duration _defaultRequestTimeout = kDefaultRequestTimeout; // 60 seconds
@@ -32,19 +33,26 @@ class BootstrapBuilder {
   Map<String, dynamic>? _defaultHeaders;
   bool _followRedirects = true;
   int _defaultMaxRedirects = 5;
-  bool _synchronized = false;
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
   bool _debugMode = false;
-
-  BootstrapBuilder withSynchronizedRequests(bool value) {
-    _synchronized = value;
-    return this;
-  }
+  List<IWordpressMiddleware>? _middlewares;
 
   /// Attaches [LogInterceptor] to the [Dio] instance.
   BootstrapBuilder withDebugMode(bool value) {
     _debugMode = value;
+    return this;
+  }
+
+  BootstrapBuilder withMiddleware(IWordpressMiddleware middleware) {
+    _middlewares ??= [];
+    _middlewares!.add(middleware);
+    return this;
+  }
+
+  BootstrapBuilder withMiddlewares(Iterable<IWordpressMiddleware> middlewares) {
+    _middlewares ??= [];
+    _middlewares!.addAll(middlewares);
     return this;
   }
 
@@ -113,9 +121,9 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
-      synchronized: _synchronized,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
+      middlewares: _middlewares,
     );
   }
 }

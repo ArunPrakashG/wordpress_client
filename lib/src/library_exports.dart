@@ -2,6 +2,7 @@ export 'authorization/authorization_export.dart';
 export 'client_configuration.dart';
 export 'enums.dart';
 export 'exceptions/exceptions_export.dart';
+export 'middleware/middleware_exports.dart';
 export 'operations/operations_export.dart';
 export 'requests/request_interface.dart';
 export 'requests/requests_export.dart';

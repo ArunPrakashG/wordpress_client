@@ -1,5 +1,6 @@
 export 'disposable_base.dart';
 export 'extensions/header_extensions.dart';
+export 'extensions/iterable_extensions.dart';
 export 'extensions/map_extensions.dart';
 export 'extensions/post_extensions.dart';
 export 'extensions/response_extensions.dart';

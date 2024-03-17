@@ -2,9 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 
-import 'authorization/authorization_base.dart';
+import '../wordpress_client.dart';
 import 'constants.dart';
-import 'utilities/typedefs.dart';
 
 @immutable
 final class BootstrapConfiguration {
@@ -16,10 +15,10 @@ final class BootstrapConfiguration {
     this.defaultHeaders,
     this.shouldFollowRedirects = false,
     this.maxRedirects = 5,
-    this.synchronized = false,
     this.statisticsDelegate,
     this.interceptors,
     this.enableDebugMode = false,
+    this.middlewares,
   });
 
   final bool enableDebugMode;
@@ -31,8 +30,8 @@ final class BootstrapConfiguration {
   final bool shouldFollowRedirects;
   final int maxRedirects;
   final List<Interceptor>? interceptors;
-  final bool synchronized;
   final StatisticsCallback? statisticsDelegate;
+  final List<IWordpressMiddleware>? middlewares;
 
   @override
   bool operator ==(covariant BootstrapConfiguration other) {
@@ -50,7 +49,7 @@ final class BootstrapConfiguration {
         other.shouldFollowRedirects == shouldFollowRedirects &&
         other.maxRedirects == maxRedirects &&
         collectionEquals(other.interceptors, interceptors) &&
-        other.synchronized == synchronized &&
+        collectionEquals(other.middlewares, middlewares) &&
         other.statisticsDelegate == statisticsDelegate;
   }
 
@@ -65,7 +64,7 @@ final class BootstrapConfiguration {
         shouldFollowRedirects.hashCode ^
         maxRedirects.hashCode ^
         interceptors.hashCode ^
-        synchronized.hashCode ^
+        middlewares.hashCode ^
         statisticsDelegate.hashCode;
   }
 
@@ -81,6 +80,7 @@ final class BootstrapConfiguration {
     List<Interceptor>? interceptors,
     bool? synchronized,
     StatisticsCallback? statisticsDelegate,
+    List<IWordpressMiddleware>? middlewares,
   }) {
     return BootstrapConfiguration(
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
@@ -94,8 +94,8 @@ final class BootstrapConfiguration {
           shouldFollowRedirects ?? this.shouldFollowRedirects,
       maxRedirects: maxRedirects ?? this.maxRedirects,
       interceptors: interceptors ?? this.interceptors,
-      synchronized: synchronized ?? this.synchronized,
       statisticsDelegate: statisticsDelegate ?? this.statisticsDelegate,
+      middlewares: middlewares ?? this.middlewares,
     );
   }
 }

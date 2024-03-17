@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../wordpress_client.dart';
 import '../constants.dart';
 
@@ -62,4 +64,34 @@ final class WordpressRequest {
 
   /// Gets if this request has a authorization module.
   bool get hasAuthorization => authorization != null;
+
+  WordpressRequest copyWith({
+    RequestUrl? url,
+    HttpMethod? method,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? queryParameters,
+    dynamic body,
+    WordpressEvents? events,
+    CancelToken? cancelToken,
+    bool? requireAuth,
+    IAuthorization? authorization,
+    ValidatorCallback? validator,
+    Duration? sendTimeout,
+    Duration? receiveTimeout,
+  }) {
+    return WordpressRequest(
+      url: url ?? this.url,
+      method: method ?? this.method,
+      headers: headers ?? this.headers,
+      queryParameters: queryParameters ?? this.queryParameters,
+      body: body ?? this.body,
+      events: events ?? this.events,
+      cancelToken: cancelToken ?? this.cancelToken,
+      requireAuth: requireAuth ?? this.requireAuth,
+      authorization: authorization ?? this.authorization,
+      validator: validator ?? this.validator,
+      sendTimeout: sendTimeout ?? this.sendTimeout,
+      receiveTimeout: receiveTimeout ?? this.receiveTimeout,
+    );
+  }
 }

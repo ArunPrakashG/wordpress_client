@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
-import 'package:synchronized/synchronized.dart' as sync;
 
 import 'bootstrap_builder.dart';
 import 'interface/application_passwords.dart';
@@ -60,6 +59,11 @@ final class WordpressClient implements IDisposable {
       baseUrl,
       configuration,
     );
+
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
   }
 
   /// Default Constructor but with initialization.
@@ -90,6 +94,11 @@ final class WordpressClient implements IDisposable {
       configuration,
     );
 
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
+
     initialize();
   }
 
@@ -107,11 +116,6 @@ final class WordpressClient implements IDisposable {
   ///
   /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
   bool get isDebugMode => _requester._isDebugMode;
-
-  /// Returns true if we have synchronized mode enabled.
-  ///
-  /// i.e., Only a single request is allowed at a time.
-  bool get isSynchronizedMode => _requester._synchronized;
 
   /// Returns true if we have valid default authorization which is to be used for all requests.
   bool get hasValidDefaultAuthorization =>
@@ -247,8 +251,8 @@ final class WordpressClient implements IDisposable {
   ApplicationPasswordsInterface get applicationPasswords =>
       get<ApplicationPasswordsInterface>('application-passwords');
 
-  final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
-      <InterfaceKey<dynamic>, dynamic>{};
+  final _interfaces = <InterfaceKey<dynamic>, dynamic>{};
+  final _middlewares = <IWordpressMiddleware>[];
 
   bool _hasInitialized = false;
 
@@ -375,6 +379,8 @@ final class WordpressClient implements IDisposable {
   /// - `tags`
   /// - `users`
   /// - `search`
+  /// - `pages`
+  /// - `application-passwords`
   ///
   /// Example usage:
   ///
@@ -484,6 +490,36 @@ final class WordpressClient implements IDisposable {
     return interface;
   }
 
+  void registerMiddleware(IWordpressMiddleware middleware) {
+    if (_middlewares.contains(middleware)) {
+      return;
+    }
+
+    unawaited(middleware.onLoad());
+
+    _middlewares.add(middleware);
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
+  void removeMiddleware(String name) {
+    if (!_middlewares.any((element) => element.name == name)) {
+      return;
+    }
+
+    final middleware =
+        _middlewares.firstWhere((element) => element.name == name);
+
+    unawaited(middleware.onUnload());
+    _middlewares.remove(middleware);
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
   /// Clears default authorization if exists.
   void clearDefaultAuthorization() => _requester._removeDefaultAuthorization();
 
@@ -508,7 +544,7 @@ final class WordpressClient implements IDisposable {
   ///
   /// The response object may allocate a decent amount of memory, it may be possible you wish to deallocate it.
   ///
-  /// In that case, call `clearDiscovered()` method to clear the cached discovery data.
+  /// In that case, call `clearDiscoveryCache()` method to clear the cached discovery data.
   Future<bool> discover() async {
     if (_discovery != null) {
       return true;
@@ -530,6 +566,18 @@ final class WordpressClient implements IDisposable {
   /// Clears the stored discovery cache
   void clearDiscoveryCache() => _discovery = null;
 
+  void clearMiddlewares() {
+    for (final middleware in _middlewares) {
+      unawaited(middleware.onUnload());
+    }
+
+    _middlewares.clear();
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
   @override
   void dispose() {
     if (_isDisposed) {
@@ -538,6 +586,7 @@ final class WordpressClient implements IDisposable {
 
     clearDefaultAuthorization();
     clearDiscoveryCache();
+    clearMiddlewares();
     _typeMap.clear();
     _isDisposed = true;
   }

@@ -9,15 +9,13 @@ final class InternalRequester extends IRequestExecutor {
   }
 
   final Dio _client = Dio();
-
   final Uri _baseUrl;
-  final sync.Lock _syncLock = sync.Lock();
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
-  bool _synchronized = false;
   bool _isDebugMode = false;
   final BootstrapConfiguration _configuration;
+  final List<IWordpressMiddleware> _middlewares = [];
 
   /// The request base url.
   ///
@@ -31,8 +29,10 @@ final class InternalRequester extends IRequestExecutor {
       _defaultAuthorization != null && !_defaultAuthorization!.isDefault;
 
   @override
+  List<IWordpressMiddleware> get middlewares => _middlewares;
+
+  @override
   void configure(BootstrapConfiguration configuration) {
-    _synchronized = configuration.synchronized;
     _isDebugMode = configuration.enableDebugMode;
 
     if (configuration.defaultAuthorization != null &&
@@ -60,6 +60,11 @@ final class InternalRequester extends IRequestExecutor {
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
     _client.options.baseUrl = _baseUrl.toString();
+
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
 
     if (configuration.enableDebugMode &&
         !_client.interceptors.any((i) => i is LogInterceptor)) {
@@ -162,8 +167,7 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    final response =
-        _synchronized ? await _syncLock.synchronized(run) : await run();
+    final response = await run();
 
     final statusCode =
         response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
