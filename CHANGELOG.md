@@ -245,7 +245,7 @@
 
 - 🩹 Bug fixes
 
-## 🎉 8.4.1
+## 🎉 8.4.0
 
 - 🎉 Added support for Middlewares!
   - You can now create custom middlewares to intercept the request and response.

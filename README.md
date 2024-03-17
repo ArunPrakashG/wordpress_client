@@ -28,6 +28,7 @@
 - 🎣 Events for preprocessing response.
 
 ## Future
+
 If you find any functionality which you require is missing from the package and you are not able to work it out using built in options like raw requests etc, then please share the functionality in details as a comment here: https://github.com/ArunPrakashG/wordpress_client/discussions/55
 
 ## 📖 How to Use
@@ -38,7 +39,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.4.1
+ wordpress_client: ^8.4.0
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
