@@ -59,6 +59,11 @@ final class WordpressClient implements IDisposable {
       baseUrl,
       configuration,
     );
+
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
   }
 
   /// Default Constructor but with initialization.
@@ -88,6 +93,11 @@ final class WordpressClient implements IDisposable {
       baseUrl,
       configuration,
     );
+
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
 
     initialize();
   }
@@ -241,8 +251,8 @@ final class WordpressClient implements IDisposable {
   ApplicationPasswordsInterface get applicationPasswords =>
       get<ApplicationPasswordsInterface>('application-passwords');
 
-  final Map<InterfaceKey<dynamic>, dynamic> _interfaces =
-      <InterfaceKey<dynamic>, dynamic>{};
+  final _interfaces = <InterfaceKey<dynamic>, dynamic>{};
+  final _middlewares = <IWordpressMiddleware>[];
 
   bool _hasInitialized = false;
 
@@ -369,6 +379,8 @@ final class WordpressClient implements IDisposable {
   /// - `tags`
   /// - `users`
   /// - `search`
+  /// - `pages`
+  /// - `application-passwords`
   ///
   /// Example usage:
   ///
@@ -476,6 +488,30 @@ final class WordpressClient implements IDisposable {
     }
 
     return interface;
+  }
+
+  void registerMiddleware(IWordpressMiddleware middleware) {
+    if (_middlewares.contains(middleware)) {
+      return;
+    }
+
+    _middlewares.add(middleware);
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
+  void removeMiddleware(IWordpressMiddleware middleware) {
+    if (!_middlewares.contains(middleware)) {
+      return;
+    }
+
+    _middlewares.remove(middleware);
+
+    reconfigureClient(
+      (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
   }
 
   /// Clears default authorization if exists.

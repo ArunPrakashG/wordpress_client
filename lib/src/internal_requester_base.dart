@@ -2,30 +2,76 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
+import 'exceptions/request/middleware_aborted_exception.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
 import 'utilities/codable_map/codable_map.dart';
+import 'utilities/extensions/iterable_extensions.dart';
 
 abstract base class IRequestExecutor {
   Uri get baseUrl;
+  List<IWordpressMiddleware> get middlewares;
 
   void configure(BootstrapConfiguration configuration);
+
+  Future<WordpressRequest> _handleRequestMiddlewares({
+    required WordpressRequest request,
+    required Iterable<IWordpressMiddleware> middlewares,
+  }) async {
+    return middlewares.foldAsync(
+      request,
+      (r, m) async {
+        await m.initialize();
+        return m.onRequest(r);
+      },
+    );
+  }
+
+  Future<WordpressRawResponse> _handleResponseMiddlewares({
+    required Iterable<IWordpressMiddleware> middlewares,
+    required WordpressRawResponse response,
+  }) async {
+    return middlewares.foldAsync(
+      response,
+      (r, m) async {
+        await m.initialize();
+        return m.onResponse(r);
+      },
+    );
+  }
 
   @internal
   Future<WordpressResponse<T>> create<T>(
     WordpressRequest request,
   ) async {
     final rawResponse = await executeGuarded<WordpressRawResponse>(
-      function: () async => execute(request),
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
       onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
           extra: <String, dynamic>{
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '$error\n\n$stackTrace',
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
         );
       },
     );
@@ -71,16 +117,33 @@ abstract base class IRequestExecutor {
     WordpressRequest request,
   ) async {
     final rawResponse = await executeGuarded<WordpressRawResponse>(
-      function: () async => execute(request),
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
       onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
           extra: <String, dynamic>{
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '$error\n\n$stackTrace',
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
         );
       },
     );
@@ -126,16 +189,33 @@ abstract base class IRequestExecutor {
     WordpressRequest request,
   ) async {
     final rawResponse = await executeGuarded<WordpressRawResponse>(
-      function: () async => execute(request),
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
       onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
           extra: <String, dynamic>{
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '$error\n\n$stackTrace',
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
         );
       },
     );
@@ -178,16 +258,33 @@ abstract base class IRequestExecutor {
     WordpressRequest request,
   ) async {
     final rawResponse = await executeGuarded<WordpressRawResponse>(
-      function: () async => execute(request),
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
       onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
           extra: <String, dynamic>{
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '$error\n\n$stackTrace',
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
         );
       },
     );
@@ -233,16 +330,33 @@ abstract base class IRequestExecutor {
     WordpressRequest request,
   ) async {
     final rawResponse = await executeGuarded<WordpressRawResponse>(
-      function: () async => execute(request),
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
       onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
           extra: <String, dynamic>{
             'error': error,
             'stackTrace': stackTrace,
           },
-          message: '$error\n\n$stackTrace',
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
         );
       },
     );

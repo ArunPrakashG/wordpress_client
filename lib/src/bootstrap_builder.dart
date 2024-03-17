@@ -6,6 +6,7 @@ import 'authorization/authorization_base.dart';
 import 'authorization/authorization_builder.dart';
 import 'client_configuration.dart';
 import 'constants.dart';
+import 'middleware/wordpress_middleware_base.dart';
 import 'utilities/typedefs.dart';
 
 class BootstrapBuilder {
@@ -22,6 +23,7 @@ class BootstrapBuilder {
     _defaultMaxRedirects = config.maxRedirects;
     _defaultRequestTimeout = config.requestTimeout;
     _followRedirects = config.shouldFollowRedirects;
+    _middlewares = config.middlewares;
   }
 
   Duration _defaultRequestTimeout = kDefaultRequestTimeout; // 60 seconds
@@ -34,10 +36,23 @@ class BootstrapBuilder {
   StatisticsCallback? _statisticsDelegate;
   List<Interceptor>? _interceptors;
   bool _debugMode = false;
+  List<IWordpressMiddleware>? _middlewares;
 
   /// Attaches [LogInterceptor] to the [Dio] instance.
   BootstrapBuilder withDebugMode(bool value) {
     _debugMode = value;
+    return this;
+  }
+
+  BootstrapBuilder withMiddleware(IWordpressMiddleware middleware) {
+    _middlewares ??= [];
+    _middlewares!.add(middleware);
+    return this;
+  }
+
+  BootstrapBuilder withMiddlewares(Iterable<IWordpressMiddleware> middlewares) {
+    _middlewares ??= [];
+    _middlewares!.addAll(middlewares);
     return this;
   }
 
@@ -108,6 +123,7 @@ class BootstrapBuilder {
       statisticsDelegate: _statisticsDelegate,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
+      middlewares: _middlewares,
     );
   }
 }

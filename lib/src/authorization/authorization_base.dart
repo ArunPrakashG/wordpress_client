@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
 
 import '../../wordpress_client.dart';

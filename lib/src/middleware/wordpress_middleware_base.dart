@@ -1,5 +1,11 @@
-import 'package:dio/dio.dart';
+import 'dart:async';
 
-interface class IWordpressMiddleware {}
+import '../library_exports.dart';
 
-class S extends Interceptor {}
+abstract base class IWordpressMiddleware {
+  String get name;
+
+  Future<void> initialize();
+  Future<WordpressRequest> onRequest(WordpressRequest request);
+  Future<WordpressRawResponse> onResponse(WordpressRawResponse response);
+}

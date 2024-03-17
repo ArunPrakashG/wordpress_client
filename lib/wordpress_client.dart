@@ -4,6 +4,4 @@
 /// Responses can contain statistical data such as Time taken for the request to finish as [Duration], Any errors that might have occured, and the raw response from the server.
 library wordpress_client;
 
-export 'package:dio/dio.dart';
-
 export 'src/library_exports.dart';

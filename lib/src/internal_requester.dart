@@ -15,6 +15,7 @@ final class InternalRequester extends IRequestExecutor {
   static StatisticsCallback? _statisticsCallback;
   bool _isDebugMode = false;
   final BootstrapConfiguration _configuration;
+  final List<IWordpressMiddleware> _middlewares = [];
 
   /// The request base url.
   ///
@@ -26,6 +27,9 @@ final class InternalRequester extends IRequestExecutor {
 
   bool get hasDefaultAuthorization =>
       _defaultAuthorization != null && !_defaultAuthorization!.isDefault;
+
+  @override
+  List<IWordpressMiddleware> get middlewares => _middlewares;
 
   @override
   void configure(BootstrapConfiguration configuration) {
@@ -56,6 +60,11 @@ final class InternalRequester extends IRequestExecutor {
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
     _client.options.baseUrl = _baseUrl.toString();
+
+    if (configuration.middlewares != null &&
+        configuration.middlewares!.isNotEmpty) {
+      _middlewares.addAll(configuration.middlewares!);
+    }
 
     if (configuration.enableDebugMode &&
         !_client.interceptors.any((i) => i is LogInterceptor)) {

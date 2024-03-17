@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../wordpress_client.dart';
 import '../constants.dart';
 
