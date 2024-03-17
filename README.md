@@ -17,14 +17,13 @@
 
 ## ✨ Features
 
-- 🔄 Request Synchronization.
 - 📦 API discovery support.
 - ⏲️ Measures request completion time.
 - 📝 Supports all CRUD operations.
 - 🌐 Supports all common endpoints.
 - 🎨 Custom Requests & Authorization systems.
 - 🔐 3 Popular authorization methods.
-- 📦 Third party DB integration.
+- 📦 Third party Database integration.
 - 🔧 Middlewares for request & response operations.
 - 🎣 Events for preprocessing response.
 

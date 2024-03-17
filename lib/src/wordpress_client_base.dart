@@ -504,10 +504,13 @@ final class WordpressClient implements IDisposable {
     );
   }
 
-  void removeMiddleware(IWordpressMiddleware middleware) {
-    if (!_middlewares.contains(middleware)) {
+  void removeMiddleware(String name) {
+    if (!_middlewares.any((element) => element.name == name)) {
       return;
     }
+
+    final middleware =
+        _middlewares.firstWhere((element) => element.name == name);
 
     unawaited(middleware.onUnload());
     _middlewares.remove(middleware);

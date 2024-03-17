@@ -6,7 +6,6 @@ import 'exceptions/request/middleware_aborted_exception.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
 import 'utilities/codable_map/codable_map.dart';
-import 'utilities/extensions/iterable_extensions.dart';
 
 abstract base class IRequestExecutor {
   Uri get baseUrl;
