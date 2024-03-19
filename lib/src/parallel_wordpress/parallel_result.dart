@@ -7,7 +7,12 @@ final class ParallelResult<T> {
     required this.results,
   });
 
+  /// The page number of the results.
+  ///
+  /// Note that, if this instance contains results from the `initial()` method, then the `page` will be `0`.
   final int page;
+
+  /// The results of the request.
   final Iterable<T> results;
 
   @override
@@ -19,4 +24,6 @@ final class ParallelResult<T> {
 
   @override
   int get hashCode => page.hashCode ^ results.hashCode;
+
+  T operator [](int index) => results.elementAt(index);
 }

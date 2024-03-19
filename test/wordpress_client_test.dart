@@ -70,10 +70,9 @@ Future<void> main() async {
         'Parallel',
         () async {
           final stopwatch = Stopwatch()..start();
-          final parallelWordpress = ParallelWordpress(client: client);
 
           print('Starting Parallel...');
-          final responses = await parallelWordpress.list(
+          final responses = await client.parallel.list(
             interface: client.posts,
             requestBuilder: () {
               return List.generate(
@@ -89,18 +88,20 @@ Future<void> main() async {
             },
           );
 
+          final merged = responses.merge();
+
           stopwatch.stop();
           parallelMs = stopwatch.elapsed.inMilliseconds;
           print('Parallel Time Taken: $parallelMs ms');
 
           expect(
-            responses.length,
+            merged.length,
             MAX_PAGES * MAX_PER_PAGE,
             reason: 'Responses length should be equal to MAX_PAGES.',
           );
 
           const expectedTotalLength = MAX_PAGES * MAX_PER_PAGE;
-          final actualTotalLength = responses.length;
+          final actualTotalLength = merged.length;
 
           expect(
             actualTotalLength,
