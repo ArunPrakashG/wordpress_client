@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
-import 'exceptions/request/middleware_aborted_exception.dart';
 import 'library_exports.dart';
 import 'responses/wordpress_error.dart';
 import 'utilities/codable_map/codable_map.dart';

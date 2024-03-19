@@ -25,10 +25,7 @@ Future<void> main() async {
         .withDefaultMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(const Duration(seconds: 60))
-        .withStatisticDelegate((requestUrl, count) {
-          print('$requestUrl => $count');
-        })
-        .withDebugMode(true)
+        .withDebugMode(false)
         .withDefaultAuthorizationBuilder(
           (authBuilder) => authBuilder
               .withUserName(json!['username'] as String)
@@ -41,13 +38,144 @@ Future<void> main() async {
               )
               .build(),
         )
+        .withMiddleware(
+          DelegatedMiddleware(
+            onRequestDelegate: (request) async {
+              // print('Request: ${request.url}');
+              return request;
+            },
+            onResponseDelegate: (response) async {
+              // print('Response: ${response.code}');
+              return response;
+            },
+          ),
+        )
         .build(),
   );
 
   client.initialize();
 
-  // tempMailClient = TempMailClient();
-  // final mailResponse = await tempMailClient.getEmails();
+  group(
+    'Post Requests: ',
+    () {
+      const MAX_PAGES = 30;
+      const MAX_PER_PAGE = 15;
+
+      print('Max Pages: $MAX_PAGES');
+      print('Max Per Page: $MAX_PER_PAGE');
+      var parallelMs = 0;
+      var sequentialMs = 0;
+
+      test(
+        'Parallel',
+        () async {
+          final stopwatch = Stopwatch()..start();
+          final parallelWordpress = ParallelWordpress(client: client);
+
+          print('Starting Parallel...');
+          final responses = await parallelWordpress.list(
+            interface: client.posts,
+            requestBuilder: () {
+              return List.generate(
+                MAX_PAGES,
+                (index) => ParallelRequest(
+                  page: index + 1,
+                  request: ListPostRequest(
+                    perPage: MAX_PER_PAGE,
+                    page: index + 1,
+                  ),
+                ),
+              );
+            },
+          );
+
+          stopwatch.stop();
+          parallelMs = stopwatch.elapsed.inMilliseconds;
+          print('Parallel Time Taken: $parallelMs ms');
+
+          expect(
+            responses.length,
+            MAX_PAGES * MAX_PER_PAGE,
+            reason: 'Responses length should be equal to MAX_PAGES.',
+          );
+
+          const expectedTotalLength = MAX_PAGES * MAX_PER_PAGE;
+          final actualTotalLength = responses.length;
+
+          expect(
+            actualTotalLength,
+            expectedTotalLength,
+            reason:
+                'Total length of all responses should be equal to MAX_PAGES * MAX_PER_PAGE.',
+          );
+        },
+      );
+
+      test(
+        'Sequential',
+        () async {
+          final stopwatch = Stopwatch()..start();
+          final responses = <List<Post>>[];
+
+          print('Starting Sequential...');
+          for (var index = 0; index < MAX_PAGES; index++) {
+            final page = index + 1;
+            final response = await client.posts.list(
+              ListPostRequest(
+                perPage: MAX_PER_PAGE,
+                page: page,
+              ),
+            );
+
+            responses.add(response.asSuccess().data);
+          }
+
+          final folded = responses.fold<List<Post>>(
+            <Post>[],
+            (previousValue, element) =>
+                previousValue.followedBy(element).map((e) => e).toList(),
+          );
+
+          stopwatch.stop();
+          sequentialMs = stopwatch.elapsed.inMilliseconds;
+          print('Sequential Time Taken: $sequentialMs ms');
+
+          expect(
+            folded.length,
+            MAX_PAGES * MAX_PER_PAGE,
+            reason: 'Responses length should be equal to MAX_PAGES.',
+          );
+
+          const expectedTotalLength = MAX_PAGES * MAX_PER_PAGE;
+          final actualTotalLength = folded.length;
+
+          expect(
+            actualTotalLength,
+            expectedTotalLength,
+            reason:
+                'Total length of all responses should be equal to MAX_PAGES * MAX_PER_PAGE.',
+          );
+        },
+      );
+
+      test('Check time difference', () async {
+        while (parallelMs == 0 || sequentialMs == 0) {
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+
+        final difference = sequentialMs - parallelMs;
+        final percentage = (difference / sequentialMs) * 100;
+
+        print('Difference: $difference ms (${percentage.toStringAsFixed(2)}%)');
+
+        expect(
+          parallelMs < sequentialMs,
+          true,
+          reason: 'Parallel time should be less than sequential time.',
+        );
+      });
+    },
+  );
 
   group(
     'Discovery',

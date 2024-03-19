@@ -69,4 +69,16 @@ abstract base class IRequest {
   ///
   /// Consider using [addIfNotNull] extension method to add a value to a map if it is not null.
   FutureOr<WordpressRequest> build(Uri baseUrl);
+
+  String operator [](String key) {
+    if (queryParameters != null) {
+      return queryParameters![key] as String? ?? '';
+    }
+
+    if (headers != null) {
+      return headers![key] ?? '';
+    }
+
+    return '';
+  }
 }

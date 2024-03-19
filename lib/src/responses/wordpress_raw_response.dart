@@ -212,4 +212,24 @@ final class WordpressRawResponse {
         duration.hashCode ^
         message.hashCode;
   }
+
+  WordpressRawResponse copyWith({
+    dynamic data,
+    int? code,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? requestHeaders,
+    Duration? duration,
+    Map<String, dynamic>? extra,
+    String? message,
+  }) {
+    return WordpressRawResponse(
+      data: data ?? this.data,
+      code: code ?? this.code,
+      headers: headers ?? this.headers,
+      requestHeaders: requestHeaders ?? this.requestHeaders,
+      duration: duration ?? this.duration,
+      extra: extra ?? this.extra,
+      message: message ?? this.message,
+    );
+  }
 }

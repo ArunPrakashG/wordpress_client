@@ -11,4 +11,14 @@ extension IterableExtensions<E> on Iterable<E> {
 
     return value;
   }
+
+  Future<Iterable<T>> mapAsync<T>(Future<T> Function(E element) f) async {
+    final results = <T>[];
+
+    for (final element in this) {
+      results.add(await f(element));
+    }
+
+    return results;
+  }
 }

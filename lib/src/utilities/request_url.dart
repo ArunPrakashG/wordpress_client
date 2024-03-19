@@ -66,7 +66,7 @@ class RequestUrl {
   @override
   String toString() {
     if (isRelative) {
-      return _endpoint!;
+      return '/${_endpoint!}';
     }
 
     return _uri.toString();
