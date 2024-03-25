@@ -257,6 +257,11 @@
   - This package was used to synchronise the request and response processing. This now needs to be handled by the user itself.
   - it didn't make sense to restrict the requesting processing inside the library itself.
 
+## 🐛 8.4.1
+
+- 🎉 Introduce `ParallelWordpress` class to generate requests and execute them in parallel, at the same time receive responses sorted using their page number.
+- 🛠 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes

@@ -1,7 +1,9 @@
 export 'disposable_base.dart';
+export 'extensions/client_extensions.dart';
 export 'extensions/header_extensions.dart';
 export 'extensions/iterable_extensions.dart';
 export 'extensions/map_extensions.dart';
+export 'extensions/parallel_result_extensions.dart';
 export 'extensions/post_extensions.dart';
 export 'extensions/response_extensions.dart';
 export 'extensions/self_representive_extensions.dart';

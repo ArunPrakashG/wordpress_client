@@ -26,6 +26,7 @@
 - 📦 Third party Database integration.
 - 🔧 Middlewares for request & response operations.
 - 🎣 Events for preprocessing response.
+- 🚀 Execute requests in Parallel.
 
 ## Future
 
@@ -39,7 +40,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.4.0
+ wordpress_client: ^8.4.1
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
