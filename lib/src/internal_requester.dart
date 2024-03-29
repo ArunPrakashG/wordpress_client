@@ -94,7 +94,7 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
-    final headers = request.headers ?? <String, dynamic>{};
+    final requestHeaders = request.headers ?? <String, dynamic>{};
 
     if (request.requireAuth) {
       final authorizer = () {
@@ -127,7 +127,7 @@ final class InternalRequester extends IRequestExecutor {
         );
       }
 
-      headers[authResult.key] = authResult.value;
+      requestHeaders[authResult.key] = authResult.value;
     }
 
     final requestUrl = () {
@@ -139,6 +139,27 @@ final class InternalRequester extends IRequestExecutor {
     }();
 
     _triggerStatistics(requestUrl);
+
+    final result = await _executeMiddlewareEvent(
+      request: request,
+      transformer: (data) {
+        final headers = <String, dynamic>{
+          'X-Local-Cached': true,
+        };
+
+        return WordpressRawResponse(
+          data: data,
+          code: 200,
+          headers: headers,
+          requestHeaders: requestHeaders,
+          message: 'Middleware event executed successfully.',
+        );
+      },
+    );
+
+    if (result != null) {
+      return result;
+    }
 
     final watch = Stopwatch();
 
@@ -159,7 +180,7 @@ final class InternalRequester extends IRequestExecutor {
             method: request.method.name,
             sendTimeout: request.sendTimeout,
             receiveTimeout: request.receiveTimeout,
-            headers: headers,
+            headers: requestHeaders,
           ),
         );
       } finally {
@@ -182,6 +203,22 @@ final class InternalRequester extends IRequestExecutor {
       extra: response.extra,
       message: response.statusMessage,
     );
+  }
+
+  Future<WordpressRawResponse?> _executeMiddlewareEvent({
+    required WordpressRequest request,
+    required WordpressRawResponse Function(MiddlewareRawResponse data)
+        transformer,
+  }) async {
+    for (final middleware in _middlewares) {
+      final result = await middleware.onExecute(request);
+
+      if (result.hasData) {
+        return transformer(result);
+      }
+    }
+
+    return null;
   }
 
   Dio _createDioClient() {
