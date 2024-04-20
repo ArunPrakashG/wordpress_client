@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../../wordpress_client.dart';
+import '../constants.dart';
 import '../utilities/helpers.dart';
 import 'wordpress_error.dart';
 
@@ -70,6 +71,8 @@ final class WordpressRawResponse {
 
   /// Returns true if the given [code] is not in between 200 to 399 range. A convenience method for `!isSuccessful`.
   bool get isFailure => !isSuccessful;
+
+  bool get isMiddlewareResponse => headers.containsKey(MIDDLEWARE_HEADER_KEY);
 
   dynamic operator [](dynamic key) {
     if (data == null) {

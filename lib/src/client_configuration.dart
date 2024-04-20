@@ -8,7 +8,7 @@ import 'constants.dart';
 @immutable
 final class BootstrapConfiguration {
   const BootstrapConfiguration({
-    this.requestTimeout = kDefaultRequestTimeout,
+    this.requestTimeout = DEFAULT_REQUEST_TIMEOUT,
     this.responsePreprocessorDelegate,
     this.defaultAuthorization,
     this.defaultUserAgent,

@@ -1,7 +1,6 @@
 import '../requests/wordpress_request.dart';
 import '../responses/wordpress_raw_response.dart';
 import 'middleware_exports.dart';
-import 'models/middleware_raw_response.dart';
 
 typedef OnRequestDelegate = Future<WordpressRequest> Function(
   WordpressRequest request,

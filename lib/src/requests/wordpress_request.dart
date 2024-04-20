@@ -16,8 +16,8 @@ final class WordpressRequest {
     this.requireAuth = false,
     this.authorization,
     this.validator,
-    this.sendTimeout = kDefaultRequestTimeout,
-    this.receiveTimeout = kDefaultRequestTimeout,
+    this.sendTimeout = DEFAULT_REQUEST_TIMEOUT,
+    this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
   });
 
   /// The request url.
