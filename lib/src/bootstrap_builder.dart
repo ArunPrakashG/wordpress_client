@@ -26,7 +26,7 @@ class BootstrapBuilder {
     _middlewares = config.middlewares;
   }
 
-  Duration _defaultRequestTimeout = kDefaultRequestTimeout; // 60 seconds
+  Duration _defaultRequestTimeout = DEFAULT_REQUEST_TIMEOUT; // 60 seconds
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
   String? _defaultUserAgent;

@@ -28,6 +28,7 @@ enum RequestErrorType {
   requestCancelled,
   invalidStatusCode,
   middlewareAborted,
+  middlewareExecutionFailed,
 }
 
 enum SearchType {

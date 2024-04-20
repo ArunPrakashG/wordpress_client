@@ -1,5 +1,9 @@
 part of 'wordpress_client_base.dart';
 
+typedef MiddlwareResponseTransformer = WordpressRawResponse Function(
+  MiddlewareRawResponse data,
+);
+
 final class InternalRequester extends IRequestExecutor {
   InternalRequester.configure(
     this._baseUrl, [
@@ -94,7 +98,7 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
-    final headers = request.headers ?? <String, dynamic>{};
+    final requestHeaders = request.headers ?? <String, dynamic>{};
 
     if (request.requireAuth) {
       final authorizer = () {
@@ -127,7 +131,7 @@ final class InternalRequester extends IRequestExecutor {
         );
       }
 
-      headers[authResult.key] = authResult.value;
+      requestHeaders[authResult.key] = authResult.value;
     }
 
     final requestUrl = () {
@@ -139,6 +143,44 @@ final class InternalRequester extends IRequestExecutor {
     }();
 
     _triggerStatistics(requestUrl);
+
+    final result = await executeGuarded(
+      function: () async {
+        return _executeMiddlewareEvent(
+          request: request,
+          transformer: (data) {
+            final headers = <String, dynamic>{
+              MIDDLEWARE_HEADER_KEY: true,
+            };
+
+            headers.addAllIfNotNull(data.headers);
+
+            return WordpressRawResponse(
+              data: data,
+              code: data.statusCode,
+              headers: headers,
+              requestHeaders: requestHeaders,
+              extra: data.extra ?? <String, dynamic>{},
+              message:
+                  data.message ?? 'Middleware event executed successfully.',
+            );
+          },
+        );
+      },
+      onError: (error, stackTrace) async {
+        return WordpressRawResponse(
+          data: null,
+          requestHeaders: requestHeaders,
+          code: -RequestErrorType.middlewareExecutionFailed.index,
+          message: 'Middleware execution failed.',
+        );
+      },
+    );
+
+    if (result != null &&
+        result.code != -RequestErrorType.middlewareExecutionFailed.index) {
+      return result;
+    }
 
     final watch = Stopwatch();
 
@@ -159,7 +201,7 @@ final class InternalRequester extends IRequestExecutor {
             method: request.method.name,
             sendTimeout: request.sendTimeout,
             receiveTimeout: request.receiveTimeout,
-            headers: headers,
+            headers: requestHeaders,
           ),
         );
       } finally {
@@ -182,6 +224,21 @@ final class InternalRequester extends IRequestExecutor {
       extra: response.extra,
       message: response.statusMessage,
     );
+  }
+
+  Future<WordpressRawResponse?> _executeMiddlewareEvent({
+    required WordpressRequest request,
+    required MiddlwareResponseTransformer transformer,
+  }) async {
+    for (final middleware in _middlewares) {
+      final result = await middleware.onExecute(request);
+
+      if (result.hasData) {
+        return transformer(result);
+      }
+    }
+
+    return null;
   }
 
   Dio _createDioClient() {
