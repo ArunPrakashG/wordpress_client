@@ -616,6 +616,66 @@ final class WordpressClient implements IDisposable {
     );
   }
 
+  static Future<bool> isWordpressSite(Uri uri) async {
+    if (!uri.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is invalid. Base URLs should always be an absolute URL.',
+        'uri',
+      );
+    }
+
+    // Check if the url contains other path than the base
+    if (uri.pathSegments.length > 1) {
+      throw ArgumentError(
+        'The provided url appears to be invalid. Remove any extra path segments from the URL.',
+        'uri',
+      );
+    }
+
+    return executeGuarded(
+      function: () async {
+        final client = Dio();
+
+        final response = await client.getUri<String>(
+          uri,
+          options: Options(
+            followRedirects: true,
+            sendTimeout: const Duration(seconds: 20),
+            receiveTimeout: const Duration(seconds: 20),
+          ),
+        );
+
+        if (response.statusCode != 200) {
+          client.close(force: true);
+          return false;
+        }
+
+        final html = response.data ?? '';
+        final headers = response.headers.map.map(
+          (key, value) => MapEntry(key, value.join(', ')),
+        );
+
+        client.close(force: true);
+        if (headers['X-Powered-By'] != null) {
+          return headers['X-Powered-By']!.contains('WordPress');
+        }
+
+        if (headers['x-powered-by'] != null) {
+          return headers['x-powered-by']!.contains('WordPress');
+        }
+
+        if (html.contains('wp-content')) {
+          return true;
+        }
+
+        return false;
+      },
+      onError: (_, __) async {
+        return false;
+      },
+    );
+  }
+
   @override
   void dispose() {
     if (_isDisposed) {
