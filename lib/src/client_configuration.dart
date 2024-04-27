@@ -74,7 +74,7 @@ final class BootstrapConfiguration {
 
   BootstrapConfiguration copyWith({
     bool? enableDebugMode,
-    Duration? requestTimeout,
+    Duration? receiveTimeout,
     bool Function(dynamic)? responsePreprocessorDelegate,
     IAuthorization? defaultAuthorization,
     String? defaultUserAgent,
@@ -89,7 +89,7 @@ final class BootstrapConfiguration {
   }) {
     return BootstrapConfiguration(
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
-      receiveTimeout: requestTimeout ?? this.receiveTimeout,
+      receiveTimeout: receiveTimeout ?? this.receiveTimeout,
       responsePreprocessorDelegate:
           responsePreprocessorDelegate ?? this.responsePreprocessorDelegate,
       defaultAuthorization: defaultAuthorization ?? this.defaultAuthorization,
