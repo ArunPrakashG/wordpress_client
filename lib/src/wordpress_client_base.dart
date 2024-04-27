@@ -578,6 +578,29 @@ final class WordpressClient implements IDisposable {
     )!;
   }
 
+  static Future<WordpressDiscovery> discoverAndClose(Uri baseUri) async {
+    if (!isValidUrl(baseUri.toString())) {
+      throw ArgumentError(
+        'The provided url is invalid. Base URLs should always be an absolute URL.',
+      );
+    }
+
+    return using(
+      WordpressClient.initialize(
+        baseUrl: baseUri,
+      ),
+      (client) async {
+        final response = await client.discover();
+
+        if (!response) {
+          throw Exception('Failed to discover the site.');
+        }
+
+        return client.discovery;
+      },
+    );
+  }
+
   /// Clears the stored discovery cache
   void clearDiscoveryCache() => _discovery = null;
 

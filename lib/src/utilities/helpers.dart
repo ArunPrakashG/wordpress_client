@@ -79,9 +79,9 @@ T? decodeByMultiKeys<T>(
 }
 
 /// A convenience method to execute a function and dispose the given [IDisposable] object.
-FutureOr<T?> using<T, E extends IDisposable>(
+FutureOr<T> using<T, E extends IDisposable>(
   E disposable,
-  FutureOr<T?> Function(E instance) delegate,
+  FutureOr<T> Function(E instance) delegate,
 ) async {
   try {
     return delegate(disposable);
