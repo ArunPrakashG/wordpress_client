@@ -59,8 +59,8 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    _client.options.connectTimeout = configuration.requestTimeout;
-    _client.options.receiveTimeout = configuration.requestTimeout;
+    _client.options.connectTimeout = configuration.connectTimeout;
+    _client.options.receiveTimeout = configuration.receiveTimeout;
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
     _client.options.baseUrl = _baseUrl.toString();
@@ -241,7 +241,7 @@ final class InternalRequester extends IRequestExecutor {
     return null;
   }
 
-  Dio _createDioClient() {
+  Dio _createAuthDioClient() {
     final client = Dio(
       BaseOptions(
         baseUrl: baseUrl.toString(),
@@ -294,7 +294,7 @@ final class InternalRequester extends IRequestExecutor {
       return (key: auth.headerKey, value: (await auth.generateAuthUrl())!);
     }
 
-    auth.clientFactoryProvider(_createDioClient());
+    auth.clientFactoryProvider(_createAuthDioClient());
 
     await auth.initialize(baseUrl: _baseUrl);
 

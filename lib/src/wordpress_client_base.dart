@@ -75,7 +75,7 @@ final class WordpressClient implements IDisposable {
   ///
   WordpressClient.initialize({
     required Uri baseUrl,
-    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
     if (!baseUrl.isAbsolute) {
       throw ArgumentError(
@@ -271,6 +271,20 @@ final class WordpressClient implements IDisposable {
   }
 
   WordpressDiscovery? _discovery;
+
+  static bool isValidUrl(String url) {
+    final uri = Uri.tryParse(url);
+
+    if (uri == null) {
+      return false;
+    }
+
+    if (!uri.isAbsolute) {
+      return false;
+    }
+
+    return true;
+  }
 
   /// Initializes all the built in interfaces and other services
   ///
