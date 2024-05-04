@@ -8,7 +8,8 @@ import 'constants.dart';
 @immutable
 final class BootstrapConfiguration {
   const BootstrapConfiguration({
-    this.requestTimeout = DEFAULT_REQUEST_TIMEOUT,
+    this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
+    this.connectTimeout = DEFAULT_CONNECT_TIMEOUT,
     this.responsePreprocessorDelegate,
     this.defaultAuthorization,
     this.defaultUserAgent,
@@ -22,7 +23,8 @@ final class BootstrapConfiguration {
   });
 
   final bool enableDebugMode;
-  final Duration requestTimeout;
+  final Duration receiveTimeout;
+  final Duration connectTimeout;
   final bool Function(dynamic)? responsePreprocessorDelegate;
   final IAuthorization? defaultAuthorization;
   final String? defaultUserAgent;
@@ -41,7 +43,7 @@ final class BootstrapConfiguration {
     final collectionEquals = const DeepCollectionEquality().equals;
 
     return other.enableDebugMode == enableDebugMode &&
-        other.requestTimeout == requestTimeout &&
+        other.receiveTimeout == receiveTimeout &&
         other.responsePreprocessorDelegate == responsePreprocessorDelegate &&
         other.defaultAuthorization == defaultAuthorization &&
         other.defaultUserAgent == defaultUserAgent &&
@@ -50,13 +52,14 @@ final class BootstrapConfiguration {
         other.maxRedirects == maxRedirects &&
         collectionEquals(other.interceptors, interceptors) &&
         collectionEquals(other.middlewares, middlewares) &&
+        other.connectTimeout == connectTimeout &&
         other.statisticsDelegate == statisticsDelegate;
   }
 
   @override
   int get hashCode {
     return enableDebugMode.hashCode ^
-        requestTimeout.hashCode ^
+        receiveTimeout.hashCode ^
         responsePreprocessorDelegate.hashCode ^
         defaultAuthorization.hashCode ^
         defaultUserAgent.hashCode ^
@@ -65,12 +68,13 @@ final class BootstrapConfiguration {
         maxRedirects.hashCode ^
         interceptors.hashCode ^
         middlewares.hashCode ^
+        connectTimeout.hashCode ^
         statisticsDelegate.hashCode;
   }
 
   BootstrapConfiguration copyWith({
     bool? enableDebugMode,
-    Duration? requestTimeout,
+    Duration? receiveTimeout,
     bool Function(dynamic)? responsePreprocessorDelegate,
     IAuthorization? defaultAuthorization,
     String? defaultUserAgent,
@@ -81,10 +85,11 @@ final class BootstrapConfiguration {
     bool? synchronized,
     StatisticsCallback? statisticsDelegate,
     List<IWordpressMiddleware>? middlewares,
+    Duration? connectTimeout,
   }) {
     return BootstrapConfiguration(
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
-      requestTimeout: requestTimeout ?? this.requestTimeout,
+      receiveTimeout: receiveTimeout ?? this.receiveTimeout,
       responsePreprocessorDelegate:
           responsePreprocessorDelegate ?? this.responsePreprocessorDelegate,
       defaultAuthorization: defaultAuthorization ?? this.defaultAuthorization,
@@ -96,6 +101,7 @@ final class BootstrapConfiguration {
       interceptors: interceptors ?? this.interceptors,
       statisticsDelegate: statisticsDelegate ?? this.statisticsDelegate,
       middlewares: middlewares ?? this.middlewares,
+      connectTimeout: connectTimeout ?? this.connectTimeout,
     );
   }
 }

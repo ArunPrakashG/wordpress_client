@@ -51,7 +51,7 @@ final class ListPageRequest extends IRequest {
   List<int>? parent;
   List<int>? parentExclude;
   List<String>? slug;
-  ContentStatus? status;
+  List<ContentStatus>? status;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -74,7 +74,7 @@ final class ListPageRequest extends IRequest {
       ..addIfNotNull('parent', parent?.join(','))
       ..addIfNotNull('parent_exclude', parentExclude?.join(','))
       ..addIfNotNull('slug', slug?.join(','))
-      ..addIfNotNull('status', status?.name)
+      ..addIfNotNull('status', status?.map((e) => e.name).join(','))
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 

@@ -32,10 +32,6 @@ Future<void> main() async {
 
   client.initialize();
 
-  client.removeMiddleware(
-    'LoggingMiddleware',
-  );
-
   final response = await client.posts.list(
     ListPostRequest(
       perPage: 1,

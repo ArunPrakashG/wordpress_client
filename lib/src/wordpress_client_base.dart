@@ -75,7 +75,7 @@ final class WordpressClient implements IDisposable {
   ///
   WordpressClient.initialize({
     required Uri baseUrl,
-    BootstrapConfiguration Function(BootstrapBuilder)? bootstrapper,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
     if (!baseUrl.isAbsolute) {
       throw ArgumentError(
@@ -271,6 +271,20 @@ final class WordpressClient implements IDisposable {
   }
 
   WordpressDiscovery? _discovery;
+
+  static bool isValidUrl(String url) {
+    final uri = Uri.tryParse(url);
+
+    if (uri == null) {
+      return false;
+    }
+
+    if (!uri.isAbsolute) {
+      return false;
+    }
+
+    return true;
+  }
 
   /// Initializes all the built in interfaces and other services
   ///
@@ -564,6 +578,29 @@ final class WordpressClient implements IDisposable {
     )!;
   }
 
+  static Future<WordpressDiscovery> discoverAndClose(Uri baseUri) async {
+    if (!isValidUrl(baseUri.toString())) {
+      throw ArgumentError(
+        'The provided url is invalid. Base URLs should always be an absolute URL.',
+      );
+    }
+
+    return using(
+      WordpressClient.initialize(
+        baseUrl: baseUri,
+      ),
+      (client) async {
+        final response = await client.discover();
+
+        if (!response) {
+          throw Exception('Failed to discover the site.');
+        }
+
+        return client.discovery;
+      },
+    );
+  }
+
   /// Clears the stored discovery cache
   void clearDiscoveryCache() => _discovery = null;
 
@@ -576,6 +613,66 @@ final class WordpressClient implements IDisposable {
 
     reconfigureClient(
       (builder) => builder.withMiddlewares(_middlewares).build(),
+    );
+  }
+
+  static Future<bool> isWordpressSite(Uri uri) async {
+    if (!uri.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is invalid. Base URLs should always be an absolute URL.',
+        'uri',
+      );
+    }
+
+    // Check if the url contains other path than the base
+    if (uri.pathSegments.length > 1) {
+      throw ArgumentError(
+        'The provided url appears to be invalid. Remove any extra path segments from the URL.',
+        'uri',
+      );
+    }
+
+    return executeGuarded(
+      function: () async {
+        final client = Dio();
+
+        final response = await client.getUri<String>(
+          uri,
+          options: Options(
+            followRedirects: true,
+            sendTimeout: const Duration(seconds: 20),
+            receiveTimeout: const Duration(seconds: 20),
+          ),
+        );
+
+        if (response.statusCode != 200) {
+          client.close(force: true);
+          return false;
+        }
+
+        final html = response.data ?? '';
+        final headers = response.headers.map.map(
+          (key, value) => MapEntry(key, value.join(', ')),
+        );
+
+        client.close(force: true);
+        if (headers['X-Powered-By'] != null) {
+          return headers['X-Powered-By']!.contains('WordPress');
+        }
+
+        if (headers['x-powered-by'] != null) {
+          return headers['x-powered-by']!.contains('WordPress');
+        }
+
+        if (html.contains('wp-content')) {
+          return true;
+        }
+
+        return false;
+      },
+      onError: (_, __) async {
+        return false;
+      },
     );
   }
 

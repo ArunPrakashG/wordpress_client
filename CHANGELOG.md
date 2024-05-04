@@ -262,6 +262,23 @@
 - 🎉 Introduce `ParallelWordpress` class to generate requests and execute them in parallel, at the same time receive responses sorted using their page number.
 - 🛠 Bug fixes
 
+## 🐛 8.4.2
+
+- 🩹 Bug fixes
+- 🎉 Added static methods to validate base url and to discovery a website.
+
+## 🐛 8.4.3
+
+- 🎉 New static method to check if a site is built using wordpress.
+
+## 🐛 8.4.4
+
+- 🩹 Bug fixes
+
+## 🐛 8.4.5
+
+- 🩹 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes

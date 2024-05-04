@@ -21,7 +21,7 @@ class BootstrapBuilder {
     _interceptors = config.interceptors;
     _responsePreprocessorDelegate = config.responsePreprocessorDelegate;
     _defaultMaxRedirects = config.maxRedirects;
-    _defaultRequestTimeout = config.requestTimeout;
+    _defaultRequestTimeout = config.receiveTimeout;
     _followRedirects = config.shouldFollowRedirects;
     _middlewares = config.middlewares;
   }
@@ -113,7 +113,7 @@ class BootstrapBuilder {
 
   BootstrapConfiguration build() {
     return BootstrapConfiguration(
-      requestTimeout: _defaultRequestTimeout,
+      receiveTimeout: _defaultRequestTimeout,
       responsePreprocessorDelegate: _responsePreprocessorDelegate,
       defaultAuthorization: _defaultAuthorization,
       defaultUserAgent: _defaultUserAgent,
