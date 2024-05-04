@@ -275,6 +275,10 @@
 
 - 🩹 Bug fixes
 
+## 🐛 8.4.5
+
+- 🩹 Bug fixes
+
 ## Legend
 
 - 🎉 New features or major changes

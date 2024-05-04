@@ -55,7 +55,7 @@ final class ListPostRequest extends IRequest {
   List<int>? tagsExclude;
   bool? sticky;
   List<String>? slug;
-  ContentStatus? status;
+  List<ContentStatus>? status;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -80,7 +80,7 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('tags_exclude', tagsExclude?.join(','))
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
-      ..addIfNotNull('status', status?.name)
+      ..addIfNotNull('status', status?.map((e) => e.name).join(','))
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 
