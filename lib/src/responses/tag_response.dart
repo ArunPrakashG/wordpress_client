@@ -3,10 +3,9 @@ import 'package:meta/meta.dart';
 
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'properties/links.dart';
 
 @immutable
-class Tag implements ISelfRespresentive {
+final class Tag implements ISelfRespresentive {
   const Tag({
     required this.id,
     required this.count,
@@ -16,8 +15,6 @@ class Tag implements ISelfRespresentive {
     required this.self,
     this.description,
     this.name,
-    this.meta,
-    this.links,
   });
 
   factory Tag.fromJson(Map<String, dynamic> json) {
@@ -29,11 +26,6 @@ class Tag implements ISelfRespresentive {
       name: castOrElse(json['name']),
       slug: castOrElse(json['slug']),
       taxonomy: castOrElse(json['taxonomy']),
-      meta: json['meta'],
-      links: castOrElse(
-        json['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
-      ),
       self: json,
     );
   }
@@ -45,8 +37,6 @@ class Tag implements ISelfRespresentive {
   final String? name;
   final String slug;
   final String taxonomy;
-  final dynamic meta;
-  final Links? links;
 
   @override
   final Map<String, dynamic> self;
@@ -60,8 +50,6 @@ class Tag implements ISelfRespresentive {
       'name': name,
       'slug': slug,
       'taxonomy': taxonomy,
-      'meta': meta,
-      '_links': links?.toJson(),
     };
   }
 
@@ -80,8 +68,6 @@ class Tag implements ISelfRespresentive {
         other.name == name &&
         other.slug == slug &&
         other.taxonomy == taxonomy &&
-        other.meta == meta &&
-        other.links == links &&
         mapEquals(other.self, self);
   }
 
@@ -94,13 +80,11 @@ class Tag implements ISelfRespresentive {
         name.hashCode ^
         slug.hashCode ^
         taxonomy.hashCode ^
-        meta.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Tag(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, meta: $meta, links: $links, self: $self)';
+    return 'Tag(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, self: $self)';
   }
 }

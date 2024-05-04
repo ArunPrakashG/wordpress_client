@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 import '../../utilities/helpers.dart';
 
 @immutable
-class ImageMeta {
+final class ImageMeta {
   const ImageMeta({
     this.aperture,
     this.credit,

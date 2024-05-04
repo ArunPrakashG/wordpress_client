@@ -5,14 +5,13 @@ import '../enums.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
 import 'properties/content.dart';
-import 'properties/links.dart';
 import 'properties/media_details.dart';
 
 @immutable
-class Media implements ISelfRespresentive {
+final class Media implements ISelfRespresentive {
   const Media({
     required this.self,
-    this.id,
+    required this.id,
     this.date,
     this.dateGmt,
     this.guid,
@@ -36,7 +35,6 @@ class Media implements ISelfRespresentive {
     this.mediaDetails,
     this.post,
     this.sourceUrl,
-    this.links,
   });
 
   factory Media.fromJson(Map<String, dynamic> json) {
@@ -82,15 +80,11 @@ class Media implements ISelfRespresentive {
       ),
       post: castOrElse(json['post']),
       sourceUrl: castOrElse(json['source_url']),
-      links: castOrElse(
-        json['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
-      ),
       self: json,
     );
   }
 
-  final int? id;
+  final int id;
   final DateTime? date;
   final DateTime? dateGmt;
   final Content? guid;
@@ -114,7 +108,6 @@ class Media implements ISelfRespresentive {
   final MediaDetails? mediaDetails;
   final int? post;
   final String? sourceUrl;
-  final Links? links;
 
   @override
   final Map<String, dynamic> self;
@@ -145,7 +138,6 @@ class Media implements ISelfRespresentive {
       'media_details': mediaDetails?.toJson(),
       'post': post,
       'source_url': sourceUrl,
-      '_links': links?.toJson(),
     };
   }
 
@@ -181,7 +173,6 @@ class Media implements ISelfRespresentive {
         other.mediaDetails == mediaDetails &&
         other.post == post &&
         other.sourceUrl == sourceUrl &&
-        other.links == links &&
         mapEquals(other.self, self);
   }
 
@@ -211,12 +202,11 @@ class Media implements ISelfRespresentive {
         mediaDetails.hashCode ^
         post.hashCode ^
         sourceUrl.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Media(id: $id, date: $date, dateGmt: $dateGmt, guid: $guid, modified: $modified, modifiedGmt: $modifiedGmt, slug: $slug, status: $status, type: $type, link: $link, title: $title, author: $author, commentStatus: $commentStatus, pingStatus: $pingStatus, template: $template, meta: $meta, description: $description, caption: $caption, altText: $altText, mediaType: $mediaType, mimeType: $mimeType, mediaDetails: $mediaDetails, post: $post, sourceUrl: $sourceUrl, links: $links, self: $self)';
+    return 'Media(id: $id, date: $date, dateGmt: $dateGmt, guid: $guid, modified: $modified, modifiedGmt: $modifiedGmt, slug: $slug, status: $status, type: $type, link: $link, title: $title, author: $author, commentStatus: $commentStatus, pingStatus: $pingStatus, template: $template, meta: $meta, description: $description, caption: $caption, altText: $altText, mediaType: $mediaType, mimeType: $mimeType, mediaDetails: $mediaDetails, post: $post, sourceUrl: $sourceUrl, self: $self)';
   }
 }

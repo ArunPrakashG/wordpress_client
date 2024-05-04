@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../../utilities/helpers.dart';
 
 @immutable
-class ExtraCapabilities {
+final class ExtraCapabilities {
   const ExtraCapabilities({
     required this.administrator,
   });

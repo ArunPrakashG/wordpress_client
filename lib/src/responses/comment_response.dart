@@ -4,79 +4,77 @@ import 'package:meta/meta.dart';
 import '../enums.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
+import 'properties/avatar_urls.dart';
 import 'properties/content.dart';
-import 'properties/links.dart';
 
 @immutable
-class Comment implements ISelfRespresentive {
+final class Comment implements ISelfRespresentive {
   const Comment({
     required this.self,
-    this.id,
+    required this.status,
+    required this.id,
+    required this.authorUrl,
+    required this.link,
+    required this.type,
     this.post,
     this.parent,
     this.author,
     this.authorName,
-    this.authorUrl,
     this.date,
     this.authorEmail,
     this.authorIp,
     this.authorUserAgent,
     this.dateGmt,
     this.content,
-    this.link,
-    this.status,
-    this.type,
     this.authorAvatarUrls,
-    this.meta,
-    this.links,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
-      id: json['id'] as int?,
-      post: json['post'] as int?,
-      parent: json['parent'] as int?,
-      author: json['author'] as int?,
-      authorName: json['author_name'] as String?,
-      authorEmail: json['author_email'] as String?,
-      authorUrl: json['author_url'] as String?,
-      authorIp: json['author_ip'] as String?,
-      authorUserAgent: json['author_user_agent'] as String?,
-      date: parseDateIfNotNull(json['date']),
-      dateGmt: parseDateIfNotNull(json['date_gmt']),
-      content: Content.fromJson(json['content']),
-      link: json['link'] as String?,
-      status: getCommentStatusFromValue(json['status'] as String?),
-      type: json['type'] as String?,
-      authorAvatarUrls: json['author_avatar_urls'] == null
-          ? null
-          : Map<String, String>.from(
-              json['author_avatar_urls'] as Map<String, dynamic>,
-            ).map(MapEntry.new),
-      meta: json['meta'],
-      links: Links.fromJson(json['_links']),
+      id: castOrElse(json['id']),
+      post: castOrElse(json['post']),
+      parent: castOrElse(json['parent']),
+      author: castOrElse(json['author']),
+      authorName: castOrElse(json['author_name']),
+      authorEmail: castOrElse(json['author_email']),
+      authorUrl: castOrElse(json['author_url'], orElse: () => '')!,
+      authorIp: castOrElse(json['author_ip']),
+      authorUserAgent: castOrElse(json['author_user_agent']),
+      date: parseDateIfNotNull(castOrElse(json['date'])),
+      dateGmt: parseDateIfNotNull(castOrElse(json['date_gmt'])),
+      content: castOrElse(
+        json['content'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
+      link: castOrElse(json['link']),
+      status: getCommentStatusFromValue(castOrElse(json['status'])),
+      type: castOrElse(json['type']),
+      authorAvatarUrls: castOrElse(
+        json['author_avatar_urls'],
+        transformer: (value) {
+          return AvatarUrls.fromJson(value as Map<String, dynamic>);
+        },
+      ),
       self: json,
     );
   }
 
-  final int? id;
+  final int id;
   final int? post;
   final int? parent;
   final int? author;
   final String? authorName;
   final String? authorEmail;
-  final String? authorUrl;
+  final String authorUrl;
   final String? authorIp;
   final String? authorUserAgent;
   final DateTime? date;
   final DateTime? dateGmt;
   final Content? content;
-  final String? link;
-  final CommentStatus? status;
-  final String? type;
-  final Map<String, String>? authorAvatarUrls;
-  final dynamic meta;
-  final Links? links;
+  final String link;
+  final CommentStatus status;
+  final String type;
+  final AvatarUrls? authorAvatarUrls;
 
   @override
   final Map<String, dynamic> self;
@@ -96,14 +94,9 @@ class Comment implements ISelfRespresentive {
       'date_gmt': dateGmt?.toIso8601String(),
       'content': content?.toJson(),
       'link': link,
-      'status': status?.name,
+      'status': status.name,
       'type': type,
-      'author_avatar_urls': authorAvatarUrls == null
-          ? null
-          : Map<String, dynamic>.from(authorAvatarUrls!)
-              .map<String, dynamic>(MapEntry<String, dynamic>.new),
-      'meta': meta,
-      '_links': links?.toJson(),
+      'author_avatar_urls': authorAvatarUrls?.toJson(),
     };
   }
 
@@ -131,8 +124,6 @@ class Comment implements ISelfRespresentive {
         other.status == status &&
         other.type == type &&
         mapEquals(other.authorAvatarUrls, authorAvatarUrls) &&
-        other.meta == meta &&
-        other.links == links &&
         mapEquals(other.self, self);
   }
 
@@ -154,13 +145,11 @@ class Comment implements ISelfRespresentive {
         status.hashCode ^
         type.hashCode ^
         authorAvatarUrls.hashCode ^
-        meta.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Comment(id: $id, post: $post, parent: $parent, author: $author, authorName: $authorName, authorEmail: $authorEmail, authorUrl: $authorUrl, authorIp: $authorIp, authorUserAgent: $authorUserAgent, date: $date, dateGmt: $dateGmt, content: $content, link: $link, status: $status, type: $type, authorAvatarUrls: $authorAvatarUrls, meta: $meta, links: $links, self: $self)';
+    return 'Comment(id: $id, post: $post, parent: $parent, author: $author, authorName: $authorName, authorEmail: $authorEmail, authorUrl: $authorUrl, authorIp: $authorIp, authorUserAgent: $authorUserAgent, date: $date, dateGmt: $dateGmt, content: $content, link: $link, status: $status, type: $type, authorAvatarUrls: $authorAvatarUrls, self: $self)';
   }
 }

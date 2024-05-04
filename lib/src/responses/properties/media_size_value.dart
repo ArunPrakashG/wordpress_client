@@ -1,7 +1,9 @@
 import 'package:meta/meta.dart';
 
+import '../../library_exports.dart';
+
 @immutable
-class SizeValue {
+final class SizeValue {
   const SizeValue({
     this.file,
     this.width,
@@ -10,13 +12,13 @@ class SizeValue {
     this.sourceUrl,
   });
 
-  factory SizeValue.fromJson(dynamic json) {
+  factory SizeValue.fromJson(Map<String, dynamic> json) {
     return SizeValue(
-      file: json['file'] as String?,
-      width: json['width'] as int?,
-      height: json['height'] as int?,
-      mimeType: json['mime_type'] as String?,
-      sourceUrl: json['source_url'] as String?,
+      file: castOrElse(json['file']),
+      width: castOrElse(json['width']),
+      height: castOrElse(json['height']),
+      mimeType: castOrElse(json['mime_type']),
+      sourceUrl: castOrElse(json['source_url']),
     );
   }
 

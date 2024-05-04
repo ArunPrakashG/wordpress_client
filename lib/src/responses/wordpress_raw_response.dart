@@ -79,6 +79,10 @@ final class WordpressRawResponse {
       throw NullReferenceException('Response is null.');
     }
 
+    if (data is! Map<String, dynamic>) {
+      throw UnsupportedError('Response is not a map.');
+    }
+
     return data[key];
   }
 
@@ -156,6 +160,14 @@ final class WordpressRawResponse {
     if (isFailure) {
       if (throwIfError) {
         throw NullReferenceException('Response is a failure.');
+      }
+
+      return orElse?.call();
+    }
+
+    if (data is! Map<String, dynamic>) {
+      if (throwIfError) {
+        throw UnsupportedError('Response is not a map.');
       }
 
       return orElse?.call();

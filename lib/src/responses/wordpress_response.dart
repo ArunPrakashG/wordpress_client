@@ -22,19 +22,43 @@ final class WordpressSuccessResponse<T> extends WordpressResponse<T> {
   final T data;
 
   int get totalPagesCount {
-    if (headers.isEmpty || headers['x-wp-totalpages'] == null) {
+    if (headers.isEmpty) {
       return 0;
     }
 
-    return int.tryParse(headers['x-wp-totalpages'] as String) ?? 0;
+    if (headers['x-wp-totalpages'] != null) {
+      return int.tryParse(
+        castOrElse(headers['x-wp-totalpages'], orElse: () => '0')!,
+      )!;
+    }
+
+    if (headers['X-Wp-TotalPages'] != null) {
+      return int.tryParse(
+        castOrElse(headers['X-Wp-TotalPages'], orElse: () => '0')!,
+      )!;
+    }
+
+    return 0;
   }
 
   int get totalCount {
-    if (headers.isEmpty || headers['x-wp-total'] == null) {
+    if (headers.isEmpty) {
       return 0;
     }
 
-    return int.tryParse(headers['x-wp-total'] as String) ?? 0;
+    if (headers['x-wp-total'] != null) {
+      return int.tryParse(
+        castOrElse(headers['x-wp-total'], orElse: () => '0')!,
+      )!;
+    }
+
+    if (headers['X-Wp-Total'] != null) {
+      return int.tryParse(
+        castOrElse(headers['X-Wp-Total'], orElse: () => '0')!,
+      )!;
+    }
+
+    return 0;
   }
 
   @override

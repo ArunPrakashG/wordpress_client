@@ -4,7 +4,6 @@ import 'package:meta/meta.dart';
 import '../../wordpress_client.dart';
 import '../utilities/self_representive_base.dart';
 import 'properties/content.dart';
-import 'properties/links.dart';
 
 @immutable
 final class Page implements ISelfRespresentive {
@@ -18,7 +17,6 @@ final class Page implements ISelfRespresentive {
     required this.template,
     required this.parent,
     required this.menuOrder,
-    required this.meta,
     required this.self,
     this.date,
     this.dateGmt,
@@ -30,45 +28,38 @@ final class Page implements ISelfRespresentive {
     this.title,
     this.content,
     this.featuredMedia,
-    this.links,
   });
 
   factory Page.fromJson(Map<String, dynamic> json) {
     return Page(
       id: castOrElse(json['id']),
-      date: castOrElse(
-        json['date'],
-        transformer: parseDateIfNotNull,
-      ),
-      dateGmt: castOrElse(
-        json['date_gmt'],
-        transformer: parseDateIfNotNull,
-      ),
+      date: parseDateIfNotNull(castOrElse(json['date'])),
+      dateGmt: parseDateIfNotNull(castOrElse(json['date_gmt'])),
       menuOrder: castOrElse(json['menu_order'], orElse: () => 0)!,
       parent: castOrElse(json['parent'], orElse: () => 0)!,
-      guid: Content.fromJson(json['guid']),
-      modified: castOrElse(json['modified'], transformer: parseDateIfNotNull),
-      modifiedGmt: castOrElse(
-        json['modified_gmt'],
-        transformer: parseDateIfNotNull,
+      guid: castOrElse(
+        json['guid'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
       ),
+      modified: parseDateIfNotNull(castOrElse(json['modified'])),
+      modifiedGmt: parseDateIfNotNull(castOrElse(json['modified_gmt'])),
       slug: castOrElse(json['slug']),
-      status: castOrElse(
-        json['status'],
-        transformer: (value) => getContentStatusFromValue(value as String?),
-        orElse: () => ContentStatus.pending,
-      )!,
+      status: getContentStatusFromValue(castOrElse(json['status'])),
       type: castOrElse(json['type']),
       link: castOrElse(json['link']),
-      title: Content.fromJson(json['title']),
-      content: Content.fromJson(json['content']),
+      title: castOrElse(
+        json['title'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
+      content: castOrElse(
+        json['content'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
       author: castOrElse(json['author']),
       featuredMedia: castOrElse(json['featured_media']),
-      commentStatus: getStatusFromValue(json['comment_status'] as String?),
-      pingStatus: getStatusFromValue(json['ping_status'] as String?),
+      commentStatus: getStatusFromValue(castOrElse(json['comment_status'])),
+      pingStatus: getStatusFromValue(castOrElse(json['ping_status'])),
       template: castOrElse(json['template']),
-      meta: json['meta'],
-      links: Links.fromJson(json['_links']),
       self: json,
     );
   }
@@ -92,8 +83,6 @@ final class Page implements ISelfRespresentive {
   final String template;
   final int parent;
   final int menuOrder;
-  final dynamic meta;
-  final Links? links;
 
   @override
   final Map<String, dynamic> self;
@@ -118,8 +107,6 @@ final class Page implements ISelfRespresentive {
     String? template,
     int? parent,
     int? menuOrder,
-    dynamic meta,
-    Links? links,
     Map<String, dynamic>? self,
   }) {
     return Page(
@@ -142,8 +129,6 @@ final class Page implements ISelfRespresentive {
       template: template ?? this.template,
       parent: parent ?? this.parent,
       menuOrder: menuOrder ?? this.menuOrder,
-      meta: meta ?? this.meta,
-      links: links ?? this.links,
       self: self ?? this.self,
     );
   }
@@ -169,8 +154,6 @@ final class Page implements ISelfRespresentive {
       'template': template,
       'parent': parent,
       'menuOrder': menuOrder,
-      'meta': meta,
-      'links': links?.toJson(),
       'self': self,
     };
   }
@@ -204,8 +187,6 @@ final class Page implements ISelfRespresentive {
         other.template == template &&
         other.parent == parent &&
         other.menuOrder == menuOrder &&
-        other.meta == meta &&
-        other.links == links &&
         mapEquals(other.self, self);
   }
 
@@ -230,8 +211,6 @@ final class Page implements ISelfRespresentive {
         template.hashCode ^
         parent.hashCode ^
         menuOrder.hashCode ^
-        meta.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 }

@@ -3,24 +3,24 @@ import 'package:meta/meta.dart';
 import '../../utilities/helpers.dart';
 
 @immutable
-class AuthorMeta {
+final class AuthorMeta {
   const AuthorMeta({
-    this.id,
+    required this.id,
     this.userNicename,
     this.userRegistered,
     this.displayName,
   });
 
-  factory AuthorMeta.fromJson(dynamic json) {
+  factory AuthorMeta.fromJson(Map<String, dynamic> json) {
     return AuthorMeta(
-      id: json?['ID'] as String?,
-      userNicename: json?['user_nicename'] as String?,
-      userRegistered: parseDateIfNotNull(json?['user_registered']),
-      displayName: json?['display_name'] as String?,
+      id: castOrElse(json['ID']),
+      userNicename: castOrElse(json['user_nicename']),
+      userRegistered: parseDateIfNotNull(castOrElse(json['user_registered'])),
+      displayName: castOrElse(json['display_name']),
     );
   }
 
-  final String? id;
+  final String id;
   final String? userNicename;
   final DateTime? userRegistered;
   final String? displayName;

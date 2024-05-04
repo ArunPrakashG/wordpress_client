@@ -5,10 +5,9 @@ import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
 import 'properties/avatar_urls.dart';
 import 'properties/extra_capabilities.dart';
-import 'properties/links.dart';
 
 @immutable
-class User implements ISelfRespresentive {
+final class User implements ISelfRespresentive {
   const User({
     required this.id,
     required this.url,
@@ -20,8 +19,6 @@ class User implements ISelfRespresentive {
     this.name,
     this.description,
     this.avatarUrls,
-    this.meta,
-    this.links,
     this.email,
     this.firstName,
     this.lastName,
@@ -40,14 +37,14 @@ class User implements ISelfRespresentive {
       lastName: castOrElse(json['last_name']),
       email: castOrElse(json['email']),
       nickname: castOrElse(json['nick_name']),
-      registeredDate: castOrElse(
-        json['registered_date'],
-        transformer: parseDateIfNotNull,
-      ),
-      capabilities: json['capabilities'] == null
-          ? const <String, bool>{}
-          : Map<String, bool>.from(json['capabilities'] as Map<String, dynamic>)
-              .map(MapEntry.new),
+      registeredDate: parseDateIfNotNull(castOrElse(json['registered_date'])),
+      capabilities: castOrElse(
+        json['capabilities'],
+        orElse: () => <String, bool>{},
+        transformer: (value) {
+          return Map<String, bool>.from(value as Map<String, dynamic>);
+        },
+      )!,
       extraCapabilities: castOrElse(
         json['extra_capabilities'],
         transformer: (value) => ExtraCapabilities.fromJson(
@@ -67,11 +64,6 @@ class User implements ISelfRespresentive {
         transformer: (dynamic value) {
           return AvatarUrls.fromJson(value as Map<String, dynamic>);
         },
-      ),
-      meta: json['meta'],
-      links: castOrElse(
-        json['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
       ),
       self: json,
     );
@@ -93,8 +85,6 @@ class User implements ISelfRespresentive {
   final String slug;
   final List<String> roles;
   final AvatarUrls? avatarUrls;
-  final dynamic meta;
-  final Links? links;
 
   @override
   final Map<String, dynamic> self;
@@ -117,8 +107,6 @@ class User implements ISelfRespresentive {
       'extra_capabilities': extraCapabilities?.toJson(),
       'roles': roles,
       'avatar_urls': avatarUrls?.toJson(),
-      'meta': meta,
-      '_links': links?.toJson(),
     };
   }
 
@@ -146,8 +134,6 @@ class User implements ISelfRespresentive {
         other.slug == slug &&
         collectionEquals(other.roles, roles) &&
         collectionEquals(other.avatarUrls, avatarUrls) &&
-        other.meta == meta &&
-        other.links == links &&
         collectionEquals(other.self, self);
   }
 
@@ -169,13 +155,11 @@ class User implements ISelfRespresentive {
         slug.hashCode ^
         roles.hashCode ^
         avatarUrls.hashCode ^
-        meta.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'User(id: $id, username: $username, name: $name, firstName: $firstName, lastName: $lastName, nickname: $nickname, email: $email, registeredDate: $registeredDate, capabilities: $capabilities, extraCapabilities: $extraCapabilities, url: $url, description: $description, link: $link, slug: $slug, roles: $roles, avatarUrls: $avatarUrls, meta: $meta, links: $links, self: $self)';
+    return 'User(id: $id, username: $username, name: $name, firstName: $firstName, lastName: $lastName, nickname: $nickname, email: $email, registeredDate: $registeredDate, capabilities: $capabilities, extraCapabilities: $extraCapabilities, url: $url, description: $description, link: $link, slug: $slug, roles: $roles, avatarUrls: $avatarUrls, self: $self)';
   }
 }

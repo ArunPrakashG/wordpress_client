@@ -1,3 +1,4 @@
+import '../../responses/properties/links.dart';
 import '../helpers.dart';
 import '../self_representive_base.dart';
 
@@ -33,4 +34,15 @@ extension SelfRepresentiveExtensions on ISelfRespresentive {
 
   @Deprecated('Use "self"')
   Map<String, dynamic> get json => self;
+
+  Links? get links {
+    return getField(
+      '_links',
+      transformer: (value) {
+        return Links.fromJson(value as Map<String, dynamic>);
+      },
+    );
+  }
+
+  dynamic get meta => getField('meta');
 }
