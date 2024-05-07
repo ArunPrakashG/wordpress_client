@@ -155,7 +155,7 @@ By Useful Team, this is another implementation using JWT for authentication purp
 
 ## 📢 Custom Response Types
 
-Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/%F0%9F%9A%80-Using-Custom-Requests).
+Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests).
 
 ## 📣 Feedback
 
