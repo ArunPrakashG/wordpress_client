@@ -46,7 +46,7 @@ final class ParallelWordpress {
     );
 
     final results = await responses.mapAsync(
-      (response) async => executeGuarded(
+      (response) async => guardAsync(
         function: () async {
           if (transformer != null) {
             return await transformer(response.results);

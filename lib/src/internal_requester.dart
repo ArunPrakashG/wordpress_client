@@ -100,6 +100,8 @@ final class InternalRequester extends IRequestExecutor {
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
     final requestHeaders = request.headers ?? <String, dynamic>{};
 
+    // If the request requires authorization, we need to check if the default authorization is set.
+    // If it is, we need to check if the default authorization is valid.
     if (request.requireAuth) {
       final authorizer = () {
         if (request.authorization != null &&
@@ -134,6 +136,7 @@ final class InternalRequester extends IRequestExecutor {
       requestHeaders[authResult.key] = authResult.value;
     }
 
+    // Generate the request URL.
     final requestUrl = () {
       if (request.url.isAbsolute) {
         return request.url.uri.replace(host: baseUrl.host).toString();
@@ -144,7 +147,10 @@ final class InternalRequester extends IRequestExecutor {
 
     _triggerStatistics(requestUrl);
 
-    final result = await executeGuarded(
+    // Trigger the onExecute middleware event and returns the result.
+    // If the result is not null, we return the result.
+    // This is used if the user already has some sort of custom cache implementation.
+    final middlewareResult = await guardAsync(
       function: () async {
         return _executeMiddlewareEvent(
           request: request,
@@ -177,18 +183,19 @@ final class InternalRequester extends IRequestExecutor {
       },
     );
 
-    if (result != null &&
-        result.code != -RequestErrorType.middlewareExecutionFailed.index) {
-      return result;
+    if (middlewareResult != null &&
+        middlewareResult.code !=
+            -RequestErrorType.middlewareExecutionFailed.index) {
+      return middlewareResult;
     }
 
     final watch = Stopwatch();
 
-    Future<Response<dynamic>> run() async {
+    Future<Response<T>> run<T>() async {
       watch.start();
 
       try {
-        return _client.request<dynamic>(
+        return _client.request<T>(
           requestUrl,
           data: request.body,
           cancelToken: request.cancelToken,
@@ -204,12 +211,14 @@ final class InternalRequester extends IRequestExecutor {
             headers: requestHeaders,
           ),
         );
+      } catch (e) {
+        rethrow;
       } finally {
         watch.stop();
       }
     }
 
-    final response = await run();
+    final response = await run<dynamic>();
 
     final statusCode =
         response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
