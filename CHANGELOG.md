@@ -279,6 +279,12 @@
 
 - 🩹 Bug fixes
 
+## 🐛 8.4.6
+
+- 🩹 Bug fixes
+- 🛠 Added validations for entered `baseUrl`.
+- 💥Renamed `executeGuarded` to `guardAsync` and added a new `guard` method to guard synchronous functions.
+
 ## Legend
 
 - 🎉 New features or major changes

@@ -37,7 +37,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> create<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await executeGuarded<WordpressRawResponse>(
+    final rawResponse = await guardAsync<WordpressRawResponse>(
       function: () async {
         request = await _handleRequestMiddlewares(
           request: request,
@@ -109,7 +109,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> retrive<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await executeGuarded<WordpressRawResponse>(
+    final rawResponse = await guardAsync<WordpressRawResponse>(
       function: () async {
         request = await _handleRequestMiddlewares(
           request: request,
@@ -181,7 +181,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<bool>> delete(
     WordpressRequest request,
   ) async {
-    final rawResponse = await executeGuarded<WordpressRawResponse>(
+    final rawResponse = await guardAsync<WordpressRawResponse>(
       function: () async {
         request = await _handleRequestMiddlewares(
           request: request,
@@ -250,7 +250,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<List<T>>> list<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await executeGuarded<WordpressRawResponse>(
+    final rawResponse = await guardAsync<WordpressRawResponse>(
       function: () async {
         request = await _handleRequestMiddlewares(
           request: request,
@@ -322,7 +322,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> update<T>(
     WordpressRequest request,
   ) async {
-    final rawResponse = await executeGuarded<WordpressRawResponse>(
+    final rawResponse = await guardAsync<WordpressRawResponse>(
       function: () async {
         request = await _handleRequestMiddlewares(
           request: request,

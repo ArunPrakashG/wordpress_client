@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 
 import '../library_exports.dart';
 import '../utilities/self_representive_base.dart';
-import 'properties/links.dart';
 
 @immutable
 final class ApplicationPassword implements ISelfRespresentive {
@@ -11,43 +10,31 @@ final class ApplicationPassword implements ISelfRespresentive {
     required this.appId,
     required this.name,
     required this.created,
-    required this.links,
     required this.self,
     this.lastUsed,
     this.lastIp,
     this.password,
   });
 
-  factory ApplicationPassword.fromJson(Map<String, dynamic> map) {
+  factory ApplicationPassword.fromJson(Map<String, dynamic> json) {
     return ApplicationPassword(
-      uuid: castOrElse(map['uuid']),
-      appId: castOrElse(map['app_id']),
-      name: castOrElse(map['name']),
-      created: castOrElse(
-        map['created'],
-        transformer: (value) => DateTime.parse(value as String),
-      )!,
-      lastUsed: castOrElse(
-        map['last_used'],
-        transformer: (value) => DateTime.parse(value as String),
-      ),
-      lastIp: castOrElse(map['last_ip']),
-      password: castOrElse(map['password']),
-      links: castOrElse(
-        map['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
-      ),
-      self: map,
+      uuid: castOrElse(json['uuid']),
+      appId: castOrElse(json['app_id']),
+      name: castOrElse(json['name']),
+      created: parseDateIfNotNull(castOrElse(json['created'])),
+      lastUsed: parseDateIfNotNull(castOrElse(json['last_used'])),
+      lastIp: castOrElse(json['last_ip']),
+      password: castOrElse(json['password']),
+      self: json,
     );
   }
 
   final String uuid;
   final String? appId;
   final String name;
-  final DateTime created;
+  final DateTime? created;
   final DateTime? lastUsed;
   final String? lastIp;
-  final Links? links;
   final String? password;
 
   @override
@@ -58,11 +45,10 @@ final class ApplicationPassword implements ISelfRespresentive {
       'uuid': uuid,
       'app_id': appId,
       'name': name,
-      'created': created.toIso8601String(),
+      'created': created?.toIso8601String(),
       'last_used': lastUsed?.toIso8601String(),
       'last_ip': lastIp,
       'password': password,
-      '_links': links?.toJson(),
     };
   }
 }

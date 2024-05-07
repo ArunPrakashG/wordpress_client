@@ -3,7 +3,6 @@ import 'package:meta/meta.dart';
 
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'properties/links.dart';
 
 @immutable
 class Category implements ISelfRespresentive {
@@ -17,39 +16,30 @@ class Category implements ISelfRespresentive {
     required this.parent,
     required this.self,
     this.name,
-    this.meta,
-    this.links,
   });
 
   factory Category.fromJson(dynamic json) {
     return Category(
       id: castOrElse(json['id']),
       count: castOrElse(json['count'], orElse: () => 0)!,
-      description: castOrElse(json['description'], orElse: () => '')!,
-      link: castOrElse(json['link'], orElse: () => '')!,
-      name: castOrElse(json['name'], orElse: () => ''),
-      slug: castOrElse(json['slug'], orElse: () => '')!,
-      taxonomy: castOrElse(json['taxonomy'], orElse: () => '')!,
-      parent: castOrElse(json['parent'], orElse: () => 0)!,
-      meta: json['meta'],
-      links: castOrElse(
-        json['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
-      ),
+      description: castOrElse(json['description']),
+      link: castOrElse(json['link']),
+      name: castOrElse(json['name']),
+      slug: castOrElse(json['slug']),
+      taxonomy: castOrElse(json['taxonomy']),
+      parent: castOrElse(json['parent']),
       self: json as Map<String, dynamic>,
     );
   }
 
   final int id;
   final int count;
-  final String description;
-  final String link;
+  final String? description;
+  final String? link;
   final String? name;
   final String slug;
-  final String taxonomy;
-  final int parent;
-  final dynamic meta;
-  final Links? links;
+  final String? taxonomy;
+  final int? parent;
 
   @override
   final Map<String, dynamic> self;
@@ -64,8 +54,6 @@ class Category implements ISelfRespresentive {
       'slug': slug,
       'taxonomy': taxonomy,
       'parent': parent,
-      'meta': meta,
-      '_links': links?.toJson(),
     };
   }
 
@@ -85,8 +73,6 @@ class Category implements ISelfRespresentive {
         other.slug == slug &&
         other.taxonomy == taxonomy &&
         other.parent == parent &&
-        other.meta == meta &&
-        other.links == links &&
         mapEquals(other.self, self);
   }
 
@@ -100,13 +86,11 @@ class Category implements ISelfRespresentive {
         slug.hashCode ^
         taxonomy.hashCode ^
         parent.hashCode ^
-        meta.hashCode ^
-        links.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, meta: $meta, links: $links, self: $self)';
+    return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, self: $self)';
   }
 }

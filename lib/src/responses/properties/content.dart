@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../../utilities/helpers.dart';
 
 @immutable
-class Content {
+final class Content {
   const Content({
     required this.protected,
     this.rendered,

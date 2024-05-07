@@ -50,6 +50,20 @@ final class WordpressClient implements IDisposable {
       );
     }
 
+    if (!isValidPortNumber(baseUrl.port)) {
+      throw ArgumentError(
+        'The provided port number is invalid. Port numbers should be between 1 and 65535.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidRestApiUrl(baseUrl)) {
+      throw ArgumentError(
+        'The provided url is invalid. The REST API path should be appended to the base URL.',
+        'baseUrl',
+      );
+    }
+
     var configuration = const BootstrapConfiguration();
 
     if (bootstrapper != null) {
@@ -80,6 +94,20 @@ final class WordpressClient implements IDisposable {
     if (!baseUrl.isAbsolute) {
       throw ArgumentError(
         'The provided url is relative. Base URLs should always be an absolute URL.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidPortNumber(baseUrl.port)) {
+      throw ArgumentError(
+        'The provided port number is invalid. Port numbers should be between 1 and 65535.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidRestApiUrl(baseUrl)) {
+      throw ArgumentError(
+        'The provided url is invalid. The REST API path should be appended to the base URL.',
         'baseUrl',
       );
     }
@@ -280,6 +308,10 @@ final class WordpressClient implements IDisposable {
     }
 
     if (!uri.isAbsolute) {
+      return false;
+    }
+
+    if (!isValidPortNumber(uri.port)) {
       return false;
     }
 
@@ -632,7 +664,7 @@ final class WordpressClient implements IDisposable {
       );
     }
 
-    return executeGuarded(
+    return guardAsync(
       function: () async {
         final client = Dio();
 

@@ -40,13 +40,25 @@ T? mapGuarded<T>({
   }
 }
 
-/// A convenience method to execute a function and handle any errors via [onError] callback.
-Future<T> executeGuarded<T>({
+/// A convenience method to execute an async function and handle any errors via [onError] callback.
+Future<T> guardAsync<T>({
   required Future<T> Function() function,
   required Future<T> Function(Object error, StackTrace stackTrace) onError,
 }) async {
   try {
     return await function();
+  } catch (error, stackTrace) {
+    return onError(error, stackTrace);
+  }
+}
+
+/// A convenience method to execute a function and handle any errors via [onError] callback.
+T guard<T>({
+  required T Function() function,
+  required T Function(Object error, StackTrace stackTrace) onError,
+}) {
+  try {
+    return function();
   } catch (error, stackTrace) {
     return onError(error, stackTrace);
   }
@@ -118,6 +130,20 @@ T? castOrElse<T>(
     return orElse?.call();
   }
 }
+
+bool isValidRestApiUrl(Uri uri, {bool forceHttps = false}) {
+  if (forceHttps && uri.scheme != 'https') {
+    return false;
+  }
+
+  if (uri.pathSegments.isEmpty) {
+    return false;
+  }
+
+  return uri.pathSegments.first == 'wp-json';
+}
+
+bool isValidPortNumber(int port) => port >= 0 && port <= 65535;
 
 /// Returns true if the given [value] is null or empty.
 bool isNullOrEmpty(String? value) => value == null || value.isEmpty;

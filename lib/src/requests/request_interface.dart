@@ -79,6 +79,10 @@ abstract base class IRequest {
       return headers![key] ?? '';
     }
 
+    if (extra != null) {
+      return extra![key] as String? ?? '';
+    }
+
     return '';
   }
 }

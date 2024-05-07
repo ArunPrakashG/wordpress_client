@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
-import 'properties/links.dart';
 
 @immutable
 final class WordpressDiscovery implements ISelfRespresentive {
@@ -20,7 +19,6 @@ final class WordpressDiscovery implements ISelfRespresentive {
     required this.authentication,
     required this.routes,
     required this.self,
-    this.links,
   });
 
   factory WordpressDiscovery.fromJson(Map<String, dynamic> map) {
@@ -28,10 +26,6 @@ final class WordpressDiscovery implements ISelfRespresentive {
       siteIconUrl: castOrElse(map['site_icon_url']),
       siteIcon: castOrElse(map['site_icon']),
       siteLogo: castOrElse(map['site_logo']),
-      links: castOrElse(
-        map['_links'],
-        transformer: (value) => Links.fromJson(value as Map<String, dynamic>),
-      ),
       name: castOrElse(map['name']),
       description: castOrElse(map['description']),
       url: castOrElse(map['url']),
@@ -51,7 +45,6 @@ final class WordpressDiscovery implements ISelfRespresentive {
   final String siteIconUrl;
   final int siteIcon;
   final int siteLogo;
-  final Links? links;
   final String name;
   final String description;
   final String url;
@@ -70,7 +63,6 @@ final class WordpressDiscovery implements ISelfRespresentive {
       'site_icon_url': siteIconUrl,
       'site_icon': siteIcon,
       'site_logo': siteLogo,
-      '_links': links?.toJson(),
       'name': name,
       'description': description,
       'url': url,

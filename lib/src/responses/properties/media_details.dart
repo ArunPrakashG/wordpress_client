@@ -1,11 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
+import '../../library_exports.dart';
 import 'image_meta.dart';
 import 'media_size_value.dart';
 
 @immutable
-class MediaDetails {
+final class MediaDetails {
   const MediaDetails({
     this.width,
     this.height,
@@ -16,21 +17,25 @@ class MediaDetails {
 
   factory MediaDetails.fromJson(Map<String, dynamic> json) {
     return MediaDetails(
-      width: json['width'] as int?,
-      height: json['height'] as int?,
-      file: json['file'] as String?,
-      sizes: json['sizes'] == null
-          ? null
-          : Map<String, dynamic>.from(json['sizes'] as Map<String, dynamic>)
-              .map(
-              (k, dynamic v) => MapEntry<String, SizeValue>(
-                k,
-                SizeValue.fromJson(v as Map<String, dynamic>),
-              ),
-            ),
-      imageMeta: json['image_meta'] == null
-          ? null
-          : ImageMeta.fromJson(json['image_meta'] as Map<String, dynamic>),
+      width: castOrElse(json['width']),
+      height: castOrElse(json['height']),
+      file: castOrElse(json['file']),
+      sizes: castOrElse(
+        json['sizes'],
+        transformer: (value) {
+          return Map<String, dynamic>.from(value as Map<String, dynamic>).map(
+            (key, value) {
+              return MapEntry(key, SizeValue.fromJson(value));
+            },
+          );
+        },
+      ),
+      imageMeta: castOrElse(
+        json['image_meta'],
+        transformer: (value) {
+          return ImageMeta.fromJson(value as Map<String, dynamic>);
+        },
+      ),
     );
   }
 
