@@ -19,6 +19,7 @@ export 'helpers.dart'
         decodeByMultiKeys,
         using,
         getMIMETypeFromExtension;
+export 'lazy.dart';
 export 'request_url.dart';
 export 'typedefs.dart';
 export 'wordpress_events.dart';

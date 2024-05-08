@@ -18,8 +18,8 @@ import 'interface/search.dart';
 import 'interface/tags.dart';
 import 'interface/users.dart';
 import 'interface_key.dart';
-import 'internal_requester_base.dart';
 import 'library_exports.dart';
+import 'request_executor_base.dart';
 import 'utilities/codable_map/codable_map.dart';
 import 'utilities/helpers.dart';
 
@@ -31,14 +31,13 @@ final class WordpressClient implements IDisposable {
   /// Default Constructor.
   ///
   /// [baseUrl] is the base url of the wordpress site.
-  /// [path] is the path of the url appended to your REST API.
   /// [bootstrapper] is a builder method for initializing the client.
   ///
   /// After this, you will have to initialize the client with [initialize] method call.
   ///
   /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
   ///
-  /// You can change [path] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
+  /// You can change [baseUrl] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
   WordpressClient({
     required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
@@ -84,7 +83,6 @@ final class WordpressClient implements IDisposable {
   /// Default Constructor but with initialization.
   ///
   /// [baseUrl] is the base url of the wordpress site.
-  /// [path] is the path of the url appended to your REST API.
   /// [bootstrapper] is a builder method for initializing the client.
   ///
   WordpressClient.initialize({
@@ -625,7 +623,7 @@ final class WordpressClient implements IDisposable {
         final response = await client.discover();
 
         if (!response) {
-          throw Exception('Failed to discover the site.');
+          throw DiscoveryFailedException();
         }
 
         return client.discovery;

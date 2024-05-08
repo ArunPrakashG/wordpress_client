@@ -14,6 +14,7 @@ enum ErrorType {
   interfaceNotInitialized,
   invalidInterface,
   discoveryPending,
+  discoveryFailed,
   nullReference,
   requestUriParsingFailed,
 }

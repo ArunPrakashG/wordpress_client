@@ -257,9 +257,11 @@ abstract base class IRequestExecutor {
           middlewares: middlewares,
         );
 
+        final response = await execute(request);
+
         return _handleResponseMiddlewares(
           middlewares: middlewares,
-          response: await execute(request),
+          response: response,
         );
       },
       onError: (error, stackTrace) async {
