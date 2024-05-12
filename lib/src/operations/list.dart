@@ -16,6 +16,6 @@ base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
   ) async {
     final wpRequest = await request.build(baseUrl);
 
-    return executor.execute(wpRequest);
+    return executor.raw(wpRequest);
   }
 }

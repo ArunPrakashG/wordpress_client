@@ -140,7 +140,8 @@ bool isValidRestApiUrl(Uri uri, {bool forceHttps = false}) {
     return false;
   }
 
-  return uri.pathSegments.first == 'wp-json';
+  // It is possible to not have wp-json on some websites but I don't plan on supporting those in this package because it goes outside of the standards defined by WordPress.
+  return uri.pathSegments.contains('wp-json');
 }
 
 bool isValidPortNumber(int port) => port >= 0 && port <= 65535;

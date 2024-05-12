@@ -17,6 +17,6 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
   Future<WordpressRawResponse> raw(R request) async {
     final wpRequest = await request.build(baseUrl);
 
-    return executor.execute(wpRequest);
+    return executor.raw(wpRequest);
   }
 }

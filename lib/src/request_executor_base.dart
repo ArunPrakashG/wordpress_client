@@ -34,6 +34,41 @@ abstract base class IRequestExecutor {
   }
 
   @internal
+  Future<WordpressRawResponse> raw(WordpressRequest request) async {
+    return guardAsync<WordpressRawResponse>(
+      function: () async {
+        request = await _handleRequestMiddlewares(
+          request: request,
+          middlewares: middlewares,
+        );
+
+        return _handleResponseMiddlewares(
+          middlewares: middlewares,
+          response: await execute(request),
+        );
+      },
+      onError: (error, stackTrace) async {
+        final isMiddlewareAbortedException =
+            error is MiddlewareAbortedException;
+
+        return WordpressRawResponse(
+          data: null,
+          code: isMiddlewareAbortedException
+              ? -RequestErrorType.middlewareAborted.index
+              : -RequestErrorType.internalGenericError.index,
+          extra: <String, dynamic>{
+            'error': error,
+            'stackTrace': stackTrace,
+          },
+          message: isMiddlewareAbortedException
+              ? error.message
+              : '$error\n\n$stackTrace',
+        );
+      },
+    );
+  }
+
+  @internal
   Future<WordpressResponse<T>> create<T>(
     WordpressRequest request,
   ) async {

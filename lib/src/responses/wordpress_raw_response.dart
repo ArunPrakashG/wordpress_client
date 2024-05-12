@@ -188,6 +188,9 @@ final class WordpressRawResponse {
     );
   }
 
+  /// Returns the error and stack trace if the response is a failure.
+  (Object, StackTrace) getError() => (extra['error'], extra['stackTrace']);
+
   /// Maps this instance to a [WordpressResponse] instance.
   ///
   /// The [onSuccess] is called if the response is a success.

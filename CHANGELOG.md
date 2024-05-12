@@ -285,6 +285,11 @@
 - 🛠 Added validations for entered `baseUrl`.
 - 💥Renamed `executeGuarded` to `guardAsync` and added a new `guard` method to guard synchronous functions.
 
+## 🐛 8.4.7
+
+- 🩹 Bug fixes
+- 🛠 Fix validations for entered `baseUrl`; Supporting sites with custom REST Api paths
+
 ## Legend
 
 - 🎉 New features or major changes

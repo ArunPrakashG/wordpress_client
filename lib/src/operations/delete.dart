@@ -14,6 +14,6 @@ base mixin DeleteOperation<R extends IRequest> on IRequestInterface {
   Future<WordpressRawResponse> deleteRaw(R request) async {
     final wpRequest = await request.build(baseUrl);
 
-    return executor.execute(wpRequest);
+    return executor.raw(wpRequest);
   }
 }
