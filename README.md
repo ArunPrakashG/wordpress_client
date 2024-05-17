@@ -40,7 +40,7 @@ Add `wordpress_client` in your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.4.7
+ wordpress_client: ^8.4.8
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
@@ -63,10 +63,6 @@ You can initialize `WordpressClient` in two methods:
 ```dart
 final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
 final client = WordpressClient(baseUrl: baseUrl);
-
-client.initialize();
-// or
-// final client = WordpressClient.initialize(baseUrl: baseUrl);
 ```
 
 > 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#-advanced-method).
