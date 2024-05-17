@@ -290,6 +290,14 @@
 - 🩹 Bug fixes
 - 🛠 Fix validations for entered `baseUrl`; Supporting sites with custom REST Api paths
 
+## 🐛 8.4.8
+
+- 🩹 Bug fixes
+- 💥 Deprecated `WordpressClient.initialize(...)` ctor and `initialize()` method.
+  - Use `WordpressClient(baseUrl: 'https://example.com')` instead. This will automatically initialize the client.
+- 🎉 Added `WordpressClient.fromDioInstance(...)` constructor to allow developers to pass a custom `Dio` instance to be used inside the client.
+  - Note that, the `BaseOptions` in this custom dio instance will be overwritten by the client's default options and those which are required by the libraries requests.
+
 ## Legend
 
 - 🎉 New features or major changes

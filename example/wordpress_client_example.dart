@@ -30,8 +30,6 @@ Future<void> main() async {
         .build(),
   );
 
-  client.initialize();
-
   final response = await client.posts.list(
     ListPostRequest(
       perPage: 1,

@@ -53,8 +53,6 @@ Future<void> main() async {
         .build(),
   );
 
-  client.initialize();
-
   group(
     'Post Requests: ',
     () {

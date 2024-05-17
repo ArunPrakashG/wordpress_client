@@ -1,9 +1,9 @@
 name: wordpress_client
 description: A library to interact with the Wordpress REST API. Supports most of the common endpoints and all of the CRUD operations on the endpoints.
-version: 8.4.7
+version: 8.4.8
 topics:
   - wordpress
-  - fluent
+  - parallel
   - crud
   - rest
 homepage: https://github.com/ArunPrakashG/wordpress_client
@@ -37,5 +37,5 @@ dependencies:
   collection: ^1.18.0
   dio: ^5.4.3
   http_parser: ^4.0.2
-  meta: ^1.9.1
+  meta: ^1.15.0
   path: ^1.8.3

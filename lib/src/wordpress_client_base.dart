@@ -33,12 +33,8 @@ final class WordpressClient implements IDisposable {
   /// [baseUrl] is the base url of the wordpress site.
   /// [bootstrapper] is a builder method for initializing the client.
   ///
-  /// After this, you will have to initialize the client with [initialize] method call.
-  ///
-  /// In order to handle initialization in the constructor itself, call [WordpressClient.initialize] factory constructor.
-  ///
   /// You can change [baseUrl] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
-  WordpressClient({
+  factory WordpressClient({
     required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
@@ -69,67 +65,89 @@ final class WordpressClient implements IDisposable {
       configuration = bootstrapper(BootstrapBuilder());
     }
 
-    _requester = InternalRequester.configure(
-      baseUrl,
-      configuration,
+    return WordpressClient._(
+      InternalRequester.configure(
+        baseUrl,
+        Dio(),
+        configuration,
+      ),
+      CodableMap(),
+      {},
+      configuration.middlewares ?? const [],
     );
+  }
 
-    if (configuration.middlewares != null &&
-        configuration.middlewares!.isNotEmpty) {
-      _middlewares.addAll(configuration.middlewares!);
+  WordpressClient._(
+    this._requester,
+    this._typeMap,
+    this._interfaces,
+    this._middlewares,
+  ) {
+    _initialize();
+  }
+
+  factory WordpressClient.fromDioInstance({
+    required Uri baseUrl,
+    required Dio instance,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    if (!baseUrl.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Base URLs should always be an absolute URL.',
+        'baseUrl',
+      );
     }
+
+    if (!isValidPortNumber(baseUrl.port)) {
+      throw ArgumentError(
+        'The provided port number is invalid. Port numbers should be between 1 and 65535.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidRestApiUrl(baseUrl)) {
+      throw ArgumentError(
+        'The provided url is invalid. The REST API path should be appended to the base URL.',
+        'baseUrl',
+      );
+    }
+
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
+
+    return WordpressClient._(
+      InternalRequester.configure(
+        baseUrl,
+        instance,
+        configuration,
+      ),
+      CodableMap(),
+      {},
+      configuration.middlewares ?? const [],
+    );
   }
 
   /// Default Constructor but with initialization.
   ///
   /// [baseUrl] is the base url of the wordpress site.
   /// [bootstrapper] is a builder method for initializing the client.
-  ///
-  WordpressClient.initialize({
+  @Deprecated(
+    'Use WordpressClient() constructor instead. This is no longer required.',
+  )
+  factory WordpressClient.initialize({
     required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
   }) {
-    if (!baseUrl.isAbsolute) {
-      throw ArgumentError(
-        'The provided url is relative. Base URLs should always be an absolute URL.',
-        'baseUrl',
-      );
-    }
-
-    if (!isValidPortNumber(baseUrl.port)) {
-      throw ArgumentError(
-        'The provided port number is invalid. Port numbers should be between 1 and 65535.',
-        'baseUrl',
-      );
-    }
-
-    if (!isValidRestApiUrl(baseUrl)) {
-      throw ArgumentError(
-        'The provided url is invalid. The REST API path should be appended to the base URL.',
-        'baseUrl',
-      );
-    }
-
-    var configuration = const BootstrapConfiguration();
-
-    if (bootstrapper != null) {
-      configuration = bootstrapper(BootstrapBuilder());
-    }
-
-    _requester = InternalRequester.configure(
-      baseUrl,
-      configuration,
+    return WordpressClient(
+      baseUrl: baseUrl,
+      bootstrapper: bootstrapper,
     );
-
-    if (configuration.middlewares != null &&
-        configuration.middlewares!.isNotEmpty) {
-      _middlewares.addAll(configuration.middlewares!);
-    }
-
-    initialize();
   }
 
-  late final InternalRequester _requester;
+  final InternalRequester _requester;
 
   /// Base url supplied through constructor.
   Uri get baseUrl => _requester._baseUrl;
@@ -137,6 +155,7 @@ final class WordpressClient implements IDisposable {
   /// Base url path.
   String get path => baseUrl.path;
 
+  /// Indicates if this instance of [WordpressClient] has been disposed.
   bool get disposed => _isDisposed;
 
   /// Returns true if this instance of [WordpressClient] is running in debug mode.
@@ -150,8 +169,13 @@ final class WordpressClient implements IDisposable {
       _requester._defaultAuthorization!.isValidAuth;
 
   /// Stores data on how to decode & encode responses.
-  final CodableMap _typeMap = CodableMap();
+  final CodableMap _typeMap;
   bool _isDisposed = false;
+
+  final Map<InterfaceKey<dynamic>, dynamic> _interfaces;
+  final List<IWordpressMiddleware> _middlewares;
+  WordpressDiscovery? _discovery;
+  bool _hasInitialized = false;
 
   /// The current user interface.
   ///
@@ -278,14 +302,9 @@ final class WordpressClient implements IDisposable {
   ApplicationPasswordsInterface get applicationPasswords =>
       get<ApplicationPasswordsInterface>('application-passwords');
 
-  final _interfaces = <InterfaceKey<dynamic>, dynamic>{};
-  final _middlewares = <IWordpressMiddleware>[];
-
-  bool _hasInitialized = false;
-
   /// Status on if the client has been initialized successfully.
   ///
-  /// This will be true if [initialize] method has been called and completed.
+  /// This will be true if [_initialize] method has been called and completed.
   bool get isReady => _hasInitialized;
 
   WordpressDiscovery get discovery {
@@ -295,8 +314,6 @@ final class WordpressClient implements IDisposable {
 
     return _discovery!;
   }
-
-  WordpressDiscovery? _discovery;
 
   static bool isValidUrl(String url) {
     final uri = Uri.tryParse(url);
@@ -319,13 +336,21 @@ final class WordpressClient implements IDisposable {
   /// Initializes all the built in interfaces and other services
   ///
   /// This method should be called before any other method.
-  void initialize() {
+  void _initialize() {
     if (_hasInitialized) {
       return;
     }
 
     _registerInternalInterfaces();
     _hasInitialized = true;
+  }
+
+  @Deprecated(
+    'Calling this is no longer required. We are initializing from the constructor itself.',
+  )
+  void initialize() {
+    // Hi! I really don't want to break anyone's code (again). So just leaving this here :P
+    // Hope you are having a great day!
   }
 
   void _registerInternalInterfaces() {
@@ -616,7 +641,7 @@ final class WordpressClient implements IDisposable {
     }
 
     return using(
-      WordpressClient.initialize(
+      WordpressClient(
         baseUrl: baseUri,
       ),
       (client) async {
