@@ -302,6 +302,10 @@
 
 - 📦 Downgrade meta package to match flutter meta version
 
+## 🐛 8.4.10
+
+- 🩹 Fix bug on clearing middleware list
+
 ## Legend
 
 - 🎉 New features or major changes
