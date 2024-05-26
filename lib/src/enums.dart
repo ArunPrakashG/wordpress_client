@@ -158,57 +158,69 @@ enum MediaType {
   audio,
 }
 
-ContentStatus getContentStatusFromValue(String? value) {
+ContentStatus getContentStatusFromValue(
+  String? value, {
+  ContentStatus defaultValue = ContentStatus.pending,
+}) {
   if (value == null) {
-    return ContentStatus.pending;
+    return defaultValue;
   }
 
   return ContentStatus.values
           .where((element) => element.name.toLowerCase() == value.toLowerCase())
           .firstOrNull ??
-      ContentStatus.pending;
+      defaultValue;
 }
 
-CommentStatus getCommentStatusFromValue(String? value) {
+CommentStatus getCommentStatusFromValue(
+  String? value, {
+  CommentStatus defaultValue = CommentStatus.pending,
+}) {
   if (value == null) {
-    return CommentStatus.pending;
+    return defaultValue;
   }
 
   return CommentStatus.values
           .where((element) => element.name.toLowerCase() == value.toLowerCase())
           .firstOrNull ??
-      CommentStatus.pending;
+      defaultValue;
 }
 
-MediaFilterStatus getMediaFilterStatusFromValue(String? value) {
+MediaFilterStatus getMediaFilterStatusFromValue(
+  String? value, {
+  MediaFilterStatus defaultValue = MediaFilterStatus.inherit,
+}) {
   if (value == null) {
-    return MediaFilterStatus.inherit;
+    return defaultValue;
   }
 
   return MediaFilterStatus.values
           .where((element) => element.name.toLowerCase() == value.toLowerCase())
           .firstOrNull ??
-      MediaFilterStatus.inherit;
+      defaultValue;
 }
 
-PostFormat getFormatFromValue(String? value) {
+PostFormat getFormatFromValue(
+  String? value, {
+  PostFormat defaultValue = PostFormat.standard,
+}) {
   if (value == null) {
-    return PostFormat.standard;
+    return defaultValue;
   }
 
   return PostFormat.values
           .where((e) => e.name.toLowerCase() == value.toLowerCase())
           .firstOrNull ??
-      PostFormat.standard;
+      defaultValue;
 }
 
-Status getStatusFromValue(String? value) {
+Status getStatusFromValue(String? value, {Status defaultValue = Status.open}) {
   if (value == null || value.isEmpty) {
-    return Status.open;
+    return defaultValue;
   }
 
   return Status.values
           .where((element) => element.name.toLowerCase() == value.toLowerCase())
           .firstOrNull ??
-      Status.open;
+      defaultValue;
 }

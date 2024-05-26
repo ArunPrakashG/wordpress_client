@@ -298,6 +298,10 @@
 - 🎉 Added `WordpressClient.fromDioInstance(...)` constructor to allow developers to pass a custom `Dio` instance to be used inside the client.
   - Note that, the `BaseOptions` in this custom dio instance will be overwritten by the client's default options and those which are required by the libraries requests.
 
+## 🐛 8.4.9
+
+- 📦 Downgrade meta package to match flutter meta version
+
 ## Legend
 
 - 🎉 New features or major changes

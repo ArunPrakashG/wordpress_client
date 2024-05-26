@@ -20,7 +20,7 @@ final class ApplicationPassword implements ISelfRespresentive {
     return ApplicationPassword(
       uuid: castOrElse(json['uuid']),
       appId: castOrElse(json['app_id']),
-      name: castOrElse(json['name']),
+      name: castOrElse(json['name'], orElse: () => '')!,
       created: parseDateIfNotNull(castOrElse(json['created'])),
       lastUsed: parseDateIfNotNull(castOrElse(json['last_used'])),
       lastIp: castOrElse(json['last_ip']),
