@@ -73,7 +73,7 @@ final class WordpressClient implements IDisposable {
       ),
       CodableMap(),
       {},
-      configuration.middlewares ?? const [],
+      configuration.middlewares ?? [],
     );
   }
 
@@ -126,7 +126,7 @@ final class WordpressClient implements IDisposable {
       ),
       CodableMap(),
       {},
-      configuration.middlewares ?? const [],
+      configuration.middlewares ?? [],
     );
   }
 
