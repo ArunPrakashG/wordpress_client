@@ -7,5 +7,5 @@ class ClientNotReadyException implements WordpressException {
 
   @override
   String? get message =>
-      'Client has not been initialized. You might have forgotten to call `WordpressClient.initialize()` method or you please use the factory constructor `WordpressClient.initialize()` to initialize client with the constructor.';
+      'Client has not been initialized. This could happen due to the Base URL not being set. If you had created the WordpressClient instance using `generic` constructor, please use `reconfigure` method to pass a Base URL.';
 }
