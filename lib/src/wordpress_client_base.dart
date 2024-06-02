@@ -65,15 +65,52 @@ final class WordpressClient implements IDisposable {
       configuration = bootstrapper(BootstrapBuilder());
     }
 
+    final typeMap = CodableMap();
+    final interfaces = <InterfaceKey<dynamic>, dynamic>{};
+    final client = Dio();
+    final middlewares = configuration.middlewares ?? <IWordpressMiddleware>[];
+
     return WordpressClient._(
       InternalRequester.configure(
         baseUrl,
-        Dio(),
+        client,
         configuration,
       ),
-      CodableMap(),
-      {},
-      configuration.middlewares ?? [],
+      typeMap,
+      interfaces,
+      middlewares,
+    );
+  }
+
+  /// Special constructor allows you to initialize the client without a base URL.
+  ///
+  /// Note that, for any operations which require access to the Base URL, it will throw an exception in this case.
+  ///
+  /// To update the client with a Base URL, you will have to call `reconfigure` method.
+  factory WordpressClient.generic({
+    Dio? instance,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    var configuration = const BootstrapConfiguration();
+
+    if (bootstrapper != null) {
+      configuration = bootstrapper(BootstrapBuilder());
+    }
+
+    final typeMap = CodableMap();
+    final interfaces = <InterfaceKey<dynamic>, dynamic>{};
+    final client = instance ?? Dio();
+    final middlewares = configuration.middlewares ?? <IWordpressMiddleware>[];
+
+    return WordpressClient._(
+      InternalRequester.configure(
+        null,
+        client,
+        configuration,
+      ),
+      typeMap,
+      interfaces,
+      middlewares,
     );
   }
 
@@ -118,15 +155,19 @@ final class WordpressClient implements IDisposable {
       configuration = bootstrapper(BootstrapBuilder());
     }
 
+    final typeMap = CodableMap();
+    final interfaces = <InterfaceKey<dynamic>, dynamic>{};
+    final middlewares = configuration.middlewares ?? <IWordpressMiddleware>[];
+
     return WordpressClient._(
       InternalRequester.configure(
         baseUrl,
         instance,
         configuration,
       ),
-      CodableMap(),
-      {},
-      configuration.middlewares ?? [],
+      typeMap,
+      interfaces,
+      middlewares,
     );
   }
 
@@ -148,9 +189,15 @@ final class WordpressClient implements IDisposable {
   }
 
   final InternalRequester _requester;
+  final CodableMap _typeMap;
+  bool _isDisposed = false;
+  final Map<InterfaceKey<dynamic>, dynamic> _interfaces;
+  final List<IWordpressMiddleware> _middlewares;
+  WordpressDiscovery? _discovery;
+  bool _hasInitialized = false;
 
-  /// Base url supplied through constructor.
-  Uri get baseUrl => _requester._baseUrl;
+  /// Base url of this instance.
+  Uri get baseUrl => _requester.baseUrl;
 
   /// Base url path.
   String get path => baseUrl.path;
@@ -164,18 +211,16 @@ final class WordpressClient implements IDisposable {
   bool get isDebugMode => _requester._isDebugMode;
 
   /// Returns true if we have valid default authorization which is to be used for all requests.
-  bool get hasValidDefaultAuthorization =>
-      _requester._defaultAuthorization != null &&
-      _requester._defaultAuthorization!.isValidAuth;
+  bool get hasValidDefaultAuthorization {
+    if (_requester._defaultAuthorization == null) {
+      return false;
+    }
 
-  /// Stores data on how to decode & encode responses.
-  final CodableMap _typeMap;
-  bool _isDisposed = false;
+    return _requester._defaultAuthorization!.isValidAuth;
+  }
 
-  final Map<InterfaceKey<dynamic>, dynamic> _interfaces;
-  final List<IWordpressMiddleware> _middlewares;
-  WordpressDiscovery? _discovery;
-  bool _hasInitialized = false;
+  /// Returns true if the discovery process has been completed.
+  bool get discoveryCompleted => _discovery != null;
 
   /// The current user interface.
   ///
@@ -305,7 +350,7 @@ final class WordpressClient implements IDisposable {
   /// Status on if the client has been initialized successfully.
   ///
   /// This will be true if [_initialize] method has been called and completed.
-  bool get isReady => _hasInitialized;
+  bool get isReady => _hasInitialized && _requester.hasBaseURL;
 
   WordpressDiscovery get discovery {
     if (_discovery == null) {
@@ -569,8 +614,8 @@ final class WordpressClient implements IDisposable {
 
     _middlewares.add(middleware);
 
-    reconfigureClient(
-      (builder) => builder.withMiddlewares(_middlewares).build(),
+    reconfigure(
+      bootstrapper: (builder) => builder.withMiddlewares(_middlewares).build(),
     );
   }
 
@@ -585,8 +630,8 @@ final class WordpressClient implements IDisposable {
     unawaited(middleware.onUnload());
     _middlewares.remove(middleware);
 
-    reconfigureClient(
-      (builder) => builder.withMiddlewares(_middlewares).build(),
+    reconfigure(
+      bootstrapper: (builder) => builder.withMiddlewares(_middlewares).build(),
     );
   }
 
@@ -598,9 +643,15 @@ final class WordpressClient implements IDisposable {
   /// The default builder will contain all the previous settings.
   ///
   /// Only the settings that have changed since will be updated.
+  @Deprecated('Prefer `reconfigure` instead.')
   void reconfigureClient(
-    BootstrapConfiguration Function(BootstrapBuilder builder) bootstrapper,
-  ) {
+    BootstrapConfiguration Function(BootstrapBuilder builder) bootstrapper, {
+    Uri? baseUri,
+  }) {
+    if (baseUri != null) {
+      _requester._setBaseUrl(baseUri);
+    }
+
     return _requester.configure(
       bootstrapper(
         BootstrapBuilder.fromConfiguration(
@@ -608,6 +659,30 @@ final class WordpressClient implements IDisposable {
         ),
       ),
     );
+  }
+
+  /// Called to reconfigure the client with new settings.
+  ///
+  /// The default builder will contain all the previous settings.
+  ///
+  /// Only the settings that have changed since will be updated.
+  void reconfigure({
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+    Uri? baseUri,
+  }) {
+    if (baseUri != null) {
+      _requester._setBaseUrl(baseUri);
+    }
+
+    if (bootstrapper != null) {
+      _requester.configure(
+        bootstrapper(
+          BootstrapBuilder.fromConfiguration(
+            _requester._configuration,
+          ),
+        ),
+      );
+    }
   }
 
   /// Fetches the discovery URL of the associated wordpress site and caches the response and returns the status as a boolean.
@@ -666,8 +741,8 @@ final class WordpressClient implements IDisposable {
 
     _middlewares.clear();
 
-    reconfigureClient(
-      (builder) => builder.withMiddlewares(_middlewares).build(),
+    reconfigure(
+      bootstrapper: (builder) => builder.withMiddlewares(_middlewares).build(),
     );
   }
 

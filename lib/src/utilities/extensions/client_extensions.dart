@@ -25,4 +25,9 @@ extension WordpressClientExtensions on WordpressClient {
   ///
   /// Optionally, call `merge()` on the `responses` to merge the results into a single iterable.
   ParallelWordpress get parallel => ParallelWordpress(client: this);
+
+  Future<bool> isAuthenticated([IAuthorization? auth]) async {
+    final response = await me.retrieve(RetrieveMeRequest(authorization: auth));
+    return response.isSuccessful;
+  }
 }

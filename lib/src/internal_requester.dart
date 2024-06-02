@@ -14,13 +14,12 @@ final class InternalRequester extends IRequestExecutor {
   }
 
   final Dio _client;
-  final Uri _baseUrl;
+  Uri? _baseUrl;
   IAuthorization? _defaultAuthorization;
   static final Map<String, int> _endPointStatistics = <String, int>{};
   static StatisticsCallback? _statisticsCallback;
   bool _isDebugMode = false;
   final BootstrapConfiguration _configuration;
-  final List<IWordpressMiddleware> _middlewares = [];
 
   /// The request base url.
   ///
@@ -28,13 +27,50 @@ final class InternalRequester extends IRequestExecutor {
   ///
   /// Basically, Base URL + Path
   @override
-  Uri get baseUrl => _baseUrl;
+  Uri get baseUrl {
+    if (_baseUrl == null) {
+      throw StateError(
+        'Base URL is not set. Did you forget to call `initialize` method?',
+      );
+    }
+
+    return _baseUrl!;
+  }
+
+  bool get hasBaseURL => _baseUrl != null;
 
   bool get hasDefaultAuthorization =>
       _defaultAuthorization != null && !_defaultAuthorization!.isDefault;
 
   @override
-  List<IWordpressMiddleware> get middlewares => _middlewares;
+  List<IWordpressMiddleware> get middlewares =>
+      _configuration.middlewares ?? [];
+
+  void _setBaseUrl(Uri url) {
+    if (!url.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Base URLs should always be an absolute URL.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidPortNumber(url.port)) {
+      throw ArgumentError(
+        'The provided port number is invalid. Port numbers should be between 1 and 65535.',
+        'baseUrl',
+      );
+    }
+
+    if (!isValidRestApiUrl(url)) {
+      throw ArgumentError(
+        'The provided url is invalid. The REST API path should be appended to the base URL.',
+        'baseUrl',
+      );
+    }
+
+    _baseUrl = url;
+    _client.options.baseUrl = url.toString();
+  }
 
   @override
   void configure(BootstrapConfiguration configuration) {
@@ -64,11 +100,9 @@ final class InternalRequester extends IRequestExecutor {
     _client.options.receiveTimeout = configuration.receiveTimeout;
     _client.options.followRedirects = configuration.shouldFollowRedirects;
     _client.options.maxRedirects = configuration.maxRedirects;
-    _client.options.baseUrl = _baseUrl.toString();
 
-    if (configuration.middlewares != null &&
-        configuration.middlewares!.isNotEmpty) {
-      _middlewares.addAll(configuration.middlewares!);
+    if (_baseUrl != null) {
+      _client.options.baseUrl = baseUrl.toString();
     }
 
     if (configuration.enableDebugMode &&
@@ -99,6 +133,12 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   Future<WordpressRawResponse> execute(WordpressRequest request) async {
+    if (_client.options.baseUrl.isEmpty) {
+      throw StateError(
+        'Base URL is not set. Did you forget to call `reconfigure` method?',
+      );
+    }
+
     final requestHeaders = request.headers ?? <String, dynamic>{};
 
     // If the request requires authorization, we need to check if the default authorization is set.
@@ -240,7 +280,7 @@ final class InternalRequester extends IRequestExecutor {
     required WordpressRequest request,
     required MiddlwareResponseTransformer transformer,
   }) async {
-    for (final middleware in _middlewares) {
+    for (final middleware in middlewares) {
       final result = await middleware.onExecute(request);
 
       if (result.hasData) {
@@ -306,7 +346,7 @@ final class InternalRequester extends IRequestExecutor {
 
     auth.clientFactoryProvider(_createAuthDioClient());
 
-    await auth.initialize(baseUrl: _baseUrl);
+    await auth.initialize(baseUrl: baseUrl);
 
     if (await auth.authorize() && await auth.isAuthenticated()) {
       final authUrl = await auth.generateAuthUrl();
