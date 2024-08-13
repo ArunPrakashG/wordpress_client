@@ -1,3 +1,15 @@
+## 8.5.3
+
+- 🩹 Fix invalid base url on web
+
+## 8.5.2
+
+- 🩹 Fix versions
+
+## 8.5.1
+
+- 🩹 Fix dio sendTimeout exception
+
 ## 8.5.0
 
 - 🎉 Added support for initialize the client without a base url.

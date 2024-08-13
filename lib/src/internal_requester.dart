@@ -247,7 +247,7 @@ final class InternalRequester extends IRequestExecutor {
             receiveDataWhenStatusError: true,
             validateStatus: (status) => true,
             method: request.method.name,
-            sendTimeout: request.sendTimeout,
+            sendTimeout: request.body != null ? request.sendTimeout : null,
             receiveTimeout: request.receiveTimeout,
             headers: requestHeaders,
           ),
