@@ -188,43 +188,49 @@ final class CreateMediaRequest extends IRequest {
   /// setting up the necessary headers and body, and returning a WordpressRequest object.
   @override
   Future<WordpressRequest> build(Uri baseUrl) async {
-    late MultipartFile multipartFile;
-    late String mimeType;
+    MultipartFile? multipartFile;
+    String? mimeType;
 
-    switch (mediaFile) {
-      case final File file:
-        if (!await file.exists()) {
-          throw FileDoesntExistException(
-            'The file at path "${file.path}" doesn\'t exist.',
-          );
-        }
+    if (mediaFile is File) {
+      final file = mediaFile as File;
+      if (!await file.exists()) {
+        throw FileDoesntExistException(
+          'The file at path "${file.path}" doesn\'t exist.',
+        );
+      }
 
-        final mediaType = getMIMETypeFromExtension(
-          extension(fileName).replaceFirst('.', ''),
-        );
+      final mediaType = getMIMETypeFromExtension(
+        extension(fileName).replaceFirst('.', ''),
+      );
 
-        multipartFile = await MultipartFile.fromFile(
-          file.path,
-          filename: fileName,
-          contentType: DioMediaType.parse(mediaType),
-        );
-        mimeType = mediaType;
-        break;
-      case final Uint8List bytes:
-        final mediaType = getMIMETypeFromExtension(
-          extension(fileName).replaceFirst('.', ''),
-        );
-        multipartFile = MultipartFile.fromBytes(
-          bytes,
-          filename: fileName,
-          contentType: DioMediaType.parse(mediaType),
-        );
-        mimeType = mediaType;
-        break;
-      default:
+      multipartFile = await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
+        contentType: DioMediaType.parse(mediaType),
+      );
+      mimeType = mediaType;
+    } else if (mediaFile is Uint8List) {
+      final bytes = mediaFile as Uint8List;
+
+      if (!fileName.contains('.')) {
         throw ArgumentError(
-          'Invalid mediaFile type. Expected File or Uint8List.',
+          'The file name must contain a file extension.',
         );
+      }
+
+      final mediaType = getMIMETypeFromExtension(
+        extension(fileName).replaceFirst('.', ''),
+      );
+      multipartFile = MultipartFile.fromBytes(
+        bytes,
+        filename: fileName,
+        contentType: DioMediaType.parse(mediaType),
+      );
+      mimeType = mediaType;
+    } else {
+      throw ArgumentError(
+        'Invalid content type for the file. Please use the `fromBytes` factory method to upload files with custom content types.',
+      );
     }
 
     final body = <String, dynamic>{}
@@ -243,7 +249,7 @@ final class CreateMediaRequest extends IRequest {
     final headers = <String, dynamic>{}
       ..addIfNotNull(
         'Content-Disposition',
-        'attachment; filename="$fileName"',
+        'attachment; filename="${multipartFile.filename}"',
       )
       ..addIfNotNull('Content-Type', mimeType)
       ..addAllIfNotNull(this.headers);
