@@ -4,8 +4,23 @@ import 'package:meta/meta.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
 
+/// Represents a category in WordPress.
+///
+/// Categories are a taxonomy in WordPress used to group and organize content.
+/// They can be hierarchical, allowing for parent-child relationships between categories.
 @immutable
 class Category implements ISelfRespresentive {
+  /// Creates a new [Category] instance.
+  ///
+  /// - [id]: Unique identifier for the category.
+  /// - [count]: Number of posts in the category.
+  /// - [description]: HTML description of the category.
+  /// - [link]: URL to the category's archive page.
+  /// - [slug]: An alphanumeric identifier for the category unique to its type.
+  /// - [taxonomy]: Type of taxonomy. For categories, this is always "category".
+  /// - [parent]: The parent category ID, if any.
+  /// - [self]: The raw JSON representation of this object.
+  /// - [name]: HTML title for the category.
   const Category({
     required this.id,
     required this.count,
@@ -18,6 +33,9 @@ class Category implements ISelfRespresentive {
     this.name,
   });
 
+  /// Creates a [Category] instance from a JSON map.
+  ///
+  /// [json] is the JSON map containing the category data.
   factory Category.fromJson(dynamic json) {
     return Category(
       id: castOrElse(json['id']),
@@ -32,18 +50,35 @@ class Category implements ISelfRespresentive {
     );
   }
 
+  /// Unique identifier for the category.
   final int id;
+
+  /// Number of posts in the category.
   final int count;
+
+  /// HTML description of the category.
   final String? description;
+
+  /// URL to the category's archive page.
   final String? link;
+
+  /// HTML title for the category.
   final String? name;
+
+  /// An alphanumeric identifier for the category unique to its type.
   final String slug;
+
+  /// Type of taxonomy. For categories, this is always "category".
   final String? taxonomy;
+
+  /// The parent category ID, if any.
   final int? parent;
 
+  /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
 
+  /// Converts this [Category] instance to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

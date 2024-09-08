@@ -7,8 +7,15 @@ import '../utilities/self_representive_base.dart';
 import 'properties/avatar_urls.dart';
 import 'properties/content.dart';
 
+/// Represents a comment in the WordPress system.
+///
+/// This class encapsulates all the properties of a comment as defined in the WordPress REST API.
+/// For more details, see: https://developer.wordpress.org/rest-api/reference/comments/
 @immutable
 final class Comment implements ISelfRespresentive {
+  /// Creates a new [Comment] instance.
+  ///
+  /// All parameters correspond to the properties of a comment as defined in the WordPress REST API.
   const Comment({
     required this.self,
     required this.status,
@@ -29,6 +36,9 @@ final class Comment implements ISelfRespresentive {
     this.authorAvatarUrls,
   });
 
+  /// Creates a [Comment] instance from a JSON map.
+  ///
+  /// [json] is the JSON map containing the comment data.
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
       id: castOrElse(json['id']),
@@ -59,26 +69,59 @@ final class Comment implements ISelfRespresentive {
     );
   }
 
+  /// Unique identifier for the comment.
   final int id;
+
+  /// The ID of the associated post.
   final int? post;
+
+  /// The ID of the parent comment (if this is a reply).
   final int? parent;
+
+  /// The ID of the user who authored the comment (if they were logged in).
   final int? author;
+
+  /// Display name of the comment author.
   final String? authorName;
+
+  /// Email address of the comment author.
   final String? authorEmail;
+
+  /// URL provided by the comment author.
   final String authorUrl;
+
+  /// IP address of the comment author.
   final String? authorIp;
+
+  /// User agent of the browser used to submit the comment.
   final String? authorUserAgent;
+
+  /// The date the comment was published, in the site's timezone.
   final DateTime? date;
+
+  /// The date the comment was published, as GMT.
   final DateTime? dateGmt;
+
+  /// The content of the comment.
   final Content? content;
+
+  /// URL to the comment.
   final String link;
+
+  /// Status of the comment (approved, pending, spam).
   final CommentStatus status;
+
+  /// Type of the comment (typically 'comment').
   final String type;
+
+  /// Avatar URLs for the comment author.
   final AvatarUrls? authorAvatarUrls;
 
+  /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
 
+  /// Converts this [Comment] instance to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

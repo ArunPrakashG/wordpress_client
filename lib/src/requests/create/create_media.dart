@@ -1,22 +1,25 @@
 // ignore_for_file: avoid_slow_async_io
 
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:path/path.dart';
 
-import '../../enums.dart' show Status, HttpMethod;
-import '../../exceptions/file_not_exist_exception.dart';
-import '../../utilities/extensions/map_extensions.dart';
-import '../../utilities/helpers.dart';
-import '../../utilities/request_url.dart';
-import '../request_interface.dart';
-import '../wordpress_request.dart';
+import '../../../wordpress_client.dart';
+import '../../constants.dart';
 
+/// A request class for creating media in WordPress.
+///
+/// This class provides functionality to create media items in WordPress,
+/// supporting both file-based and byte-based media uploads.
 final class CreateMediaRequest extends IRequest {
-  CreateMediaRequest({
-    required this.mediaFilePath,
+  /// Private constructor for CreateMediaRequest.
+  ///
+  /// This constructor is used internally by the factory methods.
+  CreateMediaRequest._({
+    required this.mediaFile,
+    required this.fileName,
     this.altText,
     this.caption,
     this.description,
@@ -38,39 +41,197 @@ final class CreateMediaRequest extends IRequest {
     super.queryParameters,
   });
 
-  String mediaFilePath;
-  String? altText;
-  String? caption;
-  String? description;
-  String? mediaStatus;
-  int? post;
-  String? title;
-  int? authorId;
-  Status? commentStatus;
-  Status? pingStatus;
+  /// Creates a CreateMediaRequest instance from a File.
+  ///
+  /// Use this factory method when you have a file on the device that you want to upload.
+  ///
+  /// [file] is the File object representing the media to be uploaded.
+  /// Other parameters are optional and correspond to various media attributes and request options.
+  factory CreateMediaRequest.fromFile({
+    required File file,
+    String? altText,
+    String? caption,
+    String? description,
+    String? mediaStatus,
+    int? post,
+    String? title,
+    int? authorId,
+    Status? commentStatus,
+    Status? pingStatus,
+    CancelToken? cancelToken,
+    IAuthorization? authorization,
+    WordpressEvents? events,
+    Duration? receiveTimeout,
+    bool? requireAuth,
+    Duration? sendTimeout,
+    ValidatorCallback? validator,
+    Map<String, dynamic>? extra,
+    Map<String, String>? headers,
+    Map<String, dynamic>? queryParameters,
+  }) {
+    return CreateMediaRequest._(
+      mediaFile: file,
+      fileName: basename(file.path),
+      altText: altText,
+      caption: caption,
+      description: description,
+      mediaStatus: mediaStatus,
+      post: post,
+      title: title,
+      authorId: authorId,
+      commentStatus: commentStatus,
+      pingStatus: pingStatus,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout ?? DEFAULT_REQUEST_TIMEOUT,
+      requireAuth: requireAuth ?? true,
+      sendTimeout: sendTimeout ?? DEFAULT_REQUEST_TIMEOUT,
+      validator: validator,
+      extra: extra,
+      headers: headers,
+      queryParameters: queryParameters,
+    );
+  }
 
+  /// Creates a CreateMediaRequest instance from bytes.
+  ///
+  /// Use this factory method when you have the media content as a byte array.
+  ///
+  /// [bytes] is the Uint8List containing the media data.
+  /// [fileName] is the name to be given to the file when uploaded.
+  /// Other parameters are optional and correspond to various media attributes and request options.
+  factory CreateMediaRequest.fromBytes({
+    required Uint8List bytes,
+    required String fileName,
+    String? altText,
+    String? caption,
+    String? description,
+    String? mediaStatus,
+    int? post,
+    String? title,
+    int? authorId,
+    Status? commentStatus,
+    Status? pingStatus,
+    CancelToken? cancelToken,
+    IAuthorization? authorization,
+    WordpressEvents? events,
+    Duration? receiveTimeout,
+    bool? requireAuth,
+    Duration? sendTimeout,
+    ValidatorCallback? validator,
+    Map<String, dynamic>? extra,
+    Map<String, String>? headers,
+    Map<String, dynamic>? queryParameters,
+  }) {
+    return CreateMediaRequest._(
+      mediaFile: bytes,
+      fileName: fileName,
+      altText: altText,
+      caption: caption,
+      description: description,
+      mediaStatus: mediaStatus,
+      post: post,
+      title: title,
+      authorId: authorId,
+      commentStatus: commentStatus,
+      pingStatus: pingStatus,
+      cancelToken: cancelToken,
+      authorization: authorization,
+      events: events,
+      receiveTimeout: receiveTimeout ?? DEFAULT_REQUEST_TIMEOUT,
+      requireAuth: requireAuth ?? true,
+      sendTimeout: sendTimeout ?? DEFAULT_REQUEST_TIMEOUT,
+      validator: validator,
+      extra: extra,
+      headers: headers,
+      queryParameters: queryParameters,
+    );
+  }
+
+  /// The media file to be uploaded, either as a File or Uint8List.
+  final dynamic mediaFile;
+
+  /// The name of the file to be uploaded.
+  final String fileName;
+
+  /// Alternative text for the media.
+  final String? altText;
+
+  /// Caption for the media.
+  final String? caption;
+
+  /// Description of the media.
+  final String? description;
+
+  /// Status of the media (e.g., 'publish', 'draft').
+  final String? mediaStatus;
+
+  /// ID of the post to which this media is attached.
+  final int? post;
+
+  /// Title of the media.
+  final String? title;
+
+  /// ID of the author of the media.
+  final int? authorId;
+
+  /// Comment status for the media.
+  final Status? commentStatus;
+
+  /// Ping status for the media.
+  final Status? pingStatus;
+
+  /// Builds the WordPress request for creating media.
+  ///
+  /// This method prepares the request by creating a MultipartFile from the media,
+  /// setting up the necessary headers and body, and returning a WordpressRequest object.
   @override
   Future<WordpressRequest> build(Uri baseUrl) async {
-    final file = File(mediaFilePath);
+    MultipartFile? multipartFile;
+    String? mimeType;
 
-    if (!await file.exists()) {
-      throw FileDoesntExistException(
-        'The file at path "$mediaFilePath" doesn\'t exist.',
+    if (mediaFile is File) {
+      final file = mediaFile as File;
+      if (!await file.exists()) {
+        throw FileDoesntExistException(
+          'The file at path "${file.path}" doesn\'t exist.',
+        );
+      }
+
+      final mediaType = getMIMETypeFromExtension(
+        extension(fileName).replaceFirst('.', ''),
+      );
+
+      multipartFile = await MultipartFile.fromFile(
+        file.path,
+        filename: fileName,
+        contentType: DioMediaType.parse(mediaType),
+      );
+      mimeType = mediaType;
+    } else if (mediaFile is Uint8List) {
+      final bytes = mediaFile as Uint8List;
+
+      if (!fileName.contains('.')) {
+        throw ArgumentError(
+          'The file name must contain a file extension.',
+        );
+      }
+
+      final mediaType = getMIMETypeFromExtension(
+        extension(fileName).replaceFirst('.', ''),
+      );
+      multipartFile = MultipartFile.fromBytes(
+        bytes,
+        filename: fileName,
+        contentType: DioMediaType.parse(mediaType),
+      );
+      mimeType = mediaType;
+    } else {
+      throw ArgumentError(
+        'Invalid content type for the file. Please use the `fromBytes` factory method to upload files with custom content types.',
       );
     }
-
-    final fileName = basename(file.path);
-    final mediaType = getMIMETypeFromExtension(
-      extension(fileName).replaceFirst('.', ''),
-    );
-
-    final multipartFile = MultipartFile.fromBytes(
-      await file.readAsBytes(),
-      filename: fileName,
-      contentType: MediaType.parse(mediaType),
-    );
-
-    final mimeType = multipartFile.contentType!.mimeType;
 
     final body = <String, dynamic>{}
       ..addIfNotNull('alt_text', altText)

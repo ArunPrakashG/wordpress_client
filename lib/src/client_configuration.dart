@@ -5,8 +5,13 @@ import 'package:meta/meta.dart';
 import '../wordpress_client.dart';
 import 'constants.dart';
 
+/// Configuration class for bootstrapping the WordPress client.
+///
+/// This class provides a fluent API for setting up various configuration options
+/// for the WordPress client, including timeouts, authorization, headers, and more.
 @immutable
 final class BootstrapConfiguration {
+  /// Creates a new instance of [BootstrapConfiguration] with default or specified values.
   const BootstrapConfiguration({
     this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
     this.connectTimeout = DEFAULT_CONNECT_TIMEOUT,
@@ -22,17 +27,40 @@ final class BootstrapConfiguration {
     this.middlewares,
   });
 
+  /// Enables or disables debug mode.
   final bool enableDebugMode;
+
+  /// The timeout duration for receiving a response.
   final Duration receiveTimeout;
+
+  /// The timeout duration for establishing a connection.
   final Duration connectTimeout;
+
+  /// A function to preprocess the response before it's handled by the client.
   final bool Function(dynamic)? responsePreprocessorDelegate;
+
+  /// The default authorization to use for requests.
   final IAuthorization? defaultAuthorization;
+
+  /// The default User-Agent header to use for requests.
   final String? defaultUserAgent;
+
+  /// Default headers to include in all requests.
   final Map<String, dynamic>? defaultHeaders;
+
+  /// Whether to follow redirects automatically.
   final bool shouldFollowRedirects;
+
+  /// The maximum number of redirects to follow.
   final int maxRedirects;
+
+  /// A list of interceptors to use for requests.
   final List<Interceptor>? interceptors;
+
+  /// A callback for collecting statistics about requests.
   final StatisticsCallback? statisticsDelegate;
+
+  /// A list of middlewares to apply to requests.
   final List<IWordpressMiddleware>? middlewares;
 
   @override
@@ -58,20 +86,23 @@ final class BootstrapConfiguration {
 
   @override
   int get hashCode {
-    return enableDebugMode.hashCode ^
-        receiveTimeout.hashCode ^
-        responsePreprocessorDelegate.hashCode ^
-        defaultAuthorization.hashCode ^
-        defaultUserAgent.hashCode ^
-        defaultHeaders.hashCode ^
-        shouldFollowRedirects.hashCode ^
-        maxRedirects.hashCode ^
-        interceptors.hashCode ^
-        middlewares.hashCode ^
-        connectTimeout.hashCode ^
-        statisticsDelegate.hashCode;
+    return Object.hash(
+      enableDebugMode,
+      receiveTimeout,
+      responsePreprocessorDelegate,
+      defaultAuthorization,
+      defaultUserAgent,
+      defaultHeaders,
+      shouldFollowRedirects,
+      maxRedirects,
+      interceptors,
+      middlewares,
+      connectTimeout,
+      statisticsDelegate,
+    );
   }
 
+  /// Creates a copy of this configuration with the given fields replaced with new values.
   BootstrapConfiguration copyWith({
     bool? enableDebugMode,
     Duration? receiveTimeout,
@@ -82,7 +113,6 @@ final class BootstrapConfiguration {
     bool? shouldFollowRedirects,
     int? maxRedirects,
     List<Interceptor>? interceptors,
-    bool? synchronized,
     StatisticsCallback? statisticsDelegate,
     List<IWordpressMiddleware>? middlewares,
     Duration? connectTimeout,

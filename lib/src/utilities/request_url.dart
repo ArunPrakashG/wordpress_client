@@ -5,32 +5,64 @@ import 'package:path/path.dart';
 
 @immutable
 
-/// An helper class which wraps around URI to provide a more flexible way of building request URLs.
+/// A helper class that wraps around URI to provide a more flexible way of building request URLs.
+///
+/// This class allows you to create and manipulate URLs for API requests, supporting both relative
+/// and absolute URLs. It provides methods to create URLs from various inputs and can merge
+/// relative URLs with a base URL.
 class RequestUrl {
   const RequestUrl._(this._uri, this._endpoint);
 
   /// Creates a new [RequestUrl] instance from the given relative endpoint.
   ///
-  /// This URL is then merged internally with the [baseUrl] to create the final request URL.
+  /// Use this when you have a relative path that needs to be combined with a base URL later.
+  ///
+  /// Example:
+  /// ```dart
+  /// final url = RequestUrl.relative('/api/users');
+  /// ```
   factory RequestUrl.relative(String endpoint) {
     return RequestUrl._(null, endpoint);
   }
 
-  /// Creates a new [RequestUrl] instance from the given relative endpoint parts. The parts are joined together using [joinAll].
+  /// Creates a new [RequestUrl] instance from the given relative endpoint parts.
   ///
-  /// This URL is then merged internally with the [baseUrl] to create the final request URL.
+  /// The parts are joined together using [joinAll] from the `path` package.
+  /// This is useful when you want to construct a path from multiple segments.
+  ///
+  /// Example:
+  /// ```dart
+  /// final url = RequestUrl.relativeParts(['api', 'users', 123]);
+  /// ```
   factory RequestUrl.relativeParts(Iterable<dynamic> parts) {
     return RequestUrl._(null, joinAll(parts.map((e) => e.toString())));
   }
 
   /// Creates a new [RequestUrl] instance from the given absolute [Uri].
+  ///
+  /// Use this when you have a complete URL and don't need to combine it with a base URL.
+  ///
+  /// Example:
+  /// ```dart
+  /// final url = RequestUrl.absolute(Uri.parse('https://api.example.com/users'));
+  /// ```
   factory RequestUrl.absolute(Uri uri) {
     return RequestUrl._(uri, null);
   }
 
-  /// Creates a new [RequestUrl] instance from the given absolute [Uri] and merges it with the given [base] [Uri].
+  /// Creates a new [RequestUrl] instance by merging the given [uri] with an optional [base] [Uri].
   ///
-  /// If the [base] is null, the [uri] is returned as is.
+  /// If [base] is provided, it combines the path segments of both URIs.
+  /// If [base] is null, it returns the [uri] as is.
+  ///
+  /// This is useful when you want to combine a relative URL with a base URL.
+  ///
+  /// Example:
+  /// ```dart
+  /// final baseUri = Uri.parse('https://api.example.com');
+  /// final relativeUri = Uri.parse('/users/123');
+  /// final url = RequestUrl.absoluteMerge(relativeUri, baseUri);
+  /// ```
   factory RequestUrl.absoluteMerge(Uri uri, [Uri? base]) {
     if (base == null) {
       return RequestUrl._(uri, null);
@@ -47,14 +79,17 @@ class RequestUrl {
   final Uri? _uri;
   final String? _endpoint;
 
-  /// Gets if this instance holds a relative URL.
+  /// Returns true if this instance holds a relative URL, false otherwise.
   bool get isRelative {
     return _uri == null && _endpoint != null && _endpoint!.isNotEmpty;
   }
 
-  /// Gets if this instance holds an absolute URL.
+  /// Returns true if this instance holds an absolute URL, false otherwise.
   bool get isAbsolute => !isRelative;
 
+  /// Returns the absolute [Uri] if this instance holds one.
+  ///
+  /// Throws a [StateError] if this instance holds a relative URL.
   Uri get uri {
     if (isRelative) {
       throw StateError('This instance holds a relative URL.');

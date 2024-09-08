@@ -26,14 +26,44 @@ import 'utilities/helpers.dart';
 part 'internal_requester.dart';
 part 'requests/request_interface_base.dart';
 
-/// The main class for [WordpressClient].
+/// The main class for interacting with the WordPress REST API.
+///
+/// This class provides methods to initialize the client, register interfaces,
+/// and perform various operations on WordPress resources.
+///
+/// Example usage:
+/// ```dart
+/// final client = WordpressClient(
+///   baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+///   bootstrapper: (builder) => builder
+///     .withDefaultAuthorization(
+///       WordpressAuth.applicationPassword('username', 'app_password')
+///     )
+///     .build(),
+/// );
+///
+/// // Get posts
+/// final posts = await client.posts.list();
+/// ```
 final class WordpressClient implements IDisposable {
-  /// Default Constructor.
+  /// Creates a new [WordpressClient] instance.
   ///
-  /// [baseUrl] is the base url of the wordpress site.
-  /// [bootstrapper] is a builder method for initializing the client.
+  /// [baseUrl] is the base URL of the WordPress site's REST API.
+  /// [bootstrapper] is an optional function to configure the client.
   ///
-  /// You can change [baseUrl] per request basis as well. You will have to assign it in `build()` method of request class which inherits from [IRequest].
+  /// Throws an [ArgumentError] if the provided URL is invalid.
+  ///
+  /// Example:
+  /// ```dart
+  /// final client = WordpressClient(
+  ///   baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+  ///   bootstrapper: (builder) => builder
+  ///     .withDefaultAuthorization(
+  ///       AppPasswordAuth('username', 'app_password')
+  ///     )
+  ///     .build(),
+  /// );
+  /// ```
   factory WordpressClient({
     required Uri baseUrl,
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
@@ -82,11 +112,27 @@ final class WordpressClient implements IDisposable {
     );
   }
 
-  /// Special constructor allows you to initialize the client without a base URL.
+  /// Creates a [WordpressClient] instance without a base URL.
   ///
-  /// Note that, for any operations which require access to the Base URL, it will throw an exception in this case.
+  /// This constructor is useful when you don't know the base URL at initialization time.
+  /// Note that operations requiring the base URL will throw exceptions until [reconfigure] is called with a valid URL.
   ///
-  /// To update the client with a Base URL, you will have to call `reconfigure` method.
+  /// [instance] is an optional Dio instance to use for HTTP requests.
+  /// [bootstrapper] is an optional function to configure the client.
+  ///
+  /// Example:
+  /// ```dart
+  /// final client = WordpressClient.generic(
+  ///   bootstrapper: (builder) => builder
+  ///     .withDefaultAuthorization(
+  ///       AppPasswordAuth('username', 'app_password')
+  ///     )
+  ///     .build(),
+  /// );
+  ///
+  /// // Later, when you know the base URL:
+  /// client.reconfigure(baseUri: Uri.parse('https://example.com/wp-json/wp/v2'));
+  /// ```
   factory WordpressClient.generic({
     Dio? instance,
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
@@ -123,6 +169,27 @@ final class WordpressClient implements IDisposable {
     _initialize();
   }
 
+  /// Creates a [WordpressClient] instance with a custom Dio instance.
+  ///
+  /// This constructor is useful when you need to customize the Dio instance used for HTTP requests.
+  ///
+  /// [baseUrl] is the base URL of the WordPress site's REST API.
+  /// [instance] is the custom Dio instance to use.
+  /// [bootstrapper] is an optional function to configure the client.
+  ///
+  /// Example:
+  /// ```dart
+  /// final dio = Dio()..interceptors.add(CustomInterceptor());
+  /// final client = WordpressClient.fromDioInstance(
+  ///   baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+  ///   instance: dio,
+  ///   bootstrapper: (builder) => builder
+  ///     .withDefaultAuthorization(
+  ///       AppPasswordAuth('username', 'app_password')
+  ///     )
+  ///     .build(),
+  /// );
+  /// ```
   factory WordpressClient.fromDioInstance({
     required Uri baseUrl,
     required Dio instance,
@@ -171,10 +238,7 @@ final class WordpressClient implements IDisposable {
     );
   }
 
-  /// Default Constructor but with initialization.
-  ///
-  /// [baseUrl] is the base url of the wordpress site.
-  /// [bootstrapper] is a builder method for initializing the client.
+  /// Deprecated constructor. Use [WordpressClient] instead.
   @Deprecated(
     'Use WordpressClient() constructor instead. This is no longer required.',
   )
@@ -196,21 +260,19 @@ final class WordpressClient implements IDisposable {
   WordpressDiscovery? _discovery;
   bool _hasInitialized = false;
 
-  /// Base url of this instance.
+  /// The base URL of this WordPress REST API instance.
   Uri get baseUrl => _requester.baseUrl;
 
-  /// Base url path.
+  /// The path component of the base URL.
   String get path => baseUrl.path;
 
-  /// Indicates if this instance of [WordpressClient] has been disposed.
+  /// Indicates whether this [WordpressClient] instance has been disposed.
   bool get disposed => _isDisposed;
 
-  /// Returns true if this instance of [WordpressClient] is running in debug mode.
-  ///
-  /// i.e., [LogInterceptor] of [Dio] is attached to [Dio] instance which prints every request & response to console.
+  /// Returns true if this instance is running in debug mode (i.e., with Dio's LogInterceptor attached).
   bool get isDebugMode => _requester._isDebugMode;
 
-  /// Returns true if we have valid default authorization which is to be used for all requests.
+  /// Returns true if a valid default authorization is set for all requests.
   bool get hasValidDefaultAuthorization {
     if (_requester._defaultAuthorization == null) {
       return false;
@@ -219,139 +281,188 @@ final class WordpressClient implements IDisposable {
     return _requester._defaultAuthorization!.isValidAuth;
   }
 
-  /// Returns true if the discovery process has been completed.
+  /// Returns true if the WordPress site discovery process has been completed.
   bool get discoveryCompleted => _discovery != null;
 
-  /// The current user interface.
+  /// Interface for operations on the current authorized user.
   ///
-  /// Provides functionality to manipulate current authorized user.
-  ///
-  /// Available Operations:
-  /// - Retrive (Requires Authorization)
+  /// Available operations:
+  /// - Retrieve (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final currentUser = await client.me.retrieve(RetrieveMeRequest());
+  /// print(currentUser.name);
+  /// ```
   MeInterface get me => get<MeInterface>('me');
 
-  /// The posts interface.
+  /// Interface for operations on posts.
   ///
-  /// Provides functionality to manipulate posts.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final posts = await client.posts.list(ListPostsRequest());
+  /// for (final post in posts) {
+  ///   print(post.title);
+  /// }
+  /// ```
   PostsInterface get posts => get<PostsInterface>('posts');
 
-  /// The pages interface.
+  /// Interface for operations on pages.
   ///
-  /// Provides functionality to manipulate pages.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final pages = await client.pages.list(ListPagesRequest());
+  /// for (final page in pages) {
+  ///   print(page.title);
+  /// }
+  /// ```
   PagesInterface get pages => get<PagesInterface>('pages');
 
-  /// The categories interface.
+  /// Interface for operations on categories.
   ///
-  /// Provides functionality to manipulate categories.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final categories = await client.categories.list(ListCategoriesRequest());
+  /// for (final category in categories) {
+  ///   print(category.name);
+  /// }
+  /// ```
   CategoryInterface get categories => get<CategoryInterface>('categories');
 
-  /// The comments interface.
+  /// Interface for operations on comments.
   ///
-  /// Provides functionality to manipulate comments.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final comments = await client.comments.list(ListCommentsRequest());
+  /// for (final comment in comments) {
+  ///   print(comment.content);
+  /// }
+  /// ```
   CommentInterface get comments => get<CommentInterface>('comments');
 
-  /// The media interface.
+  /// Interface for operations on media.
   ///
-  /// Provides functionality to manipulate media.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final mediaItems = await client.media.list(ListMediaRequest());
+  /// for (final item in mediaItems) {
+  ///   print(item.sourceUrl);
+  /// }
+  /// ```
   MediaInterface get media => get<MediaInterface>('media');
 
-  /// The tags interface.
+  /// Interface for operations on tags.
   ///
-  /// Provides functionality to manipulate tags.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final tags = await client.tags.list(ListTagsRequest());
+  /// for (final tag in tags) {
+  ///   print(tag.name);
+  /// }
+  /// ```
   TagInterface get tags => get<TagInterface>('tags');
 
-  /// The users interface.
+  /// Interface for operations on users.
   ///
-  /// Provides functionality to manipulate users.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
-  /// - Retrive
+  /// - Retrieve
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final users = await client.users.list(ListUsersRequest());
+  /// for (final user in users) {
+  ///   print(user.name);
+  /// }
+  /// ```
   UsersInterface get users => get<UsersInterface>('users');
 
-  /// The search interface.
+  /// Interface for search operations.
   ///
-  /// Provides functionality to search posts, terms, post-formats.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List
   ///
+  /// Example:
+  /// ```dart
+  /// final searchResults = await client.search.list(ListSearchRequest(search: 'WordPress'));
+  /// for (final result in searchResults) {
+  ///   print(result.title);
+  /// }
+  /// ```
   SearchInterface get search => get<SearchInterface>('search');
 
-  /// The application password interface.
+  /// Interface for operations on application passwords.
   ///
-  /// Provides functionality to list, create and delete application passwords.
-  ///
-  /// Available Operations:
+  /// Available operations:
   /// - List (Requires Authorization)
   /// - Create (Requires Authorization)
   /// - Update (Requires Authorization)
-  /// - Retrive (Requires Authorization)
+  /// - Retrieve (Requires Authorization)
   /// - Delete (Requires Authorization)
   ///
+  /// Example:
+  /// ```dart
+  /// final appPasswords = await client.applicationPasswords.list(ListApplicationPasswordsRequest());
+  /// for (final password in appPasswords) {
+  ///   print(password.name);
+  /// }
+  /// ```
   ApplicationPasswordsInterface get applicationPasswords =>
       get<ApplicationPasswordsInterface>('application-passwords');
 
-  /// Status on if the client has been initialized successfully.
-  ///
-  /// This will be true if [_initialize] method has been called and completed.
+  /// Indicates whether the client has been initialized successfully.
   bool get isReady => _hasInitialized && _requester.hasBaseURL;
 
+  /// Returns the WordPress site discovery information.
+  ///
+  /// Throws a [DiscoveryPendingException] if discovery hasn't been performed yet.
   WordpressDiscovery get discovery {
     if (_discovery == null) {
       throw DiscoveryPendingException();
@@ -360,6 +471,9 @@ final class WordpressClient implements IDisposable {
     return _discovery!;
   }
 
+  /// Checks if the provided URL is valid.
+  ///
+  /// Returns true if the URL is absolute and has a valid port number.
   static bool isValidUrl(String url) {
     final uri = Uri.tryParse(url);
 
@@ -378,9 +492,7 @@ final class WordpressClient implements IDisposable {
     return true;
   }
 
-  /// Initializes all the built in interfaces and other services
-  ///
-  /// This method should be called before any other method.
+  /// Initializes all the built-in interfaces and other services.
   void _initialize() {
     if (_hasInitialized) {
       return;

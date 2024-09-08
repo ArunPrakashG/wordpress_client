@@ -1,6 +1,6 @@
 import '../../library_exports.dart';
 
-extension ParallelResultExtensions<T> on Iterable<ParallelResult<T>> {
+extension ParallelResultExtensions<T> on Iterable<ParallelIterableResult<T>> {
   /// Merges the results of the parallel requests into a single list.
   Iterable<T> merge() {
     return fold<List<T>>(
@@ -12,7 +12,7 @@ extension ParallelResultExtensions<T> on Iterable<ParallelResult<T>> {
 }
 
 extension FutureParallelResultExtensions<T>
-    on Future<Iterable<ParallelResult<T>>> {
+    on Future<Iterable<ParallelIterableResult<T>>> {
   /// Merges the results of the parallel requests into a single list.
   Future<Iterable<T>> merge() async {
     final results = await this;

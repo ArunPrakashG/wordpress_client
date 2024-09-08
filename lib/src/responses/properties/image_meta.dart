@@ -3,8 +3,17 @@ import 'package:meta/meta.dart';
 
 import '../../utilities/helpers.dart';
 
+/// Represents metadata associated with an image in the WordPress REST API.
+///
+/// This class encapsulates various metadata properties of an image, including
+/// camera settings, copyright information, and descriptive details.
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/media/#schema
 @immutable
 final class ImageMeta {
+  /// Creates an instance of [ImageMeta].
+  ///
+  /// All parameters are optional and can be null if not provided.
   const ImageMeta({
     this.aperture,
     this.credit,
@@ -20,6 +29,10 @@ final class ImageMeta {
     this.keywords = const [],
   });
 
+  /// Creates an [ImageMeta] instance from a JSON map.
+  ///
+  /// This factory constructor is used to deserialize JSON data into an [ImageMeta] object.
+  /// It uses the [castOrElse] utility function to safely cast values or provide defaults.
   factory ImageMeta.fromJson(Map<String, dynamic> json) {
     return ImageMeta(
       aperture: castOrElse(json['aperture']),
@@ -43,19 +56,46 @@ final class ImageMeta {
     );
   }
 
+  /// The aperture setting of the camera when the image was taken.
   final String? aperture;
+
+  /// The credit or attribution for the image.
   final String? credit;
+
+  /// The camera model used to take the image.
   final String? camera;
+
+  /// The caption or description of the image.
   final String? caption;
+
+  /// The timestamp when the image was created, typically in UNIX timestamp format.
   final String? createdTimestamp;
+
+  /// The copyright information for the image.
   final String? copyright;
+
+  /// The focal length of the camera lens when the image was taken.
   final String? focalLength;
+
+  /// The ISO speed of the camera when the image was taken.
   final String? iso;
+
+  /// The shutter speed of the camera when the image was taken.
   final String? shutterSpeed;
+
+  /// The title of the image.
   final String? title;
+
+  /// The orientation of the image (e.g., landscape, portrait).
   final String? orientation;
+
+  /// A list of keywords or tags associated with the image.
   final List<dynamic> keywords;
 
+  /// Converts the [ImageMeta] instance to a JSON map.
+  ///
+  /// This method is used for serializing the object into a format that can be
+  /// easily converted to JSON for API requests or storage.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'aperture': aperture,

@@ -7,12 +7,42 @@ import 'package:dio/dio.dart';
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
-import 'basic_jwt.dart';
 
-/// Similar to [BasicJwtAuth], this plugin is in active development and has much more features than the previous one. It is recommended to use this plugin instead of the previous one.
+/// UsefulJwtAuth implements JWT (JSON Web Token) authentication for WordPress APIs.
 ///
-/// Implemented on basis of https://github.com/usefulteam/jwt-auth wordpress plugin.
+/// This class is based on the WordPress plugin https://github.com/usefulteam/jwt-auth,
+/// which is actively maintained and offers more features compared to the BasicJwtAuth.
+///
+/// ### Usage Example:
+///
+/// ```dart
+/// final auth = UsefulJwtAuth(
+///   userName: 'your_username',
+///   password: 'your_password',
+/// );
+///
+/// // Authorize the user
+/// bool isAuthorized = await auth.authorize();
+///
+/// if (isAuthorized) {
+///   print('Successfully authorized!');
+///   // Use the auth object for subsequent API calls
+/// } else {
+///   print('Authorization failed.');
+/// }
+///
+/// // Generate auth URL for API requests
+/// String? authHeader = await auth.generateAuthUrl();
+/// if (authHeader != null) {
+///   // Use authHeader in your API requests
+///   print('Auth header: $authHeader');
+/// }
+/// ```
 final class UsefulJwtAuth extends IAuthorization {
+  /// Creates a new instance of UsefulJwtAuth.
+  ///
+  /// [userName] and [password] are required for authentication.
+  /// [events] is optional and can be used to handle authentication events.
   UsefulJwtAuth({
     required super.userName,
     required super.password,
@@ -24,16 +54,32 @@ final class UsefulJwtAuth extends IAuthorization {
   bool _hasValidatedOnce = false;
   Dio? _client;
 
+  /// Number of days until the token expires.
   static const int DAYS_UNTILS_TOKEN_EXPIRY = 3;
 
+  /// Checks if the current authentication is valid.
   @override
   bool get isValidAuth => !isNullOrEmpty(_encryptedAccessToken);
 
+  /// Checks if the current authentication has expired.
   bool get _isAuthExpiried =>
       _lastAuthorizedTime != null &&
       DateTime.now().difference(_lastAuthorizedTime!).inHours >
           (DAYS_UNTILS_TOKEN_EXPIRY * 24);
 
+  /// Authorizes the user with the provided credentials.
+  ///
+  /// Returns `true` if authorization is successful, `false` otherwise.
+  ///
+  /// Example:
+  /// ```dart
+  /// bool success = await auth.authorize();
+  /// if (success) {
+  ///   print('Authorization successful');
+  /// } else {
+  ///   print('Authorization failed');
+  /// }
+  /// ```
   @override
   Future<bool> authorize() async {
     if (isValidAuth) {
@@ -79,6 +125,15 @@ final class UsefulJwtAuth extends IAuthorization {
     return _hasValidatedOnce = !isNullOrEmpty(_encryptedAccessToken);
   }
 
+  /// Checks if the user is currently authenticated.
+  ///
+  /// Returns `true` if the user is authenticated, `false` otherwise.
+  ///
+  /// Example:
+  /// ```dart
+  /// bool isAuth = await auth.isAuthenticated();
+  /// print(isAuth ? 'User is authenticated' : 'User is not authenticated');
+  /// ```
   @override
   Future<bool> isAuthenticated() async {
     if (_hasValidatedOnce && !isNullOrEmpty(_encryptedAccessToken)) {
@@ -88,6 +143,15 @@ final class UsefulJwtAuth extends IAuthorization {
     return false;
   }
 
+  /// Validates the current authentication token.
+  ///
+  /// Returns `true` if the token is valid, `false` otherwise.
+  ///
+  /// Example:
+  /// ```dart
+  /// bool isValid = await auth.validate();
+  /// print(isValid ? 'Token is valid' : 'Token is invalid');
+  /// ```
   @override
   Future<bool> validate() async {
     if (isNullOrEmpty(_encryptedAccessToken)) {
@@ -114,6 +178,18 @@ final class UsefulJwtAuth extends IAuthorization {
         (response.data['code'] as String) == 'jwt_auth_valid_token';
   }
 
+  /// Generates an authentication URL with the current token.
+  ///
+  /// Returns the authentication header as a string, or `null` if not authenticated.
+  ///
+  /// Example:
+  /// ```dart
+  /// String? authHeader = await auth.generateAuthUrl();
+  /// if (authHeader != null) {
+  ///   print('Auth header: $authHeader');
+  ///   // Use authHeader in your API requests
+  /// }
+  /// ```
   @override
   Future<String?> generateAuthUrl() async {
     if (!await isAuthenticated()) {
@@ -123,11 +199,15 @@ final class UsefulJwtAuth extends IAuthorization {
     return '$scheme $_encryptedAccessToken';
   }
 
+  /// Configures the Dio client for this authentication method.
+  ///
+  /// This method is called internally by the WordPress client.
   @override
   void clientFactoryProvider(Dio client) {
     _client = client;
   }
 
+  /// The authentication scheme used. Returns 'Bearer' for UsefulJwtAuth.
   @override
   String get scheme => 'Bearer';
 }

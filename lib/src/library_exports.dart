@@ -1,4 +1,5 @@
 export 'authorization/authorization_export.dart';
+export 'cache/cache_exports.dart';
 export 'client_configuration.dart';
 export 'enums.dart';
 export 'exceptions/exceptions_export.dart';
