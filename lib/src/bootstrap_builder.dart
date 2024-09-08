@@ -88,7 +88,8 @@ class BootstrapBuilder {
 
   /// Sets a response preprocessor function.
   BootstrapBuilder withResponsePreprocessor(
-      bool Function(dynamic) preprocessor) {
+    bool Function(dynamic) preprocessor,
+  ) {
     _responsePreprocessorDelegate = preprocessor;
     return this;
   }
