@@ -6,8 +6,16 @@ import '../utilities/self_representive_base.dart';
 import 'properties/avatar_urls.dart';
 import 'properties/extra_capabilities.dart';
 
+/// Represents a WordPress user.
+///
+/// This class encapsulates all the properties of a WordPress user as defined in the
+/// WordPress REST API. It provides a structured way to work with user data in Dart applications.
+///
+/// For more information, see the WordPress REST API handbook:
+/// https://developer.wordpress.org/rest-api/reference/users/
 @immutable
 final class User implements ISelfRespresentive {
+  /// Creates a new [User] instance.
   const User({
     required this.id,
     required this.url,
@@ -28,6 +36,9 @@ final class User implements ISelfRespresentive {
     this.nickname,
   });
 
+  /// Creates a [User] instance from a JSON map.
+  ///
+  /// This factory constructor is used to deserialize user data received from the WordPress REST API.
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: castOrElse(json['id']),
@@ -69,26 +80,61 @@ final class User implements ISelfRespresentive {
     );
   }
 
+  /// Unique identifier for the user.
   final int id;
+
+  /// Login name for the user.
   final String? username;
+
+  /// Display name for the user.
   final String? name;
+
+  /// First name for the user.
   final String? firstName;
+
+  /// Last name for the user.
   final String? lastName;
+
+  /// The nickname for the user.
   final String? nickname;
+
+  /// The email address for the user.
   final String? email;
+
+  /// Registration date for the user.
   final DateTime? registeredDate;
+
+  /// All capabilities assigned to the user.
   final Map<String, bool> capabilities;
+
+  /// Extra capabilities assigned to the user.
   final ExtraCapabilities? extraCapabilities;
+
+  /// URL of the user.
   final String url;
+
+  /// Description of the user.
   final String? description;
+
+  /// Author URL of the user.
   final String link;
+
+  /// An alphanumeric identifier for the user.
   final String slug;
+
+  /// Roles assigned to the user.
   final List<String> roles;
+
+  /// Avatar URLs for the user.
   final AvatarUrls? avatarUrls;
 
+  /// The raw data received from the API.
   @override
   final Map<String, dynamic> self;
 
+  /// Converts the [User] instance to a JSON map.
+  ///
+  /// This method is used to serialize the user data for sending to the WordPress REST API.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

@@ -2,20 +2,25 @@
   <h1>WordPress Client</h1>
 
   <p align="center">
-    <a href="https://pub.dev/packages/wordpress_client"> 
-      <img src="https://img.shields.io/pub/v/wordpress_client?color=blueviolet" alt="Pub Version"/> 
-    </a> 
+    <a href="https://pub.dev/packages/wordpress_client">
+      <img src="https://img.shields.io/pub/v/wordpress_client?color=blueviolet" alt="Pub Version"/>
+    </a>
+    <a href="https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE">
+      <img src="https://img.shields.io/github/license/ArunPrakashG/wordpress_client?color=blue" alt="License"/>
+    </a>
+    <a href="https://github.com/ArunPrakashG/wordpress_client/stargazers">
+      <img src="https://img.shields.io/github/stars/ArunPrakashG/wordpress_client?style=social" alt="Stars"/>
+    </a>
     <br>
-    <img src="https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
-    <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter" />
-    <img src="https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white" alt="WordPress" />
+    <img src="https://img.shields.io/badge/dart-%230175C2.svg?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/>
+    <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter"/>
+    <img src="https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white" alt="WordPress"/>
     <br>
-    <b>A powerful and easy-to-use WordPress REST API client for Dart & Flutter.
-    </b>
-</p>
+    <b>A powerful and easy-to-use WordPress REST API client for Dart & Flutter.</b>
+  </p>
 </div>
 
-## ✨ Features
+## 🚀 Features
 
 - 📦 API discovery support.
 - ⏲️ Measures request completion time.
@@ -32,18 +37,20 @@
 
 If you find any functionality which you require is missing from the package and you are not able to work it out using built in options like raw requests etc, then please share the functionality in details as a comment here: https://github.com/ArunPrakashG/wordpress_client/discussions/55
 
-## 📖 How to Use
+## 📦 Installation
 
-### **1. Setup**
-
-Add `wordpress_client` in your `pubspec.yaml`:
+Add `wordpress_client` to your `pubspec.yaml`:
 
 ```dart
 dependencies:
- wordpress_client: ^8.4.8
+ wordpress_client: ^8.5.3
 ```
 
 > 💡 Ensure you get the [latest version here](https://pub.dev/packages/wordpress_client).
+
+Then run `flutter pub get` to install the package.
+
+## 🔧 Usage
 
 Import the package where you need:
 
@@ -153,23 +160,22 @@ By Useful Team, this is another implementation using JWT for authentication purp
 
 Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests).
 
-## 📣 Feedback
+## 🤝 Feedback & Contributing
 
 - 🐛 For bugs or feature requests, use the [issue tracker][tracker].
 - 💡 Contributions are always appreciated. PRs are welcome!
 
-## 📜 License
+## 📄 License
 
-Licensed under [MIT](https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE).
-
-[tracker]: https://github.com/ArunPrakashG/wordpress_client/issues
+This project is [MIT](https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE) licensed.
 
 ---
 
 <div align="center">
-    
-Support Me:
+  If you find this package helpful, consider supporting the development:
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/arunprakashg)
 
 </div>
+
+[tracker]: https://github.com/ArunPrakashG/wordpress_client/issues

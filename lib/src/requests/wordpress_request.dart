@@ -3,8 +3,15 @@ import 'package:dio/dio.dart';
 import '../../wordpress_client.dart';
 import '../constants.dart';
 
-/// Represents a request to the Wordpress REST API.
+/// Represents a request to the WordPress REST API.
+///
+/// This class encapsulates all the necessary information for making a request
+/// to the WordPress REST API, including the URL, method, headers, and other
+/// configuration options.
 final class WordpressRequest {
+  /// Creates a new [WordpressRequest] instance.
+  ///
+  /// [url] and [method] are required parameters. All other parameters are optional.
   const WordpressRequest({
     required this.url,
     required this.method,
@@ -20,51 +27,54 @@ final class WordpressRequest {
     this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
   });
 
-  /// The request url.
+  /// The URL for the request.
   final RequestUrl url;
 
-  /// The request method.
+  /// The HTTP method for the request (e.g., GET, POST, PUT, DELETE).
   final HttpMethod method;
 
-  /// The request headers.
+  /// Optional headers to be included with the request.
   final Map<String, dynamic>? headers;
 
-  /// The request query parameters.
+  /// Optional query parameters to be appended to the URL.
   final Map<String, dynamic>? queryParameters;
 
-  /// The request body.
+  /// The body of the request, typically used for POST or PUT requests.
   final dynamic body;
 
-  /// Specifies if this request requires authentication.
+  /// Indicates whether this request requires authentication.
   final bool requireAuth;
 
-  /// The cancel token.
+  /// A token that can be used to cancel the request.
   final CancelToken? cancelToken;
 
-  /// The authorization instance.
+  /// The authorization instance to be used for this request, if required.
   final IAuthorization? authorization;
 
-  /// The request send timeout.
+  /// The timeout duration for sending the request.
   final Duration sendTimeout;
 
-  /// The request receive timeout.
+  /// The timeout duration for receiving the response.
   final Duration receiveTimeout;
 
-  /// The events instance.
+  /// An optional [WordpressEvents] instance for handling request lifecycle events.
   final WordpressEvents? events;
 
-  /// The validator callback.
+  /// An optional callback function for custom validation of the response.
   final ValidatorCallback? validator;
 
-  /// Gets if this request has events.
+  /// Indicates whether this request has associated events.
   bool get hasEvents => events != null;
 
-  /// Gets if this request has a validator overload.
+  /// Indicates whether this request has a custom validator.
   bool get hasValidator => validator != null;
 
-  /// Gets if this request has a authorization module.
+  /// Indicates whether this request has an associated authorization module.
   bool get hasAuthorization => authorization != null;
 
+  /// Creates a copy of this [WordpressRequest] with the given fields replaced with new values.
+  ///
+  /// This method is useful for modifying a request while keeping the original intact.
   WordpressRequest copyWith({
     RequestUrl? url,
     HttpMethod? method,

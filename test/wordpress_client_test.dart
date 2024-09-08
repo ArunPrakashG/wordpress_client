@@ -22,7 +22,7 @@ Future<void> main() async {
   final client = WordpressClient(
     baseUrl: baseUrl,
     bootstrapper: (builder) => builder
-        .withDefaultMaxRedirects(5)
+        .withMaxRedirects(5)
         .withFollowRedirects(true)
         .withRequestTimeout(const Duration(seconds: 60))
         .withDebugMode(false)

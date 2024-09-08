@@ -1,14 +1,31 @@
 // ignore_for_file: comment_references
 
+/// An abstract class that provides a self-representation of JSON data.
+///
+/// This class is designed to handle JSON responses, particularly useful when
+/// dealing with dynamic or unknown fields in API responses.
 abstract class ISelfRespresentive {
+  /// Creates a new instance of [ISelfRespresentive].
+  ///
+  /// [self] is a required parameter that contains the entire JSON response as a Map.
   const ISelfRespresentive({
     required this.self,
   });
 
-  /// Represents the entire JSON body as a Map.
+  /// Represents the entire JSON response as a Map<String, dynamic>.
   ///
-  /// Usefull if you have extra fields in the response and would like to read them without writing a custom request/response workflow.
+  /// This field is particularly useful in the following scenarios:
+  /// 1. When the API response contains extra fields that are not explicitly modeled.
+  /// 2. When you need to access the raw response data without creating a custom model.
   ///
-  /// You can get each field by using the [getField] method. Moreover, you can use `[]` operator to access the values by their key. Eg: `response['key']`
+  /// You can access specific fields in two ways:
+  /// 1. Using the [getField] method.
+  /// 2. Using the subscript operator `[]`. For example: `response['fieldName']`
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final response = MyResponse(self: jsonMap);
+  /// final specificField = response['fieldName'];
+  /// ```
   final Map<String, dynamic> self;
 }

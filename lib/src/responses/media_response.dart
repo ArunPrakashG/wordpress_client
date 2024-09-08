@@ -7,8 +7,17 @@ import '../utilities/self_representive_base.dart';
 import 'properties/content.dart';
 import 'properties/media_details.dart';
 
+/// Represents a media item in the WordPress system.
+///
+/// This class encapsulates all the properties of a media item as defined in the WordPress REST API.
+/// Media items are attachments, such as images, documents, or videos.
+///
+/// For more details, see: https://developer.wordpress.org/rest-api/reference/media/
 @immutable
 final class Media implements ISelfRespresentive {
+  /// Creates a new [Media] instance.
+  ///
+  /// All parameters correspond to the properties of a media item as defined in the WordPress REST API.
   const Media({
     required this.self,
     required this.id,
@@ -37,6 +46,9 @@ final class Media implements ISelfRespresentive {
     this.sourceUrl,
   });
 
+  /// Creates a [Media] instance from a JSON map.
+  ///
+  /// [json] is the JSON map containing the media item data.
   factory Media.fromJson(Map<String, dynamic> json) {
     return Media(
       id: castOrElse(json['id']),
@@ -84,34 +96,83 @@ final class Media implements ISelfRespresentive {
     );
   }
 
+  /// Unique identifier for the media item.
   final int id;
+
+  /// The date the media item was created, in the site's timezone.
   final DateTime? date;
+
+  /// The date the media item was created, as GMT.
   final DateTime? dateGmt;
+
+  /// The globally unique identifier for the media item.
   final Content? guid;
+
+  /// The date the media item was last modified, in the site's timezone.
   final DateTime? modified;
+
+  /// The date the media item was last modified, as GMT.
   final DateTime? modifiedGmt;
+
+  /// An alphanumeric identifier for the media item unique to its type.
   final String? slug;
+
+  /// The current status of the media item.
   final MediaFilterStatus? status;
+
+  /// Type of media item.
   final String? type;
+
+  /// URL to the media item.
   final String? link;
+
+  /// The title of the media item.
   final Content? title;
+
+  /// The ID of the user who uploaded the media item.
   final int? author;
+
+  /// Whether or not comments are open on the media item.
   final Status? commentStatus;
+
+  /// Whether or not the media item can be pinged.
   final Status? pingStatus;
+
+  /// The theme file to use to display the media item.
   final String? template;
+
+  /// Meta fields associated with the media item.
   final dynamic meta;
+
+  /// The description of the media item.
   final Content? description;
+
+  /// The caption for the media item.
   final Content? caption;
+
+  /// The alternative text for the media item.
   final String? altText;
+
+  /// The media type of the media item.
   final String? mediaType;
+
+  /// The MIME type of the media item.
   final String? mimeType;
+
+  /// Details about the media file, specific to its type.
   final MediaDetails? mediaDetails;
+
+  /// The ID of the associated post of the media item.
   final int? post;
+
+  /// The source URL of the media item.
   final String? sourceUrl;
 
+  /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
 
+  /// Converts this [Media] instance to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

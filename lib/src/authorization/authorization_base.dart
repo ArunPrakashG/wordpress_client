@@ -4,13 +4,38 @@ import 'package:meta/meta.dart';
 import '../../wordpress_client.dart';
 import '../utilities/helpers.dart';
 
-/// Base class for all authorization types.
+/// Base class for all authorization types in the WordPress client.
 ///
-/// To implement a custom authorization system, You _must_ extend this class.
+/// To implement a custom authorization system, you must extend this class.
 ///
-/// Note that, there is no storage system internally to store and retrive
+/// Note: There is no built-in storage system to store and retrieve credentials.
+/// You need to implement your own storage mechanism if required.
+///
+/// Example of a custom authorization implementation:
+/// ```dart
+/// class CustomAuth extends IAuthorization {
+///   CustomAuth({required String userName, required String password})
+///     : super(userName: userName, password: password);
+///
+///   @override
+///   String get scheme => 'Custom';
+///
+///   @override
+///   Future<bool> authorize() async {
+///     // Implement your custom authorization logic here
+///     return true;
+///   }
+///
+///   // Implement other required methods...
+/// }
+/// ```
 abstract base class IAuthorization {
   /// Creates a new instance of [IAuthorization] with the given username and password.
+  ///
+  /// [userName]: The username for authentication.
+  /// [password]: The password for authentication.
+  /// [headerKey]: The HTTP header key to use for authorization (default is 'Authorization').
+  /// [events]: Optional [WordpressEvents] to listen to during the authorization process.
   IAuthorization({
     required this.userName,
     required this.password,
@@ -18,35 +43,38 @@ abstract base class IAuthorization {
     this.events,
   });
 
-  /// The base url of the wordpress site.
+  /// The base URL of the WordPress site.
   late final Uri baseUrl;
 
-  /// The username
+  /// The username for authentication.
   final String userName;
 
-  /// The password
+  /// The password for authentication.
   final String password;
 
-  /// The header key to use for authorization.
+  /// The HTTP header key to use for authorization.
   final String headerKey;
 
-  /// The events to listen to.
+  /// Optional events to listen to during the authorization process.
   WordpressEvents? events;
 
-  /// Gets if this authorization instance has valid authentication nounce. (token/encryptedToken)
+  /// Indicates if this authorization instance has a valid authentication nonce (token/encryptedToken).
   bool get isValidAuth;
 
-  /// Gets if this is an invalid or default authorization instance without username or password fields.
+  /// Indicates if this is an invalid or default authorization instance without username or password fields.
   bool get isDefault => isNullOrEmpty(userName) || isNullOrEmpty(password);
 
-  /// Gets the authorization scheme.
+  /// Gets the authorization scheme (e.g., 'Bearer' for JWT, 'Basic' for Basic Auth).
   String get scheme;
 
-  /// Helps to initialize authorization instance with internal requesting client passed as a parameter.
+  /// Initializes the authorization instance with the internal requesting client.
   ///
-  /// This function is called only if there is no valid nounce available i.e., when isAuthenticated() returns false.
+  /// This method is called only if there is no valid nonce available (i.e., when [isAuthenticated] returns false).
+  /// [authorize] and [validate] methods will not be called before calling [initialize].
   ///
-  /// `authorize()` / `validate()` functions will not be called before calling `initialize()` function.
+  /// [baseUrl]: The base URL of the WordPress site.
+  ///
+  /// Returns a [Future<bool>] indicating whether initialization was successful.
   @mustCallSuper
   Future<bool> initialize({
     required Uri baseUrl,
@@ -56,39 +84,50 @@ abstract base class IAuthorization {
   }
 
   /// Provides this instance of [IAuthorization] with the Dio client instance for requests.
+  ///
+  /// [client]: The Dio client instance to use for making HTTP requests.
   void clientFactoryProvider(Dio client);
 
-  /// Called to validate token. (such as in JWT auth)
+  /// Validates the authentication token (e.g., JWT token).
   ///
-  /// As of right now, this function is not called outside of this instance. This can change in the future if there is a requirement to validate the nounce from the core client itself.
-  /// Therefore, be sure to implement this with valid logic for the validation process.
+  /// This method is not called outside of this instance by default, but it may be used in the future.
+  /// Implement this method with valid logic for the validation process.
   ///
-  /// Example 1: JWT authentication token can be validated through an endpoint, you can implement that validation logic inside this.
-  ///
-  /// Example 2: Basic Auth does not require any validation, therefore you can simply return true or if still require some custom logic, you can implement that as well!
+  /// Example for JWT:
+  /// ```dart
+  /// @override
+  /// Future<bool> validate() async {
+  ///   try {
+  ///     final response = await _client.post('/validate-token', data: {'token': _token});
+  ///     return response.statusCode == 200;
+  ///   } catch (e) {
+  ///     return false;
+  ///   }
+  /// }
+  /// ```
   Future<bool> validate();
 
-  /// Called to check if this instance has a valid authentication nounce and generateAuthUrl() won't return null.
+  /// Checks if this instance has a valid authentication nonce and [generateAuthUrl] won't return null.
   ///
-  /// This function will be called before init() function, therefore if you are using client instance passed through init() then there will be NullReferenceException.
+  /// This method is called before [initialize], so if you need to use the client instance,
+  /// you should implement custom logic to handle potential null references.
   ///
-  /// If you require HTTP requests in this method, then you need to implement custom logic.
+  /// Returns a [Future<bool>] indicating whether the instance is authenticated.
   Future<bool> isAuthenticated();
 
-  /// Called to authorize a request if the request requires authentication.
+  /// Authorizes a request if authentication is required.
   ///
-  /// Returning true means the request should be authorized, false means authorization failed.
+  /// Returns a [Future<bool>] indicating whether authorization was successful (true) or failed (false).
   Future<bool> authorize();
 
-  /// After `authorize()` is called, to get the authorization header string, (ie, '{scheme} {token}') the client calls this method to generate the raw string.
+  /// Generates the authorization header string after [authorize] is called.
   ///
-  /// The returning string formate must always be like
+  /// The returned string format must always be: "{scheme} {token}"
   ///
-  /// {scheme} {token}
+  /// Examples:
+  /// - JWT: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  /// - Basic Auth: "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
   ///
-  /// - Example 1: In case of JWT, `Bearer {jwt_token}`
-  ///
-  /// - Example 2: In case of Basic Auth, `Basic {Base64UsernamePassword}`
-  ///
+  /// Returns a [Future<String?>] containing the authorization header string, or null if not authorized.
   Future<String?> generateAuthUrl();
 }

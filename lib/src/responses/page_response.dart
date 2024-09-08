@@ -5,8 +5,19 @@ import '../../wordpress_client.dart';
 import '../utilities/self_representive_base.dart';
 import 'properties/content.dart';
 
+/// Represents a WordPress page.
+///
+/// This class encapsulates all the properties of a WordPress page as defined in the
+/// WordPress REST API. It provides methods to create, manipulate, and serialize page data.
+///
+/// For more information, see the WordPress REST API handbook:
+/// https://developer.wordpress.org/rest-api/reference/pages/
 @immutable
 final class Page implements ISelfRespresentive {
+  /// Creates a new [Page] instance.
+  ///
+  /// All parameters correspond to the properties of a WordPress page as defined
+  /// in the REST API.
   const Page({
     required this.id,
     required this.slug,
@@ -30,6 +41,10 @@ final class Page implements ISelfRespresentive {
     this.featuredMedia,
   });
 
+  /// Creates a [Page] instance from a JSON map.
+  ///
+  /// This factory constructor is used to deserialize page data received from
+  /// the WordPress REST API.
   factory Page.fromJson(Map<String, dynamic> json) {
     return Page(
       id: castOrElse(json['id']),
@@ -64,29 +79,68 @@ final class Page implements ISelfRespresentive {
     );
   }
 
+  /// The unique identifier for the page.
   final int id;
+
+  /// The date the page was published, in the site's timezone.
   final DateTime? date;
+
+  /// The date the page was published, as GMT.
   final DateTime? dateGmt;
+
+  /// The globally unique identifier for the page.
   final Content? guid;
+
+  /// The date the page was last modified, in the site's timezone.
   final DateTime? modified;
+
+  /// The date the page was last modified, as GMT.
   final DateTime? modifiedGmt;
+
+  /// An alphanumeric identifier for the page unique to its type.
   final String slug;
+
+  /// A named status for the page.
   final ContentStatus status;
+
+  /// Type of Post for the page.
   final String? type;
+
+  /// URL to the page.
   final String? link;
+
+  /// The title of the page.
   final Content? title;
+
+  /// The content of the page.
   final Content? content;
+
+  /// The ID of the user who published the page.
   final int author;
+
+  /// The ID of the featured media for the page.
   final int? featuredMedia;
+
+  /// Whether or not comments are open on the page.
   final Status commentStatus;
+
+  /// Whether or not the page can be pinged.
   final Status pingStatus;
+
+  /// The theme file to use to display the page.
   final String template;
+
+  /// The ID of the parent page.
   final int parent;
+
+  /// The order of the page in relation to other pages.
   final int menuOrder;
 
+  /// The raw data of the page as received from the API.
   @override
   final Map<String, dynamic> self;
 
+  /// Creates a copy of this [Page] but with the given fields replaced with the new values.
   Page copyWith({
     int? id,
     DateTime? date,
@@ -133,6 +187,9 @@ final class Page implements ISelfRespresentive {
     );
   }
 
+  /// Converts this [Page] instance to a JSON map.
+  ///
+  /// This method is used to serialize the page data for sending to the WordPress REST API.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,
