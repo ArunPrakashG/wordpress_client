@@ -11,7 +11,7 @@ import '../../wordpress_client.dart';
 ///
 /// Example usage:
 /// ```dart
-/// final wpClient = WordPressClient('https://your-wordpress-site.com');
+/// final wpClient = WordpressClient(baseUrl: 'https://your-wordpress-site.com');
 /// final appPasswords = wpClient.applicationPasswords;
 ///
 /// // Create a new application password

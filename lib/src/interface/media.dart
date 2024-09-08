@@ -7,7 +7,7 @@ import '../../wordpress_client.dart';
 ///
 /// Example usage:
 /// ```dart
-/// final wp = WordPressClient('https://example.com/wp-json');
+/// final wp = WordpressClient(baseUrl: 'https://example.com/wp-json');
 /// final mediaInterface = wp.media;
 ///
 /// // Create a new media item

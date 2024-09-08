@@ -7,7 +7,7 @@ import '../library_exports.dart';
 /// Example usage:
 ///
 /// ```dart
-/// final wordpress = WordPressClient('https://your-wordpress-site.com/wp-json');
+/// final wordpress = WordpressClient(baseUrl: 'https://your-wordpress-site.com/wp-json');
 /// final searchInterface = wordpress.search;
 ///
 /// // Perform a search

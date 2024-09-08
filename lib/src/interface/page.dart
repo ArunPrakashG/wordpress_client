@@ -8,7 +8,7 @@ import '../../wordpress_client.dart';
 /// Example usage:
 ///
 /// ```dart
-/// final wordpress = WordPressClient('https://your-site.com/wp-json');
+/// final wordpress = WordpressClient(baseUrl: 'https://your-site.com/wp-json');
 /// final pagesInterface = wordpress.pages;
 ///
 /// // Create a new page
