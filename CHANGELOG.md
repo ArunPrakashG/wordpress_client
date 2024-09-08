@@ -1,3 +1,8 @@
+## 8.5.4
+
+- Added support for creating media from bytes
+- Updated documentation
+
 ## 8.5.3
 
 - Fix invalid base url on web
