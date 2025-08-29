@@ -10,8 +10,9 @@ jobs:
   publish:
     permissions:
       id-token: write
+      contents: read
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-  # If you enable an environment requirement on pub.dev, add:
+  # To require a GitHub Environment, configure it on pub.dev and then add:
   # with:
   #   environment: pub.dev
   #   working-directory: .
