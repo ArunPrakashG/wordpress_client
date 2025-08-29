@@ -7,7 +7,8 @@ import 'dart:io';
 
 void main(List<String> args) {
   if (args.isEmpty) {
-    stderr.writeln('Usage: dart run tool/bump_version.dart [patch|minor|major|<explicit-version>]');
+    stderr.writeln(
+        'Usage: dart run tool/bump_version.dart [patch|minor|major|<explicit-version>]');
     exit(64); // usage error
   }
 
@@ -54,9 +55,12 @@ String _computeNextVersion(String current, String bump) {
   if (parts.length != 3) {
     throw FormatException('Unsupported version format: $current');
   }
-  var major = int.tryParse(parts[0]) ?? (throw FormatException('Invalid major in $current'));
-  var minor = int.tryParse(parts[1]) ?? (throw FormatException('Invalid minor in $current'));
-  var patch = int.tryParse(parts[2]) ?? (throw FormatException('Invalid patch in $current'));
+  var major = int.tryParse(parts[0]) ??
+      (throw FormatException('Invalid major in $current'));
+  var minor = int.tryParse(parts[1]) ??
+      (throw FormatException('Invalid minor in $current'));
+  var patch = int.tryParse(parts[2]) ??
+      (throw FormatException('Invalid patch in $current'));
 
   switch (bump.toLowerCase()) {
     case 'major':
