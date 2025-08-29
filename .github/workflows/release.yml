@@ -3,20 +3,26 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Dart-Release
+name: Release (bump and tag)
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type or explicit version (patch/minor/major or 1.2.3)"
+        required: true
+        default: patch
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@v1
@@ -26,17 +32,38 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
-      # Uncomment this step to verify the use of 'dart format' on each commit.
-      - name: Verify formatting
+      - name: Format check
         run: dart format --output=none --set-exit-if-changed .
 
-      # Consider passing '--fatal-infos' for slightly stricter analysis.
-      # - name: Analyze project source
-      #  run: dart analyze
-      
-      - name: Bump version and create a release on GitHub
-        uses: anothrNick/github-tag-action@1.34.0
-        with:
-          github_token: ${{ secrets.GH_TOKEN }}
-          default_bump: patch # This will bump the patch version by default. Change if needed.
-          release: true # This will create a release on GitHub using the new tag
+      - name: Publish dry-run
+        run: dart pub publish --dry-run
+
+      - name: Bump version in pubspec.yaml
+        id: bump
+        run: |
+          NEW_VER=$(dart run tool/bump_version.dart "${{ github.event.inputs.bump }}")
+          echo "new_version=$NEW_VER" >> $GITHUB_OUTPUT
+
+      - name: Ensure version changed
+        run: |
+          CURRENT=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          if [ "v$CURRENT" != "v${{ steps.bump.outputs.new_version }}" ]; then
+            echo "Version in pubspec.yaml is $CURRENT but bump script reported ${{ steps.bump.outputs.new_version }}"
+            exit 1
+          fi
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }}"
+
+      - name: Create tag
+        run: |
+          git tag v${{ steps.bump.outputs.new_version }}
+
+      - name: Push changes and tag
+        run: |
+          git push origin HEAD:master
+          git push origin v${{ steps.bump.outputs.new_version }}

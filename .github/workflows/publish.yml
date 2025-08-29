@@ -1,0 +1,17 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      # Must align with the tag-pattern configured on pub.dev, e.g., 'v{{version}}'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish:
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+  # If you enable an environment requirement on pub.dev, add:
+  # with:
+  #   environment: pub.dev
+  #   working-directory: .
