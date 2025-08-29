@@ -4,7 +4,7 @@ on:
   push:
     tags:
       # Must align with the tag-pattern configured on pub.dev, e.g., 'v{{version}}'
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   publish:

@@ -8,7 +8,8 @@ import 'dart:io';
 void main(List<String> args) {
   if (args.isEmpty) {
     stderr.writeln(
-        'Usage: dart run tool/bump_version.dart [patch|minor|major|<explicit-version>]');
+      'Usage: dart run tool/bump_version.dart [patch|minor|major|<explicit-version>]',
+    );
     exit(64); // usage error
   }
 

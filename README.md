@@ -178,23 +178,26 @@ This project is [MIT](https://github.com/ArunPrakashG/wordpress_client/blob/mast
 
 </div>
 
-[tracker]: https://github.com/ArunPrakashG/wordpress_client/issues
-
 ## 🔁 Automated Releases & Publishing
 
 This repository includes GitHub Actions to automate releasing and publishing to pub.dev.
 
 Setup required on pub.dev:
+
 - Go to your package Admin page on pub.dev and enable “Publishing from GitHub Actions”.
 - Set repository: `ArunPrakashG/wordpress_client`.
 - Set tag pattern: `v{{version}}`.
 - Optionally require a GitHub environment (e.g., `pub.dev`) for extra protection.
 
 Workflows:
+
 - `Release (bump and tag)` (manual): Bumps version in `pubspec.yaml`, commits, tags `vX.Y.Z`, and pushes.
   - Trigger from GitHub Actions using “Run workflow”. Input `bump` as `patch`/`minor`/`major` or explicit version like `8.5.5`.
 - `Publish to pub.dev` (auto): Runs on tag push matching `v[0-9]+.[0-9]+.[0-9]+` and publishes using OIDC with the official reusable workflow.
 
 Security tips:
+
 - Use tag protection rules to restrict who can push tags matching `v*`.
 - If you required an environment on pub.dev, set the same in the `publish.yml` job under `with: environment: pub.dev`.
+
+[tracker]: https://github.com/ArunPrakashG/wordpress_client/issues
