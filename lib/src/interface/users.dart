@@ -1,41 +1,30 @@
 import '../../wordpress_client.dart';
 
-/// Represents the user interface for managing WordPress users.
+/// Users (wp/v2/users)
 ///
-/// This class provides methods for creating, deleting, retrieving, updating,
-/// and listing users in a WordPress site.
+/// CRUD operations for WordPress users via the REST API.
 ///
-/// Example usage:
+/// Reference: https://developer.wordpress.org/rest-api/reference/users/
+///
+/// Example:
 ///
 /// ```dart
-/// final wordpress = WordpressClient(baseUrl: 'https://your-site.com');
-/// final usersInterface = wordpress.users;
-///
-/// // Create a new user
-/// final newUser = await usersInterface.create(CreateUserRequest(
+/// final wp = WordpressClient(baseUrl: 'https://example.com/wp-json');
+/// final me = await wp.users.retrieve(RetrieveUserRequest(id: 1));
+/// final created = await wp.users.create(CreateUserRequest(
 ///   username: 'newuser',
 ///   email: 'newuser@example.com',
-///   password: 'securepassword',
+///   password: 'strong-password',
+///   rolesList: ['author'], // optional
 /// ));
 ///
-/// // Retrieve a user
-/// final user = await usersInterface.retrieve(RetrieveUserRequest(id: 1));
-///
-/// // Update a user
-/// final updatedUser = await usersInterface.update(UpdateUserRequest(
-///   id: 1,
-///   firstName: 'John',
-///   lastName: 'Doe',
+/// final listed = await wp.users.list(ListUserRequest(
+///   rolesList: ['author','editor'],
+///   orderBy: OrderBy.name,
 /// ));
 ///
-/// // Delete a user
-/// await usersInterface.delete(DeleteUserRequest(id: 1));
-///
-/// // List users
-/// final users = await usersInterface.list(ListUserRequest(
-///   page: 1,
-///   perPage: 10,
-/// ));
+/// await wp.users.update(UpdateUserRequest(id: created.id, firstName: 'Jane'));
+/// await wp.users.delete(DeleteUserRequest(id: created.id, reassign: 1, force: true));
 /// ```
 final class UsersInterface extends IRequestInterface
     with

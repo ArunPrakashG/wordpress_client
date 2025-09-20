@@ -44,6 +44,9 @@ final class Media implements ISelfRespresentive {
     this.mediaDetails,
     this.post,
     this.sourceUrl,
+    this.permalinkTemplate,
+    this.generatedSlug,
+    this.missingImageSizes,
   });
 
   /// Creates a [Media] instance from a JSON map.
@@ -68,6 +71,8 @@ final class Media implements ISelfRespresentive {
         json['title'],
         transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
       ),
+      permalinkTemplate: castOrElse(json['permalink_template']),
+      generatedSlug: castOrElse(json['generated_slug']),
       author: castOrElse(json['author']),
       commentStatus: getStatusFromValue(json['comment_status'] as String?),
       pingStatus: getStatusFromValue(json['ping_status'] as String?),
@@ -92,6 +97,10 @@ final class Media implements ISelfRespresentive {
       ),
       post: castOrElse(json['post']),
       sourceUrl: castOrElse(json['source_url']),
+      missingImageSizes: mapIterableWithChecks<String>(
+        json['missing_image_sizes'],
+        (dynamic v) => v as String,
+      ),
       self: json,
     );
   }
@@ -125,6 +134,12 @@ final class Media implements ISelfRespresentive {
 
   /// URL to the media item.
   final String? link;
+
+  /// Permalink template for the media (context: edit).
+  final String? permalinkTemplate;
+
+  /// Slug automatically generated from the title (context: edit).
+  final String? generatedSlug;
 
   /// The title of the media item.
   final Content? title;
@@ -168,6 +183,9 @@ final class Media implements ISelfRespresentive {
   /// The source URL of the media item.
   final String? sourceUrl;
 
+  /// List of missing image sizes (context: edit).
+  final List<String>? missingImageSizes;
+
   /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
@@ -185,6 +203,8 @@ final class Media implements ISelfRespresentive {
       'status': status?.name,
       'type': type,
       'link': link,
+      'permalink_template': permalinkTemplate,
+      'generated_slug': generatedSlug,
       'title': title?.toJson(),
       'author': author,
       'comment_status': commentStatus?.name,
@@ -199,6 +219,7 @@ final class Media implements ISelfRespresentive {
       'media_details': mediaDetails?.toJson(),
       'post': post,
       'source_url': sourceUrl,
+      'missing_image_sizes': missingImageSizes,
     };
   }
 
@@ -209,6 +230,7 @@ final class Media implements ISelfRespresentive {
     }
 
     final mapEquals = const DeepCollectionEquality().equals;
+    final collectionEquals = const DeepCollectionEquality().equals;
 
     return other.id == id &&
         other.date == date &&
@@ -220,6 +242,8 @@ final class Media implements ISelfRespresentive {
         other.status == status &&
         other.type == type &&
         other.link == link &&
+        other.permalinkTemplate == permalinkTemplate &&
+        other.generatedSlug == generatedSlug &&
         other.title == title &&
         other.author == author &&
         other.commentStatus == commentStatus &&
@@ -234,6 +258,7 @@ final class Media implements ISelfRespresentive {
         other.mediaDetails == mediaDetails &&
         other.post == post &&
         other.sourceUrl == sourceUrl &&
+        collectionEquals(other.missingImageSizes, missingImageSizes) &&
         mapEquals(other.self, self);
   }
 
@@ -249,6 +274,8 @@ final class Media implements ISelfRespresentive {
         status.hashCode ^
         type.hashCode ^
         link.hashCode ^
+        permalinkTemplate.hashCode ^
+        generatedSlug.hashCode ^
         title.hashCode ^
         author.hashCode ^
         commentStatus.hashCode ^
@@ -263,6 +290,7 @@ final class Media implements ISelfRespresentive {
         mediaDetails.hashCode ^
         post.hashCode ^
         sourceUrl.hashCode ^
+        missingImageSizes.hashCode ^
         self.hashCode;
   }
 

@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// Retrieve a single Post (GET /wp/v2/posts/<id>).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/posts/#retrieve-a-post
 final class RetrievePostRequest extends IRequest {
   RetrievePostRequest({
     required this.id,

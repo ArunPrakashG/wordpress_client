@@ -1,41 +1,24 @@
 import '../../wordpress_client.dart';
 
-/// Represents the comment interface for interacting with WordPress comments.
+/// Comments (wp/v2/comments)
 ///
-/// This interface provides methods for creating, deleting, retrieving, updating,
-/// and listing comments in a WordPress site.
+/// CRUD operations for WordPress comments via the REST API.
 ///
-/// Example usage:
+/// Reference: https://developer.wordpress.org/rest-api/reference/comments/
+///
+/// Example:
 ///
 /// ```dart
-/// final wp = WordpressClient(baseUrl: 'https://your-wordpress-site.com/wp-json');
-/// final commentInterface = wp.comments;
-///
-/// // Create a new comment
-/// final newComment = await commentInterface.create(CreateCommentRequest(
-///   content: 'Great post!',
+/// final wp = WordpressClient(baseUrl: 'https://example.com/wp-json');
+/// final created = await wp.comments.create(CreateCommentRequest(
 ///   post: 123,
-///   author: 'John Doe',
+///   content: 'Great post!',
 ///   authorEmail: 'john@example.com',
 /// ));
 ///
-/// // Retrieve a comment
-/// final comment = await commentInterface.retrieve(RetrieveCommentRequest(id: 456));
-///
-/// // Update a comment
-/// final updatedComment = await commentInterface.update(UpdateCommentRequest(
-///   id: 456,
-///   content: 'Updated comment content',
-/// ));
-///
-/// // Delete a comment
-/// await commentInterface.delete(DeleteCommentRequest(id: 456));
-///
-/// // List comments
-/// final comments = await commentInterface.list(ListCommentRequest(
-///   post: 123,
-///   status: 'approved',
-/// ));
+/// final listed = await wp.comments.list(ListCommentRequest(post: [123]));
+/// await wp.comments.update(UpdateCommentRequest(id: created.id, content: 'Updated'));
+/// await wp.comments.delete(DeleteCommentRequest(id: created.id, force: true));
 /// ```
 final class CommentInterface extends IRequestInterface
     with

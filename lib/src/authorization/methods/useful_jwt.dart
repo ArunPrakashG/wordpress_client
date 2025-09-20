@@ -2,7 +2,9 @@
 
 import 'dart:async';
 
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
@@ -47,12 +49,19 @@ final class UsefulJwtAuth extends IAuthorization {
     required super.userName,
     required super.password,
     super.events,
+    this.device,
   });
+
+  /// Optional device identifier to support refresh token rotation per device
+  /// as recommended by the usefulteam/jwt-auth plugin.
+  final String? device;
 
   String? _encryptedAccessToken;
   DateTime? _lastAuthorizedTime;
   bool _hasValidatedOnce = false;
   Dio? _client;
+  CookieJar? _cookieJar;
+  CookieManager? _cookieManager;
 
   /// Number of days until the token expires.
   static const int DAYS_UNTILS_TOKEN_EXPIRY = 3;
@@ -86,10 +95,48 @@ final class UsefulJwtAuth extends IAuthorization {
       return true;
     }
 
+    if (_client == null) {
+      return false;
+    }
+
     if (!_isAuthExpiried &&
         !_hasValidatedOnce &&
         !isNullOrEmpty(_encryptedAccessToken)) {
       return validate();
+    }
+
+    // Try using refresh_token cookie if present (no credentials)
+    try {
+      if (_cookieJar != null) {
+        final cookies = await _cookieJar!.loadForRequest(baseUrl);
+        final hasRefreshCookie = cookies.any((c) => c.name == 'refresh_token');
+        if (hasRefreshCookie) {
+          final resp = await _client!.post<dynamic>(
+            baseUrl.replace(path: 'wp-json/jwt-auth/v1/token').toString(),
+            data: {
+              if (device != null && device!.isNotEmpty) 'device': device,
+            },
+            options: Options(
+              method: HttpMethod.post.name,
+              contentType: 'application/x-www-form-urlencoded',
+              followRedirects: true,
+              maxRedirects: 10,
+            ),
+          );
+          if (resp.statusCode == 200 &&
+              resp.data != null &&
+              (resp.data['success'] == true)) {
+            _encryptedAccessToken = resp.data?['data']?['token'] as String?;
+            if (_encryptedAccessToken != null) {
+              _lastAuthorizedTime = DateTime.now();
+              _hasValidatedOnce = true;
+              return true;
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Ignore and fallback to credential flow
     }
 
     final response = await _client!.post<dynamic>(
@@ -97,6 +144,7 @@ final class UsefulJwtAuth extends IAuthorization {
       data: {
         'username': userName,
         'password': password,
+        if (device != null && device!.isNotEmpty) 'device': device,
       },
       options: Options(
         method: HttpMethod.post.name,
@@ -154,7 +202,7 @@ final class UsefulJwtAuth extends IAuthorization {
   /// ```
   @override
   Future<bool> validate() async {
-    if (isNullOrEmpty(_encryptedAccessToken)) {
+    if (_client == null || isNullOrEmpty(_encryptedAccessToken)) {
       return false;
     }
 
@@ -205,9 +253,93 @@ final class UsefulJwtAuth extends IAuthorization {
   @override
   void clientFactoryProvider(Dio client) {
     _client = client;
+    // Ensure we have cookie support to capture refresh_token cookies from server
+    if (_cookieJar == null) {
+      _cookieJar = CookieJar();
+      _cookieManager = CookieManager(_cookieJar!);
+      if (!_client!.interceptors.contains(_cookieManager)) {
+        _client!.interceptors.add(_cookieManager!);
+      }
+    }
   }
 
   /// The authentication scheme used. Returns 'Bearer' for UsefulJwtAuth.
   @override
   String get scheme => 'Bearer';
+
+  /// Attempts to refresh the access token using the refresh token cookie.
+  /// Returns true if a new access token was obtained.
+  Future<bool> tryRefresh() async {
+    if (_client == null) {
+      return false;
+    }
+
+    // First, try using token endpoint with refresh cookie sent automatically by cookie manager
+    final resp = await _client!.post<dynamic>(
+      baseUrl.replace(path: 'wp-json/jwt-auth/v1/token').toString(),
+      data: {
+        if (device != null && device!.isNotEmpty) 'device': device,
+      },
+      options: Options(
+        method: HttpMethod.post.name,
+        contentType: 'application/x-www-form-urlencoded',
+        followRedirects: true,
+        maxRedirects: 10,
+      ),
+    );
+
+    if (resp.statusCode == 200 &&
+        resp.data != null &&
+        resp.data['success'] == true) {
+      final token = resp.data?['data']?['token'] as String?;
+      if (!isNullOrEmpty(token)) {
+        _encryptedAccessToken = token;
+        _lastAuthorizedTime = DateTime.now();
+        _hasValidatedOnce = true;
+        return true;
+      }
+    }
+
+    // Fallback to explicit refresh endpoint to rotate refresh token cookie
+    final refreshResp = await _client!.post<dynamic>(
+      baseUrl.replace(path: 'wp-json/jwt-auth/v1/token/refresh').toString(),
+      data: {
+        if (device != null && device!.isNotEmpty) 'device': device,
+      },
+      options: Options(
+        method: HttpMethod.post.name,
+        contentType: 'application/x-www-form-urlencoded',
+        followRedirects: true,
+        maxRedirects: 10,
+      ),
+    );
+
+    // After refresh, try obtaining a new access token again
+    if (refreshResp.statusCode == 200) {
+      final again = await _client!.post<dynamic>(
+        baseUrl.replace(path: 'wp-json/jwt-auth/v1/token').toString(),
+        data: {
+          if (device != null && device!.isNotEmpty) 'device': device,
+        },
+        options: Options(
+          method: HttpMethod.post.name,
+          contentType: 'application/x-www-form-urlencoded',
+        ),
+      );
+
+      if (again.statusCode == 200 &&
+          again.data != null &&
+          again.data['success'] == true) {
+        final token = again.data?['data']?['token'] as String?;
+        if (!isNullOrEmpty(token)) {
+          _encryptedAccessToken = token;
+          _lastAuthorizedTime = DateTime.now();
+          _hasValidatedOnce = true;
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }

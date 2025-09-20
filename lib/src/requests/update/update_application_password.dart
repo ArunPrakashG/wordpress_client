@@ -18,11 +18,16 @@ final class UpdateApplicationPasswordRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// The user ID the application password belongs to.
   int userId;
 
   /// Can be generated using the uuid package available on pub.dev.
   String uuid;
+
+  /// A human-friendly name for the application password.
   String name;
+
+  /// Identifier for the client application.
   String appId;
 
   @override
@@ -41,6 +46,7 @@ final class UpdateApplicationPasswordRequest extends IRequest {
         [
           'users',
           userId.toString(),
+          'application-passwords',
           uuid,
         ],
       ),

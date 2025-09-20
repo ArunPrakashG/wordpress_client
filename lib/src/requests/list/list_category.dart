@@ -48,7 +48,7 @@ final class ListCategoryRequest extends IRequest {
       ..addIfNotNull('search', search)
       ..addIfNotNull('exclude', exclude?.join(','))
       ..addIfNotNull('include', include?.join(','))
-      ..addIfNotNull('order_by', orderBy?.name)
+      ..addIfNotNull('orderby', orderBy?.name)
       ..addIfNotNull('order', order?.name)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('parent', parent)

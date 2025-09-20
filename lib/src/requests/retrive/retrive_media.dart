@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// Retrieve a Media Item (GET /wp/v2/media/<id>).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/media/#retrieve-a-media-item
 final class RetrieveMediaRequest extends IRequest {
   RetrieveMediaRequest({
     required this.id,

@@ -5,6 +5,7 @@ final class CreateTagRequest extends IRequest {
     required this.name,
     required this.slug,
     this.description,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -17,9 +18,17 @@ final class CreateTagRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// HTML description of the term.
   String? description;
+
+  /// HTML title for the term.
   String name;
+
+  /// An alphanumeric identifier for the term unique to its type.
   String slug;
+
+  /// Meta fields as arbitrary key/value pairs.
+  Map<String, dynamic>? meta;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -27,6 +36,7 @@ final class CreateTagRequest extends IRequest {
       ..addIfNotNull('description', description)
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

@@ -14,6 +14,8 @@ final class CreateUserRequest extends IRequest {
     this.nickName,
     this.slug,
     this.roles,
+    this.rolesList,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -26,18 +28,47 @@ final class CreateUserRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// Login name for the user.
   String username;
+
+  /// Display name for the user.
   String? displayName;
+
+  /// First name for the user.
   String? firstName;
+
+  /// Last name for the user.
   String? lastName;
+
+  /// The email address for the user.
   String email;
+
+  /// The user's password.
   String? password;
+
+  /// URL of the user.
   String? url;
+
+  /// Description of the user.
   String? description;
+
+  /// Locale for the user.
   String? locale;
+
+  /// The nickname for the user.
   String? nickName;
+
+  /// An alphanumeric identifier for the user.
   String? slug;
+
+  /// Roles assigned to the user (as CSV or list).
   List<String>? roles;
+
+  /// Alternative to roles: provide array instead of CSV
+  List<String>? rolesList;
+
+  /// Meta fields per Handbook
+  Map<String, dynamic>? meta;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -53,7 +84,8 @@ final class CreateUserRequest extends IRequest {
       ..addIfNotNull('locale', locale)
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('roles', roles?.join(','))
+      ..addIfNotNull('roles', rolesList ?? roles)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

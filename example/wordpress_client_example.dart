@@ -12,6 +12,13 @@ Future<void> main() async {
     baseUrl: baseUrl,
     bootstrapper: (bootstrapper) => bootstrapper
         .withDebugMode(true)
+        // Example: set a default authorization (choose one)
+        // .withDefaultAuthorization(
+        //   AppPasswordAuth(userName: 'user', password: 'app-password'),
+        // )
+        // .withDefaultAuthorization(
+        //   UsefulJwtAuth(userName: 'user', password: 'pass', device: 'my-device-id'),
+        // )
         .withMiddleware(AuthMiddleware())
         .withMiddleware(
           DelegatedMiddleware(

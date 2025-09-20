@@ -7,6 +7,7 @@ final class UpdateCategoryRequest extends IRequest {
     this.name,
     this.slug,
     this.parent,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -19,10 +20,22 @@ final class UpdateCategoryRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// HTML description of the term.
   String? description;
+
+  /// HTML title for the term.
   String? name;
+
+  /// An alphanumeric identifier for the term.
   String? slug;
+
+  /// The parent term ID.
   int? parent;
+
+  /// Meta fields.
+  Map<String, dynamic>? meta;
+
+  /// Unique identifier for the term.
   int id;
 
   @override
@@ -32,6 +45,7 @@ final class UpdateCategoryRequest extends IRequest {
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('parent', parent)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

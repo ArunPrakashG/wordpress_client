@@ -34,6 +34,8 @@ final class User implements ISelfRespresentive {
     this.registeredDate,
     this.username,
     this.nickname,
+    this.locale,
+    this.meta,
   });
 
   /// Creates a [User] instance from a JSON map.
@@ -47,7 +49,8 @@ final class User implements ISelfRespresentive {
       firstName: castOrElse(json['first_name']),
       lastName: castOrElse(json['last_name']),
       email: castOrElse(json['email']),
-      nickname: castOrElse(json['nick_name']),
+      nickname: castOrElse(json['nickname']),
+      locale: castOrElse(json['locale']),
       registeredDate: parseDateIfNotNull(castOrElse(json['registered_date'])),
       capabilities: castOrElse(
         json['capabilities'],
@@ -56,6 +59,7 @@ final class User implements ISelfRespresentive {
           return Map<String, bool>.from(value as Map<String, dynamic>);
         },
       )!,
+      meta: castOrElse(json['meta']),
       extraCapabilities: castOrElse(
         json['extra_capabilities'],
         transformer: (value) => ExtraCapabilities.fromJson(
@@ -98,6 +102,9 @@ final class User implements ISelfRespresentive {
   /// The nickname for the user.
   final String? nickname;
 
+  /// Locale for the user.
+  final String? locale;
+
   /// The email address for the user.
   final String? email;
 
@@ -128,6 +135,9 @@ final class User implements ISelfRespresentive {
   /// Avatar URLs for the user.
   final AvatarUrls? avatarUrls;
 
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
+
   /// The raw data received from the API.
   @override
   final Map<String, dynamic> self;
@@ -143,13 +153,15 @@ final class User implements ISelfRespresentive {
       'username': username,
       'first_name': firstName,
       'last_name': lastName,
-      'nick_name': nickname,
+      'nickname': nickname,
+      'locale': locale,
       'email': email,
       'description': description,
       'link': link,
       'slug': slug,
       'registered_date': registeredDate?.toIso8601String(),
       'capabilities': capabilities,
+      'meta': meta,
       'extra_capabilities': extraCapabilities?.toJson(),
       'roles': roles,
       'avatar_urls': avatarUrls?.toJson(),
@@ -172,7 +184,9 @@ final class User implements ISelfRespresentive {
         other.nickname == nickname &&
         other.email == email &&
         other.registeredDate == registeredDate &&
+        other.locale == locale &&
         collectionEquals(other.capabilities, capabilities) &&
+        collectionEquals(other.meta, meta) &&
         other.extraCapabilities == extraCapabilities &&
         other.url == url &&
         other.description == description &&
@@ -193,7 +207,9 @@ final class User implements ISelfRespresentive {
         nickname.hashCode ^
         email.hashCode ^
         registeredDate.hashCode ^
+        locale.hashCode ^
         capabilities.hashCode ^
+        meta.hashCode ^
         extraCapabilities.hashCode ^
         url.hashCode ^
         description.hashCode ^
@@ -206,6 +222,6 @@ final class User implements ISelfRespresentive {
 
   @override
   String toString() {
-    return 'User(id: $id, username: $username, name: $name, firstName: $firstName, lastName: $lastName, nickname: $nickname, email: $email, registeredDate: $registeredDate, capabilities: $capabilities, extraCapabilities: $extraCapabilities, url: $url, description: $description, link: $link, slug: $slug, roles: $roles, avatarUrls: $avatarUrls, self: $self)';
+    return 'User(id: $id, username: $username, name: $name, firstName: $firstName, lastName: $lastName, nickname: $nickname, locale: $locale, email: $email, registeredDate: $registeredDate, capabilities: $capabilities, meta: $meta, extraCapabilities: $extraCapabilities, url: $url, description: $description, link: $link, slug: $slug, roles: $roles, avatarUrls: $avatarUrls, self: $self)';
   }
 }
