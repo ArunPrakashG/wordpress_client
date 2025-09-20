@@ -53,4 +53,29 @@ Future<void> main() async {
       print(response.error);
     },
   );
+
+  // --- Composite ID examples ---
+  // Block Types use a composite identifier: (namespace, name)
+  final blockTypeResp =
+      await client.blockTypes.extensions.getById(('core', 'paragraph'));
+  blockTypeResp.map(
+    onSuccess: (s) => print('Block type: ${s.data.name}'),
+    onFailure: (f) => print('Failed to get block type: ${f.error}'),
+  );
+
+  // Template Revisions use (parentId, revisionId) as a composite key
+  final templateRevResp =
+      await client.templateRevisions.extensions.getById((123, 456));
+  templateRevResp.map(
+    onSuccess: (s) => print('Template revision id: ${s.data.id}'),
+    onFailure: (f) => print('Failed to get template revision: ${f.error}'),
+  );
+
+  // Template Part Revisions also use (parentId, revisionId)
+  final tpartRevResp =
+      await client.templatePartRevisions.extensions.getById((789, 55));
+  tpartRevResp.map(
+    onSuccess: (s) => print('Template part revision id: ${s.data.id}'),
+    onFailure: (f) => print('Failed to get template part revision: ${f.error}'),
+  );
 }

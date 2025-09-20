@@ -61,12 +61,13 @@ import 'package:wordpress_client/wordpress_client.dart';
 
 ### **2. Initialization**
 
-You can initialize `WordpressClient` in two methods:
+You can initialize `WordpressClient` in multiple ways:
 
-- Default (Simple Method)
+- Simple base REST URL
+- From a site root URL
 - Advanced (with Bootstrapper for additional configurations)
 
-**Simple Method:**
+**Simple Method (REST base):**
 
 ```dart
 final baseUrl = Uri.parse('https://example.com/wp-json/wp/v2');
@@ -74,6 +75,30 @@ final client = WordpressClient(baseUrl: baseUrl);
 ```
 
 > 📘 Learn more about the [Advanced Method here](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage#-advanced-method).
+
+**From site root URL:**
+
+```dart
+final client = WordpressClient.forSite(
+  siteUrl: Uri.parse('https://example.com'), // we derive /wp-json/wp/v2
+);
+```
+
+**Picking an auth quickly:**
+
+```dart
+final client = WordpressClient.forSite(
+  siteUrl: Uri.parse('https://example.com'),
+  bootstrapper: (b) => b
+    .withDefaultAuthorization(
+      // Built-in helpers
+      WordpressAuth.appPassword(user: 'user', appPassword: 'xxxx-xxxx'),
+      // or: WordpressAuth.usefulJwt(user: 'user', password: 'pass', device: 'device-id')
+      // or: WordpressAuth.basicJwt(user: 'user', password: 'pass')
+    )
+    .build(),
+);
+```
 
 ### Enable caching via middleware (optional)
 
@@ -141,6 +166,80 @@ final result = response.map(
 // you can cast to a state directly; this will throw an error if the response is of the wrong type
 final result = response.asSuccess(); // or response.asFailure();
 ```
+
+Or use the convenience extensions:
+
+```dart
+// Retrieve by id via the extensions holder
+final one = await client.posts.extensions.getById(123);
+
+// You can still handle responses ergonomically
+final posts = (await client.posts.list(ListPostRequest(perPage: 20))).map(
+  onSuccess: (s) => s.data,
+  onFailure: (f) => <Post>[],
+);
+
+// Or throw on failure when you expect success
+final justPosts = (await client.posts.list(ListPostRequest(perPage: 20))).dataOrThrow();
+```
+
+### Convenience extensions
+
+To keep the core API minimal, optional per-interface helpers are exposed under an `extensions` getter. These are thin wrappers around the typed request classes (e.g., `RetrievePostRequest`) and are safe to mix with explicit requests when you need full control.
+
+Quick examples:
+
+```dart
+// Integer IDs
+final post     = await client.posts.extensions.getById(123);
+final page     = await client.pages.extensions.getById(45);
+final media    = await client.media.extensions.getById(12);
+final user     = await client.users.extensions.getById(7);
+final comment  = await client.comments.extensions.getById(256);
+final menu     = await client.menus.extensions.getById(10);
+final menuItem = await client.menuItems.extensions.getById(25);
+final nav      = await client.navigations.extensions.getById(3);
+
+// String IDs
+final postType   = await client.types.extensions.getById('post');
+final taxonomy   = await client.taxonomies.extensions.getById('category');
+final status     = await client.statuses.extensions.getById('publish');
+final theme      = await client.themes.extensions.getById('twentytwentythree');
+final widgetType = await client.widgetTypes.extensions.getById('search');
+final sidebar    = await client.sidebars.extensions.getById('sidebar-1');
+final widget     = await client.widgets.extensions.getById('text-2');
+final menuLoc    = await client.menuLocations.extensions.getById('primary');
+final template   = await client.templates.extensions.getById('index');
+final tpart      = await client.templateParts.extensions.getById('header');
+final gstyles    = await client.globalStyles.extensions.getById('wp-global-styles-stylesheet');
+
+// Composite record IDs (Dart records)
+final blockType = await client.blockTypes.extensions.getById(('core', 'paragraph'));
+final postRev   = await client.postRevisions.extensions.getById((/* postId */ 123, /* revisionId */ 456));
+final pageRev   = await client.pageRevisions.extensions.getById((45, 789));
+final tRev      = await client.templateRevisions.extensions.getById(('index', '123')); // (parentId, revisionId)
+final tpRev     = await client.templatePartRevisions.extensions.getById(('header', '55'));
+
+// Settings singleton (special case)
+final settings = await client.settings.extensions.get();
+```
+
+Finders and pagination helpers (where supported):
+
+```dart
+// Find by slug: returns the first match or null; throws if the list request fails
+final helloWorld = await client.posts.extensions.findBySlug('hello-world');
+final aboutPage  = await client.pages.extensions.findBySlug('about');
+final tagBySlug  = await client.tags.extensions.findBySlug('news');
+final catBySlug  = await client.categories.extensions.findBySlug('updates');
+final userBySlug = await client.users.extensions.findBySlug('admin');
+
+// Auto-paginate to retrieve all items (be mindful of large sites)
+final allPosts = await client.posts.extensions.listAll(perPage: 100);
+final allMedia = await client.media.extensions.listAll(perPage: 100);
+```
+
+Currently available for: Posts, Pages, Media, Users, Categories, Tags, Comments, Blocks, Block Types, Templates, Template Parts, Template Revisions, Template Part Revisions, Navigations, Navigation Revisions, Navigation Autosaves, Menus, Menu Items, Menu Locations, Widgets, Sidebars, Widget Types, Post Types, Taxonomies, Post Statuses, Themes, Global Styles, Post Revisions, Page Revisions, and Settings.
 
 Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage) for more request examples.
 
@@ -210,6 +309,20 @@ Read = list and/or retrieve; some endpoints are custom actions and are marked un
 ## 📢 Custom Response Types
 
 Learn how to implement [Custom Requests here](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests).
+
+If you just need a one-off call, you can also send a raw request through the client:
+
+```dart
+final raw = await client.raw(
+  WordpressRequest(
+    method: HttpMethod.get,
+    url: RequestUrl.relative('posts'),
+    queryParameters: {'per_page': 1},
+  ),
+);
+print(raw.code);
+print(raw.data);
+```
 
 ### ✨ Quick examples for new endpoints
 

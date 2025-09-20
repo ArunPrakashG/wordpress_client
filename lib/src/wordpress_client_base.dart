@@ -120,6 +120,45 @@ final class WordpressClient implements IDisposable {
     );
   }
 
+  /// Creates a [WordpressClient] by deriving the REST base from a site root URL.
+  ///
+  /// This is a convenience for when you only know the site URL (e.g. https://example.com)
+  /// and don't want to construct the REST path manually. The resulting base URL will be
+  /// `siteUrl + /wp-json/wp/v2` (respecting any subdirectory path on the site URL).
+  ///
+  /// Example:
+  /// ```dart
+  /// final client = WordpressClient.forSite(
+  ///   siteUrl: Uri.parse('https://example.com'),
+  /// );
+  /// ```
+  factory WordpressClient.forSite({
+    required Uri siteUrl,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    if (!siteUrl.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Site URLs should always be an absolute URL.',
+        'siteUrl',
+      );
+    }
+
+    // Build the REST base as: <siteUrl>/<existing-path...>/wp-json/wp/v2
+    final restBase = siteUrl.replace(
+      pathSegments: [
+        ...siteUrl.pathSegments,
+        'wp-json',
+        'wp',
+        'v2',
+      ],
+    );
+
+    return WordpressClient(
+      baseUrl: restBase,
+      bootstrapper: bootstrapper,
+    );
+  }
+
   /// Creates a [WordpressClient] instance without a base URL.
   ///
   /// This constructor is useful when you don't know the base URL at initialization time.
@@ -358,6 +397,14 @@ final class WordpressClient implements IDisposable {
   /// Interface for Site Navigations.
   NavigationsInterface get navigations =>
       get<NavigationsInterface>('navigations');
+
+  /// Interfaces for Editor Blocks and Block Types.
+  BlocksInterface get blocks => get<BlocksInterface>('blocks');
+  BlockTypesInterface get blockTypes => get<BlockTypesInterface>('block-types');
+  BlockRendererInterface get blockRenderer =>
+      get<BlockRendererInterface>('block-renderer');
+  BlockDirectoryInterface get blockDirectory =>
+      get<BlockDirectoryInterface>('block-directory');
 
   /// Interfaces for navigation revisions and autosaves.
   NavigationRevisionsInterface get navigationRevisions =>
@@ -1089,6 +1136,14 @@ final class WordpressClient implements IDisposable {
         return client.discovery;
       },
     );
+  }
+
+  /// Execute a raw [WordpressRequest] and get a [WordpressRawResponse].
+  ///
+  /// This is useful for custom endpoints or quick one-offs where you don't
+  /// want to model a full request class/interface.
+  Future<WordpressRawResponse> raw(WordpressRequest request) async {
+    return _requester.raw(request);
   }
 
   /// Clears the stored discovery cache
