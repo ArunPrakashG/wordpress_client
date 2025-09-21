@@ -1,3 +1,11 @@
+## 9.0.0
+
+- Feature: Parallel requests toggle. Added `failOnError` (default: false) to `ParallelWordpress.list(...)` to opt into strict behavior. When `false`, non-success pages are merged as empty results instead of throwing; when `true`, the first non-success response throws a `ParallelProcessingException`.
+- Fix: Discovery parsing hardening. `WordpressDiscovery.fromJson` now tolerates mixed JSON types (for example, `gmt_offset` as string or number, `site_icon`/`site_logo` as string or int) and provides safe defaults to avoid type errors on fresh sites.
+- Fix: Basic JWT auth compatibility. Updated the classic JWT plugin flow to parse the top‑level `token` field correctly during authorization.
+- Quality: Broader integration coverage and local test harness. Added Docker-based local WordPress stack and grouped integration tests (posts CRUD, settings, blocks, metadata, comments, revisions, template parts, users, search). Tests are tolerant of unauthenticated environments and are skipped/no-op when no local config is present.
+- Internal: Minor refactors and stability improvements across parallel pagination and legacy tests.
+
 ## 8.6.0
 
 - Add Global Styles support (interface + retrieve/update requests + response model)
