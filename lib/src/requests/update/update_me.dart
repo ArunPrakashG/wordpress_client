@@ -14,6 +14,7 @@ final class UpdateMeRequest extends IRequest {
     this.nickName,
     this.slug,
     this.roles,
+    this.rolesNames,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -26,18 +27,32 @@ final class UpdateMeRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// Login name for the user.
   String? username;
+  /// Display name for the user.
   String? displayName;
+  /// First name for the user.
   String? firstName;
+  /// Last name for the user.
   String? lastName;
+  /// The email address for the user.
   String? email;
+  /// The user's password.
   String? password;
+  /// URL of the user.
   String? url;
+  /// Description of the user.
   String? description;
+  /// Locale for the user.
   String? locale;
+  /// The nickname for the user.
   String? nickName;
+  /// An alphanumeric identifier for the user.
   String? slug;
+  /// Legacy list of role IDs (discouraged). Prefer rolesNames.
   List<int>? roles;
+  /// Role slugs to assign to the current user.
+  List<String>? rolesNames;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -53,7 +68,8 @@ final class UpdateMeRequest extends IRequest {
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('password', password)
-      ..addIfNotNull('roles', roles?.join(','))
+      // Prefer role names array per REST docs; fallback to legacy comma string if provided.
+      ..addIfNotNull('roles', rolesNames ?? roles?.join(','))
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

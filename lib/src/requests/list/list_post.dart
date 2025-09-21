@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// List Posts (GET /wp/v2/posts).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/posts/#list-posts
 final class ListPostRequest extends IRequest {
   ListPostRequest({
     this.context,
@@ -7,7 +10,9 @@ final class ListPostRequest extends IRequest {
     this.perPage = 10,
     this.search,
     this.after,
+    this.modifiedAfter,
     this.before,
+    this.modifiedBefore,
     this.exclude,
     this.include,
     this.orderBy,
@@ -23,6 +28,7 @@ final class ListPostRequest extends IRequest {
     this.sticky,
     this.slug,
     this.status,
+    this.searchColumns,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -40,7 +46,13 @@ final class ListPostRequest extends IRequest {
   int perPage = 10;
   String? search;
   DateTime? after;
+
+  /// Limit response to posts modified after a given ISO8601 compliant date.
+  DateTime? modifiedAfter;
   DateTime? before;
+
+  /// Limit response to posts modified before a given ISO8601 compliant date.
+  DateTime? modifiedBefore;
   List<int>? exclude;
   List<int>? include;
   OrderBy? orderBy;
@@ -57,6 +69,9 @@ final class ListPostRequest extends IRequest {
   List<String>? slug;
   List<ContentStatus>? status;
 
+  /// Array of column names to be searched.
+  List<String>? searchColumns;
+
   @override
   WordpressRequest build(Uri baseUrl) {
     final queryParameters = <String, dynamic>{}
@@ -65,7 +80,9 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('per_page', perPage)
       ..addIfNotNull('search', search)
       ..addIfNotNull('after', after?.toIso8601String())
+      ..addIfNotNull('modified_after', modifiedAfter?.toIso8601String())
       ..addIfNotNull('before', before?.toIso8601String())
+      ..addIfNotNull('modified_before', modifiedBefore?.toIso8601String())
       ..addIfNotNull('exclude', exclude?.join(','))
       ..addIfNotNull('include', include?.join(','))
       ..addIfNotNull('orderby', orderBy?.name)
@@ -81,6 +98,7 @@ final class ListPostRequest extends IRequest {
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status?.map((e) => e.name).join(','))
+      ..addIfNotNull('search_columns', searchColumns?.join(','))
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 

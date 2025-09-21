@@ -38,7 +38,11 @@ final class Page implements ISelfRespresentive {
     this.link,
     this.title,
     this.content,
+    this.excerpt,
     this.featuredMedia,
+    this.meta,
+    this.permalinkTemplate,
+    this.generatedSlug,
   });
 
   /// Creates a [Page] instance from a JSON map.
@@ -70,11 +74,18 @@ final class Page implements ISelfRespresentive {
         json['content'],
         transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
       ),
+      excerpt: castOrElse(
+        json['excerpt'],
+        transformer: (value) => Content.fromJson(value as Map<String, dynamic>),
+      ),
       author: castOrElse(json['author']),
       featuredMedia: castOrElse(json['featured_media']),
       commentStatus: getStatusFromValue(castOrElse(json['comment_status'])),
       pingStatus: getStatusFromValue(castOrElse(json['ping_status'])),
       template: castOrElse(json['template']),
+      permalinkTemplate: castOrElse(json['permalink_template']),
+      generatedSlug: castOrElse(json['generated_slug']),
+      meta: castOrElse(json['meta']),
       self: json,
     );
   }
@@ -115,6 +126,9 @@ final class Page implements ISelfRespresentive {
   /// The content of the page.
   final Content? content;
 
+  /// The excerpt of the page.
+  final Content? excerpt;
+
   /// The ID of the user who published the page.
   final int author;
 
@@ -130,11 +144,20 @@ final class Page implements ISelfRespresentive {
   /// The theme file to use to display the page.
   final String template;
 
+  /// Permalink template for the page (context: edit).
+  final String? permalinkTemplate;
+
+  /// Slug automatically generated from the page title (context: edit).
+  final String? generatedSlug;
+
   /// The ID of the parent page.
   final int parent;
 
   /// The order of the page in relation to other pages.
   final int menuOrder;
+
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
 
   /// The raw data of the page as received from the API.
   @override
@@ -193,31 +216,34 @@ final class Page implements ISelfRespresentive {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,
-      'date': date?.millisecondsSinceEpoch,
-      'dateGmt': dateGmt?.millisecondsSinceEpoch,
+      'date': date?.toIso8601String(),
+      'date_gmt': dateGmt?.toIso8601String(),
       'guid': guid?.toJson(),
-      'modified': modified?.millisecondsSinceEpoch,
-      'modifiedGmt': modifiedGmt?.millisecondsSinceEpoch,
+      'modified': modified?.toIso8601String(),
+      'modified_gmt': modifiedGmt?.toIso8601String(),
       'slug': slug,
       'status': status.name,
       'type': type,
       'link': link,
       'title': title?.toJson(),
       'content': content?.toJson(),
+      'excerpt': excerpt?.toJson(),
       'author': author,
-      'featuredMedia': featuredMedia,
-      'commentStatus': commentStatus.name,
-      'pingStatus': pingStatus.name,
+      'featured_media': featuredMedia,
+      'comment_status': commentStatus.name,
+      'ping_status': pingStatus.name,
       'template': template,
+      'permalink_template': permalinkTemplate,
+      'generated_slug': generatedSlug,
       'parent': parent,
-      'menuOrder': menuOrder,
-      'self': self,
+      'menu_order': menuOrder,
+      'meta': meta,
     };
   }
 
   @override
   String toString() {
-    return 'Page(id: $id, date: $date, dateGmt: $dateGmt, guid: $guid, modified: $modified, modifiedGmt: $modifiedGmt, slug: $slug, status: $status, type: $type, link: $link, title: $title, content: $content, author: $author, featuredMedia: $featuredMedia, commentStatus: $commentStatus, pingStatus: $pingStatus, template: $template, parent: $parent, menuOrder: $menuOrder, meta: $meta, links: $links, self: $self)';
+    return 'Page(id: $id, date: $date, dateGmt: $dateGmt, guid: $guid, modified: $modified, modifiedGmt: $modifiedGmt, slug: $slug, status: $status, type: $type, link: $link, title: $title, content: $content, excerpt: $excerpt, author: $author, featuredMedia: $featuredMedia, commentStatus: $commentStatus, pingStatus: $pingStatus, template: $template, permalinkTemplate: $permalinkTemplate, generatedSlug: $generatedSlug, parent: $parent, menuOrder: $menuOrder, meta: $meta, self: $self)';
   }
 
   @override
@@ -237,13 +263,17 @@ final class Page implements ISelfRespresentive {
         other.link == link &&
         other.title == title &&
         other.content == content &&
+        other.excerpt == excerpt &&
         other.author == author &&
         other.featuredMedia == featuredMedia &&
         other.commentStatus == commentStatus &&
         other.pingStatus == pingStatus &&
         other.template == template &&
+        other.permalinkTemplate == permalinkTemplate &&
+        other.generatedSlug == generatedSlug &&
         other.parent == parent &&
         other.menuOrder == menuOrder &&
+        mapEquals(other.meta, meta) &&
         mapEquals(other.self, self);
   }
 
@@ -261,13 +291,17 @@ final class Page implements ISelfRespresentive {
         link.hashCode ^
         title.hashCode ^
         content.hashCode ^
+        excerpt.hashCode ^
         author.hashCode ^
         featuredMedia.hashCode ^
         commentStatus.hashCode ^
         pingStatus.hashCode ^
         template.hashCode ^
+        permalinkTemplate.hashCode ^
+        generatedSlug.hashCode ^
         parent.hashCode ^
         menuOrder.hashCode ^
+        meta.hashCode ^
         self.hashCode;
   }
 }

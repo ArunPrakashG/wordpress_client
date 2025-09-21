@@ -1,3 +1,11 @@
+## 8.6.0
+
+- Add Global Styles support (interface + retrieve/update requests + response model)
+- Themes: add is_block_theme, screenshot, theme_supports fields
+- Me endpoint: send DELETE force/reassign via query; add rolesNames (role names array) with legacy roles fallback
+- Templates & Template Parts: audit and confirm alignment with REST docs
+- Navigation/Menus/Widgets: audit and minor compliance fix (widgets DELETE force as query param)
+
 ## 8.5.4
 
 - Added support for creating media from bytes

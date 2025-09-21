@@ -21,15 +21,15 @@ final class DeleteMeRequest extends IRequest {
 
   @override
   WordpressRequest build(Uri baseUrl) {
-    final body = <String, dynamic>{}
+    final query = <String, dynamic>{}
       ..addIfNotNull('force', force)
       ..addIfNotNull('reassign', reassign)
+      ..addAllIfNotNull(queryParameters)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(
-      body: body,
       headers: headers,
-      queryParameters: queryParameters,
+      queryParameters: query,
       method: HttpMethod.delete,
       url: RequestUrl.relativeParts(const ['users', 'me']),
       requireAuth: requireAuth,

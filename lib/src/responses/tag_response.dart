@@ -24,6 +24,7 @@ final class Tag implements ISelfRespresentive {
     required this.self,
     this.description,
     this.name,
+    this.meta,
   });
 
   /// Creates a [Tag] instance from a JSON map.
@@ -39,6 +40,7 @@ final class Tag implements ISelfRespresentive {
       name: castOrElse(json['name']),
       slug: castOrElse(json['slug']),
       taxonomy: castOrElse(json['taxonomy']),
+      meta: castOrElse(json['meta']),
       self: json,
     );
   }
@@ -64,6 +66,9 @@ final class Tag implements ISelfRespresentive {
   /// Type of taxonomy. Always "post_tag" for tags.
   final String taxonomy;
 
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
+
   /// The raw JSON response from the API.
   @override
   final Map<String, dynamic> self;
@@ -78,6 +83,7 @@ final class Tag implements ISelfRespresentive {
       'name': name,
       'slug': slug,
       'taxonomy': taxonomy,
+      'meta': meta,
     };
   }
 
@@ -96,6 +102,7 @@ final class Tag implements ISelfRespresentive {
         other.name == name &&
         other.slug == slug &&
         other.taxonomy == taxonomy &&
+        mapEquals(other.meta, meta) &&
         mapEquals(other.self, self);
   }
 
@@ -108,11 +115,12 @@ final class Tag implements ISelfRespresentive {
         name.hashCode ^
         slug.hashCode ^
         taxonomy.hashCode ^
+        meta.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Tag(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, self: $self)';
+    return 'Tag(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, meta: $meta, self: $self)';
   }
 }

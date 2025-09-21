@@ -35,21 +35,59 @@ final class WordpressDiscovery implements ISelfRespresentive {
   /// received from the WordPress REST API's root endpoint.
   factory WordpressDiscovery.fromJson(Map<String, dynamic> map) {
     return WordpressDiscovery(
-      siteIconUrl: castOrElse(map['site_icon_url']),
-      siteIcon: castOrElse(map['site_icon']),
-      siteLogo: castOrElse(map['site_logo']),
-      name: castOrElse(map['name']),
-      description: castOrElse(map['description']),
-      url: castOrElse(map['url']),
-      home: castOrElse(map['home']),
-      gmtOffset: castOrElse(map['gmt_offset']),
-      timezoneString: castOrElse(map['timezone_string']),
+      siteIconUrl: castOrElse<String>(
+        map['site_icon_url'],
+        orElse: () => '',
+      )!,
+      siteIcon: castOrElse<int>(
+        map['site_icon'],
+        transformer: (v) {
+          if (v is int) return v;
+          if (v is String) return int.tryParse(v);
+          return null;
+        },
+        orElse: () => 0,
+      )!,
+      siteLogo: castOrElse<int>(
+        map['site_logo'],
+        transformer: (v) {
+          if (v is int) return v;
+          if (v is String) return int.tryParse(v);
+          return null;
+        },
+        orElse: () => 0,
+      )!,
+      name: castOrElse<String>(map['name'], orElse: () => '')!,
+      description: castOrElse<String>(map['description'], orElse: () => '')!,
+      url: castOrElse<String>(map['url'], orElse: () => '')!,
+      home: castOrElse<String>(map['home'], orElse: () => '')!,
+      gmtOffset: castOrElse<double>(
+        map['gmt_offset'],
+        transformer: (v) {
+          if (v is num) return v.toDouble();
+          if (v is String) return double.tryParse(v);
+          return null;
+        },
+        orElse: () => 0.0,
+      )!,
+      timezoneString:
+          castOrElse<String>(map['timezone_string'], orElse: () => '')!,
       namespaces: mapIterableWithChecks(
         map['namespaces'],
         (dynamic json) => json as String,
       ),
-      authentication: map['authentication'],
-      routes: map['routes'],
+      authentication: castOrElse<Map<String, dynamic>>(
+            map['authentication'],
+            transformer: (v) => v as Map<String, dynamic>?,
+            orElse: () => <String, dynamic>{},
+          ) ??
+          <String, dynamic>{},
+      routes: castOrElse<Map<String, dynamic>>(
+            map['routes'],
+            transformer: (v) => v as Map<String, dynamic>?,
+            orElse: () => <String, dynamic>{},
+          ) ??
+          <String, dynamic>{},
       self: map,
     );
   }

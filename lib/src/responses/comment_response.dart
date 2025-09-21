@@ -34,6 +34,7 @@ final class Comment implements ISelfRespresentive {
     this.dateGmt,
     this.content,
     this.authorAvatarUrls,
+    this.meta,
   });
 
   /// Creates a [Comment] instance from a JSON map.
@@ -65,6 +66,7 @@ final class Comment implements ISelfRespresentive {
           return AvatarUrls.fromJson(value as Map<String, dynamic>);
         },
       ),
+      meta: castOrElse(json['meta']),
       self: json,
     );
   }
@@ -117,6 +119,9 @@ final class Comment implements ISelfRespresentive {
   /// Avatar URLs for the comment author.
   final AvatarUrls? authorAvatarUrls;
 
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
+
   /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
@@ -140,6 +145,7 @@ final class Comment implements ISelfRespresentive {
       'status': status.name,
       'type': type,
       'author_avatar_urls': authorAvatarUrls?.toJson(),
+      'meta': meta,
     };
   }
 
@@ -167,6 +173,7 @@ final class Comment implements ISelfRespresentive {
         other.status == status &&
         other.type == type &&
         mapEquals(other.authorAvatarUrls, authorAvatarUrls) &&
+        mapEquals(other.meta, meta) &&
         mapEquals(other.self, self);
   }
 
@@ -188,11 +195,12 @@ final class Comment implements ISelfRespresentive {
         status.hashCode ^
         type.hashCode ^
         authorAvatarUrls.hashCode ^
+        meta.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Comment(id: $id, post: $post, parent: $parent, author: $author, authorName: $authorName, authorEmail: $authorEmail, authorUrl: $authorUrl, authorIp: $authorIp, authorUserAgent: $authorUserAgent, date: $date, dateGmt: $dateGmt, content: $content, link: $link, status: $status, type: $type, authorAvatarUrls: $authorAvatarUrls, self: $self)';
+    return 'Comment(id: $id, post: $post, parent: $parent, author: $author, authorName: $authorName, authorEmail: $authorEmail, authorUrl: $authorUrl, authorIp: $authorIp, authorUserAgent: $authorUserAgent, date: $date, dateGmt: $dateGmt, content: $content, link: $link, status: $status, type: $type, authorAvatarUrls: $authorAvatarUrls, meta: $meta, self: $self)';
   }
 }

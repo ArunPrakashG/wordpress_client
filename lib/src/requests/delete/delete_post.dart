@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// Delete a Post (DELETE /wp/v2/posts/<id>).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/posts/#delete-a-post
 final class DeletePostRequest extends IRequest {
   DeletePostRequest({
     required this.id,
@@ -17,6 +20,8 @@ final class DeletePostRequest extends IRequest {
   });
 
   int id;
+
+  /// Whether to bypass Trash and force deletion.
   bool? force;
 
   @override

@@ -188,6 +188,20 @@ final class InternalRequester extends IRequestExecutor {
 
     _triggerStatistics(requestUrl);
 
+    // Attach request metadata to request.headers for middleware consumption
+    final qpEntries = (request.queryParameters ?? const <String, dynamic>{})
+        .entries
+        .where((e) => e.value != null)
+        .toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final qpStr = qpEntries.map((e) => '${e.key}=${e.value}').join('&');
+    // Attach meta headers onto the actual request headers map used for the network call
+    requestHeaders['method'] = request.method.name;
+    requestHeaders['request-url'] = requestUrl;
+    requestHeaders['request-query'] = qpStr;
+    // Ensure the request object that middlewares see also contains these
+    request = request.copyWith(headers: requestHeaders);
+
     // Trigger the onExecute middleware event and returns the result.
     // If the result is not null, we return the result.
     // This is used if the user already has some sort of custom cache implementation.
@@ -259,21 +273,66 @@ final class InternalRequester extends IRequestExecutor {
       }
     }
 
-    final response = await run<dynamic>();
+    Future<WordpressRawResponse> buildRaw(Response<dynamic> response) async {
+      final statusCode =
+          response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
+      request.events?.onResponse?.call(response.data);
 
-    final statusCode =
-        response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
-    request.events?.onResponse?.call(response.data);
+      final raw = WordpressRawResponse(
+        data: response.data,
+        code: statusCode,
+        headers: response.headers.getHeaderMap(),
+        duration: watch.elapsed,
+        requestHeaders: response.requestOptions.headers,
+        extra: response.extra,
+        message: response.statusMessage,
+      );
 
-    return WordpressRawResponse(
-      data: response.data,
-      code: statusCode,
-      headers: response.headers.getHeaderMap(),
-      duration: watch.elapsed,
-      requestHeaders: response.requestOptions.headers,
-      extra: response.extra,
-      message: response.statusMessage,
-    );
+      return raw;
+    }
+
+    var response = await run<dynamic>();
+
+    // If unauthorized and auth is required, attempt a single re-auth and retry
+    if (response.statusCode == 401 && request.requireAuth) {
+      // Determine the authorizer again (request-specific or default)
+      final authorizer = () {
+        if (request.authorization != null &&
+            !request.authorization!.isDefault) {
+          return request.authorization;
+        }
+        return _defaultAuthorization;
+      }();
+
+      if (authorizer != null) {
+        // If UsefulJwtAuth is used, try refresh first by calling authorize without credentials (it uses cookies)
+        // Otherwise, try normal authorize flow
+        await authorizer.initialize(baseUrl: baseUrl);
+        authorizer.clientFactoryProvider(_createAuthDioClient());
+
+        // Try: validate -> authorize (which may refresh) -> set header and retry
+        final refreshed = await guardAsync(
+          function: () async {
+            if (await authorizer.validate()) {
+              return true;
+            }
+            return authorizer.authorize();
+          },
+          onError: (e, s) async => false,
+        );
+
+        if (refreshed) {
+          final authUrl = await authorizer.generateAuthUrl();
+          if (authUrl != null) {
+            requestHeaders[authorizer.headerKey] = authUrl;
+            // retry once
+            response = await run<dynamic>();
+          }
+        }
+      }
+    }
+
+    return buildRaw(response);
   }
 
   Future<WordpressRawResponse?> _executeMiddlewareEvent({

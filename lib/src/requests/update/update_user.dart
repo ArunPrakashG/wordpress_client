@@ -2,9 +2,9 @@ import '../../../wordpress_client.dart';
 
 final class UpdateUserRequest extends IRequest {
   UpdateUserRequest({
-    required this.username,
-    required this.email,
     required this.id,
+    this.username,
+    this.email,
     this.name,
     this.firstName,
     this.lastName,
@@ -15,6 +15,8 @@ final class UpdateUserRequest extends IRequest {
     this.nickName,
     this.slug,
     this.roles,
+    this.rolesList,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -27,18 +29,49 @@ final class UpdateUserRequest extends IRequest {
     super.queryParameters,
   });
 
-  String username;
+  /// Login name for the user.
+  String? username;
+
+  /// Display name for the user.
   String? name;
+
+  /// First name for the user.
   String? firstName;
+
+  /// Last name for the user.
   String? lastName;
-  String email;
+
+  /// The email address for the user.
+  String? email;
+
+  /// The user's password.
   String? password;
+
+  /// URL of the user.
   String? url;
+
+  /// Description of the user.
   String? description;
+
+  /// Locale for the user.
   String? locale;
+
+  /// The nickname for the user.
   String? nickName;
+
+  /// An alphanumeric identifier for the user.
   String? slug;
+
+  /// Roles assigned to the user (CSV string).
   List<String>? roles;
+
+  /// Alternative to roles: provide array instead of CSV
+  List<String>? rolesList;
+
+  /// Meta fields per Handbook
+  Map<String, dynamic>? meta;
+
+  /// Unique identifier for the user.
   int id;
 
   @override
@@ -55,7 +88,8 @@ final class UpdateUserRequest extends IRequest {
       ..addIfNotNull('nickname', nickName)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('password', password)
-      ..addIfNotNull('roles', roles?.join(','))
+      ..addIfNotNull('roles', rolesList ?? roles)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

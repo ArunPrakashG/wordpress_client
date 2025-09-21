@@ -2,12 +2,8 @@
 
 import 'package:dio/dio.dart';
 
-import 'authorization/authorization_base.dart';
-import 'authorization/authorization_builder.dart';
-import 'client_configuration.dart';
 import 'constants.dart';
-import 'middleware/wordpress_middleware_base.dart';
-import 'utilities/typedefs.dart';
+import 'library_exports.dart';
 
 /// A builder class for creating a [BootstrapConfiguration] with a fluent API.
 ///
@@ -44,6 +40,7 @@ class BootstrapBuilder {
   List<Interceptor>? _interceptors;
   bool _debugMode = false;
   List<IWordpressMiddleware>? _middlewares;
+  ICacheManager<WordpressRawResponse>? _cacheManager;
 
   /// Enables or disables debug mode.
   ///
@@ -129,6 +126,29 @@ class BootstrapBuilder {
   /// Sets the maximum number of redirects to follow.
   BootstrapBuilder withMaxRedirects(int maxRedirects) {
     _defaultMaxRedirects = maxRedirects;
+    return this;
+  }
+
+  /// Convenience helper to add cache middleware directly without toggling flags.
+  BootstrapBuilder withCache({
+    ICacheManager<WordpressRawResponse>? cache,
+    Duration ttl = const Duration(minutes: 1),
+    bool clearOnWrite = true,
+  }) {
+    _middlewares ??= [];
+    final manager =
+        cache ?? _cacheManager ?? MemoryCacheStore<WordpressRawResponse>();
+    _cacheManager = manager;
+    final hasCacheMw = _middlewares!.any((m) => m.name == 'CacheMiddleware');
+    if (!hasCacheMw) {
+      _middlewares!.add(
+        CacheMiddleware(
+          cache: manager,
+          ttl: ttl,
+          clearOnWrite: clearOnWrite,
+        ),
+      );
+    }
     return this;
   }
 

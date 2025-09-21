@@ -1,0 +1,53 @@
+services:
+  mariadb:
+    image: bitnami/mariadb:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_wordpress
+      - MARIADB_PASSWORD=bitnami
+      - MARIADB_DATABASE=bitnami_wordpress
+    volumes:
+      - mariadb_data:/bitnami/mariadb
+    healthcheck:
+      # Use a direct mysqladmin TCP ping with SSL disabled to avoid TLS self-signed errors in newer MariaDB
+      test: ["CMD-SHELL", "/opt/bitnami/mariadb/bin/mysqladmin ping -h 127.0.0.1 -P 3306 --protocol=tcp --silent --connect-timeout=5 --ssl=0 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: bitnami/wordpress:latest
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    environment:
+      - WORDPRESS_DATABASE_HOST=mariadb
+      - WORDPRESS_DATABASE_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_NAME=bitnami_wordpress
+      - WORDPRESS_DATABASE_USER=bn_wordpress
+      - WORDPRESS_DATABASE_PASSWORD=bitnami
+      - ALLOW_EMPTY_PASSWORD=yes
+      - WORDPRESS_USERNAME=${WP_USERNAME:-admin}
+      - WORDPRESS_PASSWORD=${WP_PASSWORD:-password}
+      - WORDPRESS_EMAIL=${WP_EMAIL:-admin@example.com}
+      - WORDPRESS_BLOG_NAME=${WP_BLOG_NAME:-wordpress-client-tests}
+      # Install helpful plugins for testing classic and site-editor endpoints (Gutenberg + Useful Team JWT)
+      - WORDPRESS_PLUGINS=${WP_PLUGINS:-gutenberg,jwt-authentication-for-wp-rest-api}
+      # Append extra wp-config for development
+      - WORDPRESS_EXTRA_WP_CONFIG_CONTENT=define('WP_DEBUG', true); define('WP_ENVIRONMENT_TYPE', 'development'); define('JWT_AUTH_SECRET_KEY', 'dev-secret-please-change'); define('JWT_AUTH_CORS_ENABLE', true);
+    volumes:
+      - wordpress_data:/bitnami/wordpress
+    healthcheck:
+      # Avoid relying on curl/wget (not present in this image). Use bash's /dev/tcp to confirm HTTP port is open.
+      # This checks only TCP connectivity; the repo's wp-up.ps1 additionally verifies /wp-json returns 200 from the host.
+      test: ["CMD-SHELL", "bash -lc '</dev/tcp/127.0.0.1/8080' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  mariadb_data:
+  wordpress_data:

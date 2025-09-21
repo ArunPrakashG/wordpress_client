@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// Delete a Media Item (DELETE /wp/v2/media/<id>).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/media/#delete-a-media-item
 final class DeleteMediaRequest extends IRequest {
   DeleteMediaRequest({
     required this.id,

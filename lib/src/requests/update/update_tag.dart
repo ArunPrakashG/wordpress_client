@@ -6,6 +6,7 @@ final class UpdateTagRequest extends IRequest {
     this.description,
     this.name,
     this.slug,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -18,9 +19,19 @@ final class UpdateTagRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// HTML description of the term.
   String? description;
+
+  /// HTML title for the term.
   String? name;
+
+  /// An alphanumeric identifier for the term.
   String? slug;
+
+  /// Meta fields.
+  Map<String, dynamic>? meta;
+
+  /// Unique identifier for the term.
   int id;
 
   @override
@@ -29,6 +40,7 @@ final class UpdateTagRequest extends IRequest {
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('name', name)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

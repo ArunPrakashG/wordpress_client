@@ -31,6 +31,7 @@ class Category implements ISelfRespresentive {
     required this.parent,
     required this.self,
     this.name,
+    this.meta,
   });
 
   /// Creates a [Category] instance from a JSON map.
@@ -46,6 +47,7 @@ class Category implements ISelfRespresentive {
       slug: castOrElse(json['slug']),
       taxonomy: castOrElse(json['taxonomy']),
       parent: castOrElse(json['parent']),
+      meta: castOrElse(json['meta']),
       self: json as Map<String, dynamic>,
     );
   }
@@ -74,6 +76,9 @@ class Category implements ISelfRespresentive {
   /// The parent category ID, if any.
   final int? parent;
 
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
+
   /// The raw JSON representation of this object.
   @override
   final Map<String, dynamic> self;
@@ -89,6 +94,7 @@ class Category implements ISelfRespresentive {
       'slug': slug,
       'taxonomy': taxonomy,
       'parent': parent,
+      'meta': meta,
     };
   }
 
@@ -108,6 +114,7 @@ class Category implements ISelfRespresentive {
         other.slug == slug &&
         other.taxonomy == taxonomy &&
         other.parent == parent &&
+        mapEquals(other.meta, meta) &&
         mapEquals(other.self, self);
   }
 
@@ -121,11 +128,12 @@ class Category implements ISelfRespresentive {
         slug.hashCode ^
         taxonomy.hashCode ^
         parent.hashCode ^
+        meta.hashCode ^
         self.hashCode;
   }
 
   @override
   String toString() {
-    return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, self: $self)';
+    return 'Category(id: $id, count: $count, description: $description, link: $link, name: $name, slug: $slug, taxonomy: $taxonomy, parent: $parent, meta: $meta, self: $self)';
   }
 }

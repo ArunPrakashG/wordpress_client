@@ -8,14 +8,22 @@ import 'package:path/path.dart';
 import 'bootstrap_builder.dart';
 import 'constants.dart';
 import 'interface/application_passwords.dart';
+import 'interface/blocks.dart';
 import 'interface/category.dart';
 import 'interface/comments.dart';
 import 'interface/me.dart';
 import 'interface/media.dart';
 import 'interface/page.dart';
 import 'interface/posts.dart';
+import 'interface/revisions.dart';
 import 'interface/search.dart';
+import 'interface/settings.dart';
+import 'interface/statuses.dart';
 import 'interface/tags.dart';
+import 'interface/taxonomies.dart';
+import 'interface/templates.dart';
+import 'interface/themes.dart';
+import 'interface/types.dart';
 import 'interface/users.dart';
 import 'interface_key.dart';
 import 'library_exports.dart';
@@ -109,6 +117,45 @@ final class WordpressClient implements IDisposable {
       typeMap,
       interfaces,
       middlewares,
+    );
+  }
+
+  /// Creates a [WordpressClient] by deriving the REST base from a site root URL.
+  ///
+  /// This is a convenience for when you only know the site URL (e.g. https://example.com)
+  /// and don't want to construct the REST path manually. The resulting base URL will be
+  /// `siteUrl + /wp-json/wp/v2` (respecting any subdirectory path on the site URL).
+  ///
+  /// Example:
+  /// ```dart
+  /// final client = WordpressClient.forSite(
+  ///   siteUrl: Uri.parse('https://example.com'),
+  /// );
+  /// ```
+  factory WordpressClient.forSite({
+    required Uri siteUrl,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    if (!siteUrl.isAbsolute) {
+      throw ArgumentError(
+        'The provided url is relative. Site URLs should always be an absolute URL.',
+        'siteUrl',
+      );
+    }
+
+    // Build the REST base as: <siteUrl>/<existing-path...>/wp-json/wp/v2
+    final restBase = siteUrl.replace(
+      pathSegments: [
+        ...siteUrl.pathSegments,
+        'wp-json',
+        'wp',
+        'v2',
+      ],
+    );
+
+    return WordpressClient(
+      baseUrl: restBase,
+      bootstrapper: bootstrapper,
     );
   }
 
@@ -334,6 +381,49 @@ final class WordpressClient implements IDisposable {
   /// ```
   PagesInterface get pages => get<PagesInterface>('pages');
 
+  /// Interface for operations on site editor templates.
+  TemplatesInterface get templates => get<TemplatesInterface>('templates');
+
+  /// Interface for operations on site editor template parts.
+  TemplatePartsInterface get templateParts =>
+      get<TemplatePartsInterface>('template-parts');
+
+  /// Interfaces for site editor template revisions.
+  TemplateRevisionsInterface get templateRevisions =>
+      get<TemplateRevisionsInterface>('template-revisions');
+  TemplatePartRevisionsInterface get templatePartRevisions =>
+      get<TemplatePartRevisionsInterface>('template-part-revisions');
+
+  /// Interface for Site Navigations.
+  NavigationsInterface get navigations =>
+      get<NavigationsInterface>('navigations');
+
+  /// Interfaces for Editor Blocks and Block Types.
+  BlocksInterface get blocks => get<BlocksInterface>('blocks');
+  BlockTypesInterface get blockTypes => get<BlockTypesInterface>('block-types');
+  BlockRendererInterface get blockRenderer =>
+      get<BlockRendererInterface>('block-renderer');
+  BlockDirectoryInterface get blockDirectory =>
+      get<BlockDirectoryInterface>('block-directory');
+
+  /// Interfaces for navigation revisions and autosaves.
+  NavigationRevisionsInterface get navigationRevisions =>
+      get<NavigationRevisionsInterface>('navigation-revisions');
+  NavigationAutosavesInterface get navigationAutosaves =>
+      get<NavigationAutosavesInterface>('navigation-autosaves');
+
+  /// Interfaces for Classic Menus (menus, menu-items, menu-locations)
+  MenusInterface get menus => get<MenusInterface>('menus');
+  MenuItemsInterface get menuItems => get<MenuItemsInterface>('menu-items');
+  MenuLocationsInterface get menuLocations =>
+      get<MenuLocationsInterface>('menu-locations');
+
+  /// Interfaces for Widgets, Sidebars and Widget Types
+  WidgetsInterface get widgets => get<WidgetsInterface>('widgets');
+  SidebarsInterface get sidebars => get<SidebarsInterface>('sidebars');
+  WidgetTypesInterface get widgetTypes =>
+      get<WidgetTypesInterface>('widget-types');
+
   /// Interface for operations on categories.
   ///
   /// Available operations:
@@ -437,6 +527,31 @@ final class WordpressClient implements IDisposable {
   /// }
   /// ```
   SearchInterface get search => get<SearchInterface>('search');
+
+  /// Interface for post types.
+  TypesInterface get types => get<TypesInterface>('types');
+
+  /// Interface for post statuses.
+  StatusesInterface get statuses => get<StatusesInterface>('statuses');
+
+  /// Interface for taxonomies.
+  TaxonomiesInterface get taxonomies => get<TaxonomiesInterface>('taxonomies');
+
+  /// Interface for site settings.
+  SettingsInterface get settings => get<SettingsInterface>('settings');
+
+  /// Interface for themes.
+  ThemesInterface get themes => get<ThemesInterface>('themes');
+
+  /// Interface for global styles.
+  GlobalStylesInterface get globalStyles =>
+      get<GlobalStylesInterface>('global-styles');
+
+  /// Interfaces for revisions.
+  PostRevisionsInterface get postRevisions =>
+      get<PostRevisionsInterface>('post-revisions');
+  PageRevisionsInterface get pageRevisions =>
+      get<PageRevisionsInterface>('page-revisions');
 
   /// Interface for operations on application passwords.
   ///
@@ -567,6 +682,91 @@ final class WordpressClient implements IDisposable {
       encoder: (dynamic search) => (search as Search).toJson(),
     );
 
+    // Blocks suite
+    register<BlocksInterface, Block>(
+      interface: BlocksInterface(),
+      key: 'blocks',
+      decoder: (json) => Block.fromJson(json),
+      encoder: (dynamic b) => (b as Block).toJson(),
+    );
+
+    register<BlockTypesInterface, BlockType>(
+      interface: BlockTypesInterface(),
+      key: 'block-types',
+      decoder: (json) => BlockType.fromJson(json),
+      encoder: (dynamic bt) => (bt as BlockType).self,
+    );
+
+    register<BlockRendererInterface, RenderedBlock>(
+      interface: BlockRendererInterface(),
+      key: 'block-renderer',
+      decoder: (json) => RenderedBlock.fromJson(json),
+      encoder: (dynamic r) => (r as RenderedBlock).self,
+    );
+
+    register<BlockDirectoryInterface, BlockDirectoryItem>(
+      interface: BlockDirectoryInterface(),
+      key: 'block-directory',
+      decoder: (json) => BlockDirectoryItem.fromJson(json),
+      encoder: (dynamic i) => (i as BlockDirectoryItem).self,
+    );
+
+    register<TypesInterface, PostType>(
+      interface: TypesInterface(),
+      key: 'types',
+      decoder: (json) => PostType.fromJson(json),
+      encoder: (dynamic t) => (t as PostType).toJson(),
+    );
+
+    register<StatusesInterface, PostStatus>(
+      interface: StatusesInterface(),
+      key: 'statuses',
+      decoder: (json) => PostStatus.fromJson(json),
+      encoder: (dynamic s) => (s as PostStatus).toJson(),
+    );
+
+    register<TaxonomiesInterface, Taxonomy>(
+      interface: TaxonomiesInterface(),
+      key: 'taxonomies',
+      decoder: (json) => Taxonomy.fromJson(json),
+      encoder: (dynamic t) => (t as Taxonomy).toJson(),
+    );
+
+    register<SettingsInterface, Settings>(
+      interface: SettingsInterface(),
+      key: 'settings',
+      decoder: (json) => Settings.fromJson(json),
+      encoder: (dynamic s) => (s as Settings).toJson(),
+    );
+
+    register<ThemesInterface, Theme>(
+      interface: ThemesInterface(),
+      key: 'themes',
+      decoder: (json) => Theme.fromJson(json),
+      encoder: (dynamic t) => (t as Theme).toJson(),
+    );
+
+    register<GlobalStylesInterface, GlobalStyles>(
+      interface: GlobalStylesInterface(),
+      key: 'global-styles',
+      decoder: (json) => GlobalStyles.fromJson(json),
+      encoder: (dynamic g) => (g as GlobalStyles).toJson(),
+    );
+
+    register<PostRevisionsInterface, Revision>(
+      interface: PostRevisionsInterface(),
+      key: 'post-revisions',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
+    register<PageRevisionsInterface, Revision>(
+      interface: PageRevisionsInterface(),
+      key: 'page-revisions',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
     register<PagesInterface, Page>(
       interface: PagesInterface(),
       key: 'pages',
@@ -580,6 +780,101 @@ final class WordpressClient implements IDisposable {
       decoder: (json) => ApplicationPassword.fromJson(json),
       encoder: (dynamic appPassword) =>
           (appPassword as ApplicationPassword).toJson(),
+    );
+
+    // Templates suite
+    register<TemplatesInterface, Template>(
+      interface: TemplatesInterface(),
+      key: 'templates',
+      decoder: (json) => Template.fromJson(json),
+      encoder: (dynamic t) => (t as Template).toJson(),
+    );
+
+    register<TemplatePartsInterface, TemplatePart>(
+      interface: TemplatePartsInterface(),
+      key: 'template-parts',
+      decoder: (json) => TemplatePart.fromJson(json),
+      encoder: (dynamic t) => (t as TemplatePart).toJson(),
+    );
+
+    register<TemplateRevisionsInterface, Revision>(
+      interface: TemplateRevisionsInterface(),
+      key: 'template-revisions',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
+    register<TemplatePartRevisionsInterface, Revision>(
+      interface: TemplatePartRevisionsInterface(),
+      key: 'template-part-revisions',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
+    // Navigations suite
+    register<NavigationsInterface, Navigation>(
+      interface: NavigationsInterface(),
+      key: 'navigations',
+      decoder: (json) => Navigation.fromJson(json),
+      encoder: (dynamic n) => (n as Navigation).toJson(),
+    );
+
+    register<NavigationRevisionsInterface, Revision>(
+      interface: NavigationRevisionsInterface(),
+      key: 'navigation-revisions',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
+    register<NavigationAutosavesInterface, Revision>(
+      interface: NavigationAutosavesInterface(),
+      key: 'navigation-autosaves',
+      decoder: (json) => Revision.fromJson(json),
+      encoder: (dynamic r) => (r as Revision).toJson(),
+    );
+
+    // Classic Menus suite
+    register<MenusInterface, NavMenu>(
+      interface: MenusInterface(),
+      key: 'menus',
+      decoder: (json) => NavMenu.fromJson(json),
+      encoder: (dynamic m) => (m as NavMenu).toJson(),
+    );
+
+    register<MenuItemsInterface, NavMenuItem>(
+      interface: MenuItemsInterface(),
+      key: 'menu-items',
+      decoder: (json) => NavMenuItem.fromJson(json),
+      encoder: (dynamic mi) => (mi as NavMenuItem).toJson(),
+    );
+
+    register<MenuLocationsInterface, MenuLocation>(
+      interface: MenuLocationsInterface(),
+      key: 'menu-locations',
+      decoder: (json) => MenuLocation.fromJson(json),
+      encoder: (dynamic ml) => (ml as MenuLocation).toJson(),
+    );
+
+    // Widgets suite
+    register<WidgetsInterface, Widget>(
+      interface: WidgetsInterface(),
+      key: 'widgets',
+      decoder: (json) => Widget.fromJson(json),
+      encoder: (dynamic w) => (w as Widget).toJson(),
+    );
+
+    register<SidebarsInterface, Sidebar>(
+      interface: SidebarsInterface(),
+      key: 'sidebars',
+      decoder: (json) => Sidebar.fromJson(json),
+      encoder: (dynamic s) => (s as Sidebar).toJson(),
+    );
+
+    register<WidgetTypesInterface, WidgetType>(
+      interface: WidgetTypesInterface(),
+      key: 'widget-types',
+      decoder: (json) => WidgetType.fromJson(json),
+      encoder: (dynamic wt) => (wt as WidgetType).toJson(),
     );
   }
 
@@ -841,6 +1136,14 @@ final class WordpressClient implements IDisposable {
         return client.discovery;
       },
     );
+  }
+
+  /// Execute a raw [WordpressRequest] and get a [WordpressRawResponse].
+  ///
+  /// This is useful for custom endpoints or quick one-offs where you don't
+  /// want to model a full request class/interface.
+  Future<WordpressRawResponse> raw(WordpressRequest request) async {
+    return _requester.raw(request);
   }
 
   /// Clears the stored discovery cache

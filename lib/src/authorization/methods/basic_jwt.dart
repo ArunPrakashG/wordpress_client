@@ -112,12 +112,13 @@ final class BasicJwtAuth extends IAuthorization {
 
     events?.onResponse?.call(response.data);
 
-    if (!(response.data['isSuccess'] as bool) ||
-        response.data['token'] == null) {
+    // The classic JWT plugin returns a top-level 'token' when successful.
+    final token = response.data['token'] as String?;
+    if (isNullOrEmpty(token)) {
       return false;
     }
 
-    _encryptedAccessToken = response.data['token'] as String?;
+    _encryptedAccessToken = token;
 
     if (_encryptedAccessToken != null) {
       _lastAuthorizedTime = DateTime.now();

@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// List Media (GET /wp/v2/media).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/media/#list-media
 final class ListMediaRequest extends IRequest {
   ListMediaRequest({
     this.context,
@@ -7,7 +10,9 @@ final class ListMediaRequest extends IRequest {
     this.perPage = 10,
     this.search,
     this.after,
+    this.modifiedAfter,
     this.before,
+    this.modifiedBefore,
     this.exclude,
     this.include,
     this.orderBy,
@@ -21,6 +26,7 @@ final class ListMediaRequest extends IRequest {
     this.mediaType,
     this.mimeType,
     this.status,
+    this.searchColumns,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -38,7 +44,9 @@ final class ListMediaRequest extends IRequest {
   int perPage = 10;
   String? search;
   DateTime? after;
+  DateTime? modifiedAfter;
   DateTime? before;
+  DateTime? modifiedBefore;
   List<int>? exclude;
   List<int>? include;
   OrderBy? orderBy;
@@ -52,6 +60,7 @@ final class ListMediaRequest extends IRequest {
   MediaType? mediaType;
   String? mimeType;
   MediaFilterStatus? status;
+  List<String>? searchColumns;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -61,7 +70,9 @@ final class ListMediaRequest extends IRequest {
       ..addIfNotNull('per_page', perPage)
       ..addIfNotNull('search', search)
       ..addIfNotNull('after', after?.toIso8601String())
+      ..addIfNotNull('modified_after', modifiedAfter?.toIso8601String())
       ..addIfNotNull('before', before?.toIso8601String())
+      ..addIfNotNull('modified_before', modifiedBefore?.toIso8601String())
       ..addIfNotNull('exclude', exclude)
       ..addIfNotNull('include', include)
       ..addIfNotNull('orderby', orderBy?.name)
@@ -75,6 +86,7 @@ final class ListMediaRequest extends IRequest {
       ..addIfNotNull('media_type', mediaType?.name)
       ..addIfNotNull('mime_type', mimeType)
       ..addIfNotNull('status', status?.name)
+      ..addIfNotNull('search_columns', searchColumns?.join(','))
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 

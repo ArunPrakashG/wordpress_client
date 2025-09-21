@@ -1,5 +1,8 @@
 import '../../../wordpress_client.dart';
 
+/// List Pages (GET /wp/v2/pages).
+///
+/// Reference: https://developer.wordpress.org/rest-api/reference/pages/#list-pages
 final class ListPageRequest extends IRequest {
   ListPageRequest({
     this.context,
@@ -17,10 +20,12 @@ final class ListPageRequest extends IRequest {
     this.offset,
     this.order,
     this.orderBy,
+    this.menuOrder,
     this.parent,
     this.parentExclude,
     this.slug,
     this.status,
+    this.searchColumns,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -48,10 +53,12 @@ final class ListPageRequest extends IRequest {
   int? offset;
   Order? order;
   OrderBy? orderBy;
+  int? menuOrder;
   List<int>? parent;
   List<int>? parentExclude;
   List<String>? slug;
   List<ContentStatus>? status;
+  List<String>? searchColumns;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -68,6 +75,7 @@ final class ListPageRequest extends IRequest {
       ..addIfNotNull('include', include?.join(','))
       ..addIfNotNull('orderby', orderBy?.name)
       ..addIfNotNull('order', order?.name)
+      ..addIfNotNull('menu_order', menuOrder)
       ..addIfNotNull('author', author?.join(','))
       ..addIfNotNull('author_exclude', authorExclude?.join(','))
       ..addIfNotNull('offset', offset)
@@ -75,6 +83,7 @@ final class ListPageRequest extends IRequest {
       ..addIfNotNull('parent_exclude', parentExclude?.join(','))
       ..addIfNotNull('slug', slug?.join(','))
       ..addIfNotNull('status', status?.map((e) => e.name).join(','))
+      ..addIfNotNull('search_columns', searchColumns?.join(','))
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 

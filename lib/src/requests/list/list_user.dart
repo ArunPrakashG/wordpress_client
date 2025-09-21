@@ -9,11 +9,16 @@ final class ListUserRequest extends IRequest {
     this.exclude,
     this.include,
     this.resultOffset,
+    this.offset,
     this.order,
     this.orderBy,
     this.slug,
     this.roles,
+    this.rolesList,
+    this.capabilities,
+    this.capabilitiesList,
     this.who,
+    this.hasPublishedPosts,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -32,12 +37,31 @@ final class ListUserRequest extends IRequest {
   String? search;
   List<int>? exclude;
   List<int>? include;
+
+  /// Deprecated: use [offset]. Kept for backward compatibility.
   int? resultOffset;
+
+  /// Offset the result set by a specific number of items.
+  int? offset;
   Order? order;
   OrderBy? orderBy;
-  List<int>? slug;
+
+  /// Limit result set to users with one or more specific slugs.
+  List<String>? slug;
+
+  /// CSV roles (legacy)
   int? roles;
+
+  /// Array roles (preferred)
+  List<String>? rolesList;
+
+  /// CSV/array capabilities
+  String? capabilities;
+  List<String>? capabilitiesList;
   String? who;
+
+  /// Limit result set to users who have published posts.
+  bool? hasPublishedPosts;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -48,12 +72,14 @@ final class ListUserRequest extends IRequest {
       ..addIfNotNull('search', search)
       ..addIfNotNull('exclude', exclude?.join(','))
       ..addIfNotNull('include', include?.join(','))
-      ..addIfNotNull('result_offset', resultOffset)
+      ..addIfNotNull('offset', offset ?? resultOffset)
       ..addIfNotNull('order', order?.name)
-      ..addIfNotNull('order_by', orderBy?.name)
+      ..addIfNotNull('orderby', orderBy?.name)
       ..addIfNotNull('slug', slug?.join(','))
-      ..addIfNotNull('roles', roles)
+      ..addIfNotNull('roles', rolesList ?? roles)
+      ..addIfNotNull('capabilities', capabilitiesList ?? capabilities)
       ..addIfNotNull('who', who)
+      ..addIfNotNull('has_published_posts', hasPublishedPosts)
       ..addAllIfNotNull(extra)
       ..addAllIfNotNull(this.queryParameters);
 

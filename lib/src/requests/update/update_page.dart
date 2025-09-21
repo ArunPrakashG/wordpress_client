@@ -30,21 +30,52 @@ final class UpdatePageRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// Unique identifier for the page.
   int id;
+
+  /// The date the page was published, in the site's timezone.
   DateTime? date;
+
+  /// The date the page was published, as GMT.
   DateTime? dateGmt;
+
+  /// An alphanumeric identifier for the page.
   String slug;
+
+  /// Page status.
   ContentStatus status;
+
+  /// A password to protect access to the content and excerpt.
   String? password;
+
+  /// ID for the parent page.
   int? parent;
+
+  /// The title for the page.
   String title;
+
+  /// The content for the page.
   String content;
+
+  /// The ID for the author of the page.
   int? author;
+
+  /// Excerpt for the page.
   String? excerpt;
+
+  /// The ID of the featured media for the page.
   int? featuredMedia;
+
+  /// Ping status for the page.
   Status pingStatus;
+
+  /// Comment status for the page.
   Status commentStatus;
+
+  /// The order of the page in relation to other pages.
   int? menuOrder;
+
+  /// The theme file to use to display the page.
   String? template;
 
   @override
@@ -53,7 +84,6 @@ final class UpdatePageRequest extends IRequest {
       ..addIfNotNull('title', title)
       ..addIfNotNull('content', content)
       ..addIfNotNull('excerpt', excerpt)
-      ..addIfNotNull('status', status)
       ..addIfNotNull('password', password)
       ..addIfNotNull('author', author)
       ..addIfNotNull('featured_media', featuredMedia)
@@ -61,7 +91,7 @@ final class UpdatePageRequest extends IRequest {
       ..addIfNotNull('ping_status', pingStatus.name)
       ..addIfNotNull('status', status.name)
       ..addIfNotNull('date', date?.toIso8601String())
-      ..addIfNotNull('data_gmt', dateGmt?.toIso8601String())
+      ..addIfNotNull('date_gmt', dateGmt?.toIso8601String())
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('menu_order', menuOrder)
       ..addIfNotNull('slug', slug)

@@ -14,6 +14,7 @@ final class ListCommentRequest extends IRequest {
     this.order,
     this.author,
     this.authorExclude,
+    this.authorEmail,
     this.offset,
     this.parent,
     this.parentExclude,
@@ -45,6 +46,7 @@ final class ListCommentRequest extends IRequest {
   Order? order;
   List<int>? author;
   List<int>? authorExclude;
+  String? authorEmail;
   int? offset;
   List<int>? parent;
   List<int>? parentExclude;
@@ -68,10 +70,11 @@ final class ListCommentRequest extends IRequest {
       ..addIfNotNull('order', order?.name)
       ..addIfNotNull('author', author?.join(','))
       ..addIfNotNull('author_exclude', authorExclude?.join(','))
+      ..addIfNotNull('author_email', authorEmail)
       ..addIfNotNull('offset', offset)
       ..addIfNotNull('parent', parent?.join(','))
       ..addIfNotNull('parent_exclude', parentExclude?.join(','))
-      ..addIfNotNull('post', post)
+      ..addIfNotNull('post', post?.join(','))
       ..addIfNotNull('status', status?.name)
       ..addIfNotNull('type', type)
       ..addIfNotNull('password', password)

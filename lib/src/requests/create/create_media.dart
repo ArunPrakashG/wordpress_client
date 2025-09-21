@@ -9,10 +9,10 @@ import 'package:path/path.dart';
 import '../../../wordpress_client.dart';
 import '../../constants.dart';
 
-/// A request class for creating media in WordPress.
+/// Create a Media Item (POST /wp/v2/media).
 ///
-/// This class provides functionality to create media items in WordPress,
-/// supporting both file-based and byte-based media uploads.
+/// Supports file-based and byte-based uploads and optional fields documented in the Handbook.
+/// Reference: https://developer.wordpress.org/rest-api/reference/media/#create-a-media-item
 final class CreateMediaRequest extends IRequest {
   /// Private constructor for CreateMediaRequest.
   ///
@@ -20,6 +20,9 @@ final class CreateMediaRequest extends IRequest {
   CreateMediaRequest._({
     required this.mediaFile,
     required this.fileName,
+    this.date,
+    this.dateGmt,
+    this.slug,
     this.altText,
     this.caption,
     this.description,
@@ -29,6 +32,8 @@ final class CreateMediaRequest extends IRequest {
     this.authorId,
     this.commentStatus,
     this.pingStatus,
+    this.meta,
+    this.template,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -49,6 +54,9 @@ final class CreateMediaRequest extends IRequest {
   /// Other parameters are optional and correspond to various media attributes and request options.
   factory CreateMediaRequest.fromFile({
     required File file,
+    DateTime? date,
+    DateTime? dateGmt,
+    String? slug,
     String? altText,
     String? caption,
     String? description,
@@ -58,6 +66,8 @@ final class CreateMediaRequest extends IRequest {
     int? authorId,
     Status? commentStatus,
     Status? pingStatus,
+    Map<String, dynamic>? meta,
+    String? template,
     CancelToken? cancelToken,
     IAuthorization? authorization,
     WordpressEvents? events,
@@ -72,6 +82,9 @@ final class CreateMediaRequest extends IRequest {
     return CreateMediaRequest._(
       mediaFile: file,
       fileName: basename(file.path),
+      date: date,
+      dateGmt: dateGmt,
+      slug: slug,
       altText: altText,
       caption: caption,
       description: description,
@@ -81,6 +94,8 @@ final class CreateMediaRequest extends IRequest {
       authorId: authorId,
       commentStatus: commentStatus,
       pingStatus: pingStatus,
+      meta: meta,
+      template: template,
       cancelToken: cancelToken,
       authorization: authorization,
       events: events,
@@ -104,6 +119,9 @@ final class CreateMediaRequest extends IRequest {
   factory CreateMediaRequest.fromBytes({
     required Uint8List bytes,
     required String fileName,
+    DateTime? date,
+    DateTime? dateGmt,
+    String? slug,
     String? altText,
     String? caption,
     String? description,
@@ -113,6 +131,8 @@ final class CreateMediaRequest extends IRequest {
     int? authorId,
     Status? commentStatus,
     Status? pingStatus,
+    Map<String, dynamic>? meta,
+    String? template,
     CancelToken? cancelToken,
     IAuthorization? authorization,
     WordpressEvents? events,
@@ -127,6 +147,9 @@ final class CreateMediaRequest extends IRequest {
     return CreateMediaRequest._(
       mediaFile: bytes,
       fileName: fileName,
+      date: date,
+      dateGmt: dateGmt,
+      slug: slug,
       altText: altText,
       caption: caption,
       description: description,
@@ -136,6 +159,8 @@ final class CreateMediaRequest extends IRequest {
       authorId: authorId,
       commentStatus: commentStatus,
       pingStatus: pingStatus,
+      meta: meta,
+      template: template,
       cancelToken: cancelToken,
       authorization: authorization,
       events: events,
@@ -154,6 +179,15 @@ final class CreateMediaRequest extends IRequest {
 
   /// The name of the file to be uploaded.
   final String fileName;
+
+  /// The date the item was published, in the site's timezone.
+  final DateTime? date;
+
+  /// The date the item was published, as GMT.
+  final DateTime? dateGmt;
+
+  /// An alphanumeric identifier unique to its type.
+  final String? slug;
 
   /// Alternative text for the media.
   final String? altText;
@@ -181,6 +215,12 @@ final class CreateMediaRequest extends IRequest {
 
   /// Ping status for the media.
   final Status? pingStatus;
+
+  /// Meta fields.
+  final Map<String, dynamic>? meta;
+
+  /// The theme file to use to display the attachment.
+  final String? template;
 
   /// Builds the WordPress request for creating media.
   ///
@@ -234,6 +274,9 @@ final class CreateMediaRequest extends IRequest {
     }
 
     final body = <String, dynamic>{}
+      ..addIfNotNull('date', date?.toIso8601String())
+      ..addIfNotNull('date_gmt', dateGmt?.toIso8601String())
+      ..addIfNotNull('slug', slug)
       ..addIfNotNull('alt_text', altText)
       ..addIfNotNull('caption', caption)
       ..addIfNotNull('description', description)
@@ -243,6 +286,8 @@ final class CreateMediaRequest extends IRequest {
       ..addIfNotNull('author_id', authorId)
       ..addIfNotNull('comment_status', commentStatus?.name)
       ..addIfNotNull('ping_status', pingStatus?.name)
+      ..addIfNotNull('meta', meta)
+      ..addIfNotNull('template', template)
       ..addIfNotNull('file', multipartFile)
       ..addAllIfNotNull(extra);
 

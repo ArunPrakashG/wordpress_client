@@ -27,6 +27,7 @@ final class RetriveApplicationPasswordRequest extends IRequest {
         [
           'users',
           userId.toString(),
+          'application-passwords',
           uuid,
         ],
       ),

@@ -28,13 +28,25 @@ final class Search implements ISelfRespresentive {
     required this.subType,
     required this.url,
     required this.self,
+    this.rawId,
     this.title,
   });
 
   /// Creates a [Search] instance from a JSON map.
   factory Search.fromJson(Map<String, dynamic> json) {
+    final dynamic idJson = json['id'];
+    int parsedId;
+    if (idJson is int) {
+      parsedId = idJson;
+    } else if (idJson is String) {
+      parsedId = int.tryParse(idJson) ?? 0;
+    } else {
+      parsedId = 0;
+    }
+
     return Search(
-      id: castOrElse(json['id'])!,
+      id: parsedId,
+      rawId: castOrElse(json['id']),
       title: castOrElse(json['title']),
       type: castOrElse(json['type']),
       subType: castOrElse(json['subtype']),
@@ -45,6 +57,9 @@ final class Search implements ISelfRespresentive {
 
   /// The unique identifier for the object.
   final int id;
+
+  /// The raw ID value as returned by the API (may be string or int).
+  final Object? rawId;
 
   /// The title for the object, if available.
   final String? title;
@@ -65,7 +80,7 @@ final class Search implements ISelfRespresentive {
   /// Converts the [Search] instance to a JSON map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'id': id,
+      'id': rawId ?? id,
       'title': title,
       'type': type,
       'subtype': subType,
@@ -82,6 +97,7 @@ final class Search implements ISelfRespresentive {
     final mapEquals = const DeepCollectionEquality().equals;
 
     return other.id == id &&
+        other.rawId == rawId &&
         other.title == title &&
         other.type == type &&
         other.subType == subType &&
@@ -93,6 +109,7 @@ final class Search implements ISelfRespresentive {
   int get hashCode {
     return id.hashCode ^
         title.hashCode ^
+        rawId.hashCode ^
         type.hashCode ^
         subType.hashCode ^
         url.hashCode ^
@@ -101,6 +118,6 @@ final class Search implements ISelfRespresentive {
 
   @override
   String toString() {
-    return 'Search(id: $id, title: $title, type: $type, subType: $subType, url: $url, self: $self)';
+    return 'Search(id: $id, rawId: $rawId, title: $title, type: $type, subType: $subType, url: $url, self: $self)';
   }
 }

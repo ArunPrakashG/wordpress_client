@@ -208,6 +208,21 @@ enum OrderBy {
 
   /// Order by count
   count,
+
+  /// Order by menu order (used by menu items)
+  menu_order,
+}
+
+/// Order by options for term collections (e.g., nav_menus)
+enum TermOrderBy {
+  id,
+  include,
+  name,
+  slug,
+  include_slugs,
+  term_group,
+  description,
+  count,
 }
 
 /// Represents different contexts for a request.
@@ -235,6 +250,16 @@ enum TaxonomyRelation {
 
   /// OR relation
   or,
+}
+
+/// Relation between multiple taxonomies for Nav Menu Items filtering.
+/// Mirrors the WordPress REST API `tax_relation` query param values.
+enum MenuItemsTaxRelation {
+  /// AND relation
+  AND,
+
+  /// OR relation
+  OR,
 }
 
 /// Represents different statuses for content (e.g., posts).
@@ -322,6 +347,15 @@ enum MediaType {
 
   /// Audio media type
   audio,
+}
+
+/// Represents theme status values used by the Themes REST endpoint filter.
+enum ThemeStatus {
+  /// Theme is installed but not active
+  inactive,
+
+  /// Theme is currently active
+  active,
 }
 
 /// Converts a string value to a [ContentStatus] enum.

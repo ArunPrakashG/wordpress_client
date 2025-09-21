@@ -5,7 +5,8 @@ final class CreateCategoryRequest extends IRequest {
     this.name,
     this.description,
     this.slug,
-    this.parentId,
+    this.parent,
+    this.meta,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -18,10 +19,20 @@ final class CreateCategoryRequest extends IRequest {
     super.queryParameters,
   });
 
+  /// HTML title for the term.
   String? name;
+
+  /// HTML description of the term.
   String? description;
+
+  /// An alphanumeric identifier for the term unique to its type.
   String? slug;
-  int? parentId;
+
+  /// The parent term ID.
+  int? parent;
+
+  /// Meta fields as arbitrary key/value pairs.
+  Map<String, dynamic>? meta;
 
   @override
   WordpressRequest build(Uri baseUrl) {
@@ -29,7 +40,8 @@ final class CreateCategoryRequest extends IRequest {
       ..addIfNotNull('name', name)
       ..addIfNotNull('description', description)
       ..addIfNotNull('slug', slug)
-      ..addIfNotNull('parent_id', parentId)
+      ..addIfNotNull('parent', parent)
+      ..addIfNotNull('meta', meta)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(
