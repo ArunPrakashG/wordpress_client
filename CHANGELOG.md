@@ -32,6 +32,21 @@
 
   - Added GitHub wiki as a submodule under `/wiki` and started populating advanced docs; README updated with a concise Wiki section and links.
 
+- Fluent queries and interface helpers (non‑breaking)
+
+  - Added a discoverable fluent API via a `query` property on each interface:
+    - Example: `client.posts.query.withPage(1).withPerPage(5).withSearch('hello').execute()`
+    - No seed class required. The builder auto‑creates the correct request internally (e.g., `ListPostRequest`).
+    - Advanced: access/modify the underlying seed via `configureSeed((seed) { ... })` or `seedRequest`.
+  - Introduced a dedicated `extensions` property on interfaces to group simple convenience methods:
+    - Example: `client.posts.extensions.getById(123)`, `findBySlug('hello-world')`, `listAll(perPage: 100)`
+  - Base interface remains minimal and focused on CRUD via operation mixins; fluent and helpers are additive.
+  - Note: Some auto‑seeded builders (e.g., revisions/navigation) use placeholder IDs; set them via `configureSeed` before `execute()`.
+
+- New endpoint coverage
+
+  - Pattern Directory Items (`/wp/v2/pattern-directory/patterns`) with fluent support via `client.patternDirectory.query.withSearch('hero').execute()`.
+
 - Local dev and integration testing
 
   - Added Docker Compose stack (WordPress + MariaDB) and PowerShell helper scripts (`.scripts/wp-up.ps1`, `wp-down.ps1`, `wp-reset.ps1`).

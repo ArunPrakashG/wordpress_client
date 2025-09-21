@@ -23,8 +23,8 @@ class TestConfig {
 
     for (final path in candidates) {
       final f = File(path);
-      if (await f.exists()) {
-        final json = jsonDecode(await f.readAsString());
+      if (f.existsSync()) {
+        final json = jsonDecode(f.readAsStringSync());
         final baseUrlStr = (json['base_url'] ?? json['baseUrl']) as String?;
         if (baseUrlStr == null) continue;
 

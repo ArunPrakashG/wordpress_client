@@ -405,6 +405,8 @@ final class WordpressClient implements IDisposable {
       get<BlockRendererInterface>('block-renderer');
   BlockDirectoryInterface get blockDirectory =>
       get<BlockDirectoryInterface>('block-directory');
+  PatternDirectoryInterface get patternDirectory =>
+      get<PatternDirectoryInterface>('pattern-directory');
 
   /// Interfaces for navigation revisions and autosaves.
   NavigationRevisionsInterface get navigationRevisions =>
@@ -709,6 +711,13 @@ final class WordpressClient implements IDisposable {
       key: 'block-directory',
       decoder: (json) => BlockDirectoryItem.fromJson(json),
       encoder: (dynamic i) => (i as BlockDirectoryItem).self,
+    );
+
+    register<PatternDirectoryInterface, PatternDirectoryItem>(
+      interface: PatternDirectoryInterface(),
+      key: 'pattern-directory',
+      decoder: (json) => PatternDirectoryItem.fromJson(json),
+      encoder: (dynamic i) => (i as PatternDirectoryItem).self,
     );
 
     register<TypesInterface, PostType>(

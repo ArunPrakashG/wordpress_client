@@ -49,6 +49,7 @@ export 'list/list_navigation_autosaves.dart';
 export 'list/list_navigation_revisions.dart';
 export 'list/list_page.dart';
 export 'list/list_page_revisions.dart';
+export 'list/list_pattern_directory_items.dart';
 export 'list/list_post.dart';
 export 'list/list_post_revisions.dart';
 export 'list/list_search.dart';

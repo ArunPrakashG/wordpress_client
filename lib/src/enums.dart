@@ -188,6 +188,9 @@ enum OrderBy {
   /// Order by title
   title,
 
+  /// Order by favorite count (Pattern Directory)
+  favorite_count,
+
   /// Order by email
   email,
 

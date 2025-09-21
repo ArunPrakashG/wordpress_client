@@ -27,3 +27,8 @@ final class BlockRendererInterface extends IRequestInterface
 /// Interface for Block Directory Items (/wp/v2/block-directory/search)
 final class BlockDirectoryInterface extends IRequestInterface
     with ListOperation<BlockDirectoryItem, ListBlockDirectoryItemsRequest> {}
+
+/// Interface for Pattern Directory Items (/wp/v2/pattern-directory/patterns)
+final class PatternDirectoryInterface extends IRequestInterface
+    with
+        ListOperation<PatternDirectoryItem, ListPatternDirectoryItemsRequest> {}

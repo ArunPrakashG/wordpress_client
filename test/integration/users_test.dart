@@ -24,8 +24,9 @@ void main() {
 
     test('retrieve me when authorized', () async {
       cfg ??= await TestConfig.tryLoad();
-      if (cfg == null || (cfg!.username == null && cfg!.appPassword == null))
+      if (cfg == null || (cfg!.username == null && cfg!.appPassword == null)) {
         return;
+      }
       final client = await bootstrapClient(cfg!);
       final me = await client.me.retrieve(RetrieveMeRequest());
       if (me.code == 200) {

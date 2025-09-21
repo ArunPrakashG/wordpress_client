@@ -33,37 +33,14 @@
 - 🎣 Events for preprocessing response.
 - 🚀 Execute requests in Parallel (with configurable error handling).
 - 🧠 Optional in‑memory caching for GET requests.
-
-If something you need is missing, please open a discussion: https://github.com/ArunPrakashG/wordpress_client/discussions/55
-
-## 📦 Install
-
-Add `wordpress_client` to your `pubspec.yaml`:
-
-```dart
-dependencies:
-  wordpress_client: ^9.0.0
-```
-
-> 💡 Ensure you get the latest version on pub.dev: https://pub.dev/packages/wordpress_client
-
-Then run `flutter pub get` or `dart pub get`.
-
-## 🔧 Quick start
-
-Import the package:
-
-```dart
-import 'package:wordpress_client/wordpress_client.dart';
-```
-
-Initialize from a site root URL (recommended):
-
-```dart
-final client = WordpressClient.forSite(
+  <!-- Fluent queries moved to Wiki to keep the README light. See Advanced docs links below. -->
+  <!-- Fluent queries moved to Wiki to keep the README light. See Advanced docs links below. -->
+  final client = WordpressClient.forSite(
   siteUrl: Uri.parse('https://example.com'),
-);
-```
+- 🌊 [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries)
+  );
+
+````
 
 Or pass the REST base directly:
 
@@ -71,7 +48,7 @@ Or pass the REST base directly:
 final client = WordpressClient(
   baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
 );
-```
+````
 
 Add an auth quickly (helpers available):
 
@@ -145,6 +122,36 @@ final post = await client.posts.extensions.getById(123);
 final allMedia = await client.media.extensions.listAll(perPage: 100);
 ```
 
+### 🌊 Fluent queries (no seed required)
+
+Build and send list requests fluently without constructing request classes manually. Each interface exposes a `query` property that auto‑seeds the correct list request type:
+
+```dart
+final res = await client.posts.query
+  .withPage(1)
+  .withPerPage(20)
+  .withSearch('welcome')
+  .withOrder(Order.desc)
+  .execute();
+
+// Advanced: mutate the underlying seed
+final res2 = await client.posts.query
+  .configureSeed((seed) {
+    seed.context = RequestContext.view;
+  })
+  .execute();
+
+// Or access it directly if you need to inspect/change fields
+final builder = client.posts.query;
+builder.seedRequest.context = RequestContext.view;
+final res3 = await builder.execute();
+```
+
+Notes:
+
+- Some auto‑seeded builders (e.g., revisions/navigation) default to placeholder IDs. Set them via `configureSeed` (or `seedRequest`) before `execute()`.
+- Fluent helpers like `withPage`, `withPerPage`, `withSearch`, `withOrder`, `withOrderBy`, `withCategories`, `withTags`, and more are available; anything not covered can be set on the seed.
+
 ## 📚 Advanced docs (Wiki)
 
 Deep-dives and more examples live in the Wiki:
@@ -155,6 +162,7 @@ Deep-dives and more examples live in the Wiki:
 - ⚡ [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests)
 - 🧠 [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching)
 - 🔗 [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods)
+- 🧩 [Pattern Directory Items](https://github.com/ArunPrakashG/wordpress_client/wiki/Pattern-Directory-Items)
 - 🧰 [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests)
 - 🧪 [Raw Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Raw-Requests)
 - 🔄 [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares)
