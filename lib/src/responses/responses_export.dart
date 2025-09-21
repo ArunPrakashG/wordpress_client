@@ -11,6 +11,7 @@ export 'nav_menu_item_response.dart';
 export 'nav_menu_response.dart';
 export 'navigation_response.dart';
 export 'page_response.dart';
+export 'pattern_directory_item_response.dart';
 export 'post_response.dart';
 export 'post_status_response.dart';
 export 'post_type_response.dart';

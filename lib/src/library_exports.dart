@@ -4,6 +4,7 @@ export 'cache/cache_exports.dart';
 export 'client_configuration.dart';
 export 'enums.dart';
 export 'exceptions/exceptions_export.dart';
+export 'fluent/fluent_exports.dart';
 export 'interface/blocks_extensions.dart';
 export 'interface/categories_extensions.dart';
 export 'interface/comments_extensions.dart';

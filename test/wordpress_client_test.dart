@@ -1,6 +1,5 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:math';
 
@@ -15,18 +14,18 @@ String getRandString(int len) {
 
 Future<void> main() async {
   // Try to load local test config; if not present, skip this heavy integration suite.
-  final localCfg = await (() async {
+  final localCfg = (() {
     try {
       final f = File('test/test_local.json');
-      if (await f.exists()) return jsonDecode(await f.readAsString());
+      if (f.existsSync()) return jsonDecode(f.readAsStringSync());
     } catch (_) {}
     return null;
   })();
   if (localCfg == null) {
-    print('Skipping legacy integration suite: no test/test_local.json');
+    dev.log('Skipping legacy integration suite: no test/test_local.json');
     return;
   }
-  final jsonFileContents = await File('test/test_settings.json').readAsString();
+  final jsonFileContents = File('test/test_settings.json').readAsStringSync();
   final dynamic json = jsonDecode(jsonFileContents);
 
   final baseUrl =
@@ -42,16 +41,14 @@ Future<void> main() async {
         .withDefaultAuthorizationBuilder(
           (authBuilder) => authBuilder
               .withUserName(
-                  (localCfg['username'] ?? json!['username']) as String,)
+                (localCfg['username'] ?? json!['username']) as String,
+              )
               .withPassword(
-                  (localCfg['password'] ?? json['password']) as String,)
+                (localCfg['password'] ?? json['password']) as String,
+              )
               // Prefer Basic JWT to match local Docker plugin defaults
               .withType(AuthorizationType.basic_jwt)
-              .withEvents(
-                const WordpressEvents(
-                  onError: print,
-                ),
-              )
+              .withEvents(const WordpressEvents())
               .build(),
         )
         .withMiddleware(
@@ -72,12 +69,12 @@ Future<void> main() async {
   group(
     'Post Requests: ',
     () {
-  // Keep modest to avoid invalid page requests on fresh sites
-  const MAX_PAGES = 5;
-  const MAX_PER_PAGE = 10;
+      // Keep modest to avoid invalid page requests on fresh sites
+      const MAX_PAGES = 5;
+      const MAX_PER_PAGE = 10;
 
-      print('Max Pages: $MAX_PAGES');
-      print('Max Per Page: $MAX_PER_PAGE');
+      dev.log('Max Pages: $MAX_PAGES');
+      dev.log('Max Per Page: $MAX_PER_PAGE');
       var parallelMs = 0;
       var sequentialMs = 0;
 
@@ -86,7 +83,7 @@ Future<void> main() async {
         () async {
           final stopwatch = Stopwatch()..start();
 
-          print('Starting Parallel...');
+          dev.log('Starting Parallel...');
           final responses = await client.parallel.list(
             interface: client.posts,
             requestBuilder: () {
@@ -106,7 +103,7 @@ Future<void> main() async {
 
           stopwatch.stop();
           parallelMs = stopwatch.elapsed.inMilliseconds;
-          print('Parallel Time Taken: $parallelMs ms');
+          dev.log('Parallel Time Taken: $parallelMs ms');
 
           // On a fresh site there may be few or no posts; just ensure we received a list (may be empty).
           expect(merged, isA<List<Post>>());
@@ -119,7 +116,7 @@ Future<void> main() async {
           final stopwatch = Stopwatch()..start();
           final responses = <List<Post>>[];
 
-          print('Starting Sequential...');
+          dev.log('Starting Sequential...');
           for (var index = 0; index < MAX_PAGES; index++) {
             final page = index + 1;
             final response = await client.posts.list(
@@ -144,7 +141,7 @@ Future<void> main() async {
 
           stopwatch.stop();
           sequentialMs = stopwatch.elapsed.inMilliseconds;
-          print('Sequential Time Taken: $sequentialMs ms');
+          dev.log('Sequential Time Taken: $sequentialMs ms');
 
           // As above, don't assert exact totals; just verify list shape.
           expect(folded, isA<List<Post>>());
@@ -159,10 +156,12 @@ Future<void> main() async {
         final difference = sequentialMs - parallelMs;
         final percentage = (difference / sequentialMs) * 100;
 
-        print('Difference: $difference ms (${percentage.toStringAsFixed(2)}%)');
+        dev.log(
+          'Difference: $difference ms (${percentage.toStringAsFixed(2)}%)',
+        );
 
-  // Timings can be noisy on small datasets; avoid strict assertion.
-  expect(parallelMs, greaterThanOrEqualTo(0));
+        // Timings can be noisy on small datasets; avoid strict assertion.
+        expect(parallelMs, greaterThanOrEqualTo(0));
       });
     },
   );
@@ -220,10 +219,10 @@ Future<void> main() async {
           ),
         );
 
-        print(
+        dev.log(
           'First Response Time Taken: ${firstResponse.duration.inMilliseconds} ms',
         );
-        print(
+        dev.log(
           'Second Response Time Taken: ${secondResponse.duration.inMilliseconds} ms',
         );
 
