@@ -1,10 +1,46 @@
 ## 9.0.0
 
-- Feature: Parallel requests toggle. Added `failOnError` (default: false) to `ParallelWordpress.list(...)` to opt into strict behavior. When `false`, non-success pages are merged as empty results instead of throwing; when `true`, the first non-success response throws a `ParallelProcessingException`.
-- Fix: Discovery parsing hardening. `WordpressDiscovery.fromJson` now tolerates mixed JSON types (for example, `gmt_offset` as string or number, `site_icon`/`site_logo` as string or int) and provides safe defaults to avoid type errors on fresh sites.
-- Fix: Basic JWT auth compatibility. Updated the classic JWT plugin flow to parse the top‑level `token` field correctly during authorization.
-- Quality: Broader integration coverage and local test harness. Added Docker-based local WordPress stack and grouped integration tests (posts CRUD, settings, blocks, metadata, comments, revisions, template parts, users, search). Tests are tolerant of unauthenticated environments and are skipped/no-op when no local config is present.
-- Internal: Minor refactors and stability improvements across parallel pagination and legacy tests.
+- New response models: Added typed models for multiple WordPress REST resources
+
+  - Settings (`/wp/v2/settings`)
+  - Sidebars (`/wp/v2/sidebars`) including widget handling
+  - Taxonomies (e.g., categories, tags)
+  - Template Parts (`/wp/v2/template-parts`)
+  - Templates (`/wp/v2/templates`)
+  - Themes (`/wp/v2/themes`)
+  - Widgets (`/wp/v2/widgets`)
+  - Widget Types (`/wp/v2/widget-types`)
+
+- Client enhancements: easier initialization and richer ergonomics
+
+  - Added `WordpressClient.forSite` factory to initialize from a site root URL (auto-derives `/wp-json/wp/v2`).
+  - Introduced convenience extensions for most interfaces (Posts, Pages, Media, Users, Categories, Tags, Comments, Blocks, Block Types, Templates, Template Parts, Template Revisions, Template Part Revisions, Navigations, Navigation Revisions, Navigation Autosaves, Menus, Menu Items, Menu Locations, Widgets, Sidebars, Widget Types, Post Types, Taxonomies, Post Statuses, Themes, Global Styles, Post Revisions, Page Revisions, Settings).
+  - Implemented a raw request API on `WordpressClient` for custom endpoint calls.
+  - Added `WordpressAuth` helpers for App Passwords and JWT (Useful/Basic) to simplify setup.
+  - Exported new extensions via library exports; example app updated with composite ID samples.
+
+- Parallel requests behavior: configurable error handling
+
+  - Added `failOnError` (default: false) to `ParallelWordpress.list(...)`. When `false`, non-success pages contribute empty results; when `true`, the first non-success response throws `ParallelProcessingException`.
+
+- Discovery and authorization robustness
+
+  - Hardened `WordpressDiscovery.fromJson` to tolerate mixed JSON types (e.g., numeric or string `gmt_offset`; `site_icon`/`site_logo` as int or string) with safe defaults.
+  - Updated classic Basic JWT flow to parse the top-level `token` correctly during authorization and simplified token validation.
+
+- Docs & Wiki
+
+  - Added GitHub wiki as a submodule under `/wiki` and started populating advanced docs; README updated with a concise Wiki section and links.
+
+- Local dev and integration testing
+
+  - Added Docker Compose stack (WordPress + MariaDB) and PowerShell helper scripts (`.scripts/wp-up.ps1`, `wp-down.ps1`, `wp-reset.ps1`).
+  - Introduced an integration test harness that loads config from `test/test_local.json` (with `test_local.json.example` provided) or environment variables.
+  - Wrote grouped integration tests covering posts CRUD (with faker data), comments, media, settings, blocks, search, revisions, templates, and template parts. Tests are tolerant of unauthenticated environments and no-op when missing local config.
+
+- Misc & housekeeping
+  - Version bumped to 9.0.0 in `README.md` and `pubspec.yaml`.
+  - Minor refactors and stability improvements, including legacy tests and parallel pagination fixes.
 
 ## 8.6.0
 
