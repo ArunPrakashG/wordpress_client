@@ -243,7 +243,22 @@ Currently available for: Posts, Pages, Media, Users, Categories, Tags, Comments,
 
 Refer to the [documentation](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage) for more request examples.
 
-## 🔒 Supported Authorization
+## � Wiki
+
+Explore focused docs in the Wiki:
+
+- 🧭 Getting Started: [Usage](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage)
+- 📩 [Sending Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Sending-Requests)
+- 🛡 [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization)
+- ⚡ [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests)
+- 🧠 [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching)
+- 🔗 [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods)
+- 🧰 [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests)
+- 🧪 [Raw Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Raw-Requests)
+- 🔄 [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares)
+- 📜 [API Changelog](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changelog)
+
+## �🔒 Supported Authorization
 
 ### 1. **AppPasswordAuth** (Recommended)
 
@@ -415,6 +430,40 @@ Contributor checklist for request changes:
 - [ ] Add concise `///` doc comments for all public fields in create/update request classes
 - [ ] Keep changes additive and non-breaking
 - [ ] Run `dart analyze` and the guard script; expect both to be clean
+
+## 🧪 Local Test Environment (optional)
+
+We provide a simple Docker setup to run a local WordPress for integration tests.
+
+What it does:
+
+- Spins up MariaDB + WordPress on localhost:8080
+- Installs Gutenberg and Useful Team JWT Auth plugin by default
+- Sets a dev JWT secret in wp-config for quick start
+
+Quick start on Windows PowerShell:
+
+1. Start the stack
+
+.scripts/wp-up.ps1
+
+2. Copy `test/test_local.json.example` to `test/test_local.json` and adjust credentials if needed.
+
+3. Run tests
+
+dart test
+
+4. Stop or reset
+
+.scripts/wp-down.ps1
+.scripts/wp-reset.ps1 # destroys volumes and recreates
+
+Environment variables supported by tests (optional):
+
+- `WP_BASE_URL` (e.g., http://localhost:8080/wp-json/wp/v2)
+- `WP_USERNAME`, `WP_PASSWORD`, `WP_APP_PASSWORD`
+
+Note: Integration tests no-op when no local config is found, so unit tests won’t fail on CI without WordPress running.
 
 ## 📄 License
 
