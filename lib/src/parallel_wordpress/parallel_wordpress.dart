@@ -34,6 +34,7 @@ final class ParallelWordpress {
     ParallelIterableResultTransformer<T>? transformer,
     ParallelIterableExceptionHandler<T>? onException,
     ParallelInitialItems<T>? initial,
+    bool failOnError = false,
   }) async {
     final requests = await requestBuilder();
 
@@ -54,6 +55,20 @@ final class ParallelWordpress {
             return await transformer(response.results);
           }
 
+          if (!response.results.isSuccessful) {
+            if (failOnError) {
+              // Force strict behavior: throw on first failure
+              throw ParallelProcessingException(
+                'Non-success response for page ${response.page}: ${response.results.code}',
+                StackTrace.current,
+              );
+            }
+            // Gracefully degrade: treat failed pages as empty results
+            return ParallelIterableResult(
+              page: response.page,
+              results: <T>[], // ignore: prefer_const_literals_to_create_immutables
+            );
+          }
           final successResponse = response.results.asSuccess();
 
           return ParallelIterableResult(

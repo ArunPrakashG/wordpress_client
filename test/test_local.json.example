@@ -1,0 +1,6 @@
+{
+  "base_url": "http://localhost:8080/wp-json",
+  "username": "admin",
+  "password": "password",
+  "application_password": null
+}
