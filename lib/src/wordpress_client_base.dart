@@ -549,6 +549,21 @@ final class WordpressClient implements IDisposable {
   GlobalStylesInterface get globalStyles =>
       get<GlobalStylesInterface>('global-styles');
 
+  /// GraphQL interface (WPGraphQL and similar plugins)
+  ///
+  /// Example:
+  /// ```dart
+  /// final res = await client.graphql.query<List<PostSummary>>(
+  ///   document: 'query MyQuery { posts(first: 5) { nodes { id title } } }',
+  ///   parseData: (data) {
+  ///     final nodes = (data['posts']?['nodes'] as List<dynamic>? ?? const [])
+  ///         .cast<Map<String, dynamic>>();
+  ///     return nodes.map((e) => PostSummary.fromJson(e)).toList();
+  ///   },
+  /// );
+  /// ```
+  GraphQLInterface get graphql => get<GraphQLInterface>('graphql');
+
   /// Interfaces for revisions.
   PostRevisionsInterface get postRevisions =>
       get<PostRevisionsInterface>('post-revisions');
@@ -884,6 +899,16 @@ final class WordpressClient implements IDisposable {
       key: 'widget-types',
       decoder: (json) => WidgetType.fromJson(json),
       encoder: (dynamic wt) => (wt as WidgetType).toJson(),
+    );
+
+    // GraphQL interface (no default type registration required)
+    register<GraphQLInterface, Map<String, dynamic>>(
+      interface: GraphQLInterface(),
+      key: 'graphql',
+      // We don't decode GraphQL data here to a specific model; the interface callers
+      // provide parseData. Keep a minimal JSON codec to satisfy registration.
+      decoder: (json) => (json as Map<String, dynamic>),
+      encoder: (dynamic m) => (m as Map<String, dynamic>),
     );
   }
 

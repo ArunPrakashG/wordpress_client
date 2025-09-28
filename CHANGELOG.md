@@ -1,3 +1,18 @@
+## 9.2.0
+
+Added
+
+- GraphQL support via `client.graphql` targeting WPGraphQL endpoint (`/graphql`).
+  - query(), mutate(), and raw() helpers.
+  - Works with existing authorization (Application Passwords, JWT, etc.).
+  - Reuses middlewares, timeouts, and response helpers.
+  - Endpoint auto-resolves from REST base and can be overridden via `client.graphql.setEndpointPath()`.
+
+Docs
+
+- README updated with usage examples.
+- Wiki updated with a new GraphQL page and links in the sidebar.
+
 ## 9.0.0
 
 - New response models: Added typed models for multiple WordPress REST resources
