@@ -38,3 +38,4 @@ export 'responses/wordpress_raw_response.dart';
 export 'responses/wordpress_response.dart';
 export 'utilities/utility_export.dart';
 export 'wordpress_client_base.dart' show IRequestInterface, WordpressClient;
+export 'graphql/graphql_interface.dart';

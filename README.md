@@ -25,7 +25,8 @@
 - 📦 API discovery support.
 - ⏲️ Measures request completion time.
 - 📝 Supports all CRUD operations.
-- 🌐 Supports all common endpoints.
+- 🌐 Supports all common REST endpoints.
+- 🧩 GraphQL (WPGraphQL) support: `client.graphql.query/mutate/raw()` with auth.
 - 🎨 Custom Requests & Authorization systems.
 - 🔐 3 Popular authorization methods.
 - 🗄️ Third‑party Database integration.
@@ -40,7 +41,7 @@ Add `wordpress_client` to your `pubspec.yaml`:
 
 ```dart
 dependencies:
-  wordpress_client: ^9.1.1
+  wordpress_client: ^9.2.0
 ```
 
 Then run `flutter pub get` or `dart pub get`.
@@ -56,6 +57,49 @@ final client = WordpressClient.forSite(
   siteUrl: Uri.parse('https://example.com'),
   // or: baseUrl via WordpressClient(baseUrl: Uri.parse('.../wp-json/wp/v2'))
 );
+```
+
+### 🧩 GraphQL (WPGraphQL)
+
+If your site uses the WPGraphQL plugin (canonical), you can send GraphQL operations using the same client and auth.
+
+```dart
+final client = WordpressClient.forSite(
+  siteUrl: Uri.parse('https://example.com'),
+  bootstrapper: (b) => b
+    .withDefaultAuthorization(
+      WordpressAuth.appPassword(user: 'user', appPassword: 'xxxx-xxxx'),
+    )
+    .build(),
+);
+
+// Auto-resolves https://example.com/graphql from the REST base.
+final result = await client.graphql.query<List<Map<String, dynamic>>>(
+  document: '''
+    query Posts($limit: Int!) {
+      posts(first: $limit) {
+        nodes { id title }
+      }
+    }
+  ''',
+  variables: { 'limit': 5 },
+  parseData: (data) {
+    final nodes = (data['posts']?['nodes'] as List<dynamic>? ?? const [])
+        .cast<Map<String, dynamic>>();
+    return nodes;
+  },
+  requireAuth: false, // set true for restricted queries/mutations
+);
+
+switch (result) {
+  case WordpressSuccessResponse():
+    print(result.data);
+  case WordpressFailureResponse():
+    print('GraphQL error: ${result.error}');
+}
+
+// Custom endpoint path if your site exposes a different GraphQL path
+client.graphql.setEndpointPath('/custom-graphql');
 ```
 
 Add an auth quickly (helpers available):
@@ -139,6 +183,7 @@ Deep-dives and more examples live in the Wiki:
 - 🛡 [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization)
 - ⚡ [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests)
 - 🧠 [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching)
+- 🧩 [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL)
 - 🔗 [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods)
 - 🧩 [Pattern Directory Items](https://github.com/ArunPrakashG/wordpress_client/wiki/Pattern-Directory-Items)
 - 🧰 [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests)
