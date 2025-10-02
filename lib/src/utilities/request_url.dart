@@ -1,7 +1,7 @@
 // ignore_for_file: comment_references
 
 import 'package:meta/meta.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 
 @immutable
 
@@ -35,7 +35,9 @@ class RequestUrl {
   /// final url = RequestUrl.relativeParts(['api', 'users', 123]);
   /// ```
   factory RequestUrl.relativeParts(Iterable<dynamic> parts) {
-    return RequestUrl._(null, joinAll(parts.map((e) => e.toString())));
+    // Always use URL-style forward slashes regardless of OS path separator
+    final endpoint = parts.map((e) => e.toString()).join('/');
+    return RequestUrl._(null, endpoint);
   }
 
   /// Creates a new [RequestUrl] instance from the given absolute [Uri].

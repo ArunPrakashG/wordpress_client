@@ -1,3 +1,21 @@
+## 9.3.0
+
+Added
+
+- Streaming APIs for polling single-resource endpoints:
+  - `RetrieveOperation.retrieveStream(...)` for built-in retrieve operations
+  - `CustomOperation.requestStream(...)` for custom interfaces
+  - Features: configurable interval, emit-on-start, distinct-by-data, optional failure emissions with de-duplication, external CancelToken support, and on-demand `refetchTrigger`.
+
+Fixed
+
+- Middleware execution now maps `MiddlewareRawResponse.body` into `WordpressRawResponse.data`, so decoders receive the actual payload.
+- `RequestUrl.relativeParts(...)` now uses forward slashes regardless of OS to avoid Windows path separator issues.
+
+Docs
+
+- README feature list updated; new Wiki page: Streaming and Polling with examples and Riverpod wiring.
+
 ## 9.2.0
 
 Added

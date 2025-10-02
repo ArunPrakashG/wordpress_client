@@ -34,6 +34,7 @@
 - 🎣 Events for preprocessing response.
 - 🚀 Execute requests in Parallel (with configurable error handling).
 - 🧠 Optional in‑memory caching for GET requests.
+- 🌊 Polling-based streaming for single-resource retrieve endpoints (works great with Riverpod's StreamProvider).
 
 ## 📦 Install
 
@@ -191,6 +192,7 @@ Deep-dives and more examples live in the Wiki:
 - 🔄 [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares)
 - 📜 [API Changelog](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changelog)
 - 🌊 [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries)
+- 🔄 [Streaming and Polling](https://github.com/ArunPrakashG/wordpress_client/wiki/Streaming-and-Polling)
 
 ## 🤝 Feedback & Contributing
 

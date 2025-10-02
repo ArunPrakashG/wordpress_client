@@ -217,7 +217,7 @@ final class InternalRequester extends IRequestExecutor {
             headers.addAllIfNotNull(data.headers);
 
             return WordpressRawResponse(
-              data: data,
+              data: data.body,
               code: data.statusCode,
               headers: headers,
               requestHeaders: requestHeaders,
