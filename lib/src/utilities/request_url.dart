@@ -1,7 +1,6 @@
 // ignore_for_file: comment_references
 
 import 'package:meta/meta.dart';
-import 'package:path/path.dart' as p;
 
 @immutable
 

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:test/test.dart';
 import 'package:wordpress_client/wordpress_client.dart';
@@ -31,7 +30,7 @@ void main() {
       // Probe actual auth status via viewer query (non-fatal)
       if (hasAuth) {
         final probe = await client.graphql.query<Map<String, dynamic>>(
-          document: r'{ viewer { databaseId username name } }',
+          document: '{ viewer { databaseId username name } }',
           parseData: (d) => d,
         );
         if (probe is WordpressSuccessResponse<Map<String, dynamic>>) {
@@ -52,8 +51,8 @@ void main() {
       );
 
       expect(res is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected a successful GraphQL response.');
-    }, timeout: const Timeout(Duration(minutes: 2)));
+          reason: 'Expected a successful GraphQL response.',);
+    }, timeout: const Timeout(Duration(minutes: 2)),);
 
     test('GraphQL errors are mapped to failure', () async {
       // Intentionally query an unknown field to trigger an error
@@ -63,8 +62,8 @@ void main() {
       );
 
       expect(res is WordpressFailureResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected a failure response due to GraphQL error.');
-    }, timeout: const Timeout(Duration(minutes: 2)));
+          reason: 'Expected a failure response due to GraphQL error.',);
+    }, timeout: const Timeout(Duration(minutes: 2)),);
 
     test('GraphQL error payload includes message/locations/extensions', () async {
       final res = await client.graphql.query<Map<String, dynamic>>(
@@ -99,10 +98,10 @@ void main() {
       if (first['extensions'] != null) {
         expect(first['extensions'], isA<Map<String, dynamic>>());
       }
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)),);
 
     test('Query posts list returns nodes', () async {
-      const doc = r'''
+      const doc = '''
         query PostsList {
           posts(first: 3) {
             nodes { databaseId title }
@@ -116,17 +115,17 @@ void main() {
       );
 
       expect(res is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected posts list query to succeed');
+          reason: 'Expected posts list query to succeed',);
 
       final ok = res as WordpressSuccessResponse<Map<String, dynamic>>;
       final nodes = (ok.data['posts']?['nodes'] as List?) ?? const [];
       // It's okay if site has 0 posts; just ensure shape is a list
       expect(nodes, isA<List>());
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)),);
 
     test('Query with variables: fetch post by databaseId', () async {
       // First fetch an available databaseId
-      const listDoc = r'''query One { posts(first: 1) { nodes { databaseId } } }''';
+      const listDoc = '''query One { posts(first: 1) { nodes { databaseId } } }''';
       final listRes = await client.graphql.query<Map<String, dynamic>>(
         document: listDoc,
         parseData: (d) => d,
@@ -153,7 +152,7 @@ void main() {
               'title': 'Temp Post ${DateTime.now().toIso8601String()}',
               'content': 'Created for integration test',
               'status': 'DRAFT',
-            }
+            },
           },
           parseData: (d) => d,
         );
@@ -183,7 +182,7 @@ void main() {
               }
             ''',
             variables: {
-              'input': {'id': createdGlobalId}
+              'input': {'id': createdGlobalId},
             },
             parseData: (d) => d,
           );
@@ -203,10 +202,10 @@ void main() {
       );
 
       expect(res is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected fetching post by databaseId to succeed');
+          reason: 'Expected fetching post by databaseId to succeed',);
       final ok = res as WordpressSuccessResponse<Map<String, dynamic>>;
       expect(ok.data['post']?['databaseId'], dbId);
-    }, timeout: const Timeout(Duration(minutes: 3)));
+    }, timeout: const Timeout(Duration(minutes: 3)),);
 
     test('Authenticated viewer query (skips if no auth)', () async {
       if (!isAuthenticated) {
@@ -215,15 +214,15 @@ void main() {
       }
 
       final res = await client.graphql.query<Map<String, dynamic>>(
-        document: r'{ viewer { databaseId name username } }',
+        document: '{ viewer { databaseId name username } }',
         parseData: (d) => d,
       );
 
       expect(res is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected viewer query to succeed when authenticated');
+          reason: 'Expected viewer query to succeed when authenticated',);
       final ok = res as WordpressSuccessResponse<Map<String, dynamic>>;
       expect(ok.data['viewer']?['databaseId'], isNotNull);
-    }, timeout: const Timeout(Duration(minutes: 2)));
+    }, timeout: const Timeout(Duration(minutes: 2)),);
 
     test('Create and delete post mutation (auth required)', () async {
       if (!isAuthenticated) return;
@@ -243,13 +242,13 @@ void main() {
             'title': title,
             'content': 'Content created via integration test',
             'status': 'DRAFT',
-          }
+          },
         },
         parseData: (d) => d,
       );
 
       expect(createRes is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected createPost mutation to succeed');
+          reason: 'Expected createPost mutation to succeed',);
       final created = createRes as WordpressSuccessResponse<Map<String, dynamic>>;
       final createdId = created.data['createPost']?['post']?['id'] as String?;
       expect(createdId, isNotNull, reason: 'Mutation should return post.id');
@@ -265,13 +264,13 @@ void main() {
           }
         ''',
         variables: {
-          'input': {'id': createdId}
+          'input': {'id': createdId},
         },
         parseData: (d) => d,
       );
 
       expect(deleteRes is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
-          reason: 'Expected deletePost mutation to succeed');
-    }, timeout: const Timeout(Duration(minutes: 3)));
+          reason: 'Expected deletePost mutation to succeed',);
+    }, timeout: const Timeout(Duration(minutes: 3)),);
   });
 }

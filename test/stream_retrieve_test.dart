@@ -10,9 +10,8 @@ final class _PingRequest extends IRequest {
   @override
   FutureOr<WordpressRequest> build(Uri baseUrl) {
     return WordpressRequest(
-      url: RequestUrl.relativeParts(['test', 'ping']),
+      url: RequestUrl.relativeParts(const ['test', 'ping']),
       method: HttpMethod.get,
-      requireAuth: false,
     );
   }
 }
@@ -52,8 +51,8 @@ void main() {
       client.register<_RetrieveMapInterface, Map<String, dynamic>>(
         interface: _RetrieveMapInterface(),
         key: 'test',
-        decoder: (json) => (json as Map<String, dynamic>),
-        encoder: (dynamic m) => (m as Map<String, dynamic>),
+        decoder: (json) => json as Map<String, dynamic>,
+        encoder: (dynamic m) => m as Map<String, dynamic>,
       );
     });
 
@@ -79,7 +78,7 @@ void main() {
 
       final values = <int>[];
   final sub = stream.listen(values.add);
-      addTearDown(() => sub.cancel());
+      addTearDown(sub.cancel);
 
   // First emission due to emitOnStart
   await Future<void>.delayed(const Duration(milliseconds: 250));
@@ -105,7 +104,7 @@ void main() {
 
       final values = <int>[];
       final c = Completer<void>();
-      final sub = stream.listen(values.add, onDone: () => c.complete());
+  final sub = stream.listen(values.add, onDone: c.complete);
 
   // First emission
   await Future<void>.delayed(const Duration(milliseconds: 250));

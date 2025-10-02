@@ -63,8 +63,8 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
     T? lastSuccess;
     int? lastFailureCode;
     String? lastFailureMessage;
-    bool inFlight = false;
-    bool scheduleImmediateAfterFlight = false;
+  var inFlight = false;
+  var scheduleImmediateAfterFlight = false;
 
     Timer? timer;
     StreamSubscription<void>? triggerSub;
@@ -85,9 +85,9 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
         }
       } else if (res is WordpressFailureResponse<T>) {
         if (emitFailures) {
-          final sameFailure = dedupeFailures &&
-              lastFailureCode == res.code &&
-              lastFailureMessage == res.message;
+      final sameFailure = dedupeFailures &&
+        lastFailureCode == res.code &&
+        lastFailureMessage == res.message;
           if (!sameFailure) {
             lastFailureCode = res.code;
             lastFailureMessage = res.message;
@@ -154,7 +154,7 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
         if (!controller.isClosed) {
           await controller.close();
         }
-      }));
+      },),);
 
       if (emitOnStart) scheduleRun();
       timer = Timer.periodic(interval, (_) => scheduleRun());

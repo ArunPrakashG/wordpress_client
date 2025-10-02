@@ -77,8 +77,8 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
     T? lastSuccess;
     int? lastFailureCode;
     String? lastFailureMessage;
-    bool inFlight = false;
-    bool scheduleImmediateAfterFlight = false;
+  var inFlight = false;
+  var scheduleImmediateAfterFlight = false;
 
     Timer? timer;
     StreamSubscription<void>? triggerSub;
@@ -172,7 +172,7 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
         if (!controller.isClosed) {
           await controller.close();
         }
-      }));
+      },),);
 
       if (emitOnStart) scheduleRun();
       timer = Timer.periodic(interval, (_) => scheduleRun());

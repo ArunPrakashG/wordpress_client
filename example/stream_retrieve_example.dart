@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:async';
 import 'package:dio/dio.dart';
 
@@ -12,7 +13,7 @@ Future<void> main() async {
   );
 
   // Sample: poll a single Post by id every minute
-  final postId = 1;
+  const postId = 1;
   final token = CancelToken();
 
   final refetchController = StreamController<void>.broadcast();

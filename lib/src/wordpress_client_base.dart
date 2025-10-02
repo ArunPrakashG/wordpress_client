@@ -907,8 +907,8 @@ final class WordpressClient implements IDisposable {
       key: 'graphql',
       // We don't decode GraphQL data here to a specific model; the interface callers
       // provide parseData. Keep a minimal JSON codec to satisfy registration.
-      decoder: (json) => (json as Map<String, dynamic>),
-      encoder: (dynamic m) => (m as Map<String, dynamic>),
+      decoder: (json) => json as Map<String, dynamic>,
+      encoder: (dynamic m) => m as Map<String, dynamic>,
     );
   }
 

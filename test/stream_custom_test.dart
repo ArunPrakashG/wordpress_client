@@ -9,9 +9,8 @@ final class _CustomRequest extends IRequest {
   @override
   FutureOr<WordpressRequest> build(Uri baseUrl) {
     return WordpressRequest(
-      url: RequestUrl.relativeParts(['custom', 'endpoint']),
+      url: RequestUrl.relativeParts(const ['custom', 'endpoint']),
       method: HttpMethod.get,
-      requireAuth: false,
     );
   }
 }
@@ -54,8 +53,8 @@ void main() {
       client.register<_CustomInterface, Map<String, dynamic>>(
         interface: _CustomInterface(),
         key: 'custom',
-        decoder: (json) => (json as Map<String, dynamic>),
-        encoder: (dynamic m) => (m as Map<String, dynamic>),
+        decoder: (json) => json as Map<String, dynamic>,
+        encoder: (dynamic m) => m as Map<String, dynamic>,
       );
     });
 
@@ -63,7 +62,7 @@ void main() {
 
     test('emits on refetch only (no periodic)', () async {
       final refetch = StreamController<void>.broadcast();
-      addTearDown(() => refetch.close());
+      addTearDown(refetch.close);
 
       final stream = client
           .get<_CustomInterface>('custom')
@@ -77,7 +76,7 @@ void main() {
 
       final values = <int>[];
       final sub = stream.listen(values.add);
-      addTearDown(() => sub.cancel());
+      addTearDown(sub.cancel);
 
     // No emit at start
   await Future<void>.delayed(const Duration(milliseconds: 250));
