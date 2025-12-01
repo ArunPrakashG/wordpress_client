@@ -4,6 +4,86 @@ import '../../wordpress_client.dart';
 import '../constants.dart';
 import '../responses/wordpress_error.dart';
 
+/// A registered GraphQL query or mutation that can be reused.
+///
+/// This class encapsulates the query document, default variables,
+/// and the parser function, allowing you to register queries once
+/// and execute them multiple times with different variables.
+///
+/// Example:
+/// ```dart
+/// final postsQuery = RegisteredQuery<List<Post>>(
+///   name: 'getPosts',
+///   document: '''
+///     query Posts($limit: Int!) {
+///       posts(first: $limit) {
+///         nodes { id title }
+///       }
+///     }
+///   ''',
+///   parseData: (data) {
+///     final nodes = (data['posts']?['nodes'] as List<dynamic>? ?? const [])
+///         .cast<Map<String, dynamic>>();
+///     return nodes.map(Post.fromJson).toList();
+///   },
+///   defaultVariables: {'limit': 10},
+/// );
+/// ```
+final class RegisteredQuery<T> {
+  /// Creates a new registered query.
+  const RegisteredQuery({
+    required this.name,
+    required this.document,
+    required this.parseData,
+    this.operationName,
+    this.defaultVariables,
+    this.requireAuth = false,
+  });
+
+  /// A unique identifier for this query.
+  final String name;
+
+  /// The GraphQL document (query or mutation string).
+  final String document;
+
+  /// The operation name within the document (if multiple operations exist).
+  final String? operationName;
+
+  /// Function to parse the `data` field from the GraphQL response.
+  final T Function(Map<String, dynamic> data) parseData;
+
+  /// Default variables to use when executing this query.
+  ///
+  /// These can be overridden when calling [GraphQLInterface.executeRegistered].
+  final Map<String, dynamic>? defaultVariables;
+
+  /// Whether this query requires authentication by default.
+  final bool requireAuth;
+
+  /// Creates a copy of this query with updated properties.
+  RegisteredQuery<T> copyWith({
+    String? name,
+    String? document,
+    String? operationName,
+    T Function(Map<String, dynamic> data)? parseData,
+    Map<String, dynamic>? defaultVariables,
+    bool? requireAuth,
+  }) {
+    return RegisteredQuery<T>(
+      name: name ?? this.name,
+      document: document ?? this.document,
+      operationName: operationName ?? this.operationName,
+      parseData: parseData ?? this.parseData,
+      defaultVariables: defaultVariables ?? this.defaultVariables,
+      requireAuth: requireAuth ?? this.requireAuth,
+    );
+  }
+
+  @override
+  String toString() =>
+      'RegisteredQuery<$T>(name: $name, operationName: $operationName)';
+}
+
 /// A lightweight GraphQL client interface that leverages the existing
 /// requester, auth, middlewares, and responses in this package.
 ///
@@ -31,6 +111,9 @@ import '../responses/wordpress_error.dart';
 /// ```
 final class GraphQLInterface extends IRequestInterface {
   late Uri _graphqlEndpoint;
+
+  /// Internal registry for storing registered queries.
+  final Map<String, RegisteredQuery<dynamic>> _registry = {};
 
   /// Compute the GraphQL endpoint from the REST base URL.
   ///
@@ -270,6 +353,154 @@ final class GraphQLInterface extends IRequestInterface {
       duration: rawResp.duration,
       extra: rawResp.extra,
       message: rawResp.message,
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Query Registration & Reuse
+  // ──────────────────────────────────────────────────────────────────────────
+
+  /// Registers a query or mutation for later reuse.
+  ///
+  /// Registered queries can be executed using [executeRegistered] by name,
+  /// avoiding the need to repeat the document and parser everywhere.
+  ///
+  /// Example:
+  /// ```dart
+  /// client.graphql.register(
+  ///   RegisteredQuery<List<Post>>(
+  ///     name: 'getPosts',
+  ///     document: '''
+  ///       query Posts($limit: Int!) {
+  ///         posts(first: $limit) { nodes { id title } }
+  ///       }
+  ///     ''',
+  ///     parseData: (data) {
+  ///       final nodes = (data['posts']?['nodes'] as List? ?? [])
+  ///           .cast<Map<String, dynamic>>();
+  ///       return nodes.map(Post.fromJson).toList();
+  ///     },
+  ///     defaultVariables: {'limit': 10},
+  ///   ),
+  /// );
+  /// ```
+  ///
+  /// Throws [ArgumentError] if a query with the same name is already registered
+  /// and [allowOverwrite] is `false` (default).
+  void register<T>(RegisteredQuery<T> query, {bool allowOverwrite = false}) {
+    if (_registry.containsKey(query.name) && !allowOverwrite) {
+      throw ArgumentError(
+        'A query with name "${query.name}" is already registered. '
+        'Use allowOverwrite: true to replace it.',
+      );
+    }
+    _registry[query.name] = query;
+  }
+
+  /// Registers multiple queries at once.
+  ///
+  /// This is a convenience method for registering several queries in one call.
+  ///
+  /// Example:
+  /// ```dart
+  /// client.graphql.registerAll([
+  ///   postsQuery,
+  ///   usersQuery,
+  ///   settingsQuery,
+  /// ]);
+  /// ```
+  void registerAll(
+    Iterable<RegisteredQuery<dynamic>> queries, {
+    bool allowOverwrite = false,
+  }) {
+    for (final query in queries) {
+      register(query, allowOverwrite: allowOverwrite);
+    }
+  }
+
+  /// Unregisters a query by name.
+  ///
+  /// Returns `true` if a query was removed, `false` if no query with that
+  /// name was registered.
+  bool unregister(String name) {
+    return _registry.remove(name) != null;
+  }
+
+  /// Clears all registered queries.
+  void clearRegistry() {
+    _registry.clear();
+  }
+
+  /// Returns `true` if a query with the given [name] is registered.
+  bool isRegistered(String name) => _registry.containsKey(name);
+
+  /// Returns the names of all registered queries.
+  Iterable<String> get registeredQueryNames => _registry.keys;
+
+  /// Returns the number of registered queries.
+  int get registeredQueryCount => _registry.length;
+
+  /// Retrieves a registered query by name.
+  ///
+  /// Returns `null` if no query with that name is registered.
+  /// The caller must cast to the appropriate type if needed.
+  RegisteredQuery<T>? getRegistered<T>(String name) {
+    final query = _registry[name];
+    if (query == null) return null;
+    return query as RegisteredQuery<T>;
+  }
+
+  /// Executes a registered query by name.
+  ///
+  /// The [variables] parameter merges with (and overrides) the query's
+  /// [RegisteredQuery.defaultVariables].
+  ///
+  /// Example:
+  /// ```dart
+  /// // Execute with default variables
+  /// final result = await client.graphql.executeRegistered<List<Post>>('getPosts');
+  ///
+  /// // Override some variables
+  /// final result = await client.graphql.executeRegistered<List<Post>>(
+  ///   'getPosts',
+  ///   variables: {'limit': 20},
+  /// );
+  /// ```
+  ///
+  /// Throws [ArgumentError] if no query with [name] is registered.
+  Future<WordpressResponse<T>> executeRegistered<T>(
+    String name, {
+    Map<String, dynamic>? variables,
+    IAuthorization? authorization,
+    Map<String, dynamic>? headers,
+    bool? requireAuth,
+    Duration sendTimeout = DEFAULT_REQUEST_TIMEOUT,
+    Duration receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
+  }) async {
+    final query = _registry[name];
+    if (query == null) {
+      throw ArgumentError(
+        'No query registered with name "$name". '
+        'Use register() to register a query first.',
+      );
+    }
+
+    // Merge default variables with provided ones
+    final mergedVariables = <String, dynamic>{
+      ...?query.defaultVariables,
+      ...?variables,
+    };
+
+    return _execute<T>(
+      document: query.document,
+      parseData: query.parseData as T Function(Map<String, dynamic>),
+      variables: mergedVariables.isEmpty ? null : mergedVariables,
+      operationName: query.operationName,
+      requireAuth: requireAuth ?? query.requireAuth,
+      authorization: authorization,
+      headers: headers,
+      sendTimeout: sendTimeout,
+      receiveTimeout: receiveTimeout,
     );
   }
 }

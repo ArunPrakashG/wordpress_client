@@ -272,5 +272,167 @@ void main() {
       expect(deleteRes is WordpressSuccessResponse<Map<String, dynamic>>, isTrue,
           reason: 'Expected deletePost mutation to succeed',);
     }, timeout: const Timeout(Duration(minutes: 3)),);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Registered Queries Tests
+    // ─────────────────────────────────────────────────────────────────────────
+
+    test(
+      'can register and execute a query',
+      () async {
+        final typeName = RegisteredQuery<Map<String, dynamic>>(
+          name: 'getTypeName',
+          document: '{ __typename }',
+          parseData: (data) => data,
+        );
+
+        client.graphql.register(typeName);
+
+        expect(client.graphql.isRegistered('getTypeName'), isTrue);
+        expect(client.graphql.registeredQueryCount, greaterThanOrEqualTo(1));
+
+        final res = await client.graphql
+            .executeRegistered<Map<String, dynamic>>('getTypeName');
+
+        expect(
+          res is WordpressSuccessResponse<Map<String, dynamic>>,
+          isTrue,
+          reason: 'Expected registered query to succeed',
+        );
+
+        // Cleanup
+        client.graphql.unregister('getTypeName');
+        expect(client.graphql.isRegistered('getTypeName'), isFalse);
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    test(
+      'registered query with default variables can be overridden',
+      () async {
+        final postsQuery = RegisteredQuery<List<Map<String, dynamic>>>(
+          name: 'getPosts',
+          document: r'''
+          query Posts($first: Int!) {
+            posts(first: $first) {
+              nodes { id title }
+            }
+          }
+        ''',
+          parseData: (data) {
+            final nodes =
+                (data['posts']?['nodes'] as List<dynamic>? ?? const [])
+                    .cast<Map<String, dynamic>>();
+            return nodes;
+          },
+          defaultVariables: {'first': 2},
+        );
+
+        client.graphql.register(postsQuery);
+
+        // Execute with default variables
+        final res1 = await client.graphql
+            .executeRegistered<List<Map<String, dynamic>>>('getPosts');
+        expect(res1 is WordpressSuccessResponse<List<Map<String, dynamic>>>,
+            isTrue);
+
+        // Execute with overridden variables
+        final res2 =
+            await client.graphql.executeRegistered<List<Map<String, dynamic>>>(
+          'getPosts',
+          variables: {'first': 1},
+        );
+        expect(res2 is WordpressSuccessResponse<List<Map<String, dynamic>>>,
+            isTrue);
+
+        // Cleanup
+        client.graphql.unregister('getPosts');
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    test(
+      'registerAll registers multiple queries',
+      () async {
+        final query1 = RegisteredQuery<Map<String, dynamic>>(
+          name: 'testQuery1',
+          document: '{ __typename }',
+          parseData: (data) => data,
+        );
+        final query2 = RegisteredQuery<Map<String, dynamic>>(
+          name: 'testQuery2',
+          document: '{ __typename }',
+          parseData: (data) => data,
+        );
+
+        client.graphql.registerAll([query1, query2]);
+
+        expect(client.graphql.isRegistered('testQuery1'), isTrue);
+        expect(client.graphql.isRegistered('testQuery2'), isTrue);
+        expect(client.graphql.registeredQueryNames,
+            containsAll(['testQuery1', 'testQuery2']));
+
+        // Cleanup
+        client.graphql.clearRegistry();
+        expect(client.graphql.registeredQueryCount, equals(0));
+      },
+      timeout: const Timeout(Duration(minutes: 1)),
+    );
+
+    test('throws when executing unregistered query', () async {
+      expect(
+        () => client.graphql
+            .executeRegistered<Map<String, dynamic>>('nonExistent'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws when registering duplicate without allowOverwrite', () {
+      final query = RegisteredQuery<Map<String, dynamic>>(
+        name: 'duplicateTest',
+        document: '{ __typename }',
+        parseData: (data) => data,
+      );
+
+      client.graphql.register(query);
+
+      expect(
+        () => client.graphql.register(query),
+        throwsA(isA<ArgumentError>()),
+      );
+
+      // But allowOverwrite should work
+      expect(
+        () => client.graphql.register(query, allowOverwrite: true),
+        returnsNormally,
+      );
+
+      // Cleanup
+      client.graphql.unregister('duplicateTest');
+    });
+
+    test('getRegistered returns the registered query', () {
+      final query = RegisteredQuery<Map<String, dynamic>>(
+        name: 'getTest',
+        document: '{ __typename }',
+        parseData: (data) => data,
+        defaultVariables: {'foo': 'bar'},
+      );
+
+      client.graphql.register(query);
+
+      final retrieved =
+          client.graphql.getRegistered<Map<String, dynamic>>('getTest');
+      expect(retrieved, isNotNull);
+      expect(retrieved!.name, equals('getTest'));
+      expect(retrieved.defaultVariables, equals({'foo': 'bar'}));
+
+      // Non-existent returns null
+      expect(client.graphql.getRegistered<Map<String, dynamic>>('nonExistent'),
+          isNull);
+
+      // Cleanup
+      client.graphql.unregister('getTest');
+    });
   });
 }

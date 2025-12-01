@@ -1,3 +1,21 @@
+## 9.4.0
+
+Added
+
+- **GraphQL Registered Queries**: Register and reuse GraphQL queries throughout your application.
+  - New `RegisteredQuery<T>` class to encapsulate query document, parser, default variables, and auth requirements.
+  - Registry methods on `GraphQLInterface`:
+    - `register()` / `registerAll()` - Add queries to the registry
+    - `unregister()` / `clearRegistry()` - Remove queries
+    - `isRegistered()` / `registeredQueryNames` / `registeredQueryCount` - Query the registry
+    - `getRegistered()` - Retrieve a registered query definition
+    - `executeRegistered()` - Execute a registered query by name with optional variable overrides
+  - Variables from `defaultVariables` merge with execution-time variables.
+
+Docs
+
+- Wiki GraphQL page updated with Registered Queries section and examples.
+
 ## 9.3.0
 
 Added
