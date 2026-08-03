@@ -61,8 +61,8 @@ class wordpress_client_helper
 
         register_rest_field('post', 'author_meta', [
             'get_callback' => array($this, 'get_author_meta'),
-            'update_callback' => 'null',
-            'schema' => 'null',
+            'update_callback' => null,
+            'schema' => null,
         ]);
 
         register_rest_field(
