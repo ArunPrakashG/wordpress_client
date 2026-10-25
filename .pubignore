@@ -1,0 +1,14 @@
+# .pubignore replaces .gitignore for pub, so repeat its entries.
+.dart_tool/
+.packages
+pubspec.lock
+build/
+doc/api/
+*.json
+plans.md
+coverage/
+
+# Not part of the package
+wiki/
+docker-compose.wordpress.yml
+.github/

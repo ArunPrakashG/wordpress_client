@@ -77,16 +77,16 @@ void main() {
           .map((r) => r.asSuccess().data['value'] as int);
 
       final values = <int>[];
-  final sub = stream.listen(values.add);
+      final sub = stream.listen(values.add);
       addTearDown(sub.cancel);
 
-  // First emission due to emitOnStart
-  await Future<void>.delayed(const Duration(milliseconds: 250));
-  expect(values, equals([1]));
+      // First emission due to emitOnStart
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      expect(values, equals([1]));
 
       // Trigger refetch => data changes (2), emits
       refetch.add(null);
-  await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(values, equals([1, 2]));
     });
 
@@ -104,10 +104,10 @@ void main() {
 
       final values = <int>[];
       final c = Completer<void>();
-  final sub = stream.listen(values.add, onDone: c.complete);
+      final sub = stream.listen(values.add, onDone: c.complete);
 
-  // First emission
-  await Future<void>.delayed(const Duration(milliseconds: 250));
+      // First emission
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(values, equals([1]));
 
       // Cancel and ensure stream completes

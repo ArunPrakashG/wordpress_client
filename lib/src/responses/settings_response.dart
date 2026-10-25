@@ -120,15 +120,15 @@ final class Settings implements ISelfRespresentive {
         other.language == language &&
         other.useSmilies == useSmilies &&
         other.defaultCategory == defaultCategory &&
-  other.defaultPostFormat == defaultPostFormat &&
-  other.postsPerPage == postsPerPage &&
-  other.showOnFront == showOnFront &&
-  other.pageOnFront == pageOnFront &&
-  other.pageForPosts == pageForPosts &&
-  other.defaultPingStatus == defaultPingStatus &&
-  other.defaultCommentStatus == defaultCommentStatus &&
-  other.siteLogo == siteLogo &&
-  other.siteIcon == siteIcon;
+        other.defaultPostFormat == defaultPostFormat &&
+        other.postsPerPage == postsPerPage &&
+        other.showOnFront == showOnFront &&
+        other.pageOnFront == pageOnFront &&
+        other.pageForPosts == pageForPosts &&
+        other.defaultPingStatus == defaultPingStatus &&
+        other.defaultCommentStatus == defaultCommentStatus &&
+        other.siteLogo == siteLogo &&
+        other.siteIcon == siteIcon;
   }
 
   @override
@@ -145,13 +145,13 @@ final class Settings implements ISelfRespresentive {
       language.hashCode ^
       useSmilies.hashCode ^
       defaultCategory.hashCode ^
-    defaultPostFormat.hashCode ^
-    postsPerPage.hashCode ^
-    showOnFront.hashCode ^
-    pageOnFront.hashCode ^
-    pageForPosts.hashCode ^
-    defaultPingStatus.hashCode ^
-    defaultCommentStatus.hashCode ^
-    siteLogo.hashCode ^
-    siteIcon.hashCode;
+      defaultPostFormat.hashCode ^
+      postsPerPage.hashCode ^
+      showOnFront.hashCode ^
+      pageOnFront.hashCode ^
+      pageForPosts.hashCode ^
+      defaultPingStatus.hashCode ^
+      defaultCommentStatus.hashCode ^
+      siteLogo.hashCode ^
+      siteIcon.hashCode;
 }

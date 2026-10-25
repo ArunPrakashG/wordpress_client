@@ -63,8 +63,8 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
     T? lastSuccess;
     int? lastFailureCode;
     String? lastFailureMessage;
-  var inFlight = false;
-  var scheduleImmediateAfterFlight = false;
+    var inFlight = false;
+    var scheduleImmediateAfterFlight = false;
 
     Timer? timer;
     StreamSubscription<void>? triggerSub;
@@ -74,7 +74,9 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
         final data = res.data;
         var shouldEmit = true;
         if (distinctData && lastSuccess != null) {
-          final equal = equals != null ? equals(lastSuccess as T, data) : lastSuccess == data;
+          final equal = equals != null
+              ? equals(lastSuccess as T, data)
+              : lastSuccess == data;
           shouldEmit = !equal;
         }
         if (shouldEmit) {
@@ -85,9 +87,9 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
         }
       } else if (res is WordpressFailureResponse<T>) {
         if (emitFailures) {
-      final sameFailure = dedupeFailures &&
-        lastFailureCode == res.code &&
-        lastFailureMessage == res.message;
+          final sameFailure = dedupeFailures &&
+              lastFailureCode == res.code &&
+              lastFailureMessage == res.message;
           if (!sameFailure) {
             lastFailureCode = res.code;
             lastFailureMessage = res.message;
@@ -149,12 +151,16 @@ base mixin CustomOperation<T, R extends IRequest> on IRequestInterface {
     controller.onListen = () {
       // Ensure immediate completion when the external token is cancelled
       // ignore: discarded_futures
-      unawaited(token.whenCancel.then((_) async {
-        await teardown();
-        if (!controller.isClosed) {
-          await controller.close();
-        }
-      },),);
+      unawaited(
+        token.whenCancel.then(
+          (_) async {
+            await teardown();
+            if (!controller.isClosed) {
+              await controller.close();
+            }
+          },
+        ),
+      );
 
       if (emitOnStart) scheduleRun();
       timer = Timer.periodic(interval, (_) => scheduleRun());
