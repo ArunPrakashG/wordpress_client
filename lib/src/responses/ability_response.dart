@@ -59,6 +59,14 @@ final class Ability implements ISelfRespresentive {
   @override
   final Map<String, dynamic> self;
 
+  /// Capabilities the current user needs to run this ability
+  /// (`required_capabilities`, when the site exposes it).
+  List<String> get requiredCapabilities =>
+      (self['required_capabilities'] as List?)
+          ?.whereType<String>()
+          .toList(growable: false) ??
+      const <String>[];
+
   /// The `meta.annotations` object, or an empty map.
   Map<String, dynamic> get annotations =>
       castOrElse<Map<String, dynamic>>(meta?['annotations']) ??
