@@ -3,6 +3,7 @@
 Added
 
 - **Automatic retries.** `BootstrapBuilder.withRetryPolicy(RetryPolicy.standard())` retries timeouts, connection errors and 429/502/503/504 with exponential backoff and jitter, honouring `Retry-After`. Only idempotent methods are retried by default (never `POST`/`PATCH`), cancelling a request aborts the wait, and `WordpressRequest.retryPolicy` overrides the client policy per request. The number of tries is reported in `extra[WordpressRequest.metaAttempts]`. Off by default. (#96)
+- **Auto-pagination.** Every list interface gains `listPages(request)`, a lazy `Stream` with one response per page driven by `X-WP-TotalPages`, and `listAll(request)`, which collects all pages into one response. Both take `perPage` (default 100) and `maxPages`; `listAll` also takes `maxItems`. A failing page ends the walk. (#97)
 
 ## 10.0.0 (unreleased)
 
