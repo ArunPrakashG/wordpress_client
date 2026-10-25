@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'tags.dart';
 
 final class TagsExtensions implements IInterfaceExtensions<Tag, int> {
   TagsExtensions(this._iface);

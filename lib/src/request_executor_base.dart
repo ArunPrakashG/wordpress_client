@@ -4,7 +4,6 @@ import 'package:dio/dio.dart' show DioException, DioExceptionType;
 import 'package:meta/meta.dart';
 
 import 'library_exports.dart';
-import 'responses/wordpress_error.dart';
 import 'utilities/codable_map/codable_map.dart';
 
 /// Base class for request executors in the WordPress API client.
@@ -62,7 +61,49 @@ abstract base class IRequestExecutor {
 
   /// Runs [request] through request middlewares, [execute] and response
   /// middlewares. Never throws: any error becomes a failure response.
-  Future<WordpressRawResponse> _pipeline(WordpressRequest request) {
+  ///
+  /// Fires [WordpressEvents.onCancel] / [WordpressEvents.onError] once the
+  /// final response is known.
+  Future<WordpressRawResponse> _pipeline(WordpressRequest request) async {
+    final raw = await _runPipeline(request);
+    _notifyEvents(request, raw);
+    return raw;
+  }
+
+  void _notifyEvents(WordpressRequest request, WordpressRawResponse raw) {
+    final events = request.events;
+    if (events == null || raw.isSuccessful) {
+      return;
+    }
+
+    try {
+      if (raw.code == -RequestErrorType.requestCancelled.index) {
+        events.onCancel?.call();
+        return;
+      }
+
+      final onError = events.onError;
+      if (onError == null) {
+        return;
+      }
+
+      final parsed = mapGuarded(mapper: WordpressError.fromMap, json: raw.data);
+      onError(
+        parsed ??
+            WordpressError(
+              code: raw.code < 0 && -raw.code < RequestErrorType.values.length
+                  ? RequestErrorType.values[-raw.code].name
+                  : 'http_${raw.code}',
+              message: raw.message,
+              status: raw.code > 0 ? raw.code : null,
+            ),
+      );
+    } catch (_) {
+      // A throwing user callback must not break the request pipeline.
+    }
+  }
+
+  Future<WordpressRawResponse> _runPipeline(WordpressRequest request) {
     return guardAsync<WordpressRawResponse>(
       function: () async {
         final processed = await _handleRequestMiddlewares(

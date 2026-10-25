@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'category.dart';
 
 final class CategoriesExtensions
     implements IInterfaceExtensions<Category, int> {

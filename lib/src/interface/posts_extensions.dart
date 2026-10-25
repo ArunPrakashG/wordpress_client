@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'posts.dart';
 
 final class PostsExtensions implements IInterfaceExtensions<Post, int> {
   PostsExtensions(this._iface);

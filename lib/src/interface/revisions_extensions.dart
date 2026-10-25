@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'revisions.dart';
 
 final class PostRevisionsExtensions
     implements IInterfaceExtensions<Revision, (int postId, int revisionId)> {

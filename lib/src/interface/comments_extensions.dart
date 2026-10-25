@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'comments.dart';
 
 final class CommentsExtensions implements IInterfaceExtensions<Comment, int> {
   CommentsExtensions(this._iface);

@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../../wordpress_client.dart';
-import 'wordpress_error.dart';
 import 'wordpress_failure.dart';
 
 @immutable

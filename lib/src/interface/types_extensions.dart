@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'types.dart';
 
 final class TypesExtensions implements IInterfaceExtensions<PostType, String> {
   TypesExtensions(this._iface);

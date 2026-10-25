@@ -4,7 +4,6 @@ import 'package:crypto/crypto.dart';
 
 import '../../wordpress_client.dart';
 import '../constants.dart';
-import '../responses/wordpress_error.dart';
 
 /// A registered GraphQL query or mutation that can be reused.
 ///

@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'themes.dart';
 
 final class ThemesExtensions implements IInterfaceExtensions<Theme, String> {
   ThemesExtensions(this._iface);

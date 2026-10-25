@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'blocks.dart';
 
 final class BlocksExtensions implements IInterfaceExtensions<Block, int> {
   BlocksExtensions(this._iface);
