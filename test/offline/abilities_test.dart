@@ -115,9 +115,11 @@ void main() {
         ..reply(
           'GET',
           '$root/categories',
-          const MockResponse(body: [
-            {'slug': 'site', 'label': 'Site'},
-          ]),
+          const MockResponse(
+            body: [
+              {'slug': 'site', 'label': 'Site'},
+            ],
+          ),
         )
         ..reply(
           'GET',
@@ -132,8 +134,10 @@ void main() {
         (list as WordpressSuccessResponse<List<AbilityCategory>>).data.single,
         isA<AbilityCategory>().having((c) => c.slug, 'slug', 'site'),
       );
-      expect((one as WordpressSuccessResponse<AbilityCategory>).data.label,
-          'Site');
+      expect(
+        (one as WordpressSuccessResponse<AbilityCategory>).data.label,
+        'Site',
+      );
     });
 
     test('read-only abilities run with GET and JSON input in the query',
@@ -209,7 +213,7 @@ void main() {
       adapter.reply(
         'POST',
         '$root/abilities/demo/save/run',
-        const MockResponse(body: null),
+        const MockResponse(),
       );
 
       await client.abilities.run(
