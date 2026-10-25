@@ -91,19 +91,22 @@ abstract base class IRequestExecutor {
         }
 
         if (error is DioException) {
-          final type = switch (error.type) {
-            DioExceptionType.cancel => RequestErrorType.requestCancelled,
-            DioExceptionType.connectionTimeout ||
-            DioExceptionType.sendTimeout ||
-            DioExceptionType.receiveTimeout =>
-              RequestErrorType.timeout,
-            DioExceptionType.connectionError ||
-            DioExceptionType.badCertificate =>
-              RequestErrorType.connectionFailed,
-            DioExceptionType.badResponse ||
-            DioExceptionType.unknown =>
-              RequestErrorType.internalGenericError,
-          };
+          // Not an exhaustive switch: newer Dio versions add enum members
+          // (for example transformTimeout), which would break compilation.
+          final dioType = error.type;
+          final RequestErrorType type;
+          if (dioType == DioExceptionType.cancel) {
+            type = RequestErrorType.requestCancelled;
+          } else if (dioType == DioExceptionType.connectionTimeout ||
+              dioType == DioExceptionType.sendTimeout ||
+              dioType == DioExceptionType.receiveTimeout) {
+            type = RequestErrorType.timeout;
+          } else if (dioType == DioExceptionType.connectionError ||
+              dioType == DioExceptionType.badCertificate) {
+            type = RequestErrorType.connectionFailed;
+          } else {
+            type = RequestErrorType.internalGenericError;
+          }
 
           if (type != RequestErrorType.internalGenericError) {
             return WordpressRawResponse(
