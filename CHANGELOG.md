@@ -1,3 +1,27 @@
+## 10.1.0
+
+Added
+
+- **`client.resource<T>(restBase, decoder: ...)`**: typed list, `listPages`, `listAll`, retrieve, create, update and delete for custom post types and plugin collections. `namespace:` targets a plugin route such as `my-plugin/v1` on the client's own origin. (`ResourceInterface<T>`)
+- **`client.batch`** for the WordPress batch endpoint (`/wp-json/batch/v1`): `BatchOperation.create/update/delete`, `BatchValidation`, chunking at 25 requests, per-item `BatchItemResult` with the decoded body or `WordpressError`.
+- **`AppPasswordFlow`**: the browser "authorize application" flow. `authorizeUrl`, `parseCallback` (checks `state` and the site) and `AppPasswordGranted.toAuthorization()`.
+- **`withEmbed([relations])` / `withFields(fields)`** on fluent queries, and a typed `Embedded` view (`post.embedded.author`, `featuredMedia`, `categories`, `tags`, `terms(...)`, `items(...)`). `post.getMedia()` / `getAuthor()` use the embedded data when present and skip the extra request.
+- **Request de-duplication** (`withRequestDeduplication()`): identical concurrent GETs share one network call.
+- **Concurrency limit** (`withMaxConcurrentRequests(n)`): excess requests wait in order.
+- **`LoggingMiddleware`** with header and query redaction, optional bodies and headers.
+- **`OfflineWriteQueue`** middleware with `WriteQueueStore` / `MemoryWriteQueueStore`, `flush(client)` and `response.wasQueued`.
+- `Ability.requiredCapabilities`.
+- A runnable Flutter example in `example/flutter_app`, and `example/main.dart`.
+
+Changed
+
+- `WordpressEvents.onError` and `onCancel` now fire (they were never called): `onError` receives the WordPress error, or a synthetic one (`timeout`, `connectionFailed`, `http_<status>`) for transport failures and unparsable bodies.
+- Response middlewares now also see transport failures (timeouts, connection errors, cancellations). Their `extra` carries the request metadata, so `LoggingMiddleware` logs them with method and URL.
+- All interface types (`PostsInterface`, `SettingsInterface`, ... and their extensions) are exported.
+- `Tag.count` defaults to 0 when the server omits it (for example in `_embed` payloads).
+- Verified the Abilities routes against WordPress core: `/wp-json/wp-abilities/v1/abilities[/{ns}/{ability}[/run]]`.
+- CI: a job against the newest allowed dependencies, a dartdoc build, and a higher coverage floor.
+
 ## 10.0.0
 
 Retries, auto-pagination, cache revalidation, GraphQL improvements and the Abilities API ship together with the breaking changes below.
