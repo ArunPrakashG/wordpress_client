@@ -191,12 +191,16 @@ abstract base class IRequestExecutor {
   }
 
   Future<WordpressRawResponse> _runPipeline(WordpressRequest request) {
+    // The request as the middlewares left it, so failures keep its metadata.
+    var latest = request;
+
     return guardAsync<WordpressRawResponse>(
       function: () async {
         final processed = await _handleRequestMiddlewares(
           request: request,
           middlewares: middlewares,
         );
+        latest = processed;
 
         return _handleResponseMiddlewares(
           middlewares: middlewares,
@@ -205,6 +209,7 @@ abstract base class IRequestExecutor {
       },
       onError: (error, stackTrace) async {
         final extra = <String, dynamic>{
+          ...latest.extra,
           'error': error,
           'stackTrace': stackTrace,
         };
