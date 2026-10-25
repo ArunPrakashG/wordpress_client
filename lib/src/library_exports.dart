@@ -21,6 +21,8 @@ export 'interface/navigation_extensions.dart';
 export 'interface/pages_extensions.dart';
 export 'interface/posts_extensions.dart';
 export 'interface/revisions_extensions.dart';
+export 'interface/settings_extensions.dart';
+export 'interface/statuses_extensions.dart';
 export 'interface/tags_extensions.dart';
 export 'interface/taxonomies_extensions.dart';
 export 'interface/templates_extensions.dart';
