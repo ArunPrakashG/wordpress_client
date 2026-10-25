@@ -77,4 +77,17 @@ void main() {
 
     expect(lines.single, contains('chars)'));
   });
+
+  test('logs transport failures with the request they belong to', () async {
+    adapter.reply('GET', '/posts', MockResponse.connectionError());
+    final client = makeClient(
+      adapter,
+      middlewares: [LoggingMiddleware(sink: lines.add)],
+    );
+
+    await client.posts.list(ListPostRequest());
+
+    expect(lines.single, startsWith('GET https://example.com/wp-json'));
+    expect(lines.single, contains('-> ERR connectionFailed'));
+  });
 }

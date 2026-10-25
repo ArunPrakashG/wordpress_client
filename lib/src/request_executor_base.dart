@@ -202,73 +202,91 @@ abstract base class IRequestExecutor {
         );
         latest = processed;
 
+        // A transport failure is an ordinary response to the response
+        // middlewares, so they can log it or react to it.
+        WordpressRawResponse raw;
+        try {
+          raw = await execute(processed);
+        } catch (error, stackTrace) {
+          raw = _failure(processed, error, stackTrace);
+        }
+
         return _handleResponseMiddlewares(
           middlewares: middlewares,
-          response: await execute(processed),
+          response: raw,
         );
       },
-      onError: (error, stackTrace) async {
-        final extra = <String, dynamic>{
-          ...latest.extra,
-          'error': error,
-          'stackTrace': stackTrace,
-        };
+      onError: (error, stackTrace) async => _failure(latest, error, stackTrace),
+    );
+  }
 
-        if (error is MiddlewareAbortedException) {
-          return WordpressRawResponse(
-            data: null,
-            code: -RequestErrorType.middlewareAborted.index,
-            extra: extra,
-            message: error.message,
-          );
-        }
+  /// The failure response for [error], carrying [request]'s extra.
+  WordpressRawResponse _failure(
+    WordpressRequest request,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    final extra = <String, dynamic>{
+      ...request.extra,
+      // The options Dio was given carry the request metadata (method, URL).
+      if (error is DioException) ...error.requestOptions.extra,
+      'error': error,
+      'stackTrace': stackTrace,
+    };
 
-        if (error is DioException) {
-          // Not an exhaustive switch: newer Dio versions add enum members
-          // (for example transformTimeout), which would break compilation.
-          final dioType = error.type;
-          final RequestErrorType type;
-          if (dioType == DioExceptionType.cancel) {
-            type = RequestErrorType.requestCancelled;
-          } else if (dioType == DioExceptionType.connectionTimeout ||
-              dioType == DioExceptionType.sendTimeout ||
-              dioType == DioExceptionType.receiveTimeout) {
-            type = RequestErrorType.timeout;
-          } else if (dioType == DioExceptionType.connectionError ||
-              dioType == DioExceptionType.badCertificate) {
-            type = RequestErrorType.connectionFailed;
-          } else {
-            type = RequestErrorType.internalGenericError;
-          }
+    if (error is MiddlewareAbortedException) {
+      return WordpressRawResponse(
+        data: null,
+        code: -RequestErrorType.middlewareAborted.index,
+        extra: extra,
+        message: error.message,
+      );
+    }
 
-          if (type != RequestErrorType.internalGenericError) {
-            return WordpressRawResponse(
-              data: null,
-              code: -type.index,
-              extra: extra,
-              message: error.message ?? error.type.name,
-            );
-          }
+    if (error is DioException) {
+      // Not an exhaustive switch: newer Dio versions add enum members
+      // (for example transformTimeout), which would break compilation.
+      final dioType = error.type;
+      final RequestErrorType type;
+      if (dioType == DioExceptionType.cancel) {
+        type = RequestErrorType.requestCancelled;
+      } else if (dioType == DioExceptionType.connectionTimeout ||
+          dioType == DioExceptionType.sendTimeout ||
+          dioType == DioExceptionType.receiveTimeout) {
+        type = RequestErrorType.timeout;
+      } else if (dioType == DioExceptionType.connectionError ||
+          dioType == DioExceptionType.badCertificate) {
+        type = RequestErrorType.connectionFailed;
+      } else {
+        type = RequestErrorType.internalGenericError;
+      }
 
-          // Dio could not parse a body that claims to be JSON (for example a
-          // PHP notice printed before the payload).
-          if (error.error is FormatException) {
-            return WordpressRawResponse(
-              data: null,
-              code: -RequestErrorType.invalidResponse.index,
-              extra: <String, dynamic>{...extra, 'error': error.error},
-              message: 'The response body is not valid JSON: ${error.error}',
-            );
-          }
-        }
-
+      if (type != RequestErrorType.internalGenericError) {
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: -type.index,
           extra: extra,
-          message: '$error\n\n$stackTrace',
+          message: error.message ?? error.type.name,
         );
-      },
+      }
+
+      // Dio could not parse a body that claims to be JSON (for example a
+      // PHP notice printed before the payload).
+      if (error.error is FormatException) {
+        return WordpressRawResponse(
+          data: null,
+          code: -RequestErrorType.invalidResponse.index,
+          extra: <String, dynamic>{...extra, 'error': error.error},
+          message: 'The response body is not valid JSON: ${error.error}',
+        );
+      }
+    }
+
+    return WordpressRawResponse(
+      data: null,
+      code: -RequestErrorType.internalGenericError.index,
+      extra: extra,
+      message: '$error\n\n$stackTrace',
     );
   }
 

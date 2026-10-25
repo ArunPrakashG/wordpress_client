@@ -2,4 +2,5 @@ export 'cache_middleware.dart';
 export 'delegated_middleware.dart';
 export 'logging_middleware.dart';
 export 'models/middleware_raw_response.dart';
+export 'offline_write_queue.dart';
 export 'wordpress_middleware_base.dart';
