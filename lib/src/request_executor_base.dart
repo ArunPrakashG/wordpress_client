@@ -17,6 +17,9 @@ abstract base class IRequestExecutor {
   /// The list of middleware to be applied to requests and responses.
   Iterable<IWordpressMiddleware> get middlewares;
 
+  /// The encoders and decoders registered with the owning client.
+  CodableMap get codableMap;
+
   /// Configures the executor with the given bootstrap configuration.
   ///
   /// This method should be called before making any requests.
@@ -174,7 +177,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> create<T>(WordpressRequest request) async {
     return _toResponse<T>(
       await _pipeline(request),
-      (data) => CodableMap.getDecoder<T>()(data),
+      (data) => codableMap.getDecoder<T>()(data),
     );
   }
 
@@ -189,7 +192,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> retrieve<T>(WordpressRequest request) async {
     return _toResponse<T>(
       await _pipeline(request),
-      (data) => CodableMap.getDecoder<T>()(data),
+      (data) => codableMap.getDecoder<T>()(data),
     );
   }
 
@@ -232,7 +235,7 @@ abstract base class IRequestExecutor {
           );
         }
 
-        final decoder = CodableMap.getDecoder<T>();
+        final decoder = codableMap.getDecoder<T>();
 
         return data.map(decoder).toList();
       },
@@ -250,7 +253,7 @@ abstract base class IRequestExecutor {
   Future<WordpressResponse<T>> update<T>(WordpressRequest request) async {
     return _toResponse<T>(
       await _pipeline(request),
-      (data) => CodableMap.getDecoder<T>()(data),
+      (data) => codableMap.getDecoder<T>()(data),
     );
   }
 

@@ -4,6 +4,7 @@ Breaking
 
 - **Requests are locked to the client's origin.** An absolute `RequestUrl` is used verbatim only when its scheme, host and port match the base URL; otherwise the request is not sent and the response has `RequestErrorType.originMismatch`. Previously only the host was rewritten. The base URL changes only via a new client or `reconfigure(baseUri: ...)`. (#87)
 - **Request metadata is no longer sent as HTTP headers.** The `method`, `request-url` and `request-query` pseudo-headers are gone. Middlewares read them from the new `WordpressRequest.extra` (keys `WordpressRequest.metaMethod`, `metaUrl`, `metaQuery`), which is also copied onto `WordpressRawResponse.extra`. (#85)
+- **No more process-wide state.** `CodableMap` decoders/encoders and the endpoint statistics (counts and the `withStatisticDelegate` callback) are now owned by each `WordpressClient`. `CodableMap.getDecoder/getEncoder` are instance methods, and the global `serialize<T>()`/`deserialize<T>()` helpers are removed. Disposing one client no longer clears the codecs of every other client. (#92)
 - `RequestErrorType` gained `originMismatch` and `invalidResponse` (appended, existing indices unchanged).
 
 Fixed

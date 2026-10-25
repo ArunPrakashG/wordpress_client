@@ -112,6 +112,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         baseUrl,
         client,
+        typeMap,
         configuration,
       ),
       typeMap,
@@ -199,6 +200,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         null,
         client,
+        typeMap,
         configuration,
       ),
       typeMap,
@@ -277,6 +279,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         baseUrl,
         instance,
+        typeMap,
         configuration,
       ),
       typeMap,

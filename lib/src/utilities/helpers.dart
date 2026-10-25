@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import '../library_exports.dart';
-import 'codable_map/codable_map.dart';
 
 /// Parses a date from a JSON object with error handling.
 ///
@@ -223,26 +222,6 @@ String parseHtmlString(String htmlString) =>
 ///
 /// Returns the Type of T.
 Type typeOf<T>() => T;
-
-/// Deserializes a JSON object to a specified type using CodableMap.
-///
-/// [object] The JSON object to deserialize.
-///
-/// Returns the deserialized object of type T.
-T deserialize<T>(dynamic object) {
-  final decoder = CodableMap.getDecoder<T>();
-  return decoder(object);
-}
-
-/// Serializes a Dart object to a JSON map using CodableMap.
-///
-/// [object] The object to serialize.
-///
-/// Returns the serialized object as a Map<String, dynamic>.
-Map<String, dynamic> serialize<T>(T object) {
-  final encoder = CodableMap.getEncoder<T>();
-  return encoder(object);
-}
 
 /// Maps an iterable JSON object to a List of specified type with error checking.
 ///

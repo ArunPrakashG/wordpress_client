@@ -8,9 +8,12 @@ import 'type_key.dart';
 /// This class provides methods to register, retrieve, and manage custom
 /// encoders and decoders for different types, allowing for flexible
 /// JSON encoding and decoding of complex objects.
+///
+/// Every [WordpressClient] owns its own instance, so two clients can register
+/// different codecs for the same type without affecting each other.
 class CodableMap {
-  static final Map<TypeKey<dynamic>, JsonDecoderCallback> _decoders = {};
-  static final Map<TypeKey<dynamic>, JsonEncoderCallback> _encoders = {};
+  final Map<TypeKey<dynamic>, JsonDecoderCallback> _decoders = {};
+  final Map<TypeKey<dynamic>, JsonEncoderCallback> _encoders = {};
 
   /// Checks if an encoder exists for the given type [T].
   ///
@@ -62,7 +65,7 @@ class CodableMap {
   /// Retrieves the decoder for the type [T].
   ///
   /// Throws a [MapDoesNotExistException] if no decoder exists for type [T].
-  static JsonDecoderCallback<T> getDecoder<T>() {
+  JsonDecoderCallback<T> getDecoder<T>() {
     if (_decoders[TypeKey<T>()] == null) {
       throw MapDoesNotExistException(
         'Map of type: ${TypeKey<T>()} does not exist!',
@@ -117,7 +120,7 @@ class CodableMap {
   /// Retrieves the encoder for the type [T].
   ///
   /// Throws a [MapDoesNotExistException] if no encoder exists for type [T].
-  static JsonEncoderCallback getEncoder<T>() {
+  JsonEncoderCallback getEncoder<T>() {
     if (_encoders[TypeKey<T>()] == null) {
       throw MapDoesNotExistException(
         'Map of type: ${TypeKey<T>()} does not exist!',

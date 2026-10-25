@@ -7,17 +7,21 @@ typedef MiddlwareResponseTransformer = WordpressRawResponse Function(
 final class InternalRequester extends IRequestExecutor {
   InternalRequester.configure(
     this._baseUrl,
-    this._client, [
+    this._client,
+    this.codableMap, [
     this._configuration = const BootstrapConfiguration(),
   ]) {
     configure(_configuration);
   }
 
+  @override
+  final CodableMap codableMap;
+
   final Dio _client;
   Uri? _baseUrl;
   IAuthorization? _defaultAuthorization;
-  static final Map<String, int> _endPointStatistics = <String, int>{};
-  static StatisticsCallback? _statisticsCallback;
+  final Map<String, int> _endPointStatistics = <String, int>{};
+  StatisticsCallback? _statisticsCallback;
   bool _isDebugMode = false;
   final BootstrapConfiguration _configuration;
 
