@@ -34,7 +34,7 @@ final class Tag implements ISelfRespresentive {
   factory Tag.fromJson(Map<String, dynamic> json) {
     return Tag(
       id: castOrElse(json['id']),
-      count: castOrElse(json['count']),
+      count: castOrElse(json['count'], orElse: () => 0)!,
       description: castOrElse(json['description']),
       link: castOrElse(json['link']),
       name: castOrElse(json['name']),

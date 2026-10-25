@@ -56,6 +56,7 @@ export 'parallel_wordpress/exports.dart';
 export 'requests/request_interface.dart';
 export 'requests/requests_export.dart';
 export 'requests/wordpress_request.dart';
+export 'responses/properties/embedded.dart';
 export 'responses/responses_export.dart';
 export 'responses/wordpress_error.dart';
 export 'responses/wordpress_failure.dart' hide classifyFailure;

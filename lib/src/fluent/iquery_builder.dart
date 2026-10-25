@@ -106,4 +106,16 @@ abstract interface class IQueryBuilder<TSelf extends IQueryBuilder<TSelf>> {
 
   /// Search in specific columns (where supported)
   TSelf withSearchColumns(List<String> columns);
+
+  /// Ask WordPress to embed linked resources (`_embed`).
+  ///
+  /// Without [relations] everything embeddable is embedded; otherwise only
+  /// the given link relations (for example `['author', 'wp:featuredmedia']`).
+  /// Read the result with `item.embedded`.
+  TSelf withEmbed([List<String>? relations]);
+
+  /// Restrict the response to the given fields (`_fields`), which shrinks the
+  /// payload. Fields missing from the response decode as defaults, so use it
+  /// with raw requests or models that tolerate absent fields.
+  TSelf withFields(List<String> fields);
 }

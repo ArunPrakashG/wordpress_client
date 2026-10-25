@@ -246,7 +246,7 @@ void main() {
   test('Ability exposes required_capabilities', () {
     final a = Ability.fromJson({
       ...ability('x/y'),
-      'required_capabilities': ['edit_posts', 'upload_files'],
+      'required_capabilities': const ['edit_posts', 'upload_files'],
     });
 
     expect(a.requiredCapabilities, ['edit_posts', 'upload_files']);
