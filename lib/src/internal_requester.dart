@@ -235,6 +235,7 @@ final class InternalRequester extends IRequestExecutor {
       function: () async {
         return _executeMiddlewareEvent(
           request: request,
+          requestHeaders: requestHeaders,
           transformer: (data) {
             final headers = <String, dynamic>{
               MIDDLEWARE_HEADER_KEY: true,
@@ -413,6 +414,7 @@ final class InternalRequester extends IRequestExecutor {
 
   Future<WordpressRawResponse?> _executeMiddlewareEvent({
     required WordpressRequest request,
+    required Map<String, dynamic> requestHeaders,
     required MiddlwareResponseTransformer transformer,
   }) async {
     for (final middleware in middlewares) {
@@ -420,6 +422,10 @@ final class InternalRequester extends IRequestExecutor {
 
       if (result.hasData) {
         return transformer(result);
+      }
+
+      if (result.requestHeaders != null) {
+        requestHeaders.addAll(result.requestHeaders!);
       }
     }
 

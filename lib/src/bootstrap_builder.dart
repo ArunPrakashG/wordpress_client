@@ -146,6 +146,7 @@ class BootstrapBuilder {
     CacheInvalidation invalidation = CacheInvalidation.resource,
     Duration? Function(Uri url)? ttlFor,
     bool Function(WordpressRawResponse response)? shouldCache,
+    Duration revalidateWindow = const Duration(hours: 1),
   }) {
     _middlewares ??= [];
     final manager =
@@ -161,6 +162,7 @@ class BootstrapBuilder {
           invalidation: invalidation,
           ttlFor: ttlFor,
           shouldCache: shouldCache,
+          revalidateWindow: revalidateWindow,
         ),
       );
     }

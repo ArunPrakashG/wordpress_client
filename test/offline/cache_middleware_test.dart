@@ -56,6 +56,7 @@ void main() {
     Duration? Function(Uri url)? ttlFor,
     bool Function(WordpressRawResponse response)? shouldCache,
     ICacheManager<WordpressRawResponse>? cache,
+    Duration revalidateWindow = const Duration(hours: 1),
   }) {
     return makeClient(
       adapter,
@@ -67,6 +68,7 @@ void main() {
           invalidation: invalidation,
           ttlFor: ttlFor,
           shouldCache: shouldCache,
+          revalidateWindow: revalidateWindow,
         ),
       ],
     );
@@ -214,6 +216,109 @@ void main() {
 
       expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
       expect(adapter.callCount(method: 'GET', path: '/pages'), 1);
+    });
+  });
+
+  group('ETag revalidation (#98)', () {
+    const etag = '"v1"';
+
+    void serveEtag() {
+      adapter.on('GET', '/posts', (req) {
+        if (req.headers['If-None-Match'] == etag) {
+          return const MockResponse(statusCode: 304, headers: {'ETag': etag});
+        }
+
+        return const MockResponse(body: [onePost], headers: {'ETag': etag});
+      });
+    }
+
+    Future<void> expire() =>
+        Future<void>.delayed(const Duration(milliseconds: 20));
+
+    Duration? shortTtl(Uri _) => const Duration(milliseconds: 5);
+
+    test('an expired entry is revalidated and served on 304', () async {
+      serveEtag();
+      final client = clientWithCache(ttlFor: shortTtl);
+
+      await client.posts.list(ListPostRequest());
+      await expire();
+      final second = await client.posts.list(ListPostRequest());
+
+      expect(second, isA<WordpressSuccessResponse<List<Post>>>());
+      expect(
+          (second as WordpressSuccessResponse<List<Post>>).data, hasLength(1));
+      expect(second.headers['X-Cache'], 'REVALIDATED');
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+      expect(adapter.lastRequest!.headers['If-None-Match'], etag);
+    });
+
+    test('a fresh entry with an ETag is served without a request', () async {
+      serveEtag();
+      final client = clientWithCache(
+        ttlFor: (_) => const Duration(milliseconds: 5000),
+      );
+
+      await client.posts.list(ListPostRequest());
+      await client.posts.list(ListPostRequest());
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 1);
+    });
+
+    test('a changed resource replaces the cached entry', () async {
+      var version = 1;
+      adapter.on('GET', '/posts', (req) {
+        final current = '"v$version"';
+        if (req.headers['If-None-Match'] == current) {
+          return MockResponse(statusCode: 304, headers: {'ETag': current});
+        }
+
+        return MockResponse(
+          body: [
+            {...onePost, 'id': version},
+          ],
+          headers: {'ETag': current},
+        );
+      });
+      final client = clientWithCache(ttlFor: shortTtl);
+
+      await client.posts.list(ListPostRequest());
+      version = 2;
+      await expire();
+      final second = await client.posts.list(ListPostRequest());
+
+      expect(
+        (second as WordpressSuccessResponse<List<Post>>).data.single.id,
+        2,
+      );
+      expect(second.headers['X-Cache'], isNot('REVALIDATED'));
+    });
+
+    test('responses without a validator are not revalidated', () async {
+      final client = clientWithCache(ttlFor: shortTtl);
+
+      await client.posts.list(ListPostRequest());
+      await expire();
+      await client.posts.list(ListPostRequest());
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+      expect(
+          adapter.lastRequest!.headers.keys, isNot(contains('If-None-Match')));
+    });
+
+    test('revalidateWindow: zero disables conditional requests', () async {
+      serveEtag();
+      final client = clientWithCache(
+        ttlFor: shortTtl,
+        revalidateWindow: Duration.zero,
+      );
+
+      await client.posts.list(ListPostRequest());
+      await expire();
+      await client.posts.list(ListPostRequest());
+
+      expect(
+          adapter.lastRequest!.headers.keys, isNot(contains('If-None-Match')));
     });
   });
 

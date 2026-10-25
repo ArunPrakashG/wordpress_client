@@ -29,6 +29,7 @@ class CacheMiddleware implements IWordpressMiddleware {
     this.invalidation = CacheInvalidation.resource,
     this.ttlFor,
     this.shouldCache,
+    this.revalidateWindow = const Duration(hours: 1),
   })  : _cache = cache,
         _ttl = ttl,
         _clearOnWrite = clearOnWrite;
@@ -44,6 +45,18 @@ class CacheMiddleware implements IWordpressMiddleware {
   /// Picks a time to live per request URL, for example a longer one for
   /// rarely changing `categories`. Return null to use the default `ttl`.
   final Duration? Function(Uri url)? ttlFor;
+
+  /// How long after its time to live an entry is kept for revalidation.
+  ///
+  /// When a cached response carries an `ETag` or `Last-Modified` header and
+  /// expires, the next request is sent with `If-None-Match` /
+  /// `If-Modified-Since`; a `304 Not Modified` answer revives the cached body
+  /// without downloading it again. Set to [Duration.zero] to turn this off.
+  /// Entries without a validator are dropped at their time to live as before.
+  final Duration revalidateWindow;
+
+  static const String _storedAtKey = 'wp.cache.storedAt';
+  static const String _ttlKey = 'wp.cache.ttl';
 
   /// Decides whether a successful GET response is stored. Return false to
   /// skip it, for example for endpoints that must always be fresh.
@@ -82,6 +95,16 @@ class CacheMiddleware implements IWordpressMiddleware {
       return MiddlewareRawResponse.defaultInstance();
     }
 
+    if (!_isFresh(hit)) {
+      final validators = _validators(hit.headers);
+
+      return MiddlewareRawResponse(
+        statusCode: -99,
+        body: null,
+        requestHeaders: validators.isEmpty ? null : validators,
+      );
+    }
+
     // Return cached payload through middleware
     return MiddlewareRawResponse(
       statusCode: hit.code,
@@ -104,21 +127,39 @@ class CacheMiddleware implements IWordpressMiddleware {
 
     final requestMethod = response.extra[WordpressRequest.metaMethod];
 
-    // Populate cache on successful GET
-    if (requestMethod == HttpMethod.get.name && response.isSuccessful) {
+    if (requestMethod == HttpMethod.get.name) {
+      final url = response.extra[WordpressRequest.metaUrl];
       final key = _buildKey(
         method: requestMethod,
-        url: response.extra[WordpressRequest.metaUrl],
+        url: url,
         query: response.extra[WordpressRequest.metaQuery],
         headers: response.requestHeaders,
       );
-      final url = response.extra[WordpressRequest.metaUrl];
-      final allowed = shouldCache?.call(response) ?? true;
-      if (key != null && allowed) {
-        final ttl = url is String ? ttlFor?.call(Uri.parse(url)) : null;
-        await _cache.set(key, response, expiry: ttl ?? _ttl);
+
+      // 304 Not Modified: the cached body is still valid, so refresh it.
+      if (response.code == 304 && key != null) {
+        final cached = await _cache.get(key);
+        if (cached != null) {
+          return _store(
+            key,
+            cached.copyWith(
+              headers: {...cached.headers, ...response.headers},
+              duration: response.duration,
+              extra: {...cached.extra, ...response.extra},
+            ),
+            url,
+            header: 'REVALIDATED',
+          );
+        }
       }
-      return response;
+
+      // Populate cache on successful GET
+      if (response.code >= 200 && response.code < 300) {
+        if (key != null && (shouldCache?.call(response) ?? true)) {
+          await _store(key, response, url);
+        }
+        return response;
+      }
     }
 
     // Invalidate cache on successful write operations if configured
@@ -132,6 +173,74 @@ class CacheMiddleware implements IWordpressMiddleware {
     }
 
     return response;
+  }
+
+  /// Stamps [response] with its freshness window and stores it.
+  ///
+  /// With a validator the entry outlives its time to live by
+  /// [revalidateWindow] so it can be revalidated instead of refetched.
+  Future<WordpressRawResponse> _store(
+    String key,
+    WordpressRawResponse response,
+    Object? url, {
+    String? header,
+  }) async {
+    final ttl = (url is String ? ttlFor?.call(Uri.parse(url)) : null) ?? _ttl;
+    final keep = _validators(response.headers).isEmpty
+        ? Duration.zero
+        : revalidateWindow;
+
+    final stamped = response.copyWith(
+      extra: {
+        ...response.extra,
+        _storedAtKey: DateTime.now().millisecondsSinceEpoch,
+        _ttlKey: ttl.inMilliseconds,
+      },
+    );
+    await _cache.set(key, stamped, expiry: ttl + keep);
+
+    if (header == null) {
+      return response;
+    }
+
+    return stamped.copyWith(
+      code: 200,
+      headers: {...stamped.headers, 'X-Cache': header},
+    );
+  }
+
+  bool _isFresh(WordpressRawResponse entry) {
+    final storedAt = entry.extra[_storedAtKey];
+    final ttl = entry.extra[_ttlKey];
+    if (storedAt is! int || ttl is! int) {
+      return true;
+    }
+
+    return DateTime.now().millisecondsSinceEpoch - storedAt <= ttl;
+  }
+
+  /// The conditional request headers for a cached response, if it has any
+  /// validator (`ETag` / `Last-Modified`).
+  Map<String, String> _validators(Map<String, dynamic> headers) {
+    String? find(String name) {
+      for (final entry in headers.entries) {
+        if (entry.key.toLowerCase() == name && entry.value != null) {
+          final value = entry.value;
+
+          return value is List ? value.firstOrNull?.toString() : '$value';
+        }
+      }
+
+      return null;
+    }
+
+    final etag = find('etag');
+    final modified = find('last-modified');
+
+    return {
+      if (etag != null) 'If-None-Match': etag,
+      if (modified != null) 'If-Modified-Since': modified,
+    };
   }
 
   Future<void> _invalidate(Object? writtenUrl) async {
