@@ -46,7 +46,7 @@ jobs:
 
       - name: Ensure version changed
         run: |
-          CURRENT=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          CURRENT=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr -d '\r')
           if [ "v$CURRENT" != "v${{ steps.bump.outputs.new_version }}" ]; then
             echo "Version in pubspec.yaml is $CURRENT but bump script reported ${{ steps.bump.outputs.new_version }}"
             exit 1
