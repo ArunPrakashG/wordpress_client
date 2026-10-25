@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../wordpress_client.dart';
+import '../utilities/rest_root.dart';
 
 /// How WordPress validates a batch before running it.
 enum BatchValidation {
@@ -155,22 +156,7 @@ final class BatchInterface extends IRequestInterface {
   /// WordPress rejects batches larger than this (25 unless a plugin raises it).
   static const defaultMaxBatchSize = 25;
 
-  Uri get _endpoint {
-    final base = baseUrl;
-    final segments = base.pathSegments;
-    final marker = segments.indexOf('wp-json');
-    final prefix = marker >= 0
-        ? segments.sublist(0, marker + 1)
-        : <String>[...segments.where((s) => s.isNotEmpty), 'wp-json'];
-
-    return Uri(
-      scheme: base.scheme,
-      userInfo: base.userInfo,
-      host: base.host,
-      port: base.hasPort ? base.port : null,
-      pathSegments: [...prefix, 'batch', 'v1'],
-    );
-  }
+  Uri get _endpoint => restRoot(baseUrl, 'batch/v1');
 
   /// Sends [operations], splitting them into requests of at most [chunkSize]
   /// (WordPress' default limit is 25). Chunks run one after another; the

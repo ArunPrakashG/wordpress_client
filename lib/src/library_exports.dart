@@ -31,6 +31,7 @@ export 'interface/page.dart';
 export 'interface/pages_extensions.dart';
 export 'interface/posts.dart';
 export 'interface/posts_extensions.dart';
+export 'interface/resource.dart';
 export 'interface/revisions.dart';
 export 'interface/revisions_extensions.dart';
 export 'interface/search.dart';

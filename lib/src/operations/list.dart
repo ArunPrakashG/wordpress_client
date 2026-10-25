@@ -50,39 +50,22 @@ base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
     int perPage = 100,
     int? maxPages,
   }) async* {
-    assert(startPage >= 1, 'startPage must be at least 1');
-    assert(perPage >= 1, 'perPage must be at least 1');
-    assert(maxPages == null || maxPages >= 1, 'maxPages must be at least 1');
-
     final base = await request.build(baseUrl);
-    var fetched = 0;
 
-    for (var page = startPage;; page++) {
-      final response = await executor.list<T>(
+    yield* walkPages<T>(
+      (page, size) => executor.list<T>(
         base.copyWith(
           queryParameters: <String, dynamic>{
             ...?base.queryParameters,
             'page': page,
-            'per_page': perPage,
+            'per_page': size,
           },
         ),
-      );
-
-      yield response;
-      fetched++;
-
-      if (response is! WordpressSuccessResponse<List<T>>) {
-        return;
-      }
-
-      final totalPages = response.totalPagesCount;
-      final isLast =
-          totalPages > 0 ? page >= totalPages : response.data.length < perPage;
-
-      if (isLast || (maxPages != null && fetched >= maxPages)) {
-        return;
-      }
-    }
+      ),
+      startPage: startPage,
+      perPage: perPage,
+      maxPages: maxPages,
+    );
   }
 
   /// Fetches every page of [request] and returns all items in one list.
@@ -100,44 +83,9 @@ base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
     int? maxPages,
     int? maxItems,
   }) async {
-    assert(maxItems == null || maxItems >= 1, 'maxItems must be at least 1');
-
-    final items = <T>[];
-    WordpressSuccessResponse<List<T>>? first;
-    var duration = Duration.zero;
-
-    await for (final page in listPages(
-      request,
-      perPage: perPage,
-      maxPages: maxPages,
-    )) {
-      if (page is! WordpressSuccessResponse<List<T>>) {
-        return page;
-      }
-
-      first ??= page;
-      duration += page.duration;
-      items.addAll(page.data);
-
-      if (maxItems != null && items.length >= maxItems) {
-        break;
-      }
-    }
-
-    final head = first!;
-    final data = maxItems != null && items.length > maxItems
-        ? items.sublist(0, maxItems)
-        : items;
-
-    return WordpressSuccessResponse<List<T>>(
-      headers: head.headers,
-      duration: duration,
-      data: data,
-      rawData: null,
-      requestHeaders: head.requestHeaders,
-      code: head.code,
-      extra: head.extra,
-      message: head.message,
+    return collectPages<T>(
+      listPages(request, perPage: perPage, maxPages: maxPages),
+      maxItems: maxItems,
     );
   }
 
@@ -157,4 +105,83 @@ base mixin ListOperation<T, R extends IRequest> on IRequestInterface {
 
     return executor.raw(wpRequest);
   }
+}
+
+/// Fetches pages through [fetch] until the last one, lazily.
+///
+/// Stops at the first failure (after yielding it), at `X-WP-TotalPages`, when
+/// a page comes back shorter than [perPage], or after [maxPages] pages.
+Stream<WordpressResponse<List<T>>> walkPages<T>(
+  Future<WordpressResponse<List<T>>> Function(int page, int perPage) fetch, {
+  int startPage = 1,
+  int perPage = 100,
+  int? maxPages,
+}) async* {
+  assert(startPage >= 1, 'startPage must be at least 1');
+  assert(perPage >= 1, 'perPage must be at least 1');
+  assert(maxPages == null || maxPages >= 1, 'maxPages must be at least 1');
+
+  var fetched = 0;
+
+  for (var page = startPage;; page++) {
+    final response = await fetch(page, perPage);
+
+    yield response;
+    fetched++;
+
+    if (response is! WordpressSuccessResponse<List<T>>) {
+      return;
+    }
+
+    final totalPages = response.totalPagesCount;
+    final isLast =
+        totalPages > 0 ? page >= totalPages : response.data.length < perPage;
+
+    if (isLast || (maxPages != null && fetched >= maxPages)) {
+      return;
+    }
+  }
+}
+
+/// Collects the [pages] of [walkPages] into one response (see
+/// `ListOperation.listAll`).
+Future<WordpressResponse<List<T>>> collectPages<T>(
+  Stream<WordpressResponse<List<T>>> pages, {
+  int? maxItems,
+}) async {
+  assert(maxItems == null || maxItems >= 1, 'maxItems must be at least 1');
+
+  final items = <T>[];
+  WordpressSuccessResponse<List<T>>? first;
+  var duration = Duration.zero;
+
+  await for (final page in pages) {
+    if (page is! WordpressSuccessResponse<List<T>>) {
+      return page;
+    }
+
+    first ??= page;
+    duration += page.duration;
+    items.addAll(page.data);
+
+    if (maxItems != null && items.length >= maxItems) {
+      break;
+    }
+  }
+
+  final head = first!;
+  final data = maxItems != null && items.length > maxItems
+      ? items.sublist(0, maxItems)
+      : items;
+
+  return WordpressSuccessResponse<List<T>>(
+    headers: head.headers,
+    duration: duration,
+    data: data,
+    rawData: null,
+    requestHeaders: head.requestHeaders,
+    code: head.code,
+    extra: head.extra,
+    message: head.message,
+  );
 }
