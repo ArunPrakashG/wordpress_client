@@ -143,6 +143,9 @@ class BootstrapBuilder {
     ICacheManager<WordpressRawResponse>? cache,
     Duration ttl = const Duration(minutes: 1),
     bool clearOnWrite = true,
+    CacheInvalidation invalidation = CacheInvalidation.resource,
+    Duration? Function(Uri url)? ttlFor,
+    bool Function(WordpressRawResponse response)? shouldCache,
   }) {
     _middlewares ??= [];
     final manager =
@@ -155,6 +158,9 @@ class BootstrapBuilder {
           cache: manager,
           ttl: ttl,
           clearOnWrite: clearOnWrite,
+          invalidation: invalidation,
+          ttlFor: ttlFor,
+          shouldCache: shouldCache,
         ),
       );
     }

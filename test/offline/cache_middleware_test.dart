@@ -15,6 +15,24 @@ final class _SpyStore extends MemoryCacheStore<WordpressRawResponse> {
   }
 }
 
+/// Implements only the base interface, like a third party store might.
+final class _PlainStore implements ICacheManager<WordpressRawResponse> {
+  final Map<String, WordpressRawResponse> _entries = {};
+
+  @override
+  void set(String key, WordpressRawResponse value, {Duration? expiry}) =>
+      _entries[key] = value;
+
+  @override
+  WordpressRawResponse? get(String key) => _entries[key];
+
+  @override
+  void remove(String key) => _entries.remove(key);
+
+  @override
+  void clear() => _entries.clear();
+}
+
 void main() {
   late MockWordpressAdapter adapter;
   late _SpyStore store;
@@ -34,11 +52,23 @@ void main() {
   WordpressClient clientWithCache({
     IAuthorization? auth,
     bool clearOnWrite = true,
+    CacheInvalidation invalidation = CacheInvalidation.resource,
+    Duration? Function(Uri url)? ttlFor,
+    bool Function(WordpressRawResponse response)? shouldCache,
+    ICacheManager<WordpressRawResponse>? cache,
   }) {
     return makeClient(
       adapter,
       auth: auth,
-      middlewares: [CacheMiddleware(cache: store, clearOnWrite: clearOnWrite)],
+      middlewares: [
+        CacheMiddleware(
+          cache: cache ?? store,
+          clearOnWrite: clearOnWrite,
+          invalidation: invalidation,
+          ttlFor: ttlFor,
+          shouldCache: shouldCache,
+        ),
+      ],
     );
   }
 
@@ -104,6 +134,86 @@ void main() {
       await client.posts.list(ListPostRequest());
 
       expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+    });
+  });
+
+  group('resource invalidation (#90)', () {
+    final auth = WordpressAuth.appPassword(user: 'a', appPassword: 'pw1 pw1');
+
+    Future<void> createPost(WordpressClient client) {
+      return client.posts.create(
+        CreatePostRequest(title: 'x', content: 'y', status: 'draft'),
+      );
+    }
+
+    test('a write evicts its own resource but not others', () async {
+      final client = clientWithCache(auth: auth);
+
+      await client.posts.list(ListPostRequest(requireAuth: true));
+      await client.pages.list(ListPageRequest(requireAuth: true));
+      await createPost(client);
+      await client.posts.list(ListPostRequest(requireAuth: true));
+      await client.pages.list(ListPageRequest(requireAuth: true));
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+      expect(adapter.callCount(method: 'GET', path: '/pages'), 1);
+    });
+
+    test('invalidation: all evicts every resource', () async {
+      final client = clientWithCache(
+        auth: auth,
+        invalidation: CacheInvalidation.all,
+      );
+
+      await client.pages.list(ListPageRequest(requireAuth: true));
+      await createPost(client);
+      await client.pages.list(ListPageRequest(requireAuth: true));
+
+      expect(adapter.callCount(method: 'GET', path: '/pages'), 2);
+    });
+
+    test('a store without removeWhere falls back to clearing', () async {
+      final client = clientWithCache(auth: auth, cache: _PlainStore());
+
+      await client.pages.list(ListPageRequest(requireAuth: true));
+      await createPost(client);
+      await client.pages.list(ListPageRequest(requireAuth: true));
+
+      expect(adapter.callCount(method: 'GET', path: '/pages'), 2);
+    });
+
+    test('clearOnWrite: false keeps everything', () async {
+      final client = clientWithCache(auth: auth, clearOnWrite: false);
+
+      await client.posts.list(ListPostRequest(requireAuth: true));
+      await createPost(client);
+      await client.posts.list(ListPostRequest(requireAuth: true));
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 1);
+    });
+
+    test('shouldCache can veto storing a response', () async {
+      final client = clientWithCache(shouldCache: (_) => false);
+
+      await client.posts.list(ListPostRequest());
+      await client.posts.list(ListPostRequest());
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+    });
+
+    test('ttlFor sets a per-endpoint time to live', () async {
+      final client = clientWithCache(
+        ttlFor: (url) => url.path.endsWith('/posts') ? Duration.zero : null,
+      );
+
+      await client.posts.list(ListPostRequest());
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await client.posts.list(ListPostRequest());
+      await client.pages.list(ListPageRequest());
+      await client.pages.list(ListPageRequest());
+
+      expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
+      expect(adapter.callCount(method: 'GET', path: '/pages'), 1);
     });
   });
 

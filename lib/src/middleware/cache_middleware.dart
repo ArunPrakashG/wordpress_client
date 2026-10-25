@@ -5,6 +5,20 @@ import 'package:crypto/crypto.dart';
 
 import '../library_exports.dart';
 
+/// What a successful write (POST/PUT/PATCH/DELETE) evicts from the cache.
+enum CacheInvalidation {
+  /// Evict only the cached GET responses of the resource that was written:
+  /// writing `/wp/v2/posts/5` evicts `/wp/v2/posts`, `/wp/v2/posts/5`,
+  /// `/wp/v2/posts/5/revisions`, and so on, but leaves `/wp/v2/pages` alone.
+  ///
+  /// Falls back to [all] when the URL is not a REST route or the store does
+  /// not implement [ISelectiveCache].
+  resource,
+
+  /// Evict everything.
+  all,
+}
+
 /// Cache middleware that implements read-through and write-through caching
 /// using an [ICacheManager].
 class CacheMiddleware implements IWordpressMiddleware {
@@ -12,6 +26,9 @@ class CacheMiddleware implements IWordpressMiddleware {
     required ICacheManager<WordpressRawResponse> cache,
     Duration ttl = const Duration(minutes: 1),
     bool clearOnWrite = true,
+    this.invalidation = CacheInvalidation.resource,
+    this.ttlFor,
+    this.shouldCache,
   })  : _cache = cache,
         _ttl = ttl,
         _clearOnWrite = clearOnWrite;
@@ -19,6 +36,18 @@ class CacheMiddleware implements IWordpressMiddleware {
   final ICacheManager<WordpressRawResponse> _cache;
   final Duration _ttl;
   final bool _clearOnWrite;
+
+  /// How much of the cache a successful write evicts. Ignored when
+  /// `clearOnWrite` is false.
+  final CacheInvalidation invalidation;
+
+  /// Picks a time to live per request URL, for example a longer one for
+  /// rarely changing `categories`. Return null to use the default `ttl`.
+  final Duration? Function(Uri url)? ttlFor;
+
+  /// Decides whether a successful GET response is stored. Return false to
+  /// skip it, for example for endpoints that must always be fresh.
+  final bool Function(WordpressRawResponse response)? shouldCache;
 
   @override
   String get name => 'CacheMiddleware';
@@ -83,8 +112,11 @@ class CacheMiddleware implements IWordpressMiddleware {
         query: response.extra[WordpressRequest.metaQuery],
         headers: response.requestHeaders,
       );
-      if (key != null) {
-        await _cache.set(key, response, expiry: _ttl);
+      final url = response.extra[WordpressRequest.metaUrl];
+      final allowed = shouldCache?.call(response) ?? true;
+      if (key != null && allowed) {
+        final ttl = url is String ? ttlFor?.call(Uri.parse(url)) : null;
+        await _cache.set(key, response, expiry: ttl ?? _ttl);
       }
       return response;
     }
@@ -96,10 +128,60 @@ class CacheMiddleware implements IWordpressMiddleware {
         requestMethod == HttpMethod.delete.name;
 
     if (_clearOnWrite && isWrite && response.isSuccessful) {
-      await _cache.clear();
+      await _invalidate(response.extra[WordpressRequest.metaUrl]);
     }
 
     return response;
+  }
+
+  Future<void> _invalidate(Object? writtenUrl) async {
+    final cache = _cache;
+    final root =
+        invalidation == CacheInvalidation.resource && writtenUrl is String
+            ? _resourceRoot(writtenUrl)
+            : null;
+
+    if (root == null || cache is! ISelectiveCache<WordpressRawResponse>) {
+      await cache.clear();
+      return;
+    }
+
+    // Keys look like `get <url>?<query>|auth:<digest>`.
+    final prefix = 'get $root';
+    await cache.removeWhere((key) {
+      if (!key.startsWith(prefix) || key.length == prefix.length) {
+        return false;
+      }
+      final next = key[prefix.length];
+
+      return next == '?' || next == '/';
+    });
+  }
+
+  /// The URL of the resource collection a write belongs to, e.g.
+  /// `https://x.com/wp-json/wp/v2/posts` for `.../wp/v2/posts/5`.
+  ///
+  /// REST routes are `wp-json/<vendor>/<version>/<resource>/...`. Returns null
+  /// when the URL does not follow that shape.
+  static String? _resourceRoot(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      return null;
+    }
+
+    final segments = uri.pathSegments;
+    final marker = segments.indexOf('wp-json');
+    if (marker < 0 || segments.length < marker + 4) {
+      return null;
+    }
+
+    return uri
+        .replace(
+          pathSegments: segments.sublist(0, marker + 4),
+          query: '',
+        )
+        .toString()
+        .replaceAll(RegExp(r'\?$'), '');
   }
 
   @override

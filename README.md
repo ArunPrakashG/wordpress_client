@@ -129,12 +129,15 @@ final client = WordpressClient(
       ttl: const Duration(minutes: 5),               // optional, default 1 minute
       // cache: MyCustomCacheManager(),              // optional custom store
       // clearOnWrite: false,                        // keep cache after POST/PUT/PATCH/DELETE
+      // invalidation: CacheInvalidation.all,        // default evicts only the written resource
+      // ttlFor: (url) => url.path.endsWith('/categories') ? Duration(hours: 1) : null,
+      // shouldCache: (response) => true,            // veto individual responses
     )
     .build(),
 );
 ```
 
-📝 Notes: applies to GET requests; default store is in-memory (custom stores supported); cache clears by default on writes.
+📝 Notes: applies to GET requests; default store is in-memory (custom stores supported); a write evicts only the cached responses of the resource it touched (for example `posts`) by default; custom stores can implement `ISelectiveCache` to support this, otherwise the whole cache is cleared.
 
 ### 📩 Send a request
 

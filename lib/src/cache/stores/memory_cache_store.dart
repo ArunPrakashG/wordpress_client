@@ -1,7 +1,7 @@
 import '../cache_entry.dart';
-import '../cache_manager_base.dart';
+import '../selective_cache.dart';
 
-class MemoryCacheStore<T> implements ICacheManager<T> {
+class MemoryCacheStore<T> implements ISelectiveCache<T> {
   MemoryCacheStore();
 
   final Map<String, CacheEntry<T>> _cache = {};
@@ -28,6 +28,11 @@ class MemoryCacheStore<T> implements ICacheManager<T> {
   @override
   void remove(String key) {
     _cache.remove(key);
+  }
+
+  @override
+  void removeWhere(bool Function(String key) test) {
+    _cache.removeWhere((key, _) => test(key));
   }
 
   @override
