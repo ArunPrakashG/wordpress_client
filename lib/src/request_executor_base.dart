@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:dio/dio.dart' show DioException, DioExceptionType;
 import 'package:meta/meta.dart';
 
 import 'library_exports.dart';
-import 'responses/wordpress_error.dart';
 import 'utilities/codable_map/codable_map.dart';
 
 /// Base class for request executors in the WordPress API client.
@@ -20,6 +20,17 @@ abstract base class IRequestExecutor {
 
   /// The encoders and decoders registered with the owning client.
   CodableMap get codableMap;
+
+  /// Whether identical in-flight `GET` requests share one network call.
+  bool get deduplicateRequests;
+
+  /// Maximum number of requests running at once, or `null` for no limit.
+  int? get maxConcurrentRequests;
+
+  final Map<String, Future<WordpressRawResponse>> _inFlight =
+      <String, Future<WordpressRawResponse>>{};
+  final Queue<Completer<void>> _waiting = Queue<Completer<void>>();
+  int _running = 0;
 
   /// Configures the executor with the given bootstrap configuration.
   ///
@@ -62,80 +73,220 @@ abstract base class IRequestExecutor {
 
   /// Runs [request] through request middlewares, [execute] and response
   /// middlewares. Never throws: any error becomes a failure response.
+  ///
+  /// Fires [WordpressEvents.onCancel] / [WordpressEvents.onError] once the
+  /// final response is known.
   Future<WordpressRawResponse> _pipeline(WordpressRequest request) {
+    final key = deduplicateRequests ? _dedupeKey(request) : null;
+    if (key == null) {
+      return _limited(request);
+    }
+
+    // Callers share the response object; it is never mutated after creation.
+    final existing = _inFlight[key];
+    if (existing != null) {
+      return existing;
+    }
+
+    // A block body: whenComplete would await the future `remove` returns,
+    // which is this very future.
+    final future = _limited(request).whenComplete(() {
+      _inFlight.remove(key);
+    });
+    _inFlight[key] = future;
+    return future;
+  }
+
+  /// Key under which identical concurrent requests are shared, or `null` when
+  /// [request] must not be shared.
+  String? _dedupeKey(WordpressRequest request) {
+    if (request.method != HttpMethod.get ||
+        request.cancelToken != null ||
+        request.events != null) {
+      return null;
+    }
+
+    final query = <String>[
+      for (final e
+          in (request.queryParameters ?? const <String, dynamic>{}).entries)
+        '${e.key}=${e.value}',
+    ]..sort();
+    final headers = <String>[
+      for (final e in (request.headers ?? const <String, dynamic>{}).entries)
+        '${e.key.toLowerCase()}:${e.value}',
+    ]..sort();
+
+    return [
+      request.url.toString(),
+      query.join('&'),
+      headers.join('|'),
+      '${request.authorization == null ? 0 : identityHashCode(request.authorization)}',
+      '${request.requireAuth}',
+    ].join('\n');
+  }
+
+  Future<WordpressRawResponse> _limited(WordpressRequest request) async {
+    final limit = maxConcurrentRequests;
+    if (limit == null) {
+      return _tracked(request);
+    }
+
+    if (_running >= limit) {
+      final turn = Completer<void>();
+      _waiting.add(turn);
+      await turn.future;
+    } else {
+      _running++;
+    }
+
+    try {
+      return await _tracked(request);
+    } finally {
+      if (_waiting.isNotEmpty) {
+        // Hand the slot straight to the next waiter.
+        _waiting.removeFirst().complete();
+      } else {
+        _running--;
+      }
+    }
+  }
+
+  Future<WordpressRawResponse> _tracked(WordpressRequest request) async {
+    final raw = await _runPipeline(request);
+    _notifyEvents(request, raw);
+    return raw;
+  }
+
+  void _notifyEvents(WordpressRequest request, WordpressRawResponse raw) {
+    final events = request.events;
+    if (events == null || raw.isSuccessful) {
+      return;
+    }
+
+    try {
+      if (raw.code == -RequestErrorType.requestCancelled.index) {
+        events.onCancel?.call();
+        return;
+      }
+
+      final onError = events.onError;
+      if (onError == null) {
+        return;
+      }
+
+      final parsed = mapGuarded(mapper: WordpressError.fromMap, json: raw.data);
+      onError(
+        parsed ??
+            WordpressError(
+              code: raw.code < 0 && -raw.code < RequestErrorType.values.length
+                  ? RequestErrorType.values[-raw.code].name
+                  : 'http_${raw.code}',
+              message: raw.message,
+              status: raw.code > 0 ? raw.code : null,
+            ),
+      );
+    } catch (_) {
+      // A throwing user callback must not break the request pipeline.
+    }
+  }
+
+  Future<WordpressRawResponse> _runPipeline(WordpressRequest request) {
+    // The request as the middlewares left it, so failures keep its metadata.
+    var latest = request;
+
     return guardAsync<WordpressRawResponse>(
       function: () async {
         final processed = await _handleRequestMiddlewares(
           request: request,
           middlewares: middlewares,
         );
+        latest = processed;
+
+        // A transport failure is an ordinary response to the response
+        // middlewares, so they can log it or react to it.
+        WordpressRawResponse raw;
+        try {
+          raw = await execute(processed);
+        } catch (error, stackTrace) {
+          raw = _failure(processed, error, stackTrace);
+        }
 
         return _handleResponseMiddlewares(
           middlewares: middlewares,
-          response: await execute(processed),
+          response: raw,
         );
       },
-      onError: (error, stackTrace) async {
-        final extra = <String, dynamic>{
-          'error': error,
-          'stackTrace': stackTrace,
-        };
+      onError: (error, stackTrace) async => _failure(latest, error, stackTrace),
+    );
+  }
 
-        if (error is MiddlewareAbortedException) {
-          return WordpressRawResponse(
-            data: null,
-            code: -RequestErrorType.middlewareAborted.index,
-            extra: extra,
-            message: error.message,
-          );
-        }
+  /// The failure response for [error], carrying [request]'s extra.
+  WordpressRawResponse _failure(
+    WordpressRequest request,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    final extra = <String, dynamic>{
+      ...request.extra,
+      // The options Dio was given carry the request metadata (method, URL).
+      if (error is DioException) ...error.requestOptions.extra,
+      'error': error,
+      'stackTrace': stackTrace,
+    };
 
-        if (error is DioException) {
-          // Not an exhaustive switch: newer Dio versions add enum members
-          // (for example transformTimeout), which would break compilation.
-          final dioType = error.type;
-          final RequestErrorType type;
-          if (dioType == DioExceptionType.cancel) {
-            type = RequestErrorType.requestCancelled;
-          } else if (dioType == DioExceptionType.connectionTimeout ||
-              dioType == DioExceptionType.sendTimeout ||
-              dioType == DioExceptionType.receiveTimeout) {
-            type = RequestErrorType.timeout;
-          } else if (dioType == DioExceptionType.connectionError ||
-              dioType == DioExceptionType.badCertificate) {
-            type = RequestErrorType.connectionFailed;
-          } else {
-            type = RequestErrorType.internalGenericError;
-          }
+    if (error is MiddlewareAbortedException) {
+      return WordpressRawResponse(
+        data: null,
+        code: -RequestErrorType.middlewareAborted.index,
+        extra: extra,
+        message: error.message,
+      );
+    }
 
-          if (type != RequestErrorType.internalGenericError) {
-            return WordpressRawResponse(
-              data: null,
-              code: -type.index,
-              extra: extra,
-              message: error.message ?? error.type.name,
-            );
-          }
+    if (error is DioException) {
+      // Not an exhaustive switch: newer Dio versions add enum members
+      // (for example transformTimeout), which would break compilation.
+      final dioType = error.type;
+      final RequestErrorType type;
+      if (dioType == DioExceptionType.cancel) {
+        type = RequestErrorType.requestCancelled;
+      } else if (dioType == DioExceptionType.connectionTimeout ||
+          dioType == DioExceptionType.sendTimeout ||
+          dioType == DioExceptionType.receiveTimeout) {
+        type = RequestErrorType.timeout;
+      } else if (dioType == DioExceptionType.connectionError ||
+          dioType == DioExceptionType.badCertificate) {
+        type = RequestErrorType.connectionFailed;
+      } else {
+        type = RequestErrorType.internalGenericError;
+      }
 
-          // Dio could not parse a body that claims to be JSON (for example a
-          // PHP notice printed before the payload).
-          if (error.error is FormatException) {
-            return WordpressRawResponse(
-              data: null,
-              code: -RequestErrorType.invalidResponse.index,
-              extra: <String, dynamic>{...extra, 'error': error.error},
-              message: 'The response body is not valid JSON: ${error.error}',
-            );
-          }
-        }
-
+      if (type != RequestErrorType.internalGenericError) {
         return WordpressRawResponse(
           data: null,
-          code: -RequestErrorType.internalGenericError.index,
+          code: -type.index,
           extra: extra,
-          message: '$error\n\n$stackTrace',
+          message: error.message ?? error.type.name,
         );
-      },
+      }
+
+      // Dio could not parse a body that claims to be JSON (for example a
+      // PHP notice printed before the payload).
+      if (error.error is FormatException) {
+        return WordpressRawResponse(
+          data: null,
+          code: -RequestErrorType.invalidResponse.index,
+          extra: <String, dynamic>{...extra, 'error': error.error},
+          message: 'The response body is not valid JSON: ${error.error}',
+        );
+      }
+    }
+
+    return WordpressRawResponse(
+      data: null,
+      code: -RequestErrorType.internalGenericError.index,
+      extra: extra,
+      message: '$error\n\n$stackTrace',
     );
   }
 

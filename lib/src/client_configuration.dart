@@ -26,10 +26,20 @@ final class BootstrapConfiguration {
     this.enableDebugMode = false,
     this.middlewares,
     this.retryPolicy = RetryPolicy.none,
+    this.deduplicateRequests = false,
+    this.maxConcurrentRequests,
   });
 
   /// How transient failures are retried. Retries are off by default.
   final RetryPolicy retryPolicy;
+
+  /// Share one network call between identical `GET` requests that are in
+  /// flight at the same time. Off by default.
+  final bool deduplicateRequests;
+
+  /// Upper bound on requests running at once across the whole client, or
+  /// `null` for no limit.
+  final int? maxConcurrentRequests;
 
   /// Enables or disables debug mode.
   final bool enableDebugMode;
@@ -86,6 +96,8 @@ final class BootstrapConfiguration {
         collectionEquals(other.middlewares, middlewares) &&
         other.connectTimeout == connectTimeout &&
         other.retryPolicy == retryPolicy &&
+        other.deduplicateRequests == deduplicateRequests &&
+        other.maxConcurrentRequests == maxConcurrentRequests &&
         other.statisticsDelegate == statisticsDelegate;
   }
 
@@ -105,6 +117,8 @@ final class BootstrapConfiguration {
       connectTimeout,
       statisticsDelegate,
       retryPolicy,
+      deduplicateRequests,
+      maxConcurrentRequests,
     );
   }
 
@@ -123,6 +137,8 @@ final class BootstrapConfiguration {
     List<IWordpressMiddleware>? middlewares,
     Duration? connectTimeout,
     RetryPolicy? retryPolicy,
+    bool? deduplicateRequests,
+    int? maxConcurrentRequests,
   }) {
     return BootstrapConfiguration(
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
@@ -140,6 +156,9 @@ final class BootstrapConfiguration {
       middlewares: middlewares ?? this.middlewares,
       connectTimeout: connectTimeout ?? this.connectTimeout,
       retryPolicy: retryPolicy ?? this.retryPolicy,
+      deduplicateRequests: deduplicateRequests ?? this.deduplicateRequests,
+      maxConcurrentRequests:
+          maxConcurrentRequests ?? this.maxConcurrentRequests,
     );
   }
 }

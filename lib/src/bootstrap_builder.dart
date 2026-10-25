@@ -29,7 +29,11 @@ class BootstrapBuilder {
     _followRedirects = config.shouldFollowRedirects;
     _middlewares = config.middlewares;
     _retryPolicy = config.retryPolicy;
+    _deduplicate = config.deduplicateRequests;
+    _maxConcurrent = config.maxConcurrentRequests;
   }
+  bool _deduplicate = false;
+  int? _maxConcurrent;
   RetryPolicy _retryPolicy = RetryPolicy.none;
   Duration _defaultRequestTimeout = DEFAULT_REQUEST_TIMEOUT;
   bool Function(dynamic)? _responsePreprocessorDelegate;
@@ -48,6 +52,27 @@ class BootstrapBuilder {
   /// are retried. Retries are off by default; see [RetryPolicy].
   BootstrapBuilder withRetryPolicy(RetryPolicy policy) {
     _retryPolicy = policy;
+    return this;
+  }
+
+  /// Shares one network call between identical `GET` requests that are in
+  /// flight at the same time (same URL, query, headers and authorization).
+  ///
+  /// Requests with a cancel token or progress events are never shared.
+  BootstrapBuilder withRequestDeduplication([bool enabled = true]) {
+    _deduplicate = enabled;
+    return this;
+  }
+
+  /// Limits how many requests the client runs at once; the rest wait their
+  /// turn. Useful with `client.parallel` against shared hosting that rate
+  /// limits. Do not issue client calls from inside a middleware when the
+  /// limit is `1`.
+  BootstrapBuilder withMaxConcurrentRequests(int limit) {
+    if (limit < 1) {
+      throw ArgumentError.value(limit, 'limit', 'Must be at least 1.');
+    }
+    _maxConcurrent = limit;
     return this;
   }
 
@@ -187,6 +212,8 @@ class BootstrapBuilder {
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
       retryPolicy: _retryPolicy,
+      deduplicateRequests: _deduplicate,
+      maxConcurrentRequests: _maxConcurrent,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
       middlewares: _middlewares,

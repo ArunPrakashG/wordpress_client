@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'media.dart';
 
 final class MediaExtensions implements IInterfaceExtensions<Media, int> {
   MediaExtensions(this._iface);

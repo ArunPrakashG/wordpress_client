@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'taxonomies.dart';
 
 final class TaxonomiesExtensions
     implements IInterfaceExtensions<Taxonomy, String> {

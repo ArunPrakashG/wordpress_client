@@ -203,6 +203,15 @@ abstract base class BaseQueryBuilder<TSelf extends BaseQueryBuilder<TSelf, R>,
   TSelf withSearchColumns(List<String> columns) =>
       query('search_columns', columns.join(','));
 
+  @override
+  TSelf withEmbed([List<String>? relations]) => query(
+        '_embed',
+        relations == null || relations.isEmpty ? 'true' : relations.join(','),
+      );
+
+  @override
+  TSelf withFields(List<String> fields) => query('_fields', fields.join(','));
+
   Future<WordpressRequest> _buildWordpressRequest() async {
     // Build from seed, then overlay fluent overrides using copyWith
     final base = await seed.build(interface.baseUrl);

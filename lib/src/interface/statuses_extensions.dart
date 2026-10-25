@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'statuses.dart';
 
 final class StatusesExtensions
     implements IInterfaceExtensions<PostStatus, String> {

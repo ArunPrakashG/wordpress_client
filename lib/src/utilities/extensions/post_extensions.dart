@@ -8,6 +8,11 @@ extension PostExtensions on Post {
     WordpressEvents? callback,
     CancelToken? cancelToken,
   }) async {
+    final embeddedMedia = embedded.featuredMedia;
+    if (embeddedMedia != null) {
+      return embeddedMedia;
+    }
+
     if (featuredMedia == null || !client.isReady) {
       return null;
     }
@@ -30,6 +35,11 @@ extension PostExtensions on Post {
     WordpressEvents? callback,
     CancelToken? cancelToken,
   }) async {
+    final embeddedAuthor = embedded.author;
+    if (embeddedAuthor != null) {
+      return embeddedAuthor;
+    }
+
     if (!client.isReady) {
       return null;
     }

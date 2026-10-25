@@ -65,9 +65,11 @@ final class MockResponse {
     required int total,
     required int totalPages,
     Map<String, String> headers = const {},
+    Duration delay = Duration.zero,
   }) {
     return MockResponse(
       body: items,
+      delay: delay,
       headers: {
         'X-WP-Total': '$total',
         'X-WP-TotalPages': '$totalPages',

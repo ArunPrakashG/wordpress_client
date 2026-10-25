@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'users.dart';
 
 final class UsersExtensions implements IInterfaceExtensions<User, int> {
   UsersExtensions(this._iface);

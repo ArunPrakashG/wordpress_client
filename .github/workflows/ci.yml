@@ -39,4 +39,43 @@ jobs:
         run: dart run coverage:test_with_coverage --function-coverage -- -x integration
 
       - name: Coverage floor
-        run: dart run tool/check_coverage.dart coverage/lcov.info 18
+        run: dart run tool/check_coverage.dart coverage/lcov.info 25
+
+  # Catches breakage from new releases of dio and friends before users hit it.
+  latest-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Upgrade to the newest allowed dependencies
+        run: dart pub upgrade
+
+      - name: Dart analyze
+        run: dart analyze
+
+      - name: Offline tests
+        run: dart test -x integration
+
+  # Builds the API docs and checks that links resolve.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Generate dartdoc
+        run: dart doc --validate-links

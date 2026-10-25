@@ -47,6 +47,12 @@ final class InternalRequester extends IRequestExecutor {
       _defaultAuthorization != null && !_defaultAuthorization!.isDefault;
 
   @override
+  bool get deduplicateRequests => _configuration.deduplicateRequests;
+
+  @override
+  int? get maxConcurrentRequests => _configuration.maxConcurrentRequests;
+
+  @override
   List<IWordpressMiddleware> get middlewares =>
       _configuration.middlewares ?? [];
 

@@ -5,27 +5,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
-import 'bootstrap_builder.dart';
 import 'constants.dart';
-import 'interface/abilities.dart';
-import 'interface/application_passwords.dart';
-import 'interface/blocks.dart';
-import 'interface/category.dart';
-import 'interface/comments.dart';
-import 'interface/me.dart';
-import 'interface/media.dart';
-import 'interface/page.dart';
-import 'interface/posts.dart';
-import 'interface/revisions.dart';
-import 'interface/search.dart';
-import 'interface/settings.dart';
-import 'interface/statuses.dart';
-import 'interface/tags.dart';
-import 'interface/taxonomies.dart';
-import 'interface/templates.dart';
-import 'interface/themes.dart';
-import 'interface/types.dart';
-import 'interface/users.dart';
 import 'interface_key.dart';
 import 'library_exports.dart';
 import 'request_executor_base.dart';
@@ -571,6 +551,17 @@ final class WordpressClient implements IDisposable {
   /// ```
   GraphQLInterface get graphql => get<GraphQLInterface>('graphql');
 
+  /// Interface for running several writes in one request
+  /// (`/wp-json/batch/v1`).
+  ///
+  /// ```dart
+  /// await client.batch.run([
+  ///   BatchOperation.create('posts', body: {'title': 'A'}),
+  ///   BatchOperation.delete('posts', 13),
+  /// ]);
+  /// ```
+  BatchInterface get batch => get<BatchInterface>('batch');
+
   /// Interfaces for revisions.
   PostRevisionsInterface get postRevisions =>
       get<PostRevisionsInterface>('post-revisions');
@@ -919,6 +910,13 @@ final class WordpressClient implements IDisposable {
       encoder: (dynamic c) => (c as AbilityCategory).toJson(),
     );
 
+    register<BatchInterface, BatchResult>(
+      interface: BatchInterface(),
+      key: 'batch',
+      decoder: (json) => const BatchResult(failed: false, responses: []),
+      encoder: (dynamic r) => <String, dynamic>{},
+    );
+
     // GraphQL interface (no default type registration required)
     register<GraphQLInterface, Map<String, dynamic>>(
       interface: GraphQLInterface(),
@@ -992,6 +990,58 @@ final class WordpressClient implements IDisposable {
     );
 
     _interfaces[interfaceKey] = interface;
+  }
+
+  /// A typed client for a custom post type, custom taxonomy or plugin
+  /// collection, without writing an interface class.
+  ///
+  /// [restBase] is the collection path (`events`); [namespace] is `wp/v2` for
+  /// core-style routes or your plugin's, e.g. `my-plugin/v1`. [decoder] turns
+  /// one JSON item into a [T]; [encoder] is only needed to pass models (rather
+  /// than maps) to `create` / `update`.
+  ///
+  /// Calling this again with the same [namespace] and [restBase] returns the
+  /// interface created the first time.
+  ///
+  /// ```dart
+  /// final events = client.resource<Event>(
+  ///   'events',
+  ///   decoder: Event.fromJson,
+  ///   encoder: (e) => e.toJson(),
+  /// );
+  /// final all = (await events.listAll()).dataOrThrow();
+  /// ```
+  ResourceInterface<T> resource<T>(
+    String restBase, {
+    required T Function(Map<String, dynamic> json) decoder,
+    Map<String, dynamic> Function(T item)? encoder,
+    String namespace = 'wp/v2',
+    bool requireAuthForReads = false,
+  }) {
+    final key = 'resource:$namespace/$restBase';
+
+    if (exists<ResourceInterface<T>>(key)) {
+      return get<ResourceInterface<T>>(key);
+    }
+
+    register<ResourceInterface<T>, T>(
+      interface: ResourceInterface<T>(
+        restBase: restBase,
+        namespace: namespace,
+        requireAuthForReads: requireAuthForReads,
+      ),
+      key: key,
+      decoder: (json) => decoder(json as Map<String, dynamic>),
+      encoder: (dynamic item) => encoder == null
+          ? throw StateError(
+              'Pass an encoder to resource<$T>() to send models; '
+              'plain maps work without one.',
+            )
+          : encoder(item as T),
+      overriteIfTypeExists: true,
+    );
+
+    return get<ResourceInterface<T>>(key);
   }
 
   /// Checks if an interface with the given Type [T] and [key] exists.

@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'page.dart';
 
 final class PagesExtensions implements IInterfaceExtensions<Page, int> {
   PagesExtensions(this._iface);

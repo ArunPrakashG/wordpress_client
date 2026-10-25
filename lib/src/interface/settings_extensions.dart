@@ -1,5 +1,4 @@
 import '../../wordpress_client.dart';
-import 'settings.dart';
 
 /// Settings is effectively a singleton resource; getById ignores the id.
 final class SettingsExtensions implements IInterfaceExtensions<Settings, void> {

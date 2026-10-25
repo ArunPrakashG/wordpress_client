@@ -4,7 +4,6 @@ import 'package:meta/meta.dart';
 import '../../wordpress_client.dart';
 import '../constants.dart';
 import '../utilities/helpers.dart';
-import 'wordpress_error.dart';
 
 /// Represents a success response from the WordPress API.
 typedef OnSuccess<T> = WordpressSuccessResponse<T> Function(

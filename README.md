@@ -24,12 +24,15 @@
 
 - **Typed REST client** for 30+ endpoints (posts, pages, media, users, comments, taxonomies, blocks, templates, navigation, widgets, settings, themes, ...) with full CRUD. See [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods).
 - **Typed results**: `WordpressResponse<T>` is a success or a failure; failures classify into a sealed `WordpressFailure`.
-- **Auth**: Application Passwords, JWT (two plugins), or your own `IAuthorization`. Credentials never follow the client to another origin.
+- **Auth**: Application Passwords (including the browser "authorize application" flow), JWT (two plugins), or your own `IAuthorization`. Credentials never follow the client to another origin.
 - **Resilience**: opt-in retries with backoff and `Retry-After`.
 - **Caching**: GET cache with per-resource invalidation and ETag revalidation. Custom stores supported.
 - **Pagination**: `listPages` / `listAll`, plus parallel page fetching.
 - **GraphQL (WPGraphQL)**: queries, mutations, partial results, GET, pagination, batching, persisted queries.
 - **Abilities API** (WordPress 6.9+).
+- **Custom post types and plugin routes**: `client.resource<T>('events', decoder: ...)` gives typed CRUD and pagination for any collection.
+- **Fewer round trips**: `_embed` / `_fields` helpers, the WordPress batch endpoint (`client.batch`), request de-duplication and a concurrency limit.
+- **Offline writes**: `OfflineWriteQueue` keeps writes that fail offline and replays them in order.
 - **Extensibility**: middlewares, Dio interceptors, custom endpoints, raw requests, polling streams.
 - **Testable**: `MockWordpressAdapter` serves canned responses, no live site needed.
 
@@ -81,12 +84,37 @@ final client = WordpressClient.forSite(
       .withRequestTimeout(const Duration(seconds: 20))
       .withRetryPolicy(const RetryPolicy.standard())
       .withCache(ttl: const Duration(minutes: 5))
+      .withRequestDeduplication()         // identical concurrent GETs share one call
+      .withMaxConcurrentRequests(6)       // queue the rest
       .withDefaultUserAgent('my-app/1.0')
       .build(),
 );
 ```
 
-More: [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
+More: [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration), [Request De-duplication and Concurrency](https://github.com/ArunPrakashG/wordpress_client/wiki/Request-Deduplication-and-Concurrency), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
+
+## Sign in with the browser
+
+Let the user approve your app on their own site (WordPress 5.6+). No password is ever typed into your app.
+
+```dart
+await client.discover();
+final flow = AppPasswordFlow.fromDiscovery(
+  client.discovery,
+  appName: 'My App',
+  successUrl: Uri.parse('myapp://wp-callback'),
+  rejectUrl: Uri.parse('myapp://wp-rejected'),
+);
+// open flow.authorizeUrl in the system browser, then on the redirect:
+final result = flow.parseCallback(callbackUri);
+if (result is AppPasswordGranted) {
+  client.reconfigure(
+    bootstrapper: (b) => b.withDefaultAuthorization(result.toAuthorization()).build(),
+  );
+}
+```
+
+More: [Browser Sign-In](https://github.com/ArunPrakashG/wordpress_client/wiki/Browser-Sign-In), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
 ## Read, create, update, delete
 
@@ -139,9 +167,15 @@ final res = await client.posts.query
     .execute();
 
 final bySlug = await client.pages.extensions.findBySlug('about'); // Page?
+
+// One request instead of three: embed the author and featured image
+final embedded = await client.posts.query.withEmbed(['author', 'wp:featuredmedia']).execute();
+final post = embedded.dataOrThrow().first;
+print(post.embedded.author?.name);          // also post.embedded.featuredMedia
+final lean = await client.posts.query.withFields(['id', 'title', 'link']).execute();
 ```
 
-More: [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries), [Interfaces and Extensions](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions).
+More: [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries), [Embed and Fields](https://github.com/ArunPrakashG/wordpress_client/wiki/Embed-and-Fields), [Interfaces and Extensions](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions).
 
 ## Paginate
 
@@ -218,6 +252,62 @@ if (result case WordpressSuccessResponse(:final data)) {
 
 Also `mutate`, `useGet`, `paginate` / `queryAll`, `batch`, persisted queries and registered queries. More: [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL).
 
+## Custom post types and plugin routes
+
+```dart
+class Event {
+  Event(this.id, this.title);
+  factory Event.fromJson(Map<String, dynamic> j) => Event(j['id'] as int, j['title'] as String);
+  final int id;
+  final String title;
+  Map<String, dynamic> toJson() => {'title': title};
+}
+
+final events = client.resource<Event>('events', decoder: Event.fromJson, encoder: (e) => e.toJson());
+final all = (await events.listAll()).dataOrThrow();
+final one = (await events.retrieve(7)).dataOrThrow();
+await events.create(Event(0, 'Launch'));
+
+// A plugin namespace instead of wp/v2
+final orders = client.resource<Order>('orders', namespace: 'my-shop/v1', decoder: Order.fromJson);
+```
+
+More: [Custom Post Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Post-Types).
+
+## Batch writes
+
+```dart
+final result = (await client.batch.run([
+  const BatchOperation.create('posts', body: {'title': 'A', 'status': 'draft'}),
+  BatchOperation.update('posts', 12, body: {'title': 'B'}),
+  BatchOperation.delete('posts', 13, force: true),
+])).dataOrThrow();
+
+print('${result.succeeded.length} ok, ${result.failures.length} failed');
+```
+
+Sent to `/wp-json/batch/v1` (WordPress 5.6+), 25 per call; longer lists are split for you. More: [Batch Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Batch-Requests).
+
+## Offline writes
+
+```dart
+final queue = OfflineWriteQueue(store: MemoryWriteQueueStore()); // implement WriteQueueStore to persist
+final client = WordpressClient.forSite(
+  siteUrl: siteUrl,
+  bootstrapper: (b) => b.withMiddleware(queue).withDefaultAuthorization(auth).build(),
+);
+
+final r = await client.posts.create(CreatePostRequest(title: 'Hi'));
+if (r.wasQueued) showSnack('Saved, will sync when online');
+
+final sync = await queue.flush(client);          // when connectivity returns
+print('${sync.sent.length} sent, ${sync.rejected.length} refused, ${sync.remaining} left');
+```
+
+Only JSON writes that failed to connect are queued (timeouts only with `queueOnTimeout: true`, because the server may have processed them).
+
+More: [Offline Write Queue](https://github.com/ArunPrakashG/wordpress_client/wiki/Offline-Write-Queue), [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
+
 ## Abilities API (WordPress 6.9+)
 
 ```dart
@@ -243,6 +333,8 @@ client.registerMiddleware(
   ),
 );
 ```
+
+`LoggingMiddleware(sink: print)` logs one line per request with credentials redacted ([Logging](https://github.com/ArunPrakashG/wordpress_client/wiki/Logging)), and `CacheMiddleware` / `OfflineWriteQueue` are middlewares too.
 
 More: [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
 

@@ -1,20 +1,5 @@
 import '../../wordpress_client.dart';
-import '../interface/blocks.dart';
-import '../interface/category.dart';
-import '../interface/comments.dart';
-import '../interface/media.dart';
-import '../interface/page.dart';
 // Import concrete interface types so we can extend them
-import '../interface/posts.dart';
-import '../interface/revisions.dart';
-import '../interface/search.dart';
-import '../interface/statuses.dart';
-import '../interface/tags.dart';
-import '../interface/taxonomies.dart';
-import '../interface/templates.dart';
-import '../interface/themes.dart';
-import '../interface/types.dart';
-import '../interface/users.dart';
 
 // Posts
 extension PostsQuerySeed on PostsInterface {

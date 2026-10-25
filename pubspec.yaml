@@ -3,9 +3,10 @@ description: A library to interact with the Wordpress REST API. Supports most of
 version: 10.0.0
 topics:
   - wordpress
-  - parallel
-  - crud
-  - rest
+  - rest-api
+  - graphql
+  - cms
+  - http
 homepage: https://github.com/ArunPrakashG/wordpress_client
 repository: https://github.com/ArunPrakashG/wordpress_client
 documentation: https://github.com/ArunPrakashG/wordpress_client/wiki
