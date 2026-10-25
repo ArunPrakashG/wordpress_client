@@ -1,28 +1,6 @@
-## 10.2.0 (unreleased)
+## 10.0.0
 
-Added
-
-- **Abilities API** (WordPress 6.9+). `client.abilities` lists and retrieves abilities (`list`, `listAll`, `retrieve`), their categories (`categories`, `category`) and runs them (`run`, `runAbility`), picking `GET` / `DELETE` / `POST` from the ability's `readonly` / `destructive` annotations. Requests go to `/wp-json/wp-abilities/v1` on the client's own origin and always send credentials. New models `Ability` and `AbilityCategory`. (#99)
-- **GraphQL improvements.** (#100)
-  - `graphql.execute` returns data *and* errors as a `GraphQLResult` (`GraphQLError` with `path`, `locations`, `extensions`), so partial responses are usable. `query` still fails on errors but now exposes them as `extra[GraphQLInterface.errorsKey]`.
-  - `query(useGet: true)` sends reads with `GET`, so `CacheMiddleware`, HTTP caches and retries apply. `mutate` is now a real mutation call: it rejects non-mutation documents, always uses `POST` and clears the cache; `POST` queries no longer clear it.
-  - `graphql.paginate` / `queryAll` walk a Relay connection (`pageInfo.endCursor`, `nodes` or `edges { node }`).
-  - Automatic Persisted Queries (`useAutomaticPersistedQueries`) and query batching (`graphql.batch`).
-
-Changed
-
-- GraphQL requests now run through the middleware pipeline (`onRequest` / `onResponse`) like REST requests, and transport errors are returned as failures instead of thrown.
-
-## 10.1.0 (unreleased)
-
-Added
-
-- **Automatic retries.** `BootstrapBuilder.withRetryPolicy(RetryPolicy.standard())` retries timeouts, connection errors and 429/502/503/504 with exponential backoff and jitter, honouring `Retry-After`. Only idempotent methods are retried by default (never `POST`/`PATCH`), cancelling a request aborts the wait, and `WordpressRequest.retryPolicy` overrides the client policy per request. The number of tries is reported in `extra[WordpressRequest.metaAttempts]`. Off by default. (#96)
-- **Auto-pagination.** Every list interface gains `listPages(request)`, a lazy `Stream` with one response per page driven by `X-WP-TotalPages`, and `listAll(request)`, which collects all pages into one response. Both take `perPage` (default 100) and `maxPages`; `listAll` also takes `maxItems`. A failing page ends the walk. (#97)
-- **Resource-level cache invalidation.** A successful write now evicts only the cached GET responses of the resource it touched (`CacheInvalidation.resource`, the new default) instead of the whole cache; `CacheInvalidation.all` restores the old behaviour. New `ISelectiveCache.removeWhere` (implemented by `MemoryCacheStore`; other stores fall back to `clear()`), plus `ttlFor` (per-endpoint TTL) and `shouldCache` hooks on `CacheMiddleware` / `withCache`. (#90)
-- **ETag / Last-Modified revalidation.** `CacheMiddleware` keeps expired entries that carry a validator for `revalidateWindow` (default 1 hour) and revalidates them with `If-None-Match` / `If-Modified-Since`; a `304` refreshes the cached body without downloading it (`X-Cache: REVALIDATED`). `MiddlewareRawResponse.requestHeaders` lets any middleware add headers from `onExecute`. Only 2xx responses are cached now (3xx used to be). (#98)
-
-## 10.0.0 (unreleased)
+Retries, auto-pagination, cache revalidation, GraphQL improvements and the Abilities API ship together with the breaking changes below.
 
 Breaking
 
@@ -32,6 +10,10 @@ Breaking
 - **No more process-wide state.** `CodableMap` decoders/encoders and the endpoint statistics (counts and the `withStatisticDelegate` callback) are now owned by each `WordpressClient`. `CodableMap.getDecoder/getEncoder` are instance methods, and the global `serialize<T>()`/`deserialize<T>()` helpers are removed. Disposing one client no longer clears the codecs of every other client. (#92)
 - **Transport errors are classified.** Timeouts, connection errors and cancelled requests used to surface as `internalGenericError` with the stack trace in `message`. They now use `RequestErrorType.timeout`, `connectionFailed` and `requestCancelled`; the exception and stack trace stay in `extra` (`exception` / `stackTrace` on the failure response). Invalid JSON behind a JSON content type is `invalidResponse`. (#93)
 - `RequestErrorType` gained `originMismatch`, `invalidResponse` and `timeout` (appended, existing indices unchanged).
+
+Changed
+
+- GraphQL requests now run through the middleware pipeline (`onRequest` / `onResponse`) like REST requests, and transport errors are returned as failures instead of thrown.
 
 Fixed
 
@@ -45,6 +27,16 @@ Fixed
 
 Added
 
+- **Abilities API** (WordPress 6.9+). `client.abilities` lists and retrieves abilities (`list`, `listAll`, `retrieve`), their categories (`categories`, `category`) and runs them (`run`, `runAbility`), picking `GET` / `DELETE` / `POST` from the ability's `readonly` / `destructive` annotations. Requests go to `/wp-json/wp-abilities/v1` on the client's own origin and always send credentials. New models `Ability` and `AbilityCategory`. (#99)
+- **GraphQL improvements.** (#100)
+  - `graphql.execute` returns data *and* errors as a `GraphQLResult` (`GraphQLError` with `path`, `locations`, `extensions`), so partial responses are usable. `query` still fails on errors but now exposes them as `extra[GraphQLInterface.errorsKey]`.
+  - `query(useGet: true)` sends reads with `GET`, so `CacheMiddleware`, HTTP caches and retries apply. `mutate` is now a real mutation call: it rejects non-mutation documents, always uses `POST` and clears the cache; `POST` queries no longer clear it.
+  - `graphql.paginate` / `queryAll` walk a Relay connection (`pageInfo.endCursor`, `nodes` or `edges { node }`).
+  - Automatic Persisted Queries (`useAutomaticPersistedQueries`) and query batching (`graphql.batch`).
+- **Automatic retries.** `BootstrapBuilder.withRetryPolicy(RetryPolicy.standard())` retries timeouts, connection errors and 429/502/503/504 with exponential backoff and jitter, honouring `Retry-After`. Only idempotent methods are retried by default (never `POST`/`PATCH`), cancelling a request aborts the wait, and `WordpressRequest.retryPolicy` overrides the client policy per request. The number of tries is reported in `extra[WordpressRequest.metaAttempts]`. Off by default. (#96)
+- **Auto-pagination.** Every list interface gains `listPages(request)`, a lazy `Stream` with one response per page driven by `X-WP-TotalPages`, and `listAll(request)`, which collects all pages into one response. Both take `perPage` (default 100) and `maxPages`; `listAll` also takes `maxItems`. A failing page ends the walk. (#97)
+- **Resource-level cache invalidation.** A successful write now evicts only the cached GET responses of the resource it touched (`CacheInvalidation.resource`, the new default) instead of the whole cache; `CacheInvalidation.all` restores the old behaviour. New `ISelectiveCache.removeWhere` (implemented by `MemoryCacheStore`; other stores fall back to `clear()`), plus `ttlFor` (per-endpoint TTL) and `shouldCache` hooks on `CacheMiddleware` / `withCache`. (#90)
+- **ETag / Last-Modified revalidation.** `CacheMiddleware` keeps expired entries that carry a validator for `revalidateWindow` (default 1 hour) and revalidates them with `If-None-Match` / `If-Modified-Since`; a `304` refreshes the cached body without downloading it (`X-Cache: REVALIDATED`). `MiddlewareRawResponse.requestHeaders` lets any middleware add headers from `onExecute`. Only 2xx responses are cached now (3xx used to be). (#98)
 - **Typed failures.** `WordpressFailureResponse.failure` returns a sealed `WordpressFailure` (`NetworkFailure`, `AuthFailure`, `ApiFailure`, `DecodeFailure`, `MiddlewareFailure`, `ClientFailure`) that can be switched over exhaustively, each carrying its `cause`, `stackTrace` and relevant details (status code, `WordpressError`, raw body). The existing `code`, `error`, `message` and `exception` accessors are unchanged, and `WordpressFailureResponse.errorType` was added. (#93)
 - `package:wordpress_client/testing.dart` with `MockWordpressAdapter`, `MockResponse` and `RecordedRequest` for testing code that uses the client without a live site. (#94, #101)
 - `WordpressRequest.extra` for local request metadata.

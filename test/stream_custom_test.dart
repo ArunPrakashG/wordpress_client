@@ -34,7 +34,8 @@ void main() {
         onResponseDelegate: (r) async => r,
         onExecuteDelegate: (request) async {
           final path = request.url.toString();
-          if (request.method == HttpMethod.get && path.endsWith('custom/endpoint')) {
+          if (request.method == HttpMethod.get &&
+              path.endsWith('custom/endpoint')) {
             counter++;
             return MiddlewareRawResponse(
               statusCode: 200,
@@ -78,16 +79,16 @@ void main() {
       final sub = stream.listen(values.add);
       addTearDown(sub.cancel);
 
-    // No emit at start
-  await Future<void>.delayed(const Duration(milliseconds: 250));
+      // No emit at start
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(values, isEmpty);
 
       refetch.add(null);
-  await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(values, equals([1]));
 
       refetch.add(null);
-  await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(const Duration(milliseconds: 250));
       expect(values, equals([1, 2]));
     });
   });

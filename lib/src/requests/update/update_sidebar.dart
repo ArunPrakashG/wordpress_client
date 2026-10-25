@@ -19,6 +19,7 @@ final class UpdateSidebarRequest extends IRequest {
 
   /// Sidebar ID.
   final String id;
+
   /// Widget instance IDs in the sidebar.
   final List<String>? widgets;
 

@@ -77,8 +77,8 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
     T? lastSuccess;
     int? lastFailureCode;
     String? lastFailureMessage;
-  var inFlight = false;
-  var scheduleImmediateAfterFlight = false;
+    var inFlight = false;
+    var scheduleImmediateAfterFlight = false;
 
     Timer? timer;
     StreamSubscription<void>? triggerSub;
@@ -88,7 +88,9 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
         final data = res.data;
         var shouldEmit = true;
         if (distinctData && lastSuccess != null) {
-          final equal = equals != null ? equals(lastSuccess as T, data) : lastSuccess == data;
+          final equal = equals != null
+              ? equals(lastSuccess as T, data)
+              : lastSuccess == data;
           shouldEmit = !equal;
         }
         if (shouldEmit) {
@@ -167,12 +169,16 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
       // If the token is cancelled externally, tear down and close immediately
       // so listeners receive onDone without waiting for the next tick.
       // ignore: discarded_futures
-      unawaited(token.whenCancel.then((_) async {
-        await teardown();
-        if (!controller.isClosed) {
-          await controller.close();
-        }
-      },),);
+      unawaited(
+        token.whenCancel.then(
+          (_) async {
+            await teardown();
+            if (!controller.isClosed) {
+              await controller.close();
+            }
+          },
+        ),
+      );
 
       if (emitOnStart) scheduleRun();
       timer = Timer.periodic(interval, (_) => scheduleRun());

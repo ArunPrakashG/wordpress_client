@@ -27,20 +27,28 @@ final class UpdateNavigationRequest extends IRequest {
 
   /// Numeric navigation post ID to update.
   final int id;
+
   /// The date of the navigation.
   final DateTime? date;
+
   /// The date in GMT.
   final DateTime? dateGmt;
+
   /// Unique slug.
   final String? slug;
+
   /// Post status.
   final ContentStatus? status;
+
   /// Password for protected content.
   final String? password;
+
   /// Title of the navigation.
   final String? title;
+
   /// Content (serialized blocks).
   final String? content;
+
   /// Template file to use.
   final String? template;
 
