@@ -178,6 +178,51 @@ final post = await client.posts.extensions.getById(123);
 final allMedia = await client.media.extensions.listAll(perPage: 100);
 ```
 
+### 🔁 Retries
+
+Transient failures (timeouts, connection errors, `429`/`502`/`503`/`504`) can be retried with exponential backoff, honouring `Retry-After`. Off by default; only idempotent methods are retried, never `POST`/`PATCH`.
+
+```dart
+final client = WordpressClient(
+  baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+  bootstrapper: (b) => b.withRetryPolicy(const RetryPolicy.standard()).build(),
+);
+```
+
+### 📄 Fetch every page
+
+```dart
+// All items in one response (headers of the first page, so totalCount is the full size)
+final all = await client.posts.listAll(ListPostRequest(), maxItems: 1000);
+
+// Or lazily, one response per page; stop listening to stop fetching
+await for (final page in client.posts.listPages(ListPostRequest(), perPage: 50)) {
+  // ...
+}
+```
+
+### 🧪 Testing your code
+
+`package:wordpress_client/testing.dart` ships a Dio adapter that serves canned responses, so you can test code that uses the client without a live site:
+
+```dart
+import 'package:wordpress_client/testing.dart';
+
+final adapter = MockWordpressAdapter()
+  ..reply('GET', '/posts', MockResponse.paged([{'id': 1, ...}], total: 1, totalPages: 1))
+  ..reply('POST', '/posts', MockResponse.wpError(statusCode: 403, code: 'rest_cannot_create'))
+  ..replySequence('GET', '/pages', [MockResponse.timeout(), const MockResponse(body: [])]);
+
+final client = WordpressClient.fromDioInstance(
+  baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+  instance: Dio()..httpClientAdapter = adapter,
+);
+
+// ... exercise your code, then assert on what was sent:
+expect(adapter.callCount(method: 'GET', path: '/posts'), 1);
+expect(adapter.lastRequest!.headers['Authorization'], isNotNull);
+```
+
 ## 📚 Advanced docs (Wiki)
 
 Deep-dives and more examples live in the Wiki:
