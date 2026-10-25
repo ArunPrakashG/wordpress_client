@@ -91,7 +91,7 @@ final client = WordpressClient.forSite(
 );
 ```
 
-More: [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
+More: [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration), [Request De-duplication and Concurrency](https://github.com/ArunPrakashG/wordpress_client/wiki/Request-Deduplication-and-Concurrency), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
 ## Sign in with the browser
 
@@ -114,7 +114,7 @@ if (result is AppPasswordGranted) {
 }
 ```
 
-More: [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
+More: [Browser Sign-In](https://github.com/ArunPrakashG/wordpress_client/wiki/Browser-Sign-In), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
 ## Read, create, update, delete
 
@@ -175,7 +175,7 @@ print(post.embedded.author?.name);          // also post.embedded.featuredMedia
 final lean = await client.posts.query.withFields(['id', 'title', 'link']).execute();
 ```
 
-More: [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries), [Interfaces and Extensions](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions).
+More: [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries), [Embed and Fields](https://github.com/ArunPrakashG/wordpress_client/wiki/Embed-and-Fields), [Interfaces and Extensions](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions).
 
 ## Paginate
 
@@ -272,6 +272,8 @@ await events.create(Event(0, 'Launch'));
 final orders = client.resource<Order>('orders', namespace: 'my-shop/v1', decoder: Order.fromJson);
 ```
 
+More: [Custom Post Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Post-Types).
+
 ## Batch writes
 
 ```dart
@@ -284,7 +286,7 @@ final result = (await client.batch.run([
 print('${result.succeeded.length} ok, ${result.failures.length} failed');
 ```
 
-Sent to `/wp-json/batch/v1` (WordPress 5.6+), 25 per call; longer lists are split for you.
+Sent to `/wp-json/batch/v1` (WordPress 5.6+), 25 per call; longer lists are split for you. More: [Batch Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Batch-Requests).
 
 ## Offline writes
 
@@ -304,7 +306,7 @@ print('${sync.sent.length} sent, ${sync.rejected.length} refused, ${sync.remaini
 
 Only JSON writes that failed to connect are queued (timeouts only with `queueOnTimeout: true`, because the server may have processed them).
 
-More: [Resources and Batch](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions), [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
+More: [Offline Write Queue](https://github.com/ArunPrakashG/wordpress_client/wiki/Offline-Write-Queue), [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
 
 ## Abilities API (WordPress 6.9+)
 
@@ -332,7 +334,7 @@ client.registerMiddleware(
 );
 ```
 
-`LoggingMiddleware(sink: print)` logs one line per request with credentials redacted, and `CacheMiddleware` / `OfflineWriteQueue` are middlewares too.
+`LoggingMiddleware(sink: print)` logs one line per request with credentials redacted ([Logging](https://github.com/ArunPrakashG/wordpress_client/wiki/Logging)), and `CacheMiddleware` / `OfflineWriteQueue` are middlewares too.
 
 More: [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
 
