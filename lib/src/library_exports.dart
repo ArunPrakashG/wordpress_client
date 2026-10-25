@@ -10,6 +10,7 @@ export 'graphql/graphql_interface.dart';
 export 'graphql/graphql_models.dart';
 export 'interface/abilities.dart';
 export 'interface/application_passwords.dart';
+export 'interface/batch.dart';
 export 'interface/blocks.dart';
 export 'interface/blocks_extensions.dart';
 export 'interface/categories_extensions.dart';

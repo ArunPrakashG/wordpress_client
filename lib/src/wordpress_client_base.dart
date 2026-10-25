@@ -551,6 +551,17 @@ final class WordpressClient implements IDisposable {
   /// ```
   GraphQLInterface get graphql => get<GraphQLInterface>('graphql');
 
+  /// Interface for running several writes in one request
+  /// (`/wp-json/batch/v1`).
+  ///
+  /// ```dart
+  /// await client.batch.run([
+  ///   BatchOperation.create('posts', body: {'title': 'A'}),
+  ///   BatchOperation.delete('posts', 13),
+  /// ]);
+  /// ```
+  BatchInterface get batch => get<BatchInterface>('batch');
+
   /// Interfaces for revisions.
   PostRevisionsInterface get postRevisions =>
       get<PostRevisionsInterface>('post-revisions');
@@ -897,6 +908,13 @@ final class WordpressClient implements IDisposable {
     _registerResponseType<AbilityCategory>(
       decoder: (json) => AbilityCategory.fromJson(json),
       encoder: (dynamic c) => (c as AbilityCategory).toJson(),
+    );
+
+    register<BatchInterface, BatchResult>(
+      interface: BatchInterface(),
+      key: 'batch',
+      decoder: (json) => const BatchResult(failed: false, responses: []),
+      encoder: (dynamic r) => <String, dynamic>{},
     );
 
     // GraphQL interface (no default type registration required)
