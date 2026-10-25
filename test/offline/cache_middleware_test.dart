@@ -247,7 +247,9 @@ void main() {
 
       expect(second, isA<WordpressSuccessResponse<List<Post>>>());
       expect(
-          (second as WordpressSuccessResponse<List<Post>>).data, hasLength(1));
+        (second as WordpressSuccessResponse<List<Post>>).data,
+        hasLength(1),
+      );
       expect(second.headers['X-Cache'], 'REVALIDATED');
       expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
       expect(adapter.lastRequest!.headers['If-None-Match'], etag);
@@ -303,7 +305,9 @@ void main() {
 
       expect(adapter.callCount(method: 'GET', path: '/posts'), 2);
       expect(
-          adapter.lastRequest!.headers.keys, isNot(contains('If-None-Match')));
+        adapter.lastRequest!.headers.keys,
+        isNot(contains('If-None-Match')),
+      );
     });
 
     test('revalidateWindow: zero disables conditional requests', () async {
@@ -318,7 +322,9 @@ void main() {
       await client.posts.list(ListPostRequest());
 
       expect(
-          adapter.lastRequest!.headers.keys, isNot(contains('If-None-Match')));
+        adapter.lastRequest!.headers.keys,
+        isNot(contains('If-None-Match')),
+      );
     });
   });
 
