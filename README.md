@@ -201,6 +201,15 @@ await for (final page in client.posts.listPages(ListPostRequest(), perPage: 50))
 }
 ```
 
+### 🧰 Abilities API (WordPress 6.9+)
+
+```dart
+final abilities = await client.abilities.list(category: 'site');
+final result = await client.abilities.run('my-plugin/get-user-info', input: {'user_id': 1});
+```
+
+Requires an authenticated user; only abilities registered with `show_in_rest` are visible.
+
 ### 🧪 Testing your code
 
 `package:wordpress_client/testing.dart` ships a Dio adapter that serves canned responses, so you can test code that uses the client without a live site:

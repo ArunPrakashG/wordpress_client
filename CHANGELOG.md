@@ -1,3 +1,9 @@
+## 10.2.0 (unreleased)
+
+Added
+
+- **Abilities API** (WordPress 6.9+). `client.abilities` lists and retrieves abilities (`list`, `listAll`, `retrieve`), their categories (`categories`, `category`) and runs them (`run`, `runAbility`), picking `GET` / `DELETE` / `POST` from the ability's `readonly` / `destructive` annotations. Requests go to `/wp-json/wp-abilities/v1` on the client's own origin and always send credentials. New models `Ability` and `AbilityCategory`. (#99)
+
 ## 10.1.0 (unreleased)
 
 Added

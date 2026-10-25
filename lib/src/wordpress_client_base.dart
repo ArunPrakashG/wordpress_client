@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 
 import 'bootstrap_builder.dart';
 import 'constants.dart';
+import 'interface/abilities.dart';
 import 'interface/application_passwords.dart';
 import 'interface/blocks.dart';
 import 'interface/category.dart';
@@ -536,6 +537,9 @@ final class WordpressClient implements IDisposable {
   /// Interface for post types.
   TypesInterface get types => get<TypesInterface>('types');
 
+  /// Interface for the Abilities API (`/wp-abilities/v1`, WordPress 6.9+).
+  AbilitiesInterface get abilities => get<AbilitiesInterface>('abilities');
+
   /// Interface for post statuses.
   StatusesInterface get statuses => get<StatusesInterface>('statuses');
 
@@ -902,6 +906,17 @@ final class WordpressClient implements IDisposable {
       key: 'widget-types',
       decoder: (json) => WidgetType.fromJson(json),
       encoder: (dynamic wt) => (wt as WidgetType).toJson(),
+    );
+
+    register<AbilitiesInterface, Ability>(
+      interface: AbilitiesInterface(),
+      key: 'abilities',
+      decoder: (json) => Ability.fromJson(json),
+      encoder: (dynamic a) => (a as Ability).toJson(),
+    );
+    _registerResponseType<AbilityCategory>(
+      decoder: (json) => AbilityCategory.fromJson(json),
+      encoder: (dynamic c) => (c as AbilityCategory).toJson(),
     );
 
     // GraphQL interface (no default type registration required)
