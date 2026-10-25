@@ -1,5 +1,6 @@
 export 'authorization/authorization_export.dart';
 export 'authorization/wordpress_auth.dart';
+export 'bootstrap_builder.dart';
 export 'cache/cache_exports.dart';
 export 'client_configuration.dart';
 export 'enums.dart';

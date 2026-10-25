@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:dio/dio.dart' show DioException, DioExceptionType;
 import 'package:meta/meta.dart';
@@ -19,6 +20,17 @@ abstract base class IRequestExecutor {
 
   /// The encoders and decoders registered with the owning client.
   CodableMap get codableMap;
+
+  /// Whether identical in-flight `GET` requests share one network call.
+  bool get deduplicateRequests;
+
+  /// Maximum number of requests running at once, or `null` for no limit.
+  int? get maxConcurrentRequests;
+
+  final Map<String, Future<WordpressRawResponse>> _inFlight =
+      <String, Future<WordpressRawResponse>>{};
+  final Queue<Completer<void>> _waiting = Queue<Completer<void>>();
+  int _running = 0;
 
   /// Configures the executor with the given bootstrap configuration.
   ///
@@ -64,7 +76,82 @@ abstract base class IRequestExecutor {
   ///
   /// Fires [WordpressEvents.onCancel] / [WordpressEvents.onError] once the
   /// final response is known.
-  Future<WordpressRawResponse> _pipeline(WordpressRequest request) async {
+  Future<WordpressRawResponse> _pipeline(WordpressRequest request) {
+    final key = deduplicateRequests ? _dedupeKey(request) : null;
+    if (key == null) {
+      return _limited(request);
+    }
+
+    // Callers share the response object; it is never mutated after creation.
+    final existing = _inFlight[key];
+    if (existing != null) {
+      return existing;
+    }
+
+    // A block body: whenComplete would await the future `remove` returns,
+    // which is this very future.
+    final future = _limited(request).whenComplete(() {
+      _inFlight.remove(key);
+    });
+    _inFlight[key] = future;
+    return future;
+  }
+
+  /// Key under which identical concurrent requests are shared, or `null` when
+  /// [request] must not be shared.
+  String? _dedupeKey(WordpressRequest request) {
+    if (request.method != HttpMethod.get ||
+        request.cancelToken != null ||
+        request.events != null) {
+      return null;
+    }
+
+    final query = <String>[
+      for (final e
+          in (request.queryParameters ?? const <String, dynamic>{}).entries)
+        '${e.key}=${e.value}',
+    ]..sort();
+    final headers = <String>[
+      for (final e in (request.headers ?? const <String, dynamic>{}).entries)
+        '${e.key.toLowerCase()}:${e.value}',
+    ]..sort();
+
+    return [
+      request.url.toString(),
+      query.join('&'),
+      headers.join('|'),
+      '${request.authorization == null ? 0 : identityHashCode(request.authorization)}',
+      '${request.requireAuth}',
+    ].join('\n');
+  }
+
+  Future<WordpressRawResponse> _limited(WordpressRequest request) async {
+    final limit = maxConcurrentRequests;
+    if (limit == null) {
+      return _tracked(request);
+    }
+
+    if (_running >= limit) {
+      final turn = Completer<void>();
+      _waiting.add(turn);
+      await turn.future;
+    } else {
+      _running++;
+    }
+
+    try {
+      return await _tracked(request);
+    } finally {
+      if (_waiting.isNotEmpty) {
+        // Hand the slot straight to the next waiter.
+        _waiting.removeFirst().complete();
+      } else {
+        _running--;
+      }
+    }
+  }
+
+  Future<WordpressRawResponse> _tracked(WordpressRequest request) async {
     final raw = await _runPipeline(request);
     _notifyEvents(request, raw);
     return raw;
