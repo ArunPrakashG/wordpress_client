@@ -67,7 +67,7 @@ abstract base class IRequest {
   ///
   /// Request body, headers and other request properties are set on the returning instance.
   ///
-  /// Consider using [addIfNotNull] extension method to add a value to a map if it is not null.
+  /// Consider using `addIfNotNull` extension method to add a value to a map if it is not null.
   FutureOr<WordpressRequest> build(Uri baseUrl);
 
   String operator [](String key) {

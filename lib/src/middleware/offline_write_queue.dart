@@ -156,7 +156,7 @@ final class FlushResult {
 ///
 /// A POST, PUT, PATCH or DELETE that fails with
 /// [RequestErrorType.connectionFailed] is stored, and its failure response is
-/// flagged (see [OfflineWriteQueue.wasQueued]). Call [flush] when connectivity
+/// flagged (see `QueuedResponse.wasQueued`). Call [flush] when connectivity
 /// is back (for example from a `connectivity_plus` listener):
 ///
 /// ```dart

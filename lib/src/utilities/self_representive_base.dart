@@ -19,7 +19,7 @@ abstract class ISelfRespresentive {
   /// 2. When you need to access the raw response data without creating a custom model.
   ///
   /// You can access specific fields in two ways:
-  /// 1. Using the [getField] method.
+  /// 1. Using the `getField` method.
   /// 2. Using the subscript operator `[]`. For example: `response['fieldName']`
   ///
   /// Example usage:
