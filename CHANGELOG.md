@@ -3,6 +3,15 @@
 Added
 
 - **Abilities API** (WordPress 6.9+). `client.abilities` lists and retrieves abilities (`list`, `listAll`, `retrieve`), their categories (`categories`, `category`) and runs them (`run`, `runAbility`), picking `GET` / `DELETE` / `POST` from the ability's `readonly` / `destructive` annotations. Requests go to `/wp-json/wp-abilities/v1` on the client's own origin and always send credentials. New models `Ability` and `AbilityCategory`. (#99)
+- **GraphQL improvements.** (#100)
+  - `graphql.execute` returns data *and* errors as a `GraphQLResult` (`GraphQLError` with `path`, `locations`, `extensions`), so partial responses are usable. `query` still fails on errors but now exposes them as `extra[GraphQLInterface.errorsKey]`.
+  - `query(useGet: true)` sends reads with `GET`, so `CacheMiddleware`, HTTP caches and retries apply. `mutate` is now a real mutation call: it rejects non-mutation documents, always uses `POST` and clears the cache; `POST` queries no longer clear it.
+  - `graphql.paginate` / `queryAll` walk a Relay connection (`pageInfo.endCursor`, `nodes` or `edges { node }`).
+  - Automatic Persisted Queries (`useAutomaticPersistedQueries`) and query batching (`graphql.batch`).
+
+Changed
+
+- GraphQL requests now run through the middleware pipeline (`onRequest` / `onResponse`) like REST requests, and transport errors are returned as failures instead of thrown.
 
 ## 10.1.0 (unreleased)
 

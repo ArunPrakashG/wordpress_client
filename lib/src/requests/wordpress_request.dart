@@ -32,6 +32,11 @@ final class WordpressRequest {
   /// [extra] key (on responses) holding how many tries the request needed.
   static const String metaAttempts = 'wp.request.attempts';
 
+  /// [extra] key that, when `true`, stops `CacheMiddleware` from evicting
+  /// cached responses after this request, even though it is a `POST`.
+  /// Used for GraphQL queries, which are reads sent over `POST`.
+  static const String metaKeepCache = 'wp.cache.keep';
+
   /// [extra] key holding the lower-case HTTP method name (`get`, `post`, ...).
   ///
   /// Filled in by the client before middlewares run. It is never sent to the server.

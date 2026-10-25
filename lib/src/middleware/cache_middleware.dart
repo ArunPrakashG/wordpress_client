@@ -168,7 +168,9 @@ class CacheMiddleware implements IWordpressMiddleware {
         requestMethod == HttpMethod.patch.name ||
         requestMethod == HttpMethod.delete.name;
 
-    if (_clearOnWrite && isWrite && response.isSuccessful) {
+    final keepCache = response.extra[WordpressRequest.metaKeepCache] == true;
+
+    if (_clearOnWrite && isWrite && !keepCache && response.isSuccessful) {
       await _invalidate(response.extra[WordpressRequest.metaUrl]);
     }
 
