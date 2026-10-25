@@ -28,7 +28,9 @@ class BootstrapBuilder {
     _defaultRequestTimeout = config.receiveTimeout;
     _followRedirects = config.shouldFollowRedirects;
     _middlewares = config.middlewares;
+    _retryPolicy = config.retryPolicy;
   }
+  RetryPolicy _retryPolicy = RetryPolicy.none;
   Duration _defaultRequestTimeout = DEFAULT_REQUEST_TIMEOUT;
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
@@ -41,6 +43,13 @@ class BootstrapBuilder {
   bool _debugMode = false;
   List<IWordpressMiddleware>? _middlewares;
   ICacheManager<WordpressRawResponse>? _cacheManager;
+
+  /// Sets how transient failures (timeouts, connection errors, 429/502/503/504)
+  /// are retried. Retries are off by default; see [RetryPolicy].
+  BootstrapBuilder withRetryPolicy(RetryPolicy policy) {
+    _retryPolicy = policy;
+    return this;
+  }
 
   /// Enables or disables debug mode.
   ///
@@ -97,6 +106,12 @@ class BootstrapBuilder {
     return this;
   }
 
+  /// Removes the default authorization.
+  BootstrapBuilder withoutDefaultAuthorization() {
+    _defaultAuthorization = null;
+    return this;
+  }
+
   /// Sets the default authorization using a builder function.
   BootstrapBuilder withDefaultAuthorizationBuilder(
     IAuthorization Function(AuthorizationBuilder) builder,
@@ -134,6 +149,10 @@ class BootstrapBuilder {
     ICacheManager<WordpressRawResponse>? cache,
     Duration ttl = const Duration(minutes: 1),
     bool clearOnWrite = true,
+    CacheInvalidation invalidation = CacheInvalidation.resource,
+    Duration? Function(Uri url)? ttlFor,
+    bool Function(WordpressRawResponse response)? shouldCache,
+    Duration revalidateWindow = const Duration(hours: 1),
   }) {
     _middlewares ??= [];
     final manager =
@@ -146,6 +165,10 @@ class BootstrapBuilder {
           cache: manager,
           ttl: ttl,
           clearOnWrite: clearOnWrite,
+          invalidation: invalidation,
+          ttlFor: ttlFor,
+          shouldCache: shouldCache,
+          revalidateWindow: revalidateWindow,
         ),
       );
     }
@@ -163,6 +186,7 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
+      retryPolicy: _retryPolicy,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
       middlewares: _middlewares,

@@ -16,199 +16,301 @@
     <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white" alt="Flutter"/>
     <img src="https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white" alt="WordPress"/>
     <br>
-    <b>The modern, strongly‑typed WordPress REST API client for Dart & Flutter — fast, flexible, and production‑ready.</b>
+    <b>A strongly typed WordPress client for Dart & Flutter: REST, GraphQL and the Abilities API.</b>
   </p>
 </div>
 
-## 🚀 Features
+## Features
 
-- 📦 API discovery support.
-- ⏲️ Measures request completion time.
-- 📝 Supports all CRUD operations.
-- 🌐 Supports all common REST endpoints.
-- 🧩 GraphQL (WPGraphQL) support: `client.graphql.query/mutate/raw()` with auth.
-- 🎨 Custom Requests & Authorization systems.
-- 🔐 3 Popular authorization methods.
-- 🗄️ Third‑party Database integration.
-- 🔧 Middlewares for request & response operations.
-- 🎣 Events for preprocessing response.
-- 🚀 Execute requests in Parallel (with configurable error handling).
-- 🧠 Optional in‑memory caching for GET requests.
-- 🌊 Polling-based streaming for single-resource retrieve endpoints (works great with Riverpod's StreamProvider).
+- **Typed REST client** for 30+ endpoints (posts, pages, media, users, comments, taxonomies, blocks, templates, navigation, widgets, settings, themes, ...) with full CRUD. See [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods).
+- **Typed results**: `WordpressResponse<T>` is a success or a failure; failures classify into a sealed `WordpressFailure`.
+- **Auth**: Application Passwords, JWT (two plugins), or your own `IAuthorization`. Credentials never follow the client to another origin.
+- **Resilience**: opt-in retries with backoff and `Retry-After`.
+- **Caching**: GET cache with per-resource invalidation and ETag revalidation. Custom stores supported.
+- **Pagination**: `listPages` / `listAll`, plus parallel page fetching.
+- **GraphQL (WPGraphQL)**: queries, mutations, partial results, GET, pagination, batching, persisted queries.
+- **Abilities API** (WordPress 6.9+).
+- **Extensibility**: middlewares, Dio interceptors, custom endpoints, raw requests, polling streams.
+- **Testable**: `MockWordpressAdapter` serves canned responses, no live site needed.
 
-## 📦 Install
+## Install
 
-Add `wordpress_client` to your `pubspec.yaml`:
-
-```dart
+```yaml
 dependencies:
-  wordpress_client: ^9.2.0
+  wordpress_client: ^10.0.0
 ```
 
-Then run `flutter pub get` or `dart pub get`.
+Requires Dart `>=3.0.0`.
 
-## 🔧 Quick start
-
-Import and initialize:
+## Quick start
 
 ```dart
 import 'package:wordpress_client/wordpress_client.dart';
 
+// From the site root (resolves <site>/wp-json/wp/v2)
 final client = WordpressClient.forSite(
   siteUrl: Uri.parse('https://example.com'),
-  // or: baseUrl via WordpressClient(baseUrl: Uri.parse('.../wp-json/wp/v2'))
-);
-```
-
-### 🧩 GraphQL (WPGraphQL)
-
-If your site uses the WPGraphQL plugin (canonical), you can send GraphQL operations using the same client and auth.
-
-```dart
-final client = WordpressClient.forSite(
-  siteUrl: Uri.parse('https://example.com'),
-  bootstrapper: (b) => b
-    .withDefaultAuthorization(
-      WordpressAuth.appPassword(user: 'user', appPassword: 'xxxx-xxxx'),
-    )
-    .build(),
 );
 
-// Auto-resolves https://example.com/graphql from the REST base.
-final result = await client.graphql.query<List<Map<String, dynamic>>>(
-  document: '''
-    query Posts($limit: Int!) {
-      posts(first: $limit) {
-        nodes { id title }
-      }
-    }
-  ''',
-  variables: { 'limit': 5 },
-  parseData: (data) {
-    final nodes = (data['posts']?['nodes'] as List<dynamic>? ?? const [])
-        .cast<Map<String, dynamic>>();
-    return nodes;
-  },
-  requireAuth: false, // set true for restricted queries/mutations
-);
-
-switch (result) {
-  case WordpressSuccessResponse():
-    print(result.data);
-  case WordpressFailureResponse():
-    print('GraphQL error: ${result.error}');
-}
-
-// Custom endpoint path if your site exposes a different GraphQL path
-client.graphql.setEndpointPath('/custom-graphql');
-```
-
-Add an auth quickly (helpers available):
-
-```dart
-final client = WordpressClient.forSite(
-  siteUrl: Uri.parse('https://example.com'),
-  bootstrapper: (b) => b
-    .withDefaultAuthorization(
-      // Built-in helpers
-      WordpressAuth.appPassword(user: 'user', appPassword: 'xxxx-xxxx'),
-      // or: WordpressAuth.usefulJwt(user: 'user', password: 'pass', device: 'device-id')
-      // or: WordpressAuth.basicJwt(user: 'user', password: 'pass')
-    )
-    .build(),
-);
-```
-
-Enable caching via middleware (optional):
-
-```dart
-final client = WordpressClient(
+// Or from the REST base URL
+final same = WordpressClient(
   baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
-  bootstrapper: (b) => b
-    .withCache(
-      ttl: const Duration(minutes: 5),               // optional, default 1 minute
-      // cache: MyCustomCacheManager(),              // optional custom store
-      // clearOnWrite: false,                        // keep cache after POST/PUT/PATCH/DELETE
-    )
-    .build(),
-);
-```
-
-📝 Notes: applies to GET requests; default store is in-memory (custom stores supported); cache clears by default on writes.
-
-### 📩 Send a request
-
-Retrieve 20 recent posts in ascending order:
-
-```dart
-final request = ListPostRequest(
-  page: 1,
-  perPage: 20,
-  order: Order.asc,
 );
 
-final response = await client.posts.list(request);
+final response = await client.posts.list(ListPostRequest(perPage: 10));
 
-// Dart 3 pattern matching
 switch (response) {
   case WordpressSuccessResponse():
-    final data = response.data; // List<Post>
-    break;
+    print(response.data.map((p) => p.title?.rendered)); // List<Post>
   case WordpressFailureResponse():
-    final error = response.error; // WordpressError
-    break;
+    print('${response.code}: ${response.message}');
 }
-
-// Or use helpers
-final posts = (await client.posts.list(ListPostRequest(perPage: 20))).map(
-  onSuccess: (s) => s.data,
-  onFailure: (f) => <Post>[],
-);
-
-final justPosts = (await client.posts.list(ListPostRequest(perPage: 20))).dataOrThrow();
 ```
 
-Convenience extensions are available under `client.<interface>.extensions` for quick lookups and pagination:
+Create the client once and reuse it. Call `client.dispose()` when done.
+
+## Configure
 
 ```dart
-final post = await client.posts.extensions.getById(123);
-final allMedia = await client.media.extensions.listAll(perPage: 100);
+final client = WordpressClient.forSite(
+  siteUrl: Uri.parse('https://example.com'),
+  bootstrapper: (b) => b
+      .withDefaultAuthorization(
+        WordpressAuth.appPassword(user: 'admin', appPassword: 'xxxx xxxx xxxx'),
+      )
+      .withRequestTimeout(const Duration(seconds: 20))
+      .withRetryPolicy(const RetryPolicy.standard())
+      .withCache(ttl: const Duration(minutes: 5))
+      .withDefaultUserAgent('my-app/1.0')
+      .build(),
+);
 ```
 
-## 📚 Advanced docs (Wiki)
+More: [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
-Deep-dives and more examples live in the Wiki:
+## Read, create, update, delete
 
-- 🧭 Getting Started: [Usage](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage)
-- 📩 [Sending Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Sending-Requests)
-- 🛡 [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization)
-- ⚡ [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests)
-- 🧠 [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching)
-- 🧩 [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL)
-- 🔗 [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods)
-- 🧩 [Pattern Directory Items](https://github.com/ArunPrakashG/wordpress_client/wiki/Pattern-Directory-Items)
-- 🧰 [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests)
-- 🧪 [Raw Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Raw-Requests)
-- 🔄 [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares)
-- 📜 [API Changelog](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changelog)
-- 🌊 [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries)
-- 🔄 [Streaming and Polling](https://github.com/ArunPrakashG/wordpress_client/wiki/Streaming-and-Polling)
+```dart
+final post = (await client.posts.retrieve(RetrievePostRequest(id: 1))).dataOrThrow();
 
-## 🤝 Feedback & Contributing
+await client.posts.create(CreatePostRequest(
+  title: 'Hello',
+  content: '<p>First post</p>',
+  status: 'draft',
+));
 
-- 🐛 For bugs or feature requests, use the [issue tracker][tracker].
-- 💡 Contributions are always appreciated. PRs are welcome!
+await client.posts.update(UpdatePostRequest(id: 1, title: 'Renamed'));
+await client.posts.delete(DeletePostRequest(id: 1, force: true));
+```
 
-Contributor tips (scripts, release process, consistency guards) are documented in the Wiki.
+Write requests need credentials (`withDefaultAuthorization`, or `authorization:` on the request).
 
-## 📄 License
+## Handle results
 
-This project is [MIT](https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE) licensed.
+```dart
+final r = await client.posts.list(ListPostRequest());
+
+final posts = r.dataOrThrow();                         // throws on failure
+final safe = r.dataOrNull();                           // null on failure
+final count = r.map(onSuccess: (s) => s.data.length, onFailure: (_) => 0);
+
+if (r case WordpressFailureResponse(:final failure)) {
+  switch (failure) {
+    case NetworkFailure(:final kind): print('network: $kind');       // timeout, connection, cancelled
+    case AuthFailure(:final reason):  print('auth: $reason');
+    case ApiFailure(:final statusCode, :final error): print('$statusCode ${error?.code}');
+    case DecodeFailure():             print('bad response body');
+    case MiddlewareFailure():         print('a middleware aborted it');
+    case ClientFailure(:final type):  print('client: $type');
+  }
+}
+```
+
+More: [Error Handling and Responses](https://github.com/ArunPrakashG/wordpress_client/wiki/Error-Handling-and-Responses).
+
+## Query fluently
+
+```dart
+final res = await client.posts.query
+    .withSearch('flutter')
+    .withCategories([3, 7])
+    .withOrder(Order.desc)
+    .withPerPage(20)
+    .execute();
+
+final bySlug = await client.pages.extensions.findBySlug('about'); // Page?
+```
+
+More: [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries), [Interfaces and Extensions](https://github.com/ArunPrakashG/wordpress_client/wiki/Interfaces-and-Extensions).
+
+## Paginate
+
+```dart
+// Everything in one response (use maxItems to cap it)
+final all = await client.posts.listAll(ListPostRequest(), maxItems: 1000);
+
+// Lazily, one response per page
+await for (final page in client.posts.listPages(ListPostRequest(), perPage: 50)) {
+  // page is a WordpressResponse<List<Post>>; a failing page ends the stream
+}
+
+// Pages in parallel
+final merged = await client.parallel
+    .list<Post, ListPostRequest>(
+      interface: client.posts,
+      requestBuilder: () => [
+        for (var p = 1; p <= 10; p++)
+          ParallelRequest(page: p, request: ListPostRequest(page: p, perPage: 50)),
+      ],
+    )
+    .merge();
+```
+
+More: [Pagination and Finders](https://github.com/ArunPrakashG/wordpress_client/wiki/Pagination-and-Finders), [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests).
+
+## Retries
+
+Off by default. Retries timeouts, connection errors and `429/502/503/504`, only for idempotent methods (never `POST`/`PATCH`).
+
+```dart
+b.withRetryPolicy(const RetryPolicy(maxAttempts: 4, baseDelay: Duration(seconds: 1)))
+
+// override for one raw request
+client.raw(WordpressRequest(
+  method: HttpMethod.get,
+  url: RequestUrl.relative('posts'),
+  retryPolicy: RetryPolicy.none,
+));
+```
+
+More: [Retries](https://github.com/ArunPrakashG/wordpress_client/wiki/Retries).
+
+## Cache
+
+```dart
+b.withCache(
+  ttl: const Duration(minutes: 5),
+  ttlFor: (url) => url.path.endsWith('/categories') ? const Duration(hours: 1) : null,
+)
+```
+
+GET responses are cached per URL, query and credential. A write evicts only the resource it touched. Expired entries with an `ETag` are revalidated with a `304`. More: [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching).
+
+## GraphQL (WPGraphQL)
+
+```dart
+final res = await client.graphql.query<List<Map<String, dynamic>>>(
+  document: r'query($n: Int!) { posts(first: $n) { nodes { id title } } }',
+  variables: {'n': 5},
+  parseData: (d) => (d['posts']['nodes'] as List).cast<Map<String, dynamic>>(),
+);
+
+// Keep data and errors together (partial results)
+final result = await client.graphql.execute<Map<String, dynamic>>(
+  document: '{ viewer { name } }',
+  parseData: (d) => d,
+  requireAuth: true,
+);
+if (result case WordpressSuccessResponse(:final data)) {
+  print(data.data); print(data.errors);
+}
+```
+
+Also `mutate`, `useGet`, `paginate` / `queryAll`, `batch`, persisted queries and registered queries. More: [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL).
+
+## Abilities API (WordPress 6.9+)
+
+```dart
+final abilities = (await client.abilities.list(category: 'site')).dataOrThrow();
+final out = await client.abilities.run('my-plugin/get-user-info', input: {'user_id': 1});
+```
+
+Requires an authenticated user. More: [Abilities](https://github.com/ArunPrakashG/wordpress_client/wiki/Abilities).
+
+## Middlewares
+
+```dart
+client.registerMiddleware(
+  DelegatedMiddleware(
+    onRequestDelegate: (req) async {
+      print('-> ${req.method.name} ${req.extra[WordpressRequest.metaUrl]}');
+      return req;
+    },
+    onResponseDelegate: (res) async {
+      print('<- ${res.code} in ${res.duration.inMilliseconds}ms');
+      return res;
+    },
+  ),
+);
+```
+
+More: [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares).
+
+## Custom endpoints and raw requests
+
+```dart
+// Any URL on the client's origin, untyped
+final raw = await client.raw(WordpressRequest(
+  method: HttpMethod.get,
+  url: RequestUrl.relative('posts'),
+  queryParameters: {'per_page': 1},
+));
+print(raw.code); print(raw.data);
+```
+
+Typed custom endpoints: [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests). Polling streams: [Streaming and Polling](https://github.com/ArunPrakashG/wordpress_client/wiki/Streaming-and-Polling).
+
+## Test your code
+
+```dart
+import 'package:dio/dio.dart';
+import 'package:wordpress_client/testing.dart';
+import 'package:wordpress_client/wordpress_client.dart';
+
+final adapter = MockWordpressAdapter()
+  ..reply('GET', '/posts', MockResponse.paged([{'id': 1}], total: 1, totalPages: 1))
+  ..reply('POST', '/posts', MockResponse.wpError(statusCode: 403, code: 'rest_cannot_create'));
+
+final client = WordpressClient.fromDioInstance(
+  baseUrl: Uri.parse('https://example.com/wp-json/wp/v2'),
+  instance: Dio()..httpClientAdapter = adapter,
+);
+
+expect(adapter.callCount(method: 'GET', path: '/posts'), 1);
+```
+
+More: [Testing](https://github.com/ArunPrakashG/wordpress_client/wiki/Testing).
+
+## Security notes
+
+- A request is only sent to the client's own origin (scheme, host and port). Anything else fails with `RequestErrorType.originMismatch`.
+- `reconfigure(baseUri: ...)` to a different origin drops the default credentials and discovery data. Pass new credentials in the same call.
+- Cache keys hold a SHA-256 digest of the `Authorization` header, never the header itself.
+
+## Documentation
+
+Everything is in the [Wiki](https://github.com/ArunPrakashG/wordpress_client/wiki):
+
+| Start | Requests | Behaviour | Extend |
+| --- | --- | --- | --- |
+| [Usage](https://github.com/ArunPrakashG/wordpress_client/wiki/Usage) | [Sending Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Sending-Requests) | [Retries](https://github.com/ArunPrakashG/wordpress_client/wiki/Retries) | [Middlewares](https://github.com/ArunPrakashG/wordpress_client/wiki/Middlewares) |
+| [Bootstrap and Configuration](https://github.com/ArunPrakashG/wordpress_client/wiki/Bootstrap-and-Configuration) | [Fluent Queries](https://github.com/ArunPrakashG/wordpress_client/wiki/Fluent-Queries) | [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching) | [Using Custom Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Using-Custom-Requests) |
+| [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization) | [Pagination and Finders](https://github.com/ArunPrakashG/wordpress_client/wiki/Pagination-and-Finders) | [Error Handling and Responses](https://github.com/ArunPrakashG/wordpress_client/wiki/Error-Handling-and-Responses) | [Raw Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Raw-Requests) |
+| [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods) | [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests) | [Events and Statistics](https://github.com/ArunPrakashG/wordpress_client/wiki/Events-and-Statistics) | [Integration with Storage Packages](https://github.com/ArunPrakashG/wordpress_client/wiki/Integration-with-Storage-Packages) |
+| [API Changelog](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changelog) | [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL), [Abilities](https://github.com/ArunPrakashG/wordpress_client/wiki/Abilities) | [Streaming and Polling](https://github.com/ArunPrakashG/wordpress_client/wiki/Streaming-and-Polling) | [Testing](https://github.com/ArunPrakashG/wordpress_client/wiki/Testing) |
+
+## Contributing
+
+Bugs and feature requests go to the [issue tracker][tracker]. PRs are welcome.
+
+## License
+
+[MIT](https://github.com/ArunPrakashG/wordpress_client/blob/master/LICENSE)
 
 ---
 
 <div align="center">
-  If you find this package helpful, consider supporting the development:
+  If this package helps you, consider supporting its development:
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/arunprakashg)
 

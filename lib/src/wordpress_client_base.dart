@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 
 import 'bootstrap_builder.dart';
 import 'constants.dart';
+import 'interface/abilities.dart';
 import 'interface/application_passwords.dart';
 import 'interface/blocks.dart';
 import 'interface/category.dart';
@@ -112,6 +113,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         baseUrl,
         client,
+        typeMap,
         configuration,
       ),
       typeMap,
@@ -199,6 +201,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         null,
         client,
+        typeMap,
         configuration,
       ),
       typeMap,
@@ -277,6 +280,7 @@ final class WordpressClient implements IDisposable {
       InternalRequester.configure(
         baseUrl,
         instance,
+        typeMap,
         configuration,
       ),
       typeMap,
@@ -532,6 +536,9 @@ final class WordpressClient implements IDisposable {
 
   /// Interface for post types.
   TypesInterface get types => get<TypesInterface>('types');
+
+  /// Interface for the Abilities API (`/wp-abilities/v1`, WordPress 6.9+).
+  AbilitiesInterface get abilities => get<AbilitiesInterface>('abilities');
 
   /// Interface for post statuses.
   StatusesInterface get statuses => get<StatusesInterface>('statuses');
@@ -901,6 +908,17 @@ final class WordpressClient implements IDisposable {
       encoder: (dynamic wt) => (wt as WidgetType).toJson(),
     );
 
+    register<AbilitiesInterface, Ability>(
+      interface: AbilitiesInterface(),
+      key: 'abilities',
+      decoder: (json) => Ability.fromJson(json),
+      encoder: (dynamic a) => (a as Ability).toJson(),
+    );
+    _registerResponseType<AbilityCategory>(
+      decoder: (json) => AbilityCategory.fromJson(json),
+      encoder: (dynamic c) => (c as AbilityCategory).toJson(),
+    );
+
     // GraphQL interface (no default type registration required)
     register<GraphQLInterface, Map<String, dynamic>>(
       interface: GraphQLInterface(),
@@ -1089,8 +1107,8 @@ final class WordpressClient implements IDisposable {
     BootstrapConfiguration Function(BootstrapBuilder builder) bootstrapper, {
     Uri? baseUri,
   }) {
-    if (baseUri != null) {
-      _requester._setBaseUrl(baseUri);
+    if (baseUri != null && _requester._setBaseUrl(baseUri)) {
+      clearDiscoveryCache();
     }
 
     return _requester.configure(
@@ -1107,12 +1125,17 @@ final class WordpressClient implements IDisposable {
   /// The default builder will contain all the previous settings.
   ///
   /// Only the settings that have changed since will be updated.
+  ///
+  /// Pointing the client at a different origin (scheme, host or port) via
+  /// [baseUri] drops the default authorization and the cached discovery data,
+  /// so credentials are never sent to a site they were not meant for. Set the
+  /// new credentials in [bootstrapper] of the same call to keep working.
   void reconfigure({
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
     Uri? baseUri,
   }) {
-    if (baseUri != null) {
-      _requester._setBaseUrl(baseUri);
+    if (baseUri != null && _requester._setBaseUrl(baseUri)) {
+      clearDiscoveryCache();
     }
 
     if (bootstrapper != null) {

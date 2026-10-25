@@ -331,7 +331,7 @@ RetrieveQueryBuilder<T, R> retrieveQuery<T, R extends IRequest>({
   return RetrieveQueryBuilder<T, R>(
     interface: interface,
     seed: seed,
-    executor: (wp) => interface.executor.retrive<T>(wp),
+    executor: (wp) => interface.executor.retrieve<T>(wp),
   );
 }
 

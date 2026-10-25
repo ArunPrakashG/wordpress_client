@@ -25,7 +25,28 @@ final class WordpressRequest {
     this.validator,
     this.sendTimeout = DEFAULT_REQUEST_TIMEOUT,
     this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
+    this.extra = const <String, dynamic>{},
+    this.retryPolicy,
   });
+
+  /// [extra] key (on responses) holding how many tries the request needed.
+  static const String metaAttempts = 'wp.request.attempts';
+
+  /// [extra] key that, when `true`, stops `CacheMiddleware` from evicting
+  /// cached responses after this request, even though it is a `POST`.
+  /// Used for GraphQL queries, which are reads sent over `POST`.
+  static const String metaKeepCache = 'wp.cache.keep';
+
+  /// [extra] key holding the lower-case HTTP method name (`get`, `post`, ...).
+  ///
+  /// Filled in by the client before middlewares run. It is never sent to the server.
+  static const String metaMethod = 'wp.request.method';
+
+  /// [extra] key holding the fully resolved request URL (without the query string).
+  static const String metaUrl = 'wp.request.url';
+
+  /// [extra] key holding the sorted, `&`-joined query string of the request.
+  static const String metaQuery = 'wp.request.query';
 
   /// The URL for the request.
   final RequestUrl url;
@@ -63,6 +84,18 @@ final class WordpressRequest {
   /// An optional callback function for custom validation of the response.
   final ValidatorCallback? validator;
 
+  /// Local metadata attached to this request.
+  ///
+  /// Unlike [headers], this is never sent to the server. It is visible to
+  /// middlewares and is copied onto the resulting response's `extra`.
+  /// See [metaMethod], [metaUrl] and [metaQuery] for the keys the client sets.
+  final Map<String, dynamic> extra;
+
+  /// Overrides the client's [RetryPolicy] for this request.
+  ///
+  /// Pass [RetryPolicy.none] to disable retries for a single request.
+  final RetryPolicy? retryPolicy;
+
   /// Indicates whether this request has associated events.
   bool get hasEvents => events != null;
 
@@ -88,6 +121,8 @@ final class WordpressRequest {
     ValidatorCallback? validator,
     Duration? sendTimeout,
     Duration? receiveTimeout,
+    Map<String, dynamic>? extra,
+    RetryPolicy? retryPolicy,
   }) {
     return WordpressRequest(
       url: url ?? this.url,
@@ -102,6 +137,8 @@ final class WordpressRequest {
       validator: validator ?? this.validator,
       sendTimeout: sendTimeout ?? this.sendTimeout,
       receiveTimeout: receiveTimeout ?? this.receiveTimeout,
+      extra: extra ?? this.extra,
+      retryPolicy: retryPolicy ?? this.retryPolicy,
     );
   }
 }

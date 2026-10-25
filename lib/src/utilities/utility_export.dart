@@ -10,8 +10,6 @@ export 'extensions/response_extensions.dart';
 export 'extensions/self_representive_extensions.dart';
 export 'helpers.dart'
     show
-        deserialize,
-        serialize,
         castOrElse,
         mapGuarded,
         guardAsync,

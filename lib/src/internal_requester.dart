@@ -7,19 +7,23 @@ typedef MiddlwareResponseTransformer = WordpressRawResponse Function(
 final class InternalRequester extends IRequestExecutor {
   InternalRequester.configure(
     this._baseUrl,
-    this._client, [
+    this._client,
+    this.codableMap, [
     this._configuration = const BootstrapConfiguration(),
   ]) {
     configure(_configuration);
   }
 
+  @override
+  final CodableMap codableMap;
+
   final Dio _client;
   Uri? _baseUrl;
   IAuthorization? _defaultAuthorization;
-  static final Map<String, int> _endPointStatistics = <String, int>{};
-  static StatisticsCallback? _statisticsCallback;
+  final Map<String, int> _endPointStatistics = <String, int>{};
+  StatisticsCallback? _statisticsCallback;
   bool _isDebugMode = false;
-  final BootstrapConfiguration _configuration;
+  BootstrapConfiguration _configuration;
 
   /// The request base url.
   ///
@@ -46,7 +50,13 @@ final class InternalRequester extends IRequestExecutor {
   List<IWordpressMiddleware> get middlewares =>
       _configuration.middlewares ?? [];
 
-  void _setBaseUrl(Uri url) {
+  /// Sets the base URL. Returns true when the origin (scheme, host or port)
+  /// changed from a previously set one.
+  ///
+  /// Moving to another origin drops the default authorization, so credentials
+  /// meant for one site are never sent to another. Supply the new credentials
+  /// in the same `reconfigure` call, or afterwards.
+  bool _setBaseUrl(Uri url) {
     if (!url.isAbsolute) {
       throw ArgumentError(
         'The provided url is relative. Base URLs should always be an absolute URL.',
@@ -68,8 +78,19 @@ final class InternalRequester extends IRequestExecutor {
       );
     }
 
+    final originChanged = _baseUrl != null &&
+        (_baseUrl!.scheme != url.scheme ||
+            _baseUrl!.host != url.host ||
+            _baseUrl!.port != url.port);
+
     _baseUrl = url;
     _client.options.baseUrl = url.toString();
+
+    if (originChanged) {
+      _removeDefaultAuthorization();
+    }
+
+    return originChanged;
   }
 
   @override
@@ -129,6 +150,13 @@ final class InternalRequester extends IRequestExecutor {
 
   void _removeDefaultAuthorization() {
     _defaultAuthorization = null;
+
+    // Also forget it in the stored configuration, so a later reconfigure()
+    // does not bring it back.
+    _configuration = BootstrapBuilder.fromConfiguration(_configuration)
+        .withoutDefaultAuthorization()
+        .build()
+        .copyWith(connectTimeout: _configuration.connectTimeout);
   }
 
   @override
@@ -139,7 +167,8 @@ final class InternalRequester extends IRequestExecutor {
       );
     }
 
-    final requestHeaders = request.headers ?? <String, dynamic>{};
+    // Copy so that the caller's header map is never mutated.
+    final requestHeaders = <String, dynamic>{...?request.headers};
 
     // If the request requires authorization, we need to check if the default authorization is set.
     // If it is, we need to check if the default authorization is valid.
@@ -178,29 +207,50 @@ final class InternalRequester extends IRequestExecutor {
     }
 
     // Generate the request URL.
-    final requestUrl = () {
-      if (request.url.isAbsolute) {
-        return request.url.uri.replace(host: baseUrl.host).toString();
+    //
+    // The origin is locked once the client has a base URL: absolute URLs are
+    // honoured only when they point at that same origin (e.g. GraphQL or the
+    // site root for discovery). To target another site, create a new client
+    // or call `reconfigure(baseUri: ...)`.
+    final String requestUrl;
+    if (request.url.isAbsolute) {
+      final target = request.url.uri;
+
+      if (!_isSameOrigin(target)) {
+        return WordpressRawResponse(
+          data: null,
+          code: -RequestErrorType.originMismatch.index,
+          message: 'Refusing to send a request to '
+              '${target.scheme}://${target.authority}: this client is bound to '
+              '${baseUrl.scheme}://${baseUrl.authority}. Create a new client or '
+              'call reconfigure(baseUri: ...) to target another site.',
+        );
       }
 
-      return join(baseUrl.toString(), request.url.toString());
-    }();
+      requestUrl = target.toString();
+    } else {
+      requestUrl = join(baseUrl.toString(), request.url.toString());
+    }
 
     _triggerStatistics(requestUrl);
 
-    // Attach request metadata to request.headers for middleware consumption
+    // Attach request metadata to request.extra for middleware consumption.
+    // This is local only and is never sent over the wire.
     final qpEntries = (request.queryParameters ?? const <String, dynamic>{})
         .entries
         .where((e) => e.value != null)
         .toList()
       ..sort((a, b) => a.key.compareTo(b.key));
     final qpStr = qpEntries.map((e) => '${e.key}=${e.value}').join('&');
-    // Attach meta headers onto the actual request headers map used for the network call
-    requestHeaders['method'] = request.method.name;
-    requestHeaders['request-url'] = requestUrl;
-    requestHeaders['request-query'] = qpStr;
-    // Ensure the request object that middlewares see also contains these
-    request = request.copyWith(headers: requestHeaders);
+    request = request.copyWith(
+      headers: requestHeaders,
+      extra: <String, dynamic>{
+        ...request.extra,
+        WordpressRequest.metaMethod: request.method.name,
+        WordpressRequest.metaUrl: requestUrl,
+        WordpressRequest.metaQuery: qpStr,
+      },
+    );
 
     // Trigger the onExecute middleware event and returns the result.
     // If the result is not null, we return the result.
@@ -209,6 +259,7 @@ final class InternalRequester extends IRequestExecutor {
       function: () async {
         return _executeMiddlewareEvent(
           request: request,
+          requestHeaders: requestHeaders,
           transformer: (data) {
             final headers = <String, dynamic>{
               MIDDLEWARE_HEADER_KEY: true,
@@ -221,7 +272,7 @@ final class InternalRequester extends IRequestExecutor {
               code: data.statusCode,
               headers: headers,
               requestHeaders: requestHeaders,
-              extra: data.extra ?? <String, dynamic>{},
+              extra: <String, dynamic>{...request.extra, ...?data.extra},
               message:
                   data.message ?? 'Middleware event executed successfully.',
             );
@@ -246,34 +297,79 @@ final class InternalRequester extends IRequestExecutor {
 
     final watch = Stopwatch();
 
-    Future<Response<T>> run<T>() async {
-      watch.start();
+    // The stopwatch spans the whole exchange, including a possible re-auth
+    // and retry, and is stopped when the raw response is built.
+    Future<Response<T>> run<T>() {
+      return _client.request<T>(
+        requestUrl,
+        data: request.body,
+        cancelToken: request.cancelToken,
+        queryParameters: request.queryParameters,
+        onSendProgress: request.events?.onSend,
+        onReceiveProgress: request.events?.onReceive,
+        options: Options(
+          receiveDataWhenStatusError: true,
+          validateStatus: (status) => true,
+          method: request.method.name,
+          sendTimeout: request.body != null ? request.sendTimeout : null,
+          receiveTimeout: request.receiveTimeout,
+          headers: requestHeaders,
+          extra: request.extra,
+        ),
+      );
+    }
 
-      try {
-        return _client.request<T>(
-          requestUrl,
-          data: request.body,
-          cancelToken: request.cancelToken,
-          queryParameters: request.queryParameters,
-          onSendProgress: request.events?.onSend,
-          onReceiveProgress: request.events?.onReceive,
-          options: Options(
-            receiveDataWhenStatusError: true,
-            validateStatus: (status) => true,
-            method: request.method.name,
-            sendTimeout: request.body != null ? request.sendTimeout : null,
-            receiveTimeout: request.receiveTimeout,
-            headers: requestHeaders,
-          ),
-        );
-      } catch (e) {
-        rethrow;
-      } finally {
-        watch.stop();
+    var attempts = 0;
+
+    // Runs the request, retrying transient failures as the active
+    // [RetryPolicy] allows. Non-retryable errors are rethrown unchanged.
+    Future<Response<dynamic>> runWithRetry() async {
+      final policy = request.retryPolicy ?? _configuration.retryPolicy;
+      final replayable = request.body is! FormData && request.body is! Stream;
+      final retries = policy.enabled &&
+          replayable &&
+          policy.methods.contains(request.method);
+
+      for (var attempt = 1;; attempt++) {
+        attempts++;
+        final canRetry = retries && attempt < policy.maxAttempts;
+        Duration? retryAfter;
+
+        try {
+          final response = await run<dynamic>();
+
+          if (!canRetry || !policy.statusCodes.contains(response.statusCode)) {
+            return response;
+          }
+
+          retryAfter = RetryPolicy.parseRetryAfter(
+            response.headers.value('retry-after'),
+          );
+          final delay = policy.nextDelay(attempt, retryAfter: retryAfter);
+          if (delay == null) {
+            return response;
+          }
+
+          await _waitBeforeRetry(policy, delay, request.cancelToken);
+        } on DioException catch (error) {
+          if (!canRetry ||
+              !policy.retryOnNetworkError ||
+              !_isTransient(error)) {
+            rethrow;
+          }
+
+          final delay = policy.nextDelay(attempt);
+          if (delay == null) {
+            rethrow;
+          }
+
+          await _waitBeforeRetry(policy, delay, request.cancelToken);
+        }
       }
     }
 
     Future<WordpressRawResponse> buildRaw(Response<dynamic> response) async {
+      watch.stop();
       final statusCode =
           response.statusCode ?? -RequestErrorType.invalidStatusCode.index;
       request.events?.onResponse?.call(response.data);
@@ -284,14 +380,19 @@ final class InternalRequester extends IRequestExecutor {
         headers: response.headers.getHeaderMap(),
         duration: watch.elapsed,
         requestHeaders: response.requestOptions.headers,
-        extra: response.extra,
+        extra: <String, dynamic>{
+          ...request.extra,
+          ...response.extra,
+          WordpressRequest.metaAttempts: attempts,
+        },
         message: response.statusMessage,
       );
 
       return raw;
     }
 
-    var response = await run<dynamic>();
+    watch.start();
+    var response = await runWithRetry();
 
     // If unauthorized and auth is required, attempt a single re-auth and retry
     if (response.statusCode == 401 && request.requireAuth) {
@@ -326,7 +427,7 @@ final class InternalRequester extends IRequestExecutor {
           if (authUrl != null) {
             requestHeaders[authorizer.headerKey] = authUrl;
             // retry once
-            response = await run<dynamic>();
+            response = await runWithRetry();
           }
         }
       }
@@ -337,6 +438,7 @@ final class InternalRequester extends IRequestExecutor {
 
   Future<WordpressRawResponse?> _executeMiddlewareEvent({
     required WordpressRequest request,
+    required Map<String, dynamic> requestHeaders,
     required MiddlwareResponseTransformer transformer,
   }) async {
     for (final middleware in middlewares) {
@@ -345,9 +447,54 @@ final class InternalRequester extends IRequestExecutor {
       if (result.hasData) {
         return transformer(result);
       }
+
+      if (result.requestHeaders != null) {
+        requestHeaders.addAll(result.requestHeaders!);
+      }
     }
 
     return null;
+  }
+
+  /// Whether [error] is a failure that a retry could plausibly fix.
+  bool _isTransient(DioException error) {
+    return switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.connectionError =>
+        true,
+      _ => false,
+    };
+  }
+
+  /// Sleeps for [delay], but wakes up and throws if [cancelToken] fires.
+  Future<void> _waitBeforeRetry(
+    RetryPolicy policy,
+    Duration delay,
+    CancelToken? cancelToken,
+  ) async {
+    final sleeper = policy.sleep;
+    final wait = sleeper != null ? sleeper(delay) : Future<void>.delayed(delay);
+
+    if (cancelToken != null) {
+      await Future.any<Object?>([wait, cancelToken.whenCancel]);
+
+      if (cancelToken.isCancelled) {
+        throw DioException.requestCancelled(
+          requestOptions: RequestOptions(path: _client.options.baseUrl),
+          reason: cancelToken.cancelError?.error,
+        );
+      }
+    }
+
+    await wait;
+  }
+
+  bool _isSameOrigin(Uri target) {
+    return target.scheme == baseUrl.scheme &&
+        target.host == baseUrl.host &&
+        target.port == baseUrl.port;
   }
 
   Dio _createAuthDioClient() {

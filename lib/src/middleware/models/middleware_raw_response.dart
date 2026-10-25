@@ -23,6 +23,7 @@ final class MiddlewareRawResponse {
     this.message,
     this.headers,
     this.extra,
+    this.requestHeaders,
   });
 
   /// Creates a default instance of [MiddlewareRawResponse] with a status code of -99
@@ -41,6 +42,12 @@ final class MiddlewareRawResponse {
 
   /// The HTTP status code of the response.
   final int statusCode;
+
+  /// Headers to add to the outgoing request when no middleware answered it.
+  ///
+  /// Only read from a response that has no data ([hasData] is false). Used,
+  /// for instance, to make a request conditional with `If-None-Match`.
+  final Map<String, String>? requestHeaders;
 
   /// The headers of the HTTP response, if any.
   final Map<String, dynamic>? headers;

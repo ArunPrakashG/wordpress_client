@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 import '../../wordpress_client.dart';
 import 'wordpress_error.dart';
+import 'wordpress_failure.dart';
 
 @immutable
 
@@ -151,6 +152,27 @@ final class WordpressFailureResponse<T> extends WordpressResponse<T> {
 
   /// The WordPress error object containing detailed error information.
   final WordpressError? error;
+
+  /// Why the request failed, as a closed set of cases to switch over.
+  ///
+  /// See [WordpressFailure].
+  WordpressFailure get failure => classifyFailure(
+        code: code,
+        error: error,
+        message: message,
+        rawData: _rawData,
+        extra: extra,
+      );
+
+  /// The local error category for failures that never reached the server
+  /// (see [RequestErrorType]); [RequestErrorType.unknown] for HTTP errors.
+  RequestErrorType get errorType {
+    if (code < 0 && -code < RequestErrorType.values.length) {
+      return RequestErrorType.values[-code];
+    }
+
+    return RequestErrorType.unknown;
+  }
 
   /// The exception that caused the failure, if available.
   Object? get exception => extra?['error'];

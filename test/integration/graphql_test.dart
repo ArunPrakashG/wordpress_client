@@ -1,3 +1,5 @@
+@Tags(['integration'])
+library;
 
 import 'package:test/test.dart';
 import 'package:wordpress_client/wordpress_client.dart';
@@ -334,7 +336,7 @@ void main() {
         final res1 = await client.graphql
             .executeRegistered<List<Map<String, dynamic>>>('getPosts');
         expect(res1 is WordpressSuccessResponse<List<Map<String, dynamic>>>,
-            isTrue);
+            isTrue,);
 
         // Execute with overridden variables
         final res2 =
@@ -343,7 +345,7 @@ void main() {
           variables: {'first': 1},
         );
         expect(res2 is WordpressSuccessResponse<List<Map<String, dynamic>>>,
-            isTrue);
+            isTrue,);
 
         // Cleanup
         client.graphql.unregister('getPosts');
@@ -370,7 +372,7 @@ void main() {
         expect(client.graphql.isRegistered('testQuery1'), isTrue);
         expect(client.graphql.isRegistered('testQuery2'), isTrue);
         expect(client.graphql.registeredQueryNames,
-            containsAll(['testQuery1', 'testQuery2']));
+            containsAll(['testQuery1', 'testQuery2']),);
 
         // Cleanup
         client.graphql.clearRegistry();
@@ -429,7 +431,7 @@ void main() {
 
       // Non-existent returns null
       expect(client.graphql.getRegistered<Map<String, dynamic>>('nonExistent'),
-          isNull);
+          isNull,);
 
       // Cleanup
       client.graphql.unregister('getTest');

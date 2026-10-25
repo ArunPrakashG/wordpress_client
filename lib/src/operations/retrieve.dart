@@ -18,7 +18,7 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
   Future<WordpressResponse<T>> retrieve(R request) async {
     final wpRequest = await request.build(baseUrl);
 
-    return executor.retrive<T>(wpRequest);
+    return executor.retrieve<T>(wpRequest);
   }
 
   /// Retrieves raw data from the WordPress API.
@@ -117,7 +117,7 @@ base mixin RetrieveOperation<T, R extends IRequest> on IRequestInterface {
       try {
         final built = await request.build(baseUrl);
         final withCancel = built.copyWith(cancelToken: token);
-        final res = await executor.retrive<T>(withCancel);
+        final res = await executor.retrieve<T>(withCancel);
         await emitIfNeeded(res);
       } catch (_) {
         // Errors during run are surfaced via failure responses by executor; swallow here.

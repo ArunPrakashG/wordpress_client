@@ -171,7 +171,7 @@ final class WordpressRawResponse {
   }) {
     if (isFailure) {
       return WordpressFailureResponse(
-        error: WordpressError.fromMap(data),
+        error: mapGuarded(mapper: WordpressError.fromMap, json: data),
         code: code,
         headers: headers,
         rawData: data,
