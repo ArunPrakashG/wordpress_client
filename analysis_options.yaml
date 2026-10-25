@@ -1,4 +1,6 @@
 analyzer:
+  exclude:
+    - example/flutter_app/**
   errors:
     avoid_positional_boolean_parameters: ignore
 include: package:personal_flutter_lints/analysis_options.yaml

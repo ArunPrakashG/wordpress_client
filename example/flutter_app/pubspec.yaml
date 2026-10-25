@@ -1,0 +1,16 @@
+name: wordpress_client_example
+description: A small Flutter app that lists posts and queues drafts while offline.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wordpress_client:
+    path: ../..
+
+flutter:
+  uses-material-design: true
