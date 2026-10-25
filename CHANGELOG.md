@@ -1,3 +1,30 @@
+## 10.0.0 (unreleased)
+
+Breaking
+
+- **Requests are locked to the client's origin.** An absolute `RequestUrl` is used verbatim only when its scheme, host and port match the base URL; otherwise the request is not sent and the response has `RequestErrorType.originMismatch`. Previously only the host was rewritten. The base URL changes only via a new client or `reconfigure(baseUri: ...)`. (#87)
+- **Request metadata is no longer sent as HTTP headers.** The `method`, `request-url` and `request-query` pseudo-headers are gone. Middlewares read them from the new `WordpressRequest.extra` (keys `WordpressRequest.metaMethod`, `metaUrl`, `metaQuery`), which is also copied onto `WordpressRawResponse.extra`. (#85)
+- `RequestErrorType` gained `originMismatch` and `invalidResponse` (appended, existing indices unchanged).
+
+Fixed
+
+- `CacheMiddleware` never served a hit because the lookup and store keys differed. Both now come from one function. (#84)
+- Cache keys no longer contain the `Authorization` value, only a SHA-256 digest of it. (#89)
+- `WordpressRawResponse.duration` now covers the full round trip (it was ~0), including a re-auth retry. (#86)
+- A 2xx response whose body cannot be decoded (for example a non-array body for a list endpoint) now returns a `WordpressFailureResponse` with `RequestErrorType.invalidResponse` instead of throwing a cast error. (#88)
+- The GraphQL endpoint follows `reconfigure(baseUri: ...)`; a custom `setEndpointPath` survives it.
+- The request header map passed in a `WordpressRequest` is no longer mutated.
+
+Added
+
+- `package:wordpress_client/testing.dart` with `MockWordpressAdapter`, `MockResponse` and `RecordedRequest` for testing code that uses the client without a live site. (#94, #101)
+- `WordpressRequest.extra` for local request metadata.
+
+Internal
+
+- The request executor's six copy-pasted pipelines are one `_pipeline` plus one `_toResponse`. `retrive` is renamed `retrieve` (the old name is a deprecated alias). (#91)
+- Offline test suite under `test/offline`; integration tests are tagged `integration` and CI runs `dart test -x integration` with a coverage floor. Integration credentials now come from `WP_*` environment variables first, then `test/test_local.json`. (#94, #95)
+
 ## 9.4.0
 
 Added

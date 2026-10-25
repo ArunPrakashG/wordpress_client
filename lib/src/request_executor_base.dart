@@ -56,25 +56,19 @@ abstract base class IRequestExecutor {
     );
   }
 
-  /// Executes a raw request and returns the response.
-  ///
-  /// This method applies middleware, executes the request, and handles errors.
-  ///
-  /// [request] The request to execute.
-  ///
-  /// Returns a [WordpressRawResponse] containing the raw response data.
-  @internal
-  Future<WordpressRawResponse> raw(WordpressRequest request) async {
+  /// Runs [request] through request middlewares, [execute] and response
+  /// middlewares. Never throws: any error becomes a failure response.
+  Future<WordpressRawResponse> _pipeline(WordpressRequest request) {
     return guardAsync<WordpressRawResponse>(
       function: () async {
-        request = await _handleRequestMiddlewares(
+        final processed = await _handleRequestMiddlewares(
           request: request,
           middlewares: middlewares,
         );
 
         return _handleResponseMiddlewares(
           middlewares: middlewares,
-          response: await execute(request),
+          response: await execute(processed),
         );
       },
       onError: (error, stackTrace) async {
@@ -98,6 +92,77 @@ abstract base class IRequestExecutor {
     );
   }
 
+  /// Converts [raw] into a typed response.
+  ///
+  /// Successful payloads go through [decode]. If decoding throws, the result is
+  /// a [WordpressFailureResponse] with [RequestErrorType.invalidResponse]
+  /// that keeps the raw payload, the exception and its stack trace.
+  WordpressResponse<T> _toResponse<T>(
+    WordpressRawResponse raw,
+    T Function(dynamic data) decode,
+  ) {
+    if (raw.isFailure) {
+      return WordpressFailureResponse<T>(
+        error: mapGuarded(
+          mapper: WordpressError.fromMap,
+          json: raw.data,
+        ),
+        code: raw.code,
+        rawData: raw.data,
+        headers: raw.headers,
+        duration: raw.duration,
+        extra: raw.extra,
+        requestHeaders: raw.requestHeaders,
+        message: raw.message,
+      );
+    }
+
+    final T data;
+
+    try {
+      data = decode(raw.data);
+    } catch (error, stackTrace) {
+      return WordpressFailureResponse<T>(
+        error: null,
+        code: -RequestErrorType.invalidResponse.index,
+        rawData: raw.data,
+        headers: raw.headers,
+        duration: raw.duration,
+        requestHeaders: raw.requestHeaders,
+        extra: <String, dynamic>{
+          ...raw.extra,
+          'error': error,
+          'stackTrace': stackTrace,
+        },
+        message: 'Failed to decode the response body as $T '
+            '(HTTP ${raw.code}): $error',
+      );
+    }
+
+    return WordpressSuccessResponse<T>(
+      data: data,
+      code: raw.code,
+      rawData: raw.data,
+      extra: raw.extra,
+      requestHeaders: raw.requestHeaders,
+      headers: raw.headers,
+      duration: raw.duration,
+      message: raw.message,
+    );
+  }
+
+  /// Executes a raw request and returns the response.
+  ///
+  /// This method applies middleware, executes the request, and handles errors.
+  ///
+  /// [request] The request to execute.
+  ///
+  /// Returns a [WordpressRawResponse] containing the raw response data.
+  @internal
+  Future<WordpressRawResponse> raw(WordpressRequest request) {
+    return _pipeline(request);
+  }
+
   /// Creates a new resource using the given request.
   ///
   /// This method is used for POST requests to create new items in the WordPress API.
@@ -106,74 +171,10 @@ abstract base class IRequestExecutor {
   ///
   /// Returns a [WordpressResponse] with the created item of type [T].
   @internal
-  Future<WordpressResponse<T>> create<T>(
-    WordpressRequest request,
-  ) async {
-    final rawResponse = await guardAsync<WordpressRawResponse>(
-      function: () async {
-        request = await _handleRequestMiddlewares(
-          request: request,
-          middlewares: middlewares,
-        );
-
-        return _handleResponseMiddlewares(
-          middlewares: middlewares,
-          response: await execute(request),
-        );
-      },
-      onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
-
-        return WordpressRawResponse(
-          data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
-        );
-      },
-    );
-
-    return rawResponse.map<T>(
-      onSuccess: (response) {
-        final decoder = CodableMap.getDecoder<T>();
-        final data = decoder(response.data);
-
-        return WordpressSuccessResponse<T>(
-          data: data,
-          code: response.code,
-          rawData: response.data,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          headers: response.headers,
-          duration: response.duration,
-          message: response.message,
-        );
-      },
-      onFailure: (response) {
-        final error = mapGuarded(
-          mapper: WordpressError.fromMap,
-          json: response.data,
-        );
-
-        return WordpressFailureResponse<T>(
-          error: error,
-          code: response.code,
-          rawData: response.data,
-          headers: response.headers,
-          duration: response.duration,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          message: response.message,
-        );
-      },
+  Future<WordpressResponse<T>> create<T>(WordpressRequest request) async {
+    return _toResponse<T>(
+      await _pipeline(request),
+      (data) => CodableMap.getDecoder<T>()(data),
     );
   }
 
@@ -185,75 +186,18 @@ abstract base class IRequestExecutor {
   ///
   /// Returns a [WordpressResponse] with the retrieved item of type [T].
   @internal
-  Future<WordpressResponse<T>> retrive<T>(
-    WordpressRequest request,
-  ) async {
-    final rawResponse = await guardAsync<WordpressRawResponse>(
-      function: () async {
-        request = await _handleRequestMiddlewares(
-          request: request,
-          middlewares: middlewares,
-        );
-
-        return _handleResponseMiddlewares(
-          middlewares: middlewares,
-          response: await execute(request),
-        );
-      },
-      onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
-
-        return WordpressRawResponse(
-          data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
-        );
-      },
+  Future<WordpressResponse<T>> retrieve<T>(WordpressRequest request) async {
+    return _toResponse<T>(
+      await _pipeline(request),
+      (data) => CodableMap.getDecoder<T>()(data),
     );
+  }
 
-    return rawResponse.map<T>(
-      onSuccess: (response) {
-        final decoder = CodableMap.getDecoder<T>();
-        final data = decoder(response.data);
-
-        return WordpressSuccessResponse<T>(
-          data: data,
-          code: response.code,
-          rawData: response.data,
-          headers: response.headers,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          duration: response.duration,
-          message: response.message,
-        );
-      },
-      onFailure: (response) {
-        final error = mapGuarded(
-          mapper: WordpressError.fromMap,
-          json: response.data,
-        );
-
-        return WordpressFailureResponse<T>(
-          error: error,
-          code: response.code,
-          headers: response.headers,
-          rawData: response.data,
-          duration: response.duration,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          message: response.message,
-        );
-      },
-    );
+  /// Misspelled alias of [retrieve].
+  @internal
+  @Deprecated('Use retrieve instead. Will be removed in 11.0.0.')
+  Future<WordpressResponse<T>> retrive<T>(WordpressRequest request) {
+    return retrieve<T>(request);
   }
 
   /// Deletes a resource using the given request.
@@ -264,72 +208,8 @@ abstract base class IRequestExecutor {
   ///
   /// Returns a [WordpressResponse] with a boolean indicating success or failure.
   @internal
-  Future<WordpressResponse<bool>> delete(
-    WordpressRequest request,
-  ) async {
-    final rawResponse = await guardAsync<WordpressRawResponse>(
-      function: () async {
-        request = await _handleRequestMiddlewares(
-          request: request,
-          middlewares: middlewares,
-        );
-
-        return _handleResponseMiddlewares(
-          middlewares: middlewares,
-          response: await execute(request),
-        );
-      },
-      onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
-
-        return WordpressRawResponse(
-          data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
-        );
-      },
-    );
-
-    return rawResponse.map(
-      onSuccess: (response) {
-        return WordpressSuccessResponse(
-          data: true,
-          code: response.code,
-          headers: response.headers,
-          rawData: response.data,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          duration: response.duration,
-          message: response.message,
-        );
-      },
-      onFailure: (response) {
-        final error = mapGuarded(
-          mapper: WordpressError.fromMap,
-          json: response.data,
-        );
-
-        return WordpressFailureResponse(
-          error: error,
-          code: response.code,
-          headers: response.headers,
-          rawData: response.data,
-          duration: response.duration,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          message: response.message,
-        );
-      },
-    );
+  Future<WordpressResponse<bool>> delete(WordpressRequest request) async {
+    return _toResponse<bool>(await _pipeline(request), (_) => true);
   }
 
   /// Retrieves a list of resources using the given request.
@@ -338,77 +218,23 @@ abstract base class IRequestExecutor {
   ///
   /// [request] The request specifying the resources to list.
   ///
-  /// Returns a [WordpressResponse] with a list of items of type [T].
+  /// Returns a [WordpressResponse] with a list of items of type [T]. A
+  /// successful status code with a body that is not a JSON array (an HTML
+  /// error page or a PHP notice, for instance) yields a failure response.
   @internal
-  Future<WordpressResponse<List<T>>> list<T>(
-    WordpressRequest request,
-  ) async {
-    final rawResponse = await guardAsync<WordpressRawResponse>(
-      function: () async {
-        request = await _handleRequestMiddlewares(
-          request: request,
-          middlewares: middlewares,
-        );
+  Future<WordpressResponse<List<T>>> list<T>(WordpressRequest request) async {
+    return _toResponse<List<T>>(
+      await _pipeline(request),
+      (data) {
+        if (data is! Iterable<dynamic>) {
+          throw FormatException(
+            'Expected a JSON array but received ${data.runtimeType}.',
+          );
+        }
 
-        final response = await execute(request);
-
-        return _handleResponseMiddlewares(
-          middlewares: middlewares,
-          response: response,
-        );
-      },
-      onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
-
-        return WordpressRawResponse(
-          data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
-        );
-      },
-    );
-
-    return rawResponse.map<List<T>>(
-      onSuccess: (response) {
         final decoder = CodableMap.getDecoder<T>();
-        final data = (response.data as Iterable<dynamic>).map(decoder).toList();
 
-        return WordpressSuccessResponse<List<T>>(
-          data: data,
-          code: response.code,
-          extra: response.extra,
-          rawData: response.data,
-          requestHeaders: response.requestHeaders,
-          headers: response.headers,
-          duration: response.duration,
-          message: response.message,
-        );
-      },
-      onFailure: (response) {
-        final error = mapGuarded(
-          mapper: WordpressError.fromMap,
-          json: response.data,
-        );
-
-        return WordpressFailureResponse(
-          error: error,
-          code: response.code,
-          headers: response.headers,
-          rawData: response.data,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          duration: response.duration,
-          message: response.message,
-        );
+        return data.map(decoder).toList();
       },
     );
   }
@@ -421,74 +247,10 @@ abstract base class IRequestExecutor {
   ///
   /// Returns a [WordpressResponse] with the updated item of type [T].
   @internal
-  Future<WordpressResponse<T>> update<T>(
-    WordpressRequest request,
-  ) async {
-    final rawResponse = await guardAsync<WordpressRawResponse>(
-      function: () async {
-        request = await _handleRequestMiddlewares(
-          request: request,
-          middlewares: middlewares,
-        );
-
-        return _handleResponseMiddlewares(
-          middlewares: middlewares,
-          response: await execute(request),
-        );
-      },
-      onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
-
-        return WordpressRawResponse(
-          data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
-        );
-      },
-    );
-
-    return rawResponse.map(
-      onSuccess: (response) {
-        final decoder = CodableMap.getDecoder<T>();
-        final data = decoder(response.data);
-
-        return WordpressSuccessResponse<T>(
-          data: data,
-          code: response.code,
-          extra: response.extra,
-          rawData: response.data,
-          requestHeaders: response.requestHeaders,
-          headers: response.headers,
-          duration: response.duration,
-          message: response.message,
-        );
-      },
-      onFailure: (response) {
-        final error = mapGuarded(
-          mapper: WordpressError.fromMap,
-          json: response.data,
-        );
-
-        return WordpressFailureResponse(
-          error: error,
-          code: response.code,
-          headers: response.headers,
-          rawData: response.data,
-          duration: response.duration,
-          extra: response.extra,
-          requestHeaders: response.requestHeaders,
-          message: response.message,
-        );
-      },
+  Future<WordpressResponse<T>> update<T>(WordpressRequest request) async {
+    return _toResponse<T>(
+      await _pipeline(request),
+      (data) => CodableMap.getDecoder<T>()(data),
     );
   }
 

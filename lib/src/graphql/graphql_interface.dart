@@ -110,54 +110,52 @@ final class RegisteredQuery<T> {
 /// );
 /// ```
 final class GraphQLInterface extends IRequestInterface {
-  late Uri _graphqlEndpoint;
-
   /// Internal registry for storing registered queries.
   final Map<String, RegisteredQuery<dynamic>> _registry = {};
 
-  /// Compute the GraphQL endpoint from the REST base URL.
+  /// Path segments set through [setEndpointPath], relative to the site prefix.
+  List<String>? _customPathSegments;
+
+  /// The GraphQL endpoint, derived from the client's current base URL.
+  ///
+  /// It is computed on access so that it follows `reconfigure(baseUri: ...)`.
   ///
   /// For most WordPress setups using WPGraphQL, the endpoint is located at
   /// `/<site-path>/graphql`. If the site is installed in a subdirectory,
   /// the subdirectory is preserved. For example:
   /// - REST: https://example.com/wp-json/wp/v2 -> GraphQL: https://example.com/graphql
   /// - REST: https://example.com/blog/wp-json/wp/v2 -> GraphQL: https://example.com/blog/graphql
-  Uri _computeGraphQLEndpoint(Uri restBase) {
+  Uri get _graphqlEndpoint {
+    final restBase = baseUrl;
     final segments = List<String>.from(restBase.pathSegments);
     final wpJsonIndex = segments.indexOf('wp-json');
 
     // Keep everything before 'wp-json' as the site path prefix, if present.
-    final sitePrefix = wpJsonIndex > 0 ? segments.sublist(0, wpJsonIndex) : <String>[];
+    final sitePrefix =
+        wpJsonIndex > 0 ? segments.sublist(0, wpJsonIndex) : <String>[];
 
-    final newPathSegments = <String>[...sitePrefix, 'graphql'];
-    return restBase.replace(pathSegments: newPathSegments, queryParameters: {});
-  }
-
-  @override
-  void onInit() {
-    _graphqlEndpoint = _computeGraphQLEndpoint(baseUrl);
-  }
-
-  /// Override or customize the GraphQL endpoint if your site uses a custom path
-  /// or query-style endpoint (e.g., `/?graphql`).
-  void setEndpointPath(String path) {
-    // Normalize path, remove leading '/'
-    final normalized = path.startsWith('/') ? path.substring(1) : path;
-    final prefixSegments = _graphqlEndpoint.pathSegments
-        .takeWhile((s) => s.isNotEmpty)
-        .toList();
-
-    // If previous computation had .../graphql, drop it to only the site prefix
-    if (prefixSegments.isNotEmpty && prefixSegments.last == 'graphql') {
-      prefixSegments.removeLast();
-    }
-
-    final update = _graphqlEndpoint.replace(
-      pathSegments: <String>[...prefixSegments, ...normalized.split('/')],
-      queryParameters: {},
+    return Uri(
+      scheme: restBase.scheme,
+      userInfo: restBase.userInfo,
+      host: restBase.host,
+      port: restBase.hasPort ? restBase.port : null,
+      pathSegments: <String>[
+        ...sitePrefix,
+        ..._customPathSegments ?? const ['graphql'],
+      ],
     );
+  }
 
-    _graphqlEndpoint = update;
+  /// Override or customize the GraphQL endpoint path, relative to the site
+  /// root, if your site uses a custom path (e.g. `api/graphql`).
+  ///
+  /// The override is kept when the client is reconfigured with a new base URL.
+  /// The endpoint always stays on the client's own origin.
+  void setEndpointPath(String path) {
+    final normalized = path.startsWith('/') ? path.substring(1) : path;
+
+    _customPathSegments =
+        normalized.split('/').where((s) => s.isNotEmpty).toList();
   }
 
   /// Execute a raw GraphQL request and get the raw response.
@@ -275,7 +273,8 @@ final class GraphQLInterface extends IRequestInterface {
     // HTTP-level failure => map using existing REST helpers
     if (rawResp.isFailure) {
       return rawResp.asResponse<T>(
-        decoder: (_) => throw StateError('Decoder should not be called for failures'),
+        decoder: (_) =>
+            throw StateError('Decoder should not be called for failures'),
       );
     }
 
@@ -298,11 +297,11 @@ final class GraphQLInterface extends IRequestInterface {
     }
 
     final map = rawResp.data as Map<String, dynamic>;
-    final hasErrors = map['errors'] is List && (map['errors'] as List).isNotEmpty;
+    final hasErrors =
+        map['errors'] is List && (map['errors'] as List).isNotEmpty;
     if (hasErrors) {
-      final errors = (map['errors'] as List)
-          .whereType<Map<String, dynamic>>()
-          .toList();
+      final errors =
+          (map['errors'] as List).whereType<Map<String, dynamic>>().toList();
       final message = errors
           .map((e) => e['message']?.toString())
           .whereType<String>()

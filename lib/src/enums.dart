@@ -82,6 +82,12 @@ enum RequestErrorType {
 
   /// Middleware execution failed
   middlewareExecutionFailed,
+
+  /// The request targeted an origin other than the one the client is bound to
+  originMismatch,
+
+  /// The response body could not be decoded into the expected type
+  invalidResponse,
 }
 
 /// Represents different types of search operations.

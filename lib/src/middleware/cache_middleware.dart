@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 
 import '../library_exports.dart';
 
@@ -35,7 +38,16 @@ class CacheMiddleware implements IWordpressMiddleware {
       return MiddlewareRawResponse.defaultInstance();
     }
 
-    final key = _buildCacheKey(request);
+    final key = _buildKey(
+      method: request.extra[WordpressRequest.metaMethod],
+      url: request.extra[WordpressRequest.metaUrl],
+      query: request.extra[WordpressRequest.metaQuery],
+      headers: request.headers,
+    );
+    if (key == null) {
+      return MiddlewareRawResponse.defaultInstance();
+    }
+
     final hit = await _cache.get(key);
     if (hit == null) {
       return MiddlewareRawResponse.defaultInstance();
@@ -61,17 +73,19 @@ class CacheMiddleware implements IWordpressMiddleware {
       return response;
     }
 
+    final requestMethod = response.extra[WordpressRequest.metaMethod];
+
     // Populate cache on successful GET
-    final requestMethod = response.requestHeaders['method']?.toString();
-    final requestUrl = response.requestHeaders['request-url']?.toString();
     if (requestMethod == HttpMethod.get.name && response.isSuccessful) {
-      // Reconstruct a minimal request to create a key
-      final key = _buildCacheKeyFromHeaders(
-        response.requestHeaders,
-        requestMethod!,
-        requestUrl ?? '',
+      final key = _buildKey(
+        method: requestMethod,
+        url: response.extra[WordpressRequest.metaUrl],
+        query: response.extra[WordpressRequest.metaQuery],
+        headers: response.requestHeaders,
       );
-      await _cache.set(key, response, expiry: _ttl);
+      if (key != null) {
+        await _cache.set(key, response, expiry: _ttl);
+      }
       return response;
     }
 
@@ -91,29 +105,36 @@ class CacheMiddleware implements IWordpressMiddleware {
   @override
   Future<void> onUnload() async {}
 
-  String _buildCacheKey(WordpressRequest request) {
-    final qpEntries = (request.queryParameters ?? const <String, dynamic>{})
-        .entries
-        .where((e) => e.value != null)
-        .toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    final qpStr = qpEntries.map((e) => '${e.key}=${e.value}').join('&');
+  /// Builds the cache key from request metadata, or null when it is missing.
+  ///
+  /// Both the lookup ([onExecute]) and the store ([onResponse]) go through this
+  /// method so the two can never disagree. The credential is never part of the
+  /// key itself, only a one-way digest of it, so persistent [ICacheManager]
+  /// implementations do not end up storing secrets.
+  String? _buildKey({
+    required Object? method,
+    required Object? url,
+    required Object? query,
+    required Map<String, dynamic>? headers,
+  }) {
+    if (method is! String || url is! String) {
+      return null;
+    }
 
-    // We do not have access to final resolved URL here, but request.url.toString()
-    // is deterministic combined with base in execute; acceptable for a cache key.
-    return '${request.method.name} ${request.url}|$qpStr|auth:${request.headers?['Authorization'] ?? ''}';
+    return '$method $url?${query ?? ''}|auth:${_authDigest(headers)}';
   }
 
-  String _buildCacheKeyFromHeaders(
-    Map<String, dynamic> headers,
-    String method,
-    String requestUrl,
-  ) {
-    final qp = headers['request-query']?.toString() ?? '';
-    final auth = headers['Authorization']?.toString() ?? '';
-    if (requestUrl.isNotEmpty) {
-      return '$method $requestUrl|$qp|auth:$auth';
+  String _authDigest(Map<String, dynamic>? headers) {
+    if (headers == null) {
+      return 'none';
     }
-    return '$method|$qp|auth:$auth';
+
+    for (final entry in headers.entries) {
+      if (entry.key.toLowerCase() == 'authorization' && entry.value != null) {
+        return sha256.convert(utf8.encode(entry.value.toString())).toString();
+      }
+    }
+
+    return 'none';
   }
 }
