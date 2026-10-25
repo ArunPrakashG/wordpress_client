@@ -16,7 +16,19 @@ class TestConfig {
   final String? appPassword;
 
   static Future<TestConfig?> tryLoad() async {
-    // Prefer test/test_local.json if present; else fall back to test_settings.json
+    // Environment variables win, so CI and one-off runs never need a file.
+    final env = Platform.environment;
+    final envBase = env['WP_BASE_URL'];
+    if (envBase != null) {
+      return TestConfig(
+        baseUrl: Uri.parse(envBase),
+        username: env['WP_USERNAME'],
+        password: env['WP_PASSWORD'],
+        appPassword: env['WP_APP_PASSWORD'],
+      );
+    }
+
+    // Otherwise use the git-ignored test/test_local.json (see the .example file).
     final candidates = [
       'test/test_local.json',
     ];
@@ -41,18 +53,6 @@ class TestConfig {
           appPassword: json['application_password'] as String?,
         );
       }
-    }
-
-    // Env var override
-    final env = Platform.environment;
-    final base = env['WP_BASE_URL'];
-    if (base != null) {
-      return TestConfig(
-        baseUrl: Uri.parse(base),
-        username: env['WP_USERNAME'],
-        password: env['WP_PASSWORD'],
-        appPassword: env['WP_APP_PASSWORD'],
-      );
     }
 
     return null;

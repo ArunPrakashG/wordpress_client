@@ -1,0 +1,3 @@
+tags:
+  # Needs a live WordPress site (test/test_local.json or WP_BASE_URL env var).
+  integration:

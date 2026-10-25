@@ -1,3 +1,6 @@
+@Tags(['integration'])
+library;
+
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -25,8 +28,11 @@ Future<void> main() async {
     dev.log('Skipping legacy integration suite: no test/test_local.json');
     return;
   }
-  final jsonFileContents = File('test/test_settings.json').readAsStringSync();
-  final dynamic json = jsonDecode(jsonFileContents);
+  // Optional legacy fallback; credentials should live in test_local.json or env vars.
+  final legacyFile = File('test/test_settings.json');
+  final dynamic json = legacyFile.existsSync()
+      ? jsonDecode(legacyFile.readAsStringSync())
+      : <String, dynamic>{};
 
   final baseUrl =
       Uri.parse((localCfg['base_url'] ?? json['base_url']) as String);
