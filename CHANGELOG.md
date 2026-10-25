@@ -5,7 +5,8 @@ Breaking
 - **Requests are locked to the client's origin.** An absolute `RequestUrl` is used verbatim only when its scheme, host and port match the base URL; otherwise the request is not sent and the response has `RequestErrorType.originMismatch`. Previously only the host was rewritten. The base URL changes only via a new client or `reconfigure(baseUri: ...)`. (#87)
 - **Request metadata is no longer sent as HTTP headers.** The `method`, `request-url` and `request-query` pseudo-headers are gone. Middlewares read them from the new `WordpressRequest.extra` (keys `WordpressRequest.metaMethod`, `metaUrl`, `metaQuery`), which is also copied onto `WordpressRawResponse.extra`. (#85)
 - **No more process-wide state.** `CodableMap` decoders/encoders and the endpoint statistics (counts and the `withStatisticDelegate` callback) are now owned by each `WordpressClient`. `CodableMap.getDecoder/getEncoder` are instance methods, and the global `serialize<T>()`/`deserialize<T>()` helpers are removed. Disposing one client no longer clears the codecs of every other client. (#92)
-- `RequestErrorType` gained `originMismatch` and `invalidResponse` (appended, existing indices unchanged).
+- **Transport errors are classified.** Timeouts, connection errors and cancelled requests used to surface as `internalGenericError` with the stack trace in `message`. They now use `RequestErrorType.timeout`, `connectionFailed` and `requestCancelled`; the exception and stack trace stay in `extra` (`exception` / `stackTrace` on the failure response). Invalid JSON behind a JSON content type is `invalidResponse`. (#93)
+- `RequestErrorType` gained `originMismatch`, `invalidResponse` and `timeout` (appended, existing indices unchanged).
 
 Fixed
 
@@ -15,9 +16,11 @@ Fixed
 - A 2xx response whose body cannot be decoded (for example a non-array body for a list endpoint) now returns a `WordpressFailureResponse` with `RequestErrorType.invalidResponse` instead of throwing a cast error. (#88)
 - The GraphQL endpoint follows `reconfigure(baseUri: ...)`; a custom `setEndpointPath` survives it.
 - The request header map passed in a `WordpressRequest` is no longer mutated.
+- `WordpressRawResponse.asResponse` no longer throws on a failure with a null or non-map body.
 
 Added
 
+- **Typed failures.** `WordpressFailureResponse.failure` returns a sealed `WordpressFailure` (`NetworkFailure`, `AuthFailure`, `ApiFailure`, `DecodeFailure`, `MiddlewareFailure`, `ClientFailure`) that can be switched over exhaustively, each carrying its `cause`, `stackTrace` and relevant details (status code, `WordpressError`, raw body). The existing `code`, `error`, `message` and `exception` accessors are unchanged, and `WordpressFailureResponse.errorType` was added. (#93)
 - `package:wordpress_client/testing.dart` with `MockWordpressAdapter`, `MockResponse` and `RecordedRequest` for testing code that uses the client without a live site. (#94, #101)
 - `WordpressRequest.extra` for local request metadata.
 

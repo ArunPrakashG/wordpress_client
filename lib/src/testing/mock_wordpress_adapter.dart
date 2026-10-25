@@ -40,6 +40,7 @@ final class MockResponse {
     this.headers = const {},
     this.delay = Duration.zero,
     this.error,
+    this.errorType = DioExceptionType.connectionError,
   });
 
   /// A WordPress-style JSON error, e.g. `rest_post_invalid_id`.
@@ -80,6 +81,14 @@ final class MockResponse {
     return MockResponse(error: message);
   }
 
+  /// A receive timeout (no HTTP response).
+  factory MockResponse.timeout([String message = 'Receive timeout']) {
+    return MockResponse(
+      error: message,
+      errorType: DioExceptionType.receiveTimeout,
+    );
+  }
+
   final int statusCode;
 
   /// Either a [String] (sent verbatim) or any JSON encodable value.
@@ -89,9 +98,12 @@ final class MockResponse {
   /// Artificial latency before the response is delivered.
   final Duration delay;
 
-  /// When set, the adapter throws a [DioException] of type
-  /// [DioExceptionType.connectionError] instead of answering.
+  /// When set, the adapter throws a [DioException] of [errorType] with this
+  /// message instead of answering.
   final String? error;
+
+  /// The kind of [DioException] thrown when [error] is set.
+  final DioExceptionType errorType;
 }
 
 typedef MockHandler = FutureOr<MockResponse> Function(RecordedRequest request);
@@ -217,9 +229,10 @@ class MockWordpressAdapter implements HttpClientAdapter {
 
     final error = response.error;
     if (error != null) {
-      throw DioException.connectionError(
+      throw DioException(
         requestOptions: options,
-        reason: error,
+        type: response.errorType,
+        message: error,
       );
     }
 
@@ -234,11 +247,15 @@ class MockWordpressAdapter implements HttpClientAdapter {
       _ => jsonEncode(body),
     };
 
+    final contentType = body is String ? 'text/plain' : Headers.jsonContentType;
+
     return ResponseBody.fromString(
       payload,
       response.statusCode,
       headers: {
-        Headers.contentTypeHeader: [Headers.jsonContentType],
+        // Strings are sent verbatim, so they default to text/plain. Set a
+        // Content-Type header to simulate a server that lies about it.
+        Headers.contentTypeHeader: [contentType],
         for (final entry in response.headers.entries)
           entry.key.toLowerCase(): [entry.value],
       },

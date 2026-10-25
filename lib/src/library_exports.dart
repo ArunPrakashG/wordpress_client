@@ -35,6 +35,7 @@ export 'requests/request_interface.dart';
 export 'requests/requests_export.dart';
 export 'requests/wordpress_request.dart';
 export 'responses/responses_export.dart';
+export 'responses/wordpress_failure.dart' hide classifyFailure;
 export 'responses/wordpress_raw_response.dart';
 export 'responses/wordpress_response.dart';
 export 'utilities/utility_export.dart';

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart' show DioException, DioExceptionType;
 import 'package:meta/meta.dart';
 
 import 'library_exports.dart';
@@ -75,21 +76,61 @@ abstract base class IRequestExecutor {
         );
       },
       onError: (error, stackTrace) async {
-        final isMiddlewareAbortedException =
-            error is MiddlewareAbortedException;
+        final extra = <String, dynamic>{
+          'error': error,
+          'stackTrace': stackTrace,
+        };
+
+        if (error is MiddlewareAbortedException) {
+          return WordpressRawResponse(
+            data: null,
+            code: -RequestErrorType.middlewareAborted.index,
+            extra: extra,
+            message: error.message,
+          );
+        }
+
+        if (error is DioException) {
+          final type = switch (error.type) {
+            DioExceptionType.cancel => RequestErrorType.requestCancelled,
+            DioExceptionType.connectionTimeout ||
+            DioExceptionType.sendTimeout ||
+            DioExceptionType.receiveTimeout =>
+              RequestErrorType.timeout,
+            DioExceptionType.connectionError ||
+            DioExceptionType.badCertificate =>
+              RequestErrorType.connectionFailed,
+            DioExceptionType.badResponse ||
+            DioExceptionType.unknown =>
+              RequestErrorType.internalGenericError,
+          };
+
+          if (type != RequestErrorType.internalGenericError) {
+            return WordpressRawResponse(
+              data: null,
+              code: -type.index,
+              extra: extra,
+              message: error.message ?? error.type.name,
+            );
+          }
+
+          // Dio could not parse a body that claims to be JSON (for example a
+          // PHP notice printed before the payload).
+          if (error.error is FormatException) {
+            return WordpressRawResponse(
+              data: null,
+              code: -RequestErrorType.invalidResponse.index,
+              extra: <String, dynamic>{...extra, 'error': error.error},
+              message: 'The response body is not valid JSON: ${error.error}',
+            );
+          }
+        }
 
         return WordpressRawResponse(
           data: null,
-          code: isMiddlewareAbortedException
-              ? -RequestErrorType.middlewareAborted.index
-              : -RequestErrorType.internalGenericError.index,
-          extra: <String, dynamic>{
-            'error': error,
-            'stackTrace': stackTrace,
-          },
-          message: isMiddlewareAbortedException
-              ? error.message
-              : '$error\n\n$stackTrace',
+          code: -RequestErrorType.internalGenericError.index,
+          extra: extra,
+          message: '$error\n\n$stackTrace',
         );
       },
     );
@@ -136,6 +177,7 @@ abstract base class IRequestExecutor {
           ...raw.extra,
           'error': error,
           'stackTrace': stackTrace,
+          'statusCode': raw.code,
         },
         message: 'Failed to decode the response body as $T '
             '(HTTP ${raw.code}): $error',
