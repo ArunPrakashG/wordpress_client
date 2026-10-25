@@ -294,6 +294,55 @@ final class InternalRequester extends IRequestExecutor {
       );
     }
 
+    var attempts = 0;
+
+    // Runs the request, retrying transient failures as the active
+    // [RetryPolicy] allows. Non-retryable errors are rethrown unchanged.
+    Future<Response<dynamic>> runWithRetry() async {
+      final policy = request.retryPolicy ?? _configuration.retryPolicy;
+      final replayable = request.body is! FormData && request.body is! Stream;
+      final retries = policy.enabled &&
+          replayable &&
+          policy.methods.contains(request.method);
+
+      for (var attempt = 1;; attempt++) {
+        attempts++;
+        final canRetry = retries && attempt < policy.maxAttempts;
+        Duration? retryAfter;
+
+        try {
+          final response = await run<dynamic>();
+
+          if (!canRetry || !policy.statusCodes.contains(response.statusCode)) {
+            return response;
+          }
+
+          retryAfter = RetryPolicy.parseRetryAfter(
+            response.headers.value('retry-after'),
+          );
+          final delay = policy.nextDelay(attempt, retryAfter: retryAfter);
+          if (delay == null) {
+            return response;
+          }
+
+          await _waitBeforeRetry(policy, delay, request.cancelToken);
+        } on DioException catch (error) {
+          if (!canRetry ||
+              !policy.retryOnNetworkError ||
+              !_isTransient(error)) {
+            rethrow;
+          }
+
+          final delay = policy.nextDelay(attempt);
+          if (delay == null) {
+            rethrow;
+          }
+
+          await _waitBeforeRetry(policy, delay, request.cancelToken);
+        }
+      }
+    }
+
     Future<WordpressRawResponse> buildRaw(Response<dynamic> response) async {
       watch.stop();
       final statusCode =
@@ -306,7 +355,11 @@ final class InternalRequester extends IRequestExecutor {
         headers: response.headers.getHeaderMap(),
         duration: watch.elapsed,
         requestHeaders: response.requestOptions.headers,
-        extra: <String, dynamic>{...request.extra, ...response.extra},
+        extra: <String, dynamic>{
+          ...request.extra,
+          ...response.extra,
+          WordpressRequest.metaAttempts: attempts,
+        },
         message: response.statusMessage,
       );
 
@@ -314,7 +367,7 @@ final class InternalRequester extends IRequestExecutor {
     }
 
     watch.start();
-    var response = await run<dynamic>();
+    var response = await runWithRetry();
 
     // If unauthorized and auth is required, attempt a single re-auth and retry
     if (response.statusCode == 401 && request.requireAuth) {
@@ -349,7 +402,7 @@ final class InternalRequester extends IRequestExecutor {
           if (authUrl != null) {
             requestHeaders[authorizer.headerKey] = authUrl;
             // retry once
-            response = await run<dynamic>();
+            response = await runWithRetry();
           }
         }
       }
@@ -371,6 +424,41 @@ final class InternalRequester extends IRequestExecutor {
     }
 
     return null;
+  }
+
+  /// Whether [error] is a failure that a retry could plausibly fix.
+  bool _isTransient(DioException error) {
+    return switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.connectionError =>
+        true,
+      _ => false,
+    };
+  }
+
+  /// Sleeps for [delay], but wakes up and throws if [cancelToken] fires.
+  Future<void> _waitBeforeRetry(
+    RetryPolicy policy,
+    Duration delay,
+    CancelToken? cancelToken,
+  ) async {
+    final sleeper = policy.sleep;
+    final wait = sleeper != null ? sleeper(delay) : Future<void>.delayed(delay);
+
+    if (cancelToken != null) {
+      await Future.any<Object?>([wait, cancelToken.whenCancel]);
+
+      if (cancelToken.isCancelled) {
+        throw DioException.requestCancelled(
+          requestOptions: RequestOptions(path: _client.options.baseUrl),
+          reason: cancelToken.cancelError?.error,
+        );
+      }
+    }
+
+    await wait;
   }
 
   bool _isSameOrigin(Uri target) {

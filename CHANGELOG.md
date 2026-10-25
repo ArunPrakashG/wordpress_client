@@ -1,3 +1,9 @@
+## 10.1.0 (unreleased)
+
+Added
+
+- **Automatic retries.** `BootstrapBuilder.withRetryPolicy(RetryPolicy.standard())` retries timeouts, connection errors and 429/502/503/504 with exponential backoff and jitter, honouring `Retry-After`. Only idempotent methods are retried by default (never `POST`/`PATCH`), cancelling a request aborts the wait, and `WordpressRequest.retryPolicy` overrides the client policy per request. The number of tries is reported in `extra[WordpressRequest.metaAttempts]`. Off by default. (#96)
+
 ## 10.0.0 (unreleased)
 
 Breaking

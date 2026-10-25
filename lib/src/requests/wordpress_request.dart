@@ -26,7 +26,11 @@ final class WordpressRequest {
     this.sendTimeout = DEFAULT_REQUEST_TIMEOUT,
     this.receiveTimeout = DEFAULT_REQUEST_TIMEOUT,
     this.extra = const <String, dynamic>{},
+    this.retryPolicy,
   });
+
+  /// [extra] key (on responses) holding how many tries the request needed.
+  static const String metaAttempts = 'wp.request.attempts';
 
   /// [extra] key holding the lower-case HTTP method name (`get`, `post`, ...).
   ///
@@ -82,6 +86,11 @@ final class WordpressRequest {
   /// See [metaMethod], [metaUrl] and [metaQuery] for the keys the client sets.
   final Map<String, dynamic> extra;
 
+  /// Overrides the client's [RetryPolicy] for this request.
+  ///
+  /// Pass [RetryPolicy.none] to disable retries for a single request.
+  final RetryPolicy? retryPolicy;
+
   /// Indicates whether this request has associated events.
   bool get hasEvents => events != null;
 
@@ -108,6 +117,7 @@ final class WordpressRequest {
     Duration? sendTimeout,
     Duration? receiveTimeout,
     Map<String, dynamic>? extra,
+    RetryPolicy? retryPolicy,
   }) {
     return WordpressRequest(
       url: url ?? this.url,
@@ -123,6 +133,7 @@ final class WordpressRequest {
       sendTimeout: sendTimeout ?? this.sendTimeout,
       receiveTimeout: receiveTimeout ?? this.receiveTimeout,
       extra: extra ?? this.extra,
+      retryPolicy: retryPolicy ?? this.retryPolicy,
     );
   }
 }

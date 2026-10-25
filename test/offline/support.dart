@@ -10,6 +10,7 @@ WordpressClient makeClient(
   List<IWordpressMiddleware> middlewares = const [],
   IAuthorization? auth,
   Uri? baseUrl,
+  RetryPolicy? retryPolicy,
 }) {
   return WordpressClient.fromDioInstance(
     baseUrl: baseUrl ?? testBaseUrl,
@@ -17,6 +18,9 @@ WordpressClient makeClient(
     bootstrapper: (b) {
       if (middlewares.isNotEmpty) {
         b.withMiddlewares(middlewares);
+      }
+      if (retryPolicy != null) {
+        b.withRetryPolicy(retryPolicy);
       }
       if (auth != null) {
         b.withDefaultAuthorization(auth);

@@ -28,7 +28,9 @@ class BootstrapBuilder {
     _defaultRequestTimeout = config.receiveTimeout;
     _followRedirects = config.shouldFollowRedirects;
     _middlewares = config.middlewares;
+    _retryPolicy = config.retryPolicy;
   }
+  RetryPolicy _retryPolicy = RetryPolicy.none;
   Duration _defaultRequestTimeout = DEFAULT_REQUEST_TIMEOUT;
   bool Function(dynamic)? _responsePreprocessorDelegate;
   IAuthorization? _defaultAuthorization;
@@ -41,6 +43,13 @@ class BootstrapBuilder {
   bool _debugMode = false;
   List<IWordpressMiddleware>? _middlewares;
   ICacheManager<WordpressRawResponse>? _cacheManager;
+
+  /// Sets how transient failures (timeouts, connection errors, 429/502/503/504)
+  /// are retried. Retries are off by default; see [RetryPolicy].
+  BootstrapBuilder withRetryPolicy(RetryPolicy policy) {
+    _retryPolicy = policy;
+    return this;
+  }
 
   /// Enables or disables debug mode.
   ///
@@ -163,6 +172,7 @@ class BootstrapBuilder {
       shouldFollowRedirects: _followRedirects,
       maxRedirects: _defaultMaxRedirects,
       statisticsDelegate: _statisticsDelegate,
+      retryPolicy: _retryPolicy,
       interceptors: _interceptors,
       enableDebugMode: _debugMode,
       middlewares: _middlewares,

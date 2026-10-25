@@ -25,7 +25,11 @@ final class BootstrapConfiguration {
     this.interceptors,
     this.enableDebugMode = false,
     this.middlewares,
+    this.retryPolicy = RetryPolicy.none,
   });
+
+  /// How transient failures are retried. Retries are off by default.
+  final RetryPolicy retryPolicy;
 
   /// Enables or disables debug mode.
   final bool enableDebugMode;
@@ -81,6 +85,7 @@ final class BootstrapConfiguration {
         collectionEquals(other.interceptors, interceptors) &&
         collectionEquals(other.middlewares, middlewares) &&
         other.connectTimeout == connectTimeout &&
+        other.retryPolicy == retryPolicy &&
         other.statisticsDelegate == statisticsDelegate;
   }
 
@@ -99,6 +104,7 @@ final class BootstrapConfiguration {
       middlewares,
       connectTimeout,
       statisticsDelegate,
+      retryPolicy,
     );
   }
 
@@ -116,6 +122,7 @@ final class BootstrapConfiguration {
     StatisticsCallback? statisticsDelegate,
     List<IWordpressMiddleware>? middlewares,
     Duration? connectTimeout,
+    RetryPolicy? retryPolicy,
   }) {
     return BootstrapConfiguration(
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
@@ -132,6 +139,7 @@ final class BootstrapConfiguration {
       statisticsDelegate: statisticsDelegate ?? this.statisticsDelegate,
       middlewares: middlewares ?? this.middlewares,
       connectTimeout: connectTimeout ?? this.connectTimeout,
+      retryPolicy: retryPolicy ?? this.retryPolicy,
     );
   }
 }
