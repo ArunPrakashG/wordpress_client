@@ -23,7 +23,7 @@ final class InternalRequester extends IRequestExecutor {
   final Map<String, int> _endPointStatistics = <String, int>{};
   StatisticsCallback? _statisticsCallback;
   bool _isDebugMode = false;
-  final BootstrapConfiguration _configuration;
+  BootstrapConfiguration _configuration;
 
   /// The request base url.
   ///
@@ -50,7 +50,13 @@ final class InternalRequester extends IRequestExecutor {
   List<IWordpressMiddleware> get middlewares =>
       _configuration.middlewares ?? [];
 
-  void _setBaseUrl(Uri url) {
+  /// Sets the base URL. Returns true when the origin (scheme, host or port)
+  /// changed from a previously set one.
+  ///
+  /// Moving to another origin drops the default authorization, so credentials
+  /// meant for one site are never sent to another. Supply the new credentials
+  /// in the same `reconfigure` call, or afterwards.
+  bool _setBaseUrl(Uri url) {
     if (!url.isAbsolute) {
       throw ArgumentError(
         'The provided url is relative. Base URLs should always be an absolute URL.',
@@ -72,8 +78,19 @@ final class InternalRequester extends IRequestExecutor {
       );
     }
 
+    final originChanged = _baseUrl != null &&
+        (_baseUrl!.scheme != url.scheme ||
+            _baseUrl!.host != url.host ||
+            _baseUrl!.port != url.port);
+
     _baseUrl = url;
     _client.options.baseUrl = url.toString();
+
+    if (originChanged) {
+      _removeDefaultAuthorization();
+    }
+
+    return originChanged;
   }
 
   @override
@@ -133,6 +150,13 @@ final class InternalRequester extends IRequestExecutor {
 
   void _removeDefaultAuthorization() {
     _defaultAuthorization = null;
+
+    // Also forget it in the stored configuration, so a later reconfigure()
+    // does not bring it back.
+    _configuration = BootstrapBuilder.fromConfiguration(_configuration)
+        .withoutDefaultAuthorization()
+        .build()
+        .copyWith(connectTimeout: _configuration.connectTimeout);
   }
 
   @override

@@ -106,6 +106,12 @@ class BootstrapBuilder {
     return this;
   }
 
+  /// Removes the default authorization.
+  BootstrapBuilder withoutDefaultAuthorization() {
+    _defaultAuthorization = null;
+    return this;
+  }
+
   /// Sets the default authorization using a builder function.
   BootstrapBuilder withDefaultAuthorizationBuilder(
     IAuthorization Function(AuthorizationBuilder) builder,

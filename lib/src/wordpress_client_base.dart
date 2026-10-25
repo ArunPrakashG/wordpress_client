@@ -1107,8 +1107,8 @@ final class WordpressClient implements IDisposable {
     BootstrapConfiguration Function(BootstrapBuilder builder) bootstrapper, {
     Uri? baseUri,
   }) {
-    if (baseUri != null) {
-      _requester._setBaseUrl(baseUri);
+    if (baseUri != null && _requester._setBaseUrl(baseUri)) {
+      clearDiscoveryCache();
     }
 
     return _requester.configure(
@@ -1125,12 +1125,17 @@ final class WordpressClient implements IDisposable {
   /// The default builder will contain all the previous settings.
   ///
   /// Only the settings that have changed since will be updated.
+  ///
+  /// Pointing the client at a different origin (scheme, host or port) via
+  /// [baseUri] drops the default authorization and the cached discovery data,
+  /// so credentials are never sent to a site they were not meant for. Set the
+  /// new credentials in [bootstrapper] of the same call to keep working.
   void reconfigure({
     BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
     Uri? baseUri,
   }) {
-    if (baseUri != null) {
-      _requester._setBaseUrl(baseUri);
+    if (baseUri != null && _requester._setBaseUrl(baseUri)) {
+      clearDiscoveryCache();
     }
 
     if (bootstrapper != null) {

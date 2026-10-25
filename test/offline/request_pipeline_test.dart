@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:test/test.dart';
 import 'package:wordpress_client/testing.dart';
 import 'package:wordpress_client/wordpress_client.dart';
@@ -67,6 +69,74 @@ void main() {
         response.duration,
         greaterThanOrEqualTo(const Duration(milliseconds: 70)),
       );
+    });
+  });
+
+  group('credentials follow the origin (#87)', () {
+    final auth = WordpressAuth.appPassword(user: 'a', appPassword: 'pw1 pw1');
+    final request = ListPostRequest(requireAuth: true);
+
+    test('a different host drops the default authorization', () async {
+      final client = makeClient(adapter, auth: auth);
+      client.reconfigure(
+        baseUri: Uri.parse('https://other.example/wp-json/wp/v2'),
+      );
+
+      final response = await client.posts.list(request);
+
+      expect(response.isFailure, isTrue);
+      expect(
+        (response as WordpressFailureResponse).errorType,
+        RequestErrorType.authorizationModuleNotFound,
+      );
+      expect(adapter.requests, isEmpty);
+    });
+
+    test('a later reconfigure does not bring it back', () async {
+      final client = makeClient(adapter, auth: auth);
+      client.reconfigure(
+        baseUri: Uri.parse('https://other.example/wp-json/wp/v2'),
+      );
+      client.reconfigure(
+        bootstrapper: (b) => b.withRetryPolicy(RetryPolicy.none).build(),
+      );
+
+      final response = await client.posts.list(request);
+
+      expect(response.isFailure, isTrue);
+    });
+
+    test('new credentials can be set in the same call', () async {
+      final client = makeClient(adapter, auth: auth);
+      client.reconfigure(
+        baseUri: Uri.parse('https://other.example/wp-json/wp/v2'),
+        bootstrapper: (b) => b
+            .withDefaultAuthorization(
+              WordpressAuth.appPassword(user: 'b', appPassword: 'pw2 pw2'),
+            )
+            .build(),
+      );
+
+      await client.posts.list(request);
+
+      final sent = adapter.lastRequest!;
+      expect(sent.uri.host, 'other.example');
+      expect(
+        sent.headers['Authorization'],
+        isNot(contains(base64.encode(utf8.encode('a:pw1 pw1')))),
+      );
+      expect(sent.headers['Authorization'], isNotNull);
+    });
+
+    test('the same origin keeps the authorization', () async {
+      final client = makeClient(adapter, auth: auth);
+      client.reconfigure(
+        baseUri: Uri.parse('https://example.com/blog/wp-json/wp/v2'),
+      );
+
+      await client.posts.list(request);
+
+      expect(adapter.lastRequest!.headers['Authorization'], isNotNull);
     });
   });
 
