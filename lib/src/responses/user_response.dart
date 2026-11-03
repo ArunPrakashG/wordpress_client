@@ -14,7 +14,7 @@ import 'properties/extra_capabilities.dart';
 /// For more information, see the WordPress REST API handbook:
 /// https://developer.wordpress.org/rest-api/reference/users/
 @immutable
-final class User implements ISelfRespresentive {
+final class User implements ISelfRepresentative {
   /// Creates a new [User] instance.
   const User({
     required this.id,

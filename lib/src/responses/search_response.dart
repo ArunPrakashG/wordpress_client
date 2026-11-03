@@ -13,7 +13,7 @@ import '../utilities/self_representive_base.dart';
 /// For more information, see:
 /// https://developer.wordpress.org/rest-api/reference/search-results/
 @immutable
-final class Search implements ISelfRespresentive {
+final class Search implements ISelfRepresentative {
   /// Creates a new [Search] instance.
   ///
   /// [id] is the unique identifier for the search result.

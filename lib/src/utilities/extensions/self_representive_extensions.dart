@@ -2,7 +2,7 @@ import '../../responses/properties/links.dart';
 import '../helpers.dart';
 import '../self_representive_base.dart';
 
-extension SelfRepresentiveExtensions on ISelfRespresentive {
+extension SelfRepresentiveExtensions on ISelfRepresentative {
   /// Returns the value of the key or null if it doesn't exist.
   ///
   /// Casts the returning value to the type of the generic type parameter.

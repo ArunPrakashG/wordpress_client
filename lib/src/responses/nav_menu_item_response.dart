@@ -10,7 +10,7 @@ import 'properties/content.dart';
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/nav_menu_items/
 @immutable
-final class NavMenuItem implements ISelfRespresentive {
+final class NavMenuItem implements ISelfRepresentative {
   const NavMenuItem({
     required this.id,
     required this.typeLabel,

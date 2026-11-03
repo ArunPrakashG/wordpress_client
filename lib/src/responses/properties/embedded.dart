@@ -23,7 +23,7 @@ final class Embedded {
   const Embedded(this.raw);
 
   /// Reads the `_embedded` object of [resource].
-  factory Embedded.of(ISelfRespresentive resource) {
+  factory Embedded.of(ISelfRepresentative resource) {
     final value = resource.self['_embedded'];
     return Embedded(
       value is Map<String, dynamic> ? value : const <String, dynamic>{},
@@ -119,7 +119,7 @@ final class Embedded {
 }
 
 /// Adds [embedded] to every response model.
-extension EmbeddedResource on ISelfRespresentive {
+extension EmbeddedResource on ISelfRepresentative {
   /// Typed access to the `_embedded` data of this resource.
   Embedded get embedded => Embedded.of(this);
 }

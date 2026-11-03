@@ -8,7 +8,7 @@ import 'properties/content.dart';
 
 /// Represents a Site Editor Template (wp/v2/templates).
 @immutable
-final class Template implements ISelfRespresentive {
+final class Template implements ISelfRepresentative {
   const Template({
     required this.id,
     required this.slug,

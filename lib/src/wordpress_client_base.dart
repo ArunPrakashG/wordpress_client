@@ -404,7 +404,7 @@ final class WordpressClient implements IDisposable {
   MenuLocationsInterface get menuLocations =>
       get<MenuLocationsInterface>('menu-locations');
 
-  /// Interfaces for Widgets, Sidebars and Widget Types
+  /// Interfaces for Widgets, Sidebars and WordpressWidget Types
   WidgetsInterface get widgets => get<WidgetsInterface>('widgets');
   SidebarsInterface get sidebars => get<SidebarsInterface>('sidebars');
   WidgetTypesInterface get widgetTypes =>
@@ -878,11 +878,11 @@ final class WordpressClient implements IDisposable {
     );
 
     // Widgets suite
-    register<WidgetsInterface, Widget>(
+    register<WidgetsInterface, WordpressWidget>(
       interface: WidgetsInterface(),
       key: 'widgets',
-      decoder: (json) => Widget.fromJson(json),
-      encoder: (dynamic w) => (w as Widget).toJson(),
+      decoder: (json) => WordpressWidget.fromJson(json),
+      encoder: (dynamic w) => (w as WordpressWidget).toJson(),
     );
 
     register<SidebarsInterface, Sidebar>(
@@ -940,7 +940,8 @@ final class WordpressClient implements IDisposable {
   /// [encoder] is a function that takes an instance of [T] and returns a json object
   /// These are required to decode and encode responses for this interface.
   ///
-  /// [overriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// [overwriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// `overriteIfTypeExists` is its old, deprecated spelling.
   ///
   /// Some keys are already occupied:
   /// - `me`
@@ -970,7 +971,9 @@ final class WordpressClient implements IDisposable {
     required JsonEncoderCallback encoder,
     required JsonDecoderCallback<E> decoder,
     String? key,
-    bool overriteIfTypeExists = false,
+    bool overwriteIfTypeExists = false,
+    @Deprecated('Use overwriteIfTypeExists. Removed in 11.0.')
+    bool? overriteIfTypeExists,
   }) {
     final interfaceKey = InterfaceKey<T>(key);
 
@@ -981,7 +984,7 @@ final class WordpressClient implements IDisposable {
     _registerResponseType<E>(
       decoder: decoder,
       encoder: encoder,
-      overriteIfExists: overriteIfTypeExists,
+      overwriteIfExists: overriteIfTypeExists ?? overwriteIfTypeExists,
     );
 
     interface._initInterface(
@@ -1038,7 +1041,7 @@ final class WordpressClient implements IDisposable {
               'plain maps work without one.',
             )
           : encoder(item as T),
-      overriteIfTypeExists: true,
+      overwriteIfTypeExists: true,
     );
 
     return get<ResourceInterface<T>>(key);
@@ -1059,16 +1062,16 @@ final class WordpressClient implements IDisposable {
   /// [encoder] is a function that takes an instance of [E] and returns a json object
   /// These are required to decode and encode responses.
   ///
-  /// [overriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// [overwriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
   void _registerResponseType<E>({
     required JsonEncoderCallback encoder,
     required JsonDecoderCallback<E> decoder,
-    bool overriteIfExists = false,
+    bool overwriteIfExists = false,
   }) {
     _typeMap.addCodablePair<E>(
       decoder: decoder,
       encoder: encoder,
-      overwrite: overriteIfExists,
+      overwrite: overwriteIfExists,
     );
   }
 

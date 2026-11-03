@@ -7,7 +7,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// See: https://developer.wordpress.org/rest-api/reference/pattern-directory-items/
 @immutable
-final class PatternDirectoryItem implements ISelfRespresentive {
+final class PatternDirectoryItem implements ISelfRepresentative {
   const PatternDirectoryItem({
     required this.id,
     required this.title,

@@ -8,7 +8,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/nav_menus/
 @immutable
-final class NavMenu implements ISelfRespresentive {
+final class NavMenu implements ISelfRepresentative {
   const NavMenu({
     required this.id,
     required this.name,

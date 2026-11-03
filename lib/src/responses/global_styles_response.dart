@@ -7,7 +7,7 @@ import 'properties/content.dart';
 
 /// Represents Global Styles (wp/v2/global-styles).
 @immutable
-final class GlobalStyles implements ISelfRespresentive {
+final class GlobalStyles implements ISelfRepresentative {
   const GlobalStyles({
     required this.id,
     required this.self,

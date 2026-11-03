@@ -13,7 +13,7 @@ import 'properties/content.dart';
 /// WordPress REST API. For more details, see:
 /// https://developer.wordpress.org/rest-api/reference/posts/
 @immutable
-class Post implements ISelfRespresentive {
+class Post implements ISelfRepresentative {
   /// Creates a new [Post] instance.
   const Post({
     required this.id,

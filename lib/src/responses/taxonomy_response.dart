@@ -6,7 +6,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a WordPress taxonomy (e.g., category, post_tag).
 @immutable
-final class Taxonomy implements ISelfRespresentive {
+final class Taxonomy implements ISelfRepresentative {
   const Taxonomy({
     required this.slug,
     required this.types,

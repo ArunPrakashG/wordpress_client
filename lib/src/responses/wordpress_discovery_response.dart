@@ -11,7 +11,7 @@ import '../utilities/self_representive_base.dart';
 /// For more information, see:
 /// https://developer.wordpress.org/rest-api/reference/
 @immutable
-final class WordpressDiscovery implements ISelfRespresentive {
+final class WordpressDiscovery implements ISelfRepresentative {
   /// Creates a new [WordpressDiscovery] instance.
   const WordpressDiscovery({
     required this.siteIconUrl,

@@ -1,7 +1,8 @@
 import '../../../wordpress_client.dart';
 
-final class RetriveApplicationPasswordRequest extends IRequest {
-  RetriveApplicationPasswordRequest({
+/// Retrieve one application password: GET `/wp/v2/users/<id>/application-passwords/<uuid>`.
+final class RetrieveApplicationPasswordRequest extends IRequest {
+  RetrieveApplicationPasswordRequest({
     required this.userId,
     required this.uuid,
     super.cancelToken,
@@ -43,3 +44,10 @@ final class RetriveApplicationPasswordRequest extends IRequest {
     );
   }
 }
+
+/// The old, misspelled name of [RetrieveApplicationPasswordRequest].
+@Deprecated(
+  'Use RetrieveApplicationPasswordRequest. '
+  'RetriveApplicationPasswordRequest will be removed in 11.0.',
+)
+typedef RetriveApplicationPasswordRequest = RetrieveApplicationPasswordRequest;

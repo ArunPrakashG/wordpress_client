@@ -1,14 +1,13 @@
 import 'package:meta/meta.dart';
 
 import '../library_exports.dart';
-import '../utilities/self_representive_base.dart';
 
 /// Represents an application password in the WordPress system.
 ///
 /// Application passwords allow authentication for non-interactive systems, such as mobile or desktop applications,
 /// without providing your actual password. Each application password has limited capabilities compared to your main account password.
 @immutable
-final class ApplicationPassword implements ISelfRespresentive {
+final class ApplicationPassword implements ISelfRepresentative {
   /// Creates a new [ApplicationPassword] instance.
   ///
   /// - [uuid]: The unique identifier for this application password.

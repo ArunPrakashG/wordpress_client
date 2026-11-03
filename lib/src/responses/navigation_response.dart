@@ -11,7 +11,7 @@ import 'properties/content.dart';
 /// Schema reference:
 /// https://developer.wordpress.org/rest-api/reference/wp_navigations/
 @immutable
-final class Navigation implements ISelfRespresentive {
+final class Navigation implements ISelfRepresentative {
   const Navigation({
     required this.id,
     required this.slug,

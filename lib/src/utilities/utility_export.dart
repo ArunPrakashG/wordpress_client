@@ -21,5 +21,6 @@ export 'helpers.dart'
 export 'json_persistence.dart' show PersistRead, PersistWrite;
 export 'lazy.dart';
 export 'request_url.dart';
+export 'self_representive_base.dart';
 export 'typedefs.dart';
 export 'wordpress_events.dart';
