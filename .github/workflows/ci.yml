@@ -100,3 +100,41 @@ jobs:
 
       - name: Compile the example to wasm
         run: dart compile wasm example/main.dart -o build/main.wasm
+
+  # Runs the integration tests against a throwaway WordPress in Docker.
+  integration:
+    runs-on: ubuntu-latest
+    env:
+      COMPOSE: docker compose -f docker-compose.wordpress.yml
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Start WordPress
+        run: |
+          $COMPOSE up -d --wait
+          $COMPOSE run --rm setup
+
+      - name: Create an application password
+        run: |
+          pass=$($COMPOSE run --rm -T setup wp user application-password create admin ci --porcelain)
+          echo "::add-mask::$pass"
+          echo "WP_APP_PASSWORD=$pass" >> "$GITHUB_ENV"
+
+      - name: Integration tests
+        env:
+          WP_BASE_URL: http://localhost:8080/wp-json/wp/v2
+          WP_USERNAME: admin
+        run: dart test -t integration --reporter expanded
+
+      - name: WordPress logs
+        if: failure()
+        run: $COMPOSE logs --tail 200
