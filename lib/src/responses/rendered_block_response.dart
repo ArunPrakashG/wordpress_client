@@ -4,7 +4,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a rendered block response from block renderer endpoint.
 @immutable
-class RenderedBlock implements ISelfRespresentive {
+class RenderedBlock implements ISelfRepresentative {
   const RenderedBlock({required this.rendered, required this.self});
 
   factory RenderedBlock.fromJson(Map<String, dynamic> json) => RenderedBlock(

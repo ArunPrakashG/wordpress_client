@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Template Part (POST /wp/v2/template-parts/<id>)
+/// Update a Template Part (POST `/wp/v2/template-parts/<id>`)
 final class UpdateTemplatePartRequest extends IRequest {
   UpdateTemplatePartRequest({
     required this.id,

@@ -1,11 +1,12 @@
 import '../../wordpress_client.dart';
 
-final class WidgetsExtensions implements IInterfaceExtensions<Widget, String> {
+final class WidgetsExtensions
+    implements IInterfaceExtensions<WordpressWidget, String> {
   WidgetsExtensions(this._iface);
   final WidgetsInterface _iface;
 
   @override
-  Future<WordpressResponse<Widget>> getById(
+  Future<WordpressResponse<WordpressWidget>> getById(
     String id, {
     RequestContext? context,
   }) {

@@ -5,7 +5,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a block directory search item (wp/v2/block-directory/search).
 @immutable
-class BlockDirectoryItem implements ISelfRespresentive {
+class BlockDirectoryItem implements ISelfRepresentative {
   const BlockDirectoryItem({
     required this.name,
     required this.title,

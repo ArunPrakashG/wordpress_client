@@ -141,6 +141,55 @@ final class WordpressClient implements IDisposable {
     );
   }
 
+  /// Creates a [WordpressClient] for a site hosted on WordPress.com, or a
+  /// self-hosted site connected through Jetpack, via
+  /// `https://public-api.wordpress.com/wp/v2/sites/<site>`.
+  ///
+  /// [site] is the site's domain (`example.wordpress.com`, or a custom
+  /// domain) or its numeric ID. [accessToken] is an OAuth2 token from
+  /// [WordpressComOAuth]; without one only public content can be read.
+  ///
+  /// ```dart
+  /// final client = WordpressClient.forWordpressCom(
+  ///   site: 'example.wordpress.com',
+  ///   accessToken: token.accessToken,
+  /// );
+  /// final posts = await client.posts.list(ListPostRequest());
+  /// ```
+  ///
+  /// The `wp/v2` routes and `client.resource(namespace: ...)` work as on a
+  /// self-hosted site. Features that rely on self-hosted plugins or
+  /// `wp-json` URLs (JWT and application passwords, GraphQL, the
+  /// application password flow) do not apply on WordPress.com.
+  factory WordpressClient.forWordpressCom({
+    required String site,
+    String? accessToken,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    // Accept a pasted site URL too: https://example.wordpress.com/
+    final parsed = Uri.tryParse(site.trim());
+    final trimmed =
+        parsed != null && parsed.host.isNotEmpty ? parsed.host : site.trim();
+    if (trimmed.isEmpty || trimmed.contains('/')) {
+      throw ArgumentError.value(
+        site,
+        'site',
+        'Pass the site domain or ID, e.g. example.wordpress.com',
+      );
+    }
+
+    return WordpressClient(
+      baseUrl: Uri.https(wordpressComApiHost, '/wp/v2/sites/$trimmed'),
+      bootstrapper: (builder) {
+        if (accessToken != null) {
+          builder.withDefaultAuthorization(BearerTokenAuth(accessToken));
+        }
+
+        return bootstrapper?.call(builder) ?? builder.build();
+      },
+    );
+  }
+
   /// Creates a [WordpressClient] instance without a base URL.
   ///
   /// This constructor is useful when you don't know the base URL at initialization time.
@@ -297,6 +346,80 @@ final class WordpressClient implements IDisposable {
   /// The path component of the base URL.
   String get path => baseUrl.path;
 
+  /// The root of the site this client talks to: [baseUrl] without its REST
+  /// path, e.g. `https://example.com/blog` for
+  /// `https://example.com/blog/wp-json/wp/v2`. For a WordPress.com client
+  /// it is the site's domain when the site was given by domain.
+  Uri get siteUrl {
+    final segments = baseUrl.pathSegments;
+
+    // public-api.wordpress.com/wp/v2/sites/<site>: the site is its domain.
+    if (isWordpressComApiUrl(baseUrl)) {
+      final site = segments[segments.indexOf('sites') + 1];
+      if (site.contains('.')) {
+        return Uri.https(site);
+      }
+    }
+    final marker = segments.indexOf('wp-json');
+
+    return Uri(
+      scheme: baseUrl.scheme,
+      userInfo: baseUrl.userInfo,
+      host: baseUrl.host,
+      port: baseUrl.hasPort ? baseUrl.port : null,
+      pathSegments: marker < 0 ? segments : segments.sublist(0, marker),
+    );
+  }
+
+  /// A new client for another site of a multisite network (or any other
+  /// WordPress site), configured like this one.
+  ///
+  /// [site] is the other site's root. A relative URI is resolved against
+  /// [siteUrl], which suits sub-directory networks; pass an absolute one for
+  /// sub-domain networks:
+  ///
+  /// ```dart
+  /// final auth = WordpressAuth.appPassword(user: 'admin', appPassword: pw);
+  /// final shop = client.forNetworkSite(
+  ///   Uri.parse('/shop/'),
+  ///   bootstrapper: (b) => b.withDefaultAuthorization(auth).build(),
+  /// );
+  /// final blog = client.forNetworkSite(Uri.parse('https://blog.example.com'));
+  /// ```
+  ///
+  /// Timeouts, headers, the user agent, retry, deduplication and
+  /// concurrency settings, Dio interceptors and the HTTP adapter carry over.
+  /// The default authorization and the middlewares do not, since they hold
+  /// per-site state (tokens, queued writes); add them in [bootstrapper],
+  /// which receives the copied settings. Interfaces registered with
+  /// [register] are not copied either.
+  WordpressClient forNetworkSite(
+    Uri site, {
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    final root = site.isAbsolute ? site : siteUrl.resolveUri(site);
+    final restBase = root.replace(
+      pathSegments: [
+        ...root.pathSegments.where((s) => s.isNotEmpty),
+        'wp-json',
+        'wp',
+        'v2',
+      ],
+    );
+
+    final current = _requester._configuration;
+    final builder = BootstrapBuilder.fromConfiguration(current)
+        .withoutDefaultAuthorization()
+        .withoutMiddlewares();
+
+    return WordpressClient.fromDioInstance(
+      baseUrl: restBase,
+      instance: Dio()..httpClientAdapter = _requester._client.httpClientAdapter,
+      bootstrapper: (_) => (bootstrapper?.call(builder) ?? builder.build())
+          .copyWith(connectTimeout: current.connectTimeout),
+    );
+  }
+
   /// Indicates whether this [WordpressClient] instance has been disposed.
   bool get disposed => _isDisposed;
 
@@ -404,7 +527,7 @@ final class WordpressClient implements IDisposable {
   MenuLocationsInterface get menuLocations =>
       get<MenuLocationsInterface>('menu-locations');
 
-  /// Interfaces for Widgets, Sidebars and Widget Types
+  /// Interfaces for Widgets, Sidebars and WordpressWidget Types
   WidgetsInterface get widgets => get<WidgetsInterface>('widgets');
   SidebarsInterface get sidebars => get<SidebarsInterface>('sidebars');
   WidgetTypesInterface get widgetTypes =>
@@ -878,11 +1001,11 @@ final class WordpressClient implements IDisposable {
     );
 
     // Widgets suite
-    register<WidgetsInterface, Widget>(
+    register<WidgetsInterface, WordpressWidget>(
       interface: WidgetsInterface(),
       key: 'widgets',
-      decoder: (json) => Widget.fromJson(json),
-      encoder: (dynamic w) => (w as Widget).toJson(),
+      decoder: (json) => WordpressWidget.fromJson(json),
+      encoder: (dynamic w) => (w as WordpressWidget).toJson(),
     );
 
     register<SidebarsInterface, Sidebar>(
@@ -940,7 +1063,8 @@ final class WordpressClient implements IDisposable {
   /// [encoder] is a function that takes an instance of [T] and returns a json object
   /// These are required to decode and encode responses for this interface.
   ///
-  /// [overriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// [overwriteIfTypeExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// `overriteIfTypeExists` is its old, deprecated spelling.
   ///
   /// Some keys are already occupied:
   /// - `me`
@@ -970,7 +1094,9 @@ final class WordpressClient implements IDisposable {
     required JsonEncoderCallback encoder,
     required JsonDecoderCallback<E> decoder,
     String? key,
-    bool overriteIfTypeExists = false,
+    bool overwriteIfTypeExists = false,
+    @Deprecated('Use overwriteIfTypeExists. Removed in 11.0.')
+    bool? overriteIfTypeExists,
   }) {
     final interfaceKey = InterfaceKey<T>(key);
 
@@ -981,7 +1107,7 @@ final class WordpressClient implements IDisposable {
     _registerResponseType<E>(
       decoder: decoder,
       encoder: encoder,
-      overriteIfExists: overriteIfTypeExists,
+      overwriteIfExists: overriteIfTypeExists ?? overwriteIfTypeExists,
     );
 
     interface._initInterface(
@@ -1038,7 +1164,7 @@ final class WordpressClient implements IDisposable {
               'plain maps work without one.',
             )
           : encoder(item as T),
-      overriteIfTypeExists: true,
+      overwriteIfTypeExists: true,
     );
 
     return get<ResourceInterface<T>>(key);
@@ -1059,16 +1185,16 @@ final class WordpressClient implements IDisposable {
   /// [encoder] is a function that takes an instance of [E] and returns a json object
   /// These are required to decode and encode responses.
   ///
-  /// [overriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
+  /// [overwriteIfExists] is a boolean that determines if the type should be overwritten if it already exists.
   void _registerResponseType<E>({
     required JsonEncoderCallback encoder,
     required JsonDecoderCallback<E> decoder,
-    bool overriteIfExists = false,
+    bool overwriteIfExists = false,
   }) {
     _typeMap.addCodablePair<E>(
       decoder: decoder,
       encoder: encoder,
-      overwrite: overriteIfExists,
+      overwrite: overwriteIfExists,
     );
   }
 

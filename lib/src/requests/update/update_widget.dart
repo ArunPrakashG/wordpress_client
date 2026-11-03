@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Widget: POST /wp/v2/widgets/<id>
+/// Update a Widget: POST `/wp/v2/widgets/<id>`
 final class UpdateWidgetRequest extends IRequest {
   UpdateWidgetRequest({
     required this.id,

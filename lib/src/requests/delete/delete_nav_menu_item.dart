@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Nav Menu Item (DELETE /wp/v2/menu-items/<id>)
+/// Delete a Nav Menu Item (DELETE `/wp/v2/menu-items/<id>`)
 final class DeleteNavMenuItemRequest extends IRequest {
   DeleteNavMenuItemRequest({
     required this.id,

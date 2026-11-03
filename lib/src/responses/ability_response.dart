@@ -10,7 +10,7 @@ import '../utilities/self_representive_base.dart';
 /// `my-plugin/get-site-info`, that can be discovered and run over REST.
 /// Only abilities registered with `show_in_rest` are visible to the client.
 @immutable
-final class Ability implements ISelfRespresentive {
+final class Ability implements ISelfRepresentative {
   const Ability({
     required this.name,
     required this.self,
@@ -107,7 +107,7 @@ final class Ability implements ISelfRespresentive {
 
 /// A group of related [Ability] entries.
 @immutable
-final class AbilityCategory implements ISelfRespresentive {
+final class AbilityCategory implements ISelfRepresentative {
   const AbilityCategory({
     required this.slug,
     required this.self,

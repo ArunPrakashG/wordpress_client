@@ -24,7 +24,7 @@ import '../../wordpress_client.dart';
 /// final passwords = await appPasswords.list(ListApplicationPasswordRequest());
 ///
 /// // Retrieve a specific application password
-/// final password = await appPasswords.retrieve(RetriveApplicationPasswordRequest(
+/// final password = await appPasswords.retrieve(RetrieveApplicationPasswordRequest(
 ///   id: newPassword.id,
 ///   user: 1, // User ID
 /// ));
@@ -48,6 +48,6 @@ final class ApplicationPasswordsInterface extends IRequestInterface
         DeleteOperation<DeleteApplicationPasswordRequest>,
         ListOperation<ApplicationPassword, ListApplicationPasswordRequest>,
         RetrieveOperation<ApplicationPassword,
-            RetriveApplicationPasswordRequest>,
+            RetrieveApplicationPasswordRequest>,
         UpdateOperation<ApplicationPassword,
             UpdateApplicationPasswordRequest> {}

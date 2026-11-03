@@ -6,6 +6,7 @@ final class CreateTagRequest extends IRequest {
     required this.slug,
     this.description,
     this.meta,
+    this.acf,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -30,6 +31,10 @@ final class CreateTagRequest extends IRequest {
   /// Meta fields as arbitrary key/value pairs.
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   @override
   WordpressRequest build(Uri baseUrl) {
     final body = <String, dynamic>{}
@@ -37,6 +42,7 @@ final class CreateTagRequest extends IRequest {
       ..addIfNotNull('name', name)
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

@@ -9,7 +9,7 @@ import '../utilities/self_representive_base.dart';
 /// Categories are a taxonomy in WordPress used to group and organize content.
 /// They can be hierarchical, allowing for parent-child relationships between categories.
 @immutable
-class Category implements ISelfRespresentive {
+class Category implements ISelfRepresentative {
   /// Creates a new [Category] instance.
   ///
   /// - [id]: Unique identifier for the category.

@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Media Item (POST /wp/v2/media/<id>).
+/// Update a Media Item (POST `/wp/v2/media/<id>`).
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/media/#update-a-media-item
 final class UpdateMediaRequest extends IRequest {
@@ -19,6 +19,7 @@ final class UpdateMediaRequest extends IRequest {
     this.description,
     this.post,
     this.meta,
+    this.acf,
     this.template,
     super.cancelToken,
     super.authorization,
@@ -71,6 +72,10 @@ final class UpdateMediaRequest extends IRequest {
   /// Meta fields.
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// The theme file to use to display the media item.
   String? template;
 
@@ -93,6 +98,7 @@ final class UpdateMediaRequest extends IRequest {
       ..addIfNotNull('description', description)
       ..addIfNotNull('post', post)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addIfNotNull('template', template)
       ..addAllIfNotNull(extra);
 

@@ -4,7 +4,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a Block Type (wp/v2/block-types)
 @immutable
-class BlockType implements ISelfRespresentive {
+class BlockType implements ISelfRepresentative {
   const BlockType({
     required this.name,
     required this.title,

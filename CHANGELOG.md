@@ -1,3 +1,33 @@
+## 10.2.0
+
+Added
+
+- **Web and WebAssembly.** `package:wordpress_client/wordpress_client.dart` no longer imports `dart:io`, so it compiles for the web with `dart compile js` and `dart compile wasm`. `CreateMediaRequest.fromBytes` works everywhere; `fromFile` needs `dart:io`. JWT refresh cookies are handled by a small built-in store, so `cookie_jar` and `dio_cookie_manager` are no longer dependencies. (#108)
+- **WordPress.com and Jetpack sites**: `WordpressClient.forWordpressCom(site:, accessToken:)` talks to `public-api.wordpress.com/wp/v2/sites/<site>`. `BearerTokenAuth` / `WordpressAuth.bearer(token)` send an OAuth2 token, and `WordpressComOAuth` builds the authorize URL, reads implicit-flow redirects (`tokenFromRedirect`) and exchanges codes (`exchangeCode`). `client.resource(namespace: ...)` routes plugin namespaces per site. (#113)
+- **Persistent stores**: `JsonWriteQueueStore` and `JsonCacheStore` save the offline queue and the GET cache through two callbacks (`shared_preferences`, `localStorage`, a file). `package:wordpress_client/io.dart` adds `FileWriteQueueStore` and `FileCacheStore`, written atomically. Request headers are never saved, so credentials do not reach the storage. `WordpressRawResponse.toJson` / `fromJson` support this. (#116)
+- **Meta and ACF**: `post.metaValue<int>('rating')` and `post.acfValue<DateTime>('launch_date')` read typed values with lenient conversion (`'12'` as `12`, `'1'` as `true`), and `post.acf` returns the raw map. Create and update requests for posts, pages, users, comments, categories and tags, and `UpdateMediaRequest`, take `acf:`; `UpdatePageRequest` also gained `meta:`. (#114)
+- **`updateIfUnmodified(request, lastModifiedGmt:)`** on every updatable interface: checks `modified_gmt` first and returns a 409 failure (`UpdateOperation.conflictErrorCode`) instead of overwriting someone else's edit. (#118)
+- **Multisite**: `client.forNetworkSite(Uri)` returns a client for another site of the network (sub-directory or sub-domain) with the same settings, and `client.siteUrl` gives the site root. Credentials and middlewares are not copied; pass them in `bootstrapper`. (#117)
+- **Model generator**: `dart run wordpress_client:generate --site <url> --route wp/v2/books` writes Dart models from a route's REST schema, ready for `client.resource<T>()`. `--schema <file>` works offline. (#115)
+- `WordpressRequest.metaSkipCache` makes `CacheMiddleware` skip the lookup for one GET. `BootstrapBuilder.withoutMiddlewares()`.
+- `ISelfRepresentative` (models with a `self` map) is exported.
+
+Deprecated (removed in 11.0)
+
+- `Widget` is now `WordpressWidget`; the old name clashed with Flutter's `Widget`. (#119)
+- `RetriveApplicationPasswordRequest` is now `RetrieveApplicationPasswordRequest`. (#119)
+- The `overriteIfTypeExists` parameter of `register` is now `overwriteIfTypeExists`. (#119)
+
+Fixed
+
+- `reconfigure()` and `reconfigureClient()` start from the current settings instead of the ones the client was created with, and builders copy the header, interceptor and middleware lists they inherit instead of sharing them.
+- Doc comments flagged by the pub.dev analysis. (#109)
+
+Project
+
+- Releases: the release workflow pushes the tag with a token that starts the pub.dev publish workflow, and creates a GitHub release from this changelog. (#110, #112)
+- CI runs the integration tests against WordPress in Docker (`docker-compose.wordpress.yml`, now on the official `wordpress` and `mariadb` images), and builds the example for JavaScript and WebAssembly. (#111)
+
 ## 10.1.0
 
 Added

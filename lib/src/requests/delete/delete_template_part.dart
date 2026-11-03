@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Template Part (DELETE /wp/v2/template-parts/<id>)
+/// Delete a Template Part (DELETE `/wp/v2/template-parts/<id>`)
 final class DeleteTemplatePartRequest extends IRequest {
   DeleteTemplatePartRequest({
     required this.id,

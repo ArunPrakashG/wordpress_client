@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Nav Menu Item (GET /wp/v2/menu-items/<id>)
+/// Retrieve a Nav Menu Item (GET `/wp/v2/menu-items/<id>`)
 final class RetrieveNavMenuItemRequest extends IRequest {
   RetrieveNavMenuItemRequest({
     required this.id,

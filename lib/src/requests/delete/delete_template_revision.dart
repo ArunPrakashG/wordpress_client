@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Template Revision (DELETE /wp/v2/templates/<parent>/revisions/<id>)
+/// Delete a Template Revision (DELETE `/wp/v2/templates/<parent>/revisions/<id>`)
 final class DeleteTemplateRevisionRequest extends IRequest {
   DeleteTemplateRevisionRequest({
     required this.parent,

@@ -7,3 +7,5 @@ include: package:personal_flutter_lints/analysis_options.yaml
 
 linter:
   rules:
+    # pub.dev scores packages with this rule (package:lints/core).
+    unintended_html_in_doc_comment: true

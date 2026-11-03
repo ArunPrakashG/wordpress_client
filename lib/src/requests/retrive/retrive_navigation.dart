@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Navigation (GET /wp/v2/navigation/<id>)
+/// Retrieve a Navigation (GET `/wp/v2/navigation/<id>`)
 final class RetrieveNavigationRequest extends IRequest {
   RetrieveNavigationRequest({
     required this.id,

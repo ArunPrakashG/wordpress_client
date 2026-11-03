@@ -20,10 +20,10 @@ DateTime? parseDateIfNotNull(dynamic json) {
 
 /// Maps a JSON object to a Dart object with error handling.
 ///
-/// [mapper] A function that converts a Map<String, dynamic> to type T.
+/// [mapper] A function that converts a `Map<String, dynamic>` to type T.
 /// [json] The JSON object to map.
 ///
-/// Returns null if the input is null or not a Map<String, dynamic>.
+/// Returns null if the input is null or not a `Map<String, dynamic>`.
 /// If an error occurs during mapping, returns null instead of throwing an exception.
 T? mapGuarded<T>({
   required T Function(Map<String, dynamic> json) mapper,
@@ -153,7 +153,22 @@ bool isValidRestApiUrl(Uri uri, {bool forceHttps = false}) {
     return false;
   }
 
-  return uri.pathSegments.isNotEmpty && uri.pathSegments.contains('wp-json');
+  return uri.pathSegments.isNotEmpty &&
+      (uri.pathSegments.contains('wp-json') || isWordpressComApiUrl(uri));
+}
+
+/// The WordPress.com REST API host, which also serves Jetpack sites.
+const String wordpressComApiHost = 'public-api.wordpress.com';
+
+/// Whether [uri] is a WordPress.com site API base such as
+/// `https://public-api.wordpress.com/wp/v2/sites/example.wordpress.com`.
+bool isWordpressComApiUrl(Uri uri) {
+  final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+  final sites = segments.indexOf('sites');
+
+  return uri.host == wordpressComApiHost &&
+      sites > 0 &&
+      sites + 1 < segments.length;
 }
 
 /// Checks if a given integer is a valid port number.

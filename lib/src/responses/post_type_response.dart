@@ -6,7 +6,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a WordPress Post Type (e.g., post, page, wp_block).
 @immutable
-final class PostType implements ISelfRespresentive {
+final class PostType implements ISelfRepresentative {
   const PostType({
     required this.slug,
     required this.restBase,

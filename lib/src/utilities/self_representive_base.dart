@@ -4,15 +4,15 @@
 ///
 /// This class is designed to handle JSON responses, particularly useful when
 /// dealing with dynamic or unknown fields in API responses.
-abstract class ISelfRespresentive {
-  /// Creates a new instance of [ISelfRespresentive].
+abstract class ISelfRepresentative {
+  /// Creates a new instance of [ISelfRepresentative].
   ///
   /// [self] is a required parameter that contains the entire JSON response as a Map.
-  const ISelfRespresentive({
+  const ISelfRepresentative({
     required this.self,
   });
 
-  /// Represents the entire JSON response as a Map<String, dynamic>.
+  /// Represents the entire JSON response as a `Map<String, dynamic>`.
   ///
   /// This field is particularly useful in the following scenarios:
   /// 1. When the API response contains extra fields that are not explicitly modeled.

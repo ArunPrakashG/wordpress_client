@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Template Revision (GET /wp/v2/templates/<parent>/revisions/<id>)
+/// Retrieve a Template Revision (GET `/wp/v2/templates/<parent>/revisions/<id>`)
 final class RetrieveTemplateRevisionRequest extends IRequest {
   RetrieveTemplateRevisionRequest({
     required this.parent,

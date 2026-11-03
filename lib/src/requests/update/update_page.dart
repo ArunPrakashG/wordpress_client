@@ -18,6 +18,8 @@ final class UpdatePageRequest extends IRequest {
     this.pingStatus = Status.closed,
     this.template,
     this.password,
+    this.meta,
+    this.acf,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -78,6 +80,12 @@ final class UpdatePageRequest extends IRequest {
   /// The theme file to use to display the page.
   String? template;
 
+  /// Registered meta fields to update (keys need `show_in_rest`).
+  Map<String, dynamic>? meta;
+
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
   @override
   WordpressRequest build(Uri baseUrl) {
     final body = <String, dynamic>{}
@@ -95,6 +103,8 @@ final class UpdatePageRequest extends IRequest {
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('menu_order', menuOrder)
       ..addIfNotNull('slug', slug)
+      ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

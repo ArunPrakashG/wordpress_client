@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// List Navigation Revisions (GET /wp/v2/navigation/<parent>/revisions)
+/// List Navigation Revisions (GET `/wp/v2/navigation/<parent>/revisions`)
 final class ListNavigationRevisionsRequest extends IRequest {
   ListNavigationRevisionsRequest({
     required this.parent,

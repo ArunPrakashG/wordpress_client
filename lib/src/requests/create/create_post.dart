@@ -20,6 +20,7 @@ final class CreatePostRequest extends IRequest {
     this.format,
     this.sticky,
     this.meta,
+    this.acf,
     this.template,
     this.categories,
     this.tags,
@@ -80,6 +81,10 @@ final class CreatePostRequest extends IRequest {
   /// Meta fields (arbitrary key/value pairs).
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// The theme file to use to display the post.
   String? template;
 
@@ -106,6 +111,7 @@ final class CreatePostRequest extends IRequest {
       ..addIfNotNull('format', format)
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addIfNotNull('template', template)
       ..addIfNotNull('categories', categories?.join(','))
       ..addIfNotNull('tags', tags?.join(','))

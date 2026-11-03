@@ -6,7 +6,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents site settings accessed via /wp/v2/settings.
 @immutable
-final class Settings implements ISelfRespresentive {
+final class Settings implements ISelfRepresentative {
   const Settings({
     required this.self,
     this.title,

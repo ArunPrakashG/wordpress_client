@@ -8,7 +8,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// Schema: https://developer.wordpress.org/rest-api/reference/sidebars/
 @immutable
-final class Sidebar implements ISelfRespresentive {
+final class Sidebar implements ISelfRepresentative {
   const Sidebar({
     required this.id,
     required this.name,

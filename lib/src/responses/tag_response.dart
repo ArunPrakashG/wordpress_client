@@ -11,7 +11,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// For more details, see: https://developer.wordpress.org/rest-api/reference/tags/
 @immutable
-final class Tag implements ISelfRespresentive {
+final class Tag implements ISelfRepresentative {
   /// Creates a new [Tag] instance.
   ///
   /// All parameters correspond to the properties of a tag as defined in the WordPress REST API.

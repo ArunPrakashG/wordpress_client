@@ -140,8 +140,8 @@ extension MenuLocationsQuerySeed on MenuLocationsInterface {
 
 // Widgets
 extension WidgetsQuerySeed on WidgetsInterface {
-  ListQueryBuilder<Widget, ListWidgetsRequest> get query =>
-      listQuery<Widget, ListWidgetsRequest>(
+  ListQueryBuilder<WordpressWidget, ListWidgetsRequest> get query =>
+      listQuery<WordpressWidget, ListWidgetsRequest>(
         interface: this,
         seed: ListWidgetsRequest(),
       );

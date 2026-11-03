@@ -24,15 +24,19 @@
 
 - **Typed REST client** for 30+ endpoints (posts, pages, media, users, comments, taxonomies, blocks, templates, navigation, widgets, settings, themes, ...) with full CRUD. See [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods).
 - **Typed results**: `WordpressResponse<T>` is a success or a failure; failures classify into a sealed `WordpressFailure`.
-- **Auth**: Application Passwords (including the browser "authorize application" flow), JWT (two plugins), or your own `IAuthorization`. Credentials never follow the client to another origin.
+- **Runs everywhere**: Dart VM, Flutter on every platform, and the web, including WebAssembly.
+- **Self-hosted, WordPress.com and Jetpack** sites, and every site of a multisite network.
+- **Auth**: Application Passwords (including the browser "authorize application" flow), JWT (two plugins), OAuth2 bearer tokens for WordPress.com, or your own `IAuthorization`. Credentials never follow the client to another origin.
 - **Resilience**: opt-in retries with backoff and `Retry-After`.
-- **Caching**: GET cache with per-resource invalidation and ETag revalidation. Custom stores supported.
+- **Caching**: GET cache with per-resource invalidation and ETag revalidation, in memory or persisted (file, `shared_preferences`, `localStorage`).
 - **Pagination**: `listPages` / `listAll`, plus parallel page fetching.
 - **GraphQL (WPGraphQL)**: queries, mutations, partial results, GET, pagination, batching, persisted queries.
 - **Abilities API** (WordPress 6.9+).
-- **Custom post types and plugin routes**: `client.resource<T>('events', decoder: ...)` gives typed CRUD and pagination for any collection.
+- **Custom post types and plugin routes**: `client.resource<T>('events', decoder: ...)` gives typed CRUD and pagination for any collection, and `dart run wordpress_client:generate` writes the models from the site's REST schema.
+- **Meta and ACF**: typed `metaValue<T>` / `acfValue<T>` reads and `acf:` on writes.
+- **Safe edits**: `updateIfUnmodified` refuses to overwrite a newer copy on the server.
 - **Fewer round trips**: `_embed` / `_fields` helpers, the WordPress batch endpoint (`client.batch`), request de-duplication and a concurrency limit.
-- **Offline writes**: `OfflineWriteQueue` keeps writes that fail offline and replays them in order.
+- **Offline writes**: `OfflineWriteQueue` keeps writes that fail offline, across app restarts if you like, and replays them in order.
 - **Extensibility**: middlewares, Dio interceptors, custom endpoints, raw requests, polling streams.
 - **Testable**: `MockWordpressAdapter` serves canned responses, no live site needed.
 
@@ -40,10 +44,10 @@
 
 ```yaml
 dependencies:
-  wordpress_client: ^10.0.0
+  wordpress_client: ^10.2.0
 ```
 
-Requires Dart `>=3.0.0`.
+Requires Dart `>=3.0.0`. Works on the Dart VM, Flutter and the web (`dart compile js` and `dart compile wasm`). On the web, upload media with `CreateMediaRequest.fromBytes`.
 
 ## Quick start
 
@@ -116,6 +120,35 @@ if (result is AppPasswordGranted) {
 
 More: [Browser Sign-In](https://github.com/ArunPrakashG/wordpress_client/wiki/Browser-Sign-In), [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization).
 
+## WordPress.com and Jetpack
+
+```dart
+// After the user approves your app (register it at developer.wordpress.com/apps)
+final token = WordpressComOAuth.tokenFromRedirect(redirectUri, expectedState: state);
+
+final client = WordpressClient.forWordpressCom(
+  site: 'example.wordpress.com',
+  accessToken: token?.accessToken, // leave out for public content
+);
+final posts = await client.posts.list(ListPostRequest(perPage: 5));
+```
+
+`WordpressComOAuth.authorizeUrl(...)` builds the approval link and `exchangeCode(...)` swaps a code for a token on your server. More: [WordPress.com and Jetpack](https://github.com/ArunPrakashG/wordpress_client/wiki/WordPress-com-and-Jetpack).
+
+## Multisite
+
+```dart
+final network = WordpressClient.forSite(siteUrl: Uri.parse('https://example.com'));
+
+// Same settings, another site of the network
+final shop = network.forNetworkSite(
+  Uri.parse('/shop/'),                       // or Uri.parse('https://shop.example.com')
+  bootstrapper: (b) => b.withDefaultAuthorization(auth).build(),
+);
+```
+
+Credentials and middlewares are not copied, so pass them for each site. More: [Multisite](https://github.com/ArunPrakashG/wordpress_client/wiki/Multisite).
+
 ## Read, create, update, delete
 
 ```dart
@@ -132,6 +165,32 @@ await client.posts.delete(DeletePostRequest(id: 1, force: true));
 ```
 
 Write requests need credentials (`withDefaultAuthorization`, or `authorization:` on the request).
+
+Don't overwrite someone else's edit:
+
+```dart
+final r = await client.posts.updateIfUnmodified(
+  UpdatePostRequest(id: post.id, title: 'Renamed'),
+  lastModifiedGmt: post.modifiedGmt!,
+);
+if (r case WordpressFailureResponse(:final error?) when error.code == UpdateOperation.conflictErrorCode) {
+  // changed on the server since it was loaded: reload and merge
+}
+```
+
+More: [Concurrent Edits](https://github.com/ArunPrakashG/wordpress_client/wiki/Concurrent-Edits).
+
+## Meta and ACF
+
+```dart
+final rating = post.metaValue<int>('rating');           // meta registered with show_in_rest
+final price = post.acfValue<double>('price');           // ACF field, "Show in REST API" on
+final launch = post.acfValue<DateTime>('launch_date');  // date pickers too
+
+await client.posts.update(UpdatePostRequest(id: post.id, meta: {'rating': 5}, acf: {'price': 9.5}));
+```
+
+More: [Meta and ACF](https://github.com/ArunPrakashG/wordpress_client/wiki/Meta-and-ACF).
 
 ## Handle results
 
@@ -228,7 +287,22 @@ b.withCache(
 )
 ```
 
-GET responses are cached per URL, query and credential. A write evicts only the resource it touched. Expired entries with an `ETag` are revalidated with a `304`. More: [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching).
+GET responses are cached per URL, query and credential. A write evicts only the resource it touched. Expired entries with an `ETag` are revalidated with a `304`.
+
+Keep the cache across app restarts:
+
+```dart
+import 'package:wordpress_client/io.dart'; // FileCacheStore, FileWriteQueueStore (not on the web)
+
+b.withMiddleware(CacheMiddleware(cache: FileCacheStore('$dir/wp_cache.json')))
+
+// any text storage, including the web
+final cache = JsonCacheStore(
+  read: () async => prefs.getString('wp_cache'),
+  write: (json) => prefs.setString('wp_cache', json),
+);
+```
+ More: [Caching](https://github.com/ArunPrakashG/wordpress_client/wiki/Caching).
 
 ## GraphQL (WPGraphQL)
 
@@ -272,7 +346,13 @@ await events.create(Event(0, 'Launch'));
 final orders = client.resource<Order>('orders', namespace: 'my-shop/v1', decoder: Order.fromJson);
 ```
 
-More: [Custom Post Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Post-Types).
+Write the models from the site's own schema instead of by hand:
+
+```sh
+dart run wordpress_client:generate --site https://example.com --route wp/v2/events --out lib/models/event.dart
+```
+
+More: [Custom Post Types](https://github.com/ArunPrakashG/wordpress_client/wiki/Custom-Post-Types), [Model Generator](https://github.com/ArunPrakashG/wordpress_client/wiki/Model-Generator).
 
 ## Batch writes
 
@@ -291,7 +371,7 @@ Sent to `/wp-json/batch/v1` (WordPress 5.6+), 25 per call; longer lists are spli
 ## Offline writes
 
 ```dart
-final queue = OfflineWriteQueue(store: MemoryWriteQueueStore()); // implement WriteQueueStore to persist
+final queue = OfflineWriteQueue(store: FileWriteQueueStore('$dir/wp_queue.json')); // or MemoryWriteQueueStore, JsonWriteQueueStore
 final client = WordpressClient.forSite(
   siteUrl: siteUrl,
   bootstrapper: (b) => b.withMiddleware(queue).withDefaultAuthorization(auth).build(),
@@ -378,6 +458,7 @@ More: [Testing](https://github.com/ArunPrakashG/wordpress_client/wiki/Testing).
 - A request is only sent to the client's own origin (scheme, host and port). Anything else fails with `RequestErrorType.originMismatch`.
 - `reconfigure(baseUri: ...)` to a different origin drops the default credentials and discovery data. Pass new credentials in the same call.
 - Cache keys hold a SHA-256 digest of the `Authorization` header, never the header itself.
+- Persistent cache and queue stores never save request headers, so credentials do not end up on disk.
 
 ## Documentation
 
@@ -390,6 +471,7 @@ Everything is in the [Wiki](https://github.com/ArunPrakashG/wordpress_client/wik
 | [Authorization](https://github.com/ArunPrakashG/wordpress_client/wiki/Authorization) | [Pagination and Finders](https://github.com/ArunPrakashG/wordpress_client/wiki/Pagination-and-Finders) | [Error Handling and Responses](https://github.com/ArunPrakashG/wordpress_client/wiki/Error-Handling-and-Responses) | [Raw Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Raw-Requests) |
 | [Supported REST Methods](https://github.com/ArunPrakashG/wordpress_client/wiki/Supported-REST-Methods) | [Parallel Requests](https://github.com/ArunPrakashG/wordpress_client/wiki/Parallel-Requests) | [Events and Statistics](https://github.com/ArunPrakashG/wordpress_client/wiki/Events-and-Statistics) | [Integration with Storage Packages](https://github.com/ArunPrakashG/wordpress_client/wiki/Integration-with-Storage-Packages) |
 | [API Changelog](https://github.com/ArunPrakashG/wordpress_client/wiki/API-Changelog) | [GraphQL](https://github.com/ArunPrakashG/wordpress_client/wiki/GraphQL), [Abilities](https://github.com/ArunPrakashG/wordpress_client/wiki/Abilities) | [Streaming and Polling](https://github.com/ArunPrakashG/wordpress_client/wiki/Streaming-and-Polling) | [Testing](https://github.com/ArunPrakashG/wordpress_client/wiki/Testing) |
+| [WordPress.com and Jetpack](https://github.com/ArunPrakashG/wordpress_client/wiki/WordPress-com-and-Jetpack), [Multisite](https://github.com/ArunPrakashG/wordpress_client/wiki/Multisite) | [Meta and ACF](https://github.com/ArunPrakashG/wordpress_client/wiki/Meta-and-ACF) | [Concurrent Edits](https://github.com/ArunPrakashG/wordpress_client/wiki/Concurrent-Edits) | [Model Generator](https://github.com/ArunPrakashG/wordpress_client/wiki/Model-Generator) |
 
 ## Contributing
 

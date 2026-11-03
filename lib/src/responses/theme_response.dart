@@ -6,7 +6,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a WordPress Theme (wp/v2/themes).
 @immutable
-final class Theme implements ISelfRespresentive {
+final class Theme implements ISelfRepresentative {
   const Theme({
     required this.stylesheet,
     required this.self,

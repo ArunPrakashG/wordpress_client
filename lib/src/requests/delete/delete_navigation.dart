@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Navigation (DELETE /wp/v2/navigation/<id>)
+/// Delete a Navigation (DELETE `/wp/v2/navigation/<id>`)
 final class DeleteNavigationRequest extends IRequest {
   DeleteNavigationRequest({
     required this.id,

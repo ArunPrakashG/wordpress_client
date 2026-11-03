@@ -8,7 +8,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// Schema: https://developer.wordpress.org/rest-api/reference/widget-types/
 @immutable
-final class WidgetType implements ISelfRespresentive {
+final class WidgetType implements ISelfRepresentative {
   const WidgetType({
     required this.id,
     required this.name,

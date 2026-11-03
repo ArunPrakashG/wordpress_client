@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Widget: DELETE /wp/v2/widgets/<id>
+/// Delete a Widget: DELETE `/wp/v2/widgets/<id>`
 final class DeleteWidgetRequest extends IRequest {
   DeleteWidgetRequest({
     required this.id,

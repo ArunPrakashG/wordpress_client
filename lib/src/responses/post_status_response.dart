@@ -6,7 +6,7 @@ import '../utilities/self_representive_base.dart';
 
 /// Represents a WordPress Post Status (e.g., publish, draft).
 @immutable
-final class PostStatus implements ISelfRespresentive {
+final class PostStatus implements ISelfRepresentative {
   const PostStatus({
     required this.slug,
     required this.self,

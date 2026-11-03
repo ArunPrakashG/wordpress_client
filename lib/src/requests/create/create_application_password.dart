@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Create an Application Password for a user (POST /wp/v2/users/<id>/application-passwords).
+/// Create an Application Password for a user (POST `/wp/v2/users/<id>/application-passwords`).
 final class CreateApplicationPasswordRequest extends IRequest {
   CreateApplicationPasswordRequest({
     required this.name,

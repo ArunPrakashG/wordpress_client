@@ -21,13 +21,14 @@ class BootstrapBuilder {
     _statisticsDelegate = config.statisticsDelegate;
     _defaultAuthorization = config.defaultAuthorization;
     _defaultUserAgent = config.defaultUserAgent;
-    _defaultHeaders = config.defaultHeaders;
-    _interceptors = config.interceptors;
+    _defaultHeaders =
+        config.defaultHeaders == null ? null : {...config.defaultHeaders!};
+    _interceptors = config.interceptors?.toList();
     _responsePreprocessorDelegate = config.responsePreprocessorDelegate;
     _defaultMaxRedirects = config.maxRedirects;
     _defaultRequestTimeout = config.receiveTimeout;
     _followRedirects = config.shouldFollowRedirects;
-    _middlewares = config.middlewares;
+    _middlewares = config.middlewares?.toList();
     _retryPolicy = config.retryPolicy;
     _deduplicate = config.deduplicateRequests;
     _maxConcurrent = config.maxConcurrentRequests;
@@ -134,6 +135,12 @@ class BootstrapBuilder {
   /// Removes the default authorization.
   BootstrapBuilder withoutDefaultAuthorization() {
     _defaultAuthorization = null;
+    return this;
+  }
+
+  /// Removes every middleware added so far.
+  BootstrapBuilder withoutMiddlewares() {
+    _middlewares = null;
     return this;
   }
 

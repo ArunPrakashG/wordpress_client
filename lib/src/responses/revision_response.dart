@@ -7,7 +7,7 @@ import 'properties/content.dart';
 
 /// Represents a Post/Page revision item.
 @immutable
-final class Revision implements ISelfRespresentive {
+final class Revision implements ISelfRepresentative {
   const Revision({
     required this.id,
     required this.parent,

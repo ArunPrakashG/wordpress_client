@@ -8,7 +8,7 @@ import '../utilities/self_representive_base.dart';
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/menu-locations/
 @immutable
-final class MenuLocation implements ISelfRespresentive {
+final class MenuLocation implements ISelfRepresentative {
   const MenuLocation({
     required this.name,
     required this.description,

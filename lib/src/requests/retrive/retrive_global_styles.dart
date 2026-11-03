@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve Global Styles (GET /wp/v2/global-styles/<id>)
+/// Retrieve Global Styles (GET `/wp/v2/global-styles/<id>`)
 final class RetrieveGlobalStylesRequest extends IRequest {
   RetrieveGlobalStylesRequest({
     required this.id,

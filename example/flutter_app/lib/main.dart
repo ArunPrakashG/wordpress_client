@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-// The package also exports a `Widget` (a WordPress widget), so hide it.
+// The package exports `Widget`, a deprecated alias of `WordpressWidget`
+// until 11.0, so hide it.
 import 'package:wordpress_client/wordpress_client.dart' hide Widget;
 
 void main() => runApp(const ExampleApp());

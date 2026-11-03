@@ -8,6 +8,7 @@ final class UpdateCategoryRequest extends IRequest {
     this.slug,
     this.parent,
     this.meta,
+    this.acf,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -35,6 +36,10 @@ final class UpdateCategoryRequest extends IRequest {
   /// Meta fields.
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// Unique identifier for the term.
   int id;
 
@@ -46,6 +51,7 @@ final class UpdateCategoryRequest extends IRequest {
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('parent', parent)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

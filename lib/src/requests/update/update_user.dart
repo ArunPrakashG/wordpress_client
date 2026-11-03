@@ -17,6 +17,7 @@ final class UpdateUserRequest extends IRequest {
     this.roles,
     this.rolesList,
     this.meta,
+    this.acf,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -71,6 +72,10 @@ final class UpdateUserRequest extends IRequest {
   /// Meta fields per Handbook
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// Unique identifier for the user.
   int id;
 
@@ -90,6 +95,7 @@ final class UpdateUserRequest extends IRequest {
       ..addIfNotNull('password', password)
       ..addIfNotNull('roles', rolesList ?? roles)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../../wordpress_client.dart';
-import '../utilities/self_representive_base.dart';
 import 'properties/content.dart';
 
 /// Represents a WordPress page.
@@ -13,7 +12,7 @@ import 'properties/content.dart';
 /// For more information, see the WordPress REST API handbook:
 /// https://developer.wordpress.org/rest-api/reference/pages/
 @immutable
-final class Page implements ISelfRespresentive {
+final class Page implements ISelfRepresentative {
   /// Creates a new [Page] instance.
   ///
   /// All parameters correspond to the properties of a WordPress page as defined

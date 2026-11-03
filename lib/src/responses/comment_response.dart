@@ -12,7 +12,7 @@ import 'properties/content.dart';
 /// This class encapsulates all the properties of a comment as defined in the WordPress REST API.
 /// For more details, see: https://developer.wordpress.org/rest-api/reference/comments/
 @immutable
-final class Comment implements ISelfRespresentive {
+final class Comment implements ISelfRepresentative {
   /// Creates a new [Comment] instance.
   ///
   /// All parameters correspond to the properties of a comment as defined in the WordPress REST API.

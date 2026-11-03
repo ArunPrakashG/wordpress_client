@@ -14,7 +14,7 @@ import 'properties/media_details.dart';
 ///
 /// For more details, see: https://developer.wordpress.org/rest-api/reference/media/
 @immutable
-final class Media implements ISelfRespresentive {
+final class Media implements ISelfRepresentative {
   /// Creates a new [Media] instance.
   ///
   /// All parameters correspond to the properties of a media item as defined in the WordPress REST API.

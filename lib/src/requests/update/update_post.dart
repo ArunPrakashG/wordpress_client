@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update an existing Post (POST /wp/v2/posts/<id>).
+/// Update an existing Post (POST `/wp/v2/posts/<id>`).
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/posts/#update-a-post
 final class UpdatePostRequest extends IRequest {
@@ -21,6 +21,7 @@ final class UpdatePostRequest extends IRequest {
     this.format,
     this.sticky,
     this.meta,
+    this.acf,
     this.template,
     this.categories,
     this.tags,
@@ -81,6 +82,10 @@ final class UpdatePostRequest extends IRequest {
   /// Meta fields (arbitrary key/value pairs).
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// The theme file to use to display the post.
   String? template;
 
@@ -111,6 +116,7 @@ final class UpdatePostRequest extends IRequest {
       ..addIfNotNull('format', format?.name)
       ..addIfNotNull('sticky', sticky)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addIfNotNull('template', template)
       ..addIfNotNull('categories', categories?.join(','))
       ..addIfNotNull('tags', tags?.join(','))

@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Post (DELETE /wp/v2/posts/<id>).
+/// Delete a Post (DELETE `/wp/v2/posts/<id>`).
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/posts/#delete-a-post
 final class DeletePostRequest extends IRequest {

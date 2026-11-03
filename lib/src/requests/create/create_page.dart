@@ -20,6 +20,7 @@ final class CreatePageRequest extends IRequest {
     this.pingStatus = Status.closed,
     this.template,
     this.meta,
+    this.acf,
     this.password,
     super.cancelToken,
     super.authorization,
@@ -81,6 +82,10 @@ final class CreatePageRequest extends IRequest {
   /// Meta fields as arbitrary key/value pairs.
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   @override
   WordpressRequest build(Uri baseUrl) {
     final body = <String, dynamic>{}
@@ -100,6 +105,7 @@ final class CreatePageRequest extends IRequest {
       ..addIfNotNull('slug', slug)
       ..addIfNotNull('template', template)
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

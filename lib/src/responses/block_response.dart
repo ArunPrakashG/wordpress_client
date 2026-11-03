@@ -7,7 +7,7 @@ import 'properties/content.dart';
 
 /// Represents an Editor Block (wp_block post type).
 @immutable
-class Block implements ISelfRespresentive {
+class Block implements ISelfRepresentative {
   const Block({
     required this.id,
     required this.slug,

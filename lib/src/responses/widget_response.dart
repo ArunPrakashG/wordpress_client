@@ -4,12 +4,12 @@ import 'package:meta/meta.dart';
 import '../utilities/helpers.dart';
 import '../utilities/self_representive_base.dart';
 
-/// Represents a Widget (wp/v2/widgets)
+/// Represents a widget (wp/v2/widgets)
 ///
 /// Schema: https://developer.wordpress.org/rest-api/reference/widgets/
 @immutable
-final class Widget implements ISelfRespresentive {
-  const Widget({
+final class WordpressWidget implements ISelfRepresentative {
+  const WordpressWidget({
     required this.id,
     required this.idBase,
     required this.sidebar,
@@ -19,7 +19,8 @@ final class Widget implements ISelfRespresentive {
     this.self = const {},
   });
 
-  factory Widget.fromJson(Map<String, dynamic> json) => Widget(
+  factory WordpressWidget.fromJson(Map<String, dynamic> json) =>
+      WordpressWidget(
         id: castOrElse(json['id'], orElse: () => '')!,
         idBase: castOrElse(json['id_base'], orElse: () => '')!,
         sidebar: castOrElse(json['sidebar'], orElse: () => '')!,
@@ -60,7 +61,7 @@ final class Widget implements ISelfRespresentive {
       };
 
   @override
-  bool operator ==(covariant Widget other) {
+  bool operator ==(covariant WordpressWidget other) {
     if (identical(this, other)) return true;
     final eq = const DeepCollectionEquality().equals;
     return other.id == id &&
@@ -82,3 +83,7 @@ final class Widget implements ISelfRespresentive {
       (instance?.hashCode ?? 0) ^
       self.hashCode;
 }
+
+/// The old name of [WordpressWidget]. It clashes with Flutter's `Widget`.
+@Deprecated('Use WordpressWidget. Widget will be removed in 11.0.')
+typedef Widget = WordpressWidget;
