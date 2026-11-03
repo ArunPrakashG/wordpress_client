@@ -17,6 +17,7 @@ final class UpdateCommentRequest extends IRequest {
     this.date,
     this.dateGmt,
     this.meta,
+    this.acf,
     super.cancelToken,
     super.authorization,
     super.events,
@@ -71,6 +72,10 @@ final class UpdateCommentRequest extends IRequest {
   /// Meta fields.
   Map<String, dynamic>? meta;
 
+  /// Advanced Custom Fields values, sent as `acf`. Needs ACF with
+  /// "Show in REST API" enabled on the field group.
+  Map<String, dynamic>? acf;
+
   /// Unique identifier for the comment.
   int id;
 
@@ -91,6 +96,7 @@ final class UpdateCommentRequest extends IRequest {
       ..addIfNotNull('date', date?.toIso8601String())
       ..addIfNotNull('date_gmt', dateGmt?.toIso8601String())
       ..addIfNotNull('meta', meta)
+      ..addIfNotNull('acf', acf)
       ..addAllIfNotNull(extra);
 
     return WordpressRequest(

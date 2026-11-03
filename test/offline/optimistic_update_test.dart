@@ -87,7 +87,10 @@ void main() {
 
   test('items without modified_gmt fail clearly', () async {
     adapter.reply(
-        'GET', '/posts/1', const MockResponse(body: <String, dynamic>{}));
+      'GET',
+      '/posts/1',
+      const MockResponse(body: <String, dynamic>{}),
+    );
 
     final response = await client.posts.updateIfUnmodified(
       UpdatePostRequest(id: 1, title: 'New'),
