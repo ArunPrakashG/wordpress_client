@@ -2,13 +2,12 @@
 
 import 'dart:async';
 
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import '../../enums.dart';
 import '../../utilities/helpers.dart';
 import '../authorization_base.dart';
+import 'cookie_store.dart';
 
 /// UsefulJwtAuth implements JWT (JSON Web Token) authentication for WordPress APIs.
 ///
@@ -60,8 +59,7 @@ final class UsefulJwtAuth extends IAuthorization {
   DateTime? _lastAuthorizedTime;
   bool _hasValidatedOnce = false;
   Dio? _client;
-  CookieJar? _cookieJar;
-  CookieManager? _cookieManager;
+  CookieStore? _cookies;
 
   /// Number of days until the token expires.
   static const int DAYS_UNTILS_TOKEN_EXPIRY = 3;
@@ -107,9 +105,9 @@ final class UsefulJwtAuth extends IAuthorization {
 
     // Try using refresh_token cookie if present (no credentials)
     try {
-      if (_cookieJar != null) {
-        final cookies = await _cookieJar!.loadForRequest(baseUrl);
-        final hasRefreshCookie = cookies.any((c) => c.name == 'refresh_token');
+      if (_cookies != null) {
+        final hasRefreshCookie =
+            _cookies!.cookiesFor(baseUrl).containsKey('refresh_token');
         if (hasRefreshCookie) {
           final resp = await _client!.post<dynamic>(
             baseUrl.replace(path: 'wp-json/jwt-auth/v1/token').toString(),
@@ -254,12 +252,9 @@ final class UsefulJwtAuth extends IAuthorization {
   void clientFactoryProvider(Dio client) {
     _client = client;
     // Ensure we have cookie support to capture refresh_token cookies from server
-    if (_cookieJar == null) {
-      _cookieJar = CookieJar();
-      _cookieManager = CookieManager(_cookieJar!);
-      if (!_client!.interceptors.contains(_cookieManager)) {
-        _client!.interceptors.add(_cookieManager!);
-      }
+    final cookies = _cookies ??= CookieStore();
+    if (!client.interceptors.contains(cookies)) {
+      client.interceptors.add(cookies);
     }
   }
 

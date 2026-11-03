@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_slow_async_io
 
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -8,6 +7,7 @@ import 'package:path/path.dart';
 
 import '../../../wordpress_client.dart';
 import '../../constants.dart';
+import '../../utilities/io/file.dart';
 
 /// Create a Media Item (POST /wp/v2/media).
 ///
