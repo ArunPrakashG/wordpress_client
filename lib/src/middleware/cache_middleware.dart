@@ -76,7 +76,8 @@ class CacheMiddleware implements IWordpressMiddleware {
   @override
   Future<MiddlewareRawResponse> onExecute(WordpressRequest request) async {
     // Only cache GET requests
-    if (request.method != HttpMethod.get) {
+    if (request.method != HttpMethod.get ||
+        request.extra[WordpressRequest.metaSkipCache] == true) {
       return MiddlewareRawResponse.defaultInstance();
     }
 

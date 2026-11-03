@@ -37,6 +37,10 @@ final class WordpressRequest {
   /// Used for GraphQL queries, which are reads sent over `POST`.
   static const String metaKeepCache = 'wp.cache.keep';
 
+  /// [extra] key that, when `true`, makes `CacheMiddleware` skip the cache
+  /// lookup for this GET so the answer comes from the server.
+  static const String metaSkipCache = 'wp.cache.skip';
+
   /// [extra] key holding the lower-case HTTP method name (`get`, `post`, ...).
   ///
   /// Filled in by the client before middlewares run. It is never sent to the server.
