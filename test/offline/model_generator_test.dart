@@ -84,7 +84,7 @@ void main() {
     ]);
     expect(generate.exitCode, 0, reason: '${generate.stderr}');
 
-    File('${dir.path}/main.dart').writeAsStringSync(r'''
+    File('${dir.path}/main.dart').writeAsStringSync('''
 import 'dart:convert';
 import 'models.dart';
 
