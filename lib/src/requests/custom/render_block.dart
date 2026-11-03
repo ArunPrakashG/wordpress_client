@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Render a block on server (wp/v2/block-renderer/<name>)
+/// Render a block on server (`wp/v2/block-renderer/<name>`)
 final class RenderBlockRequest extends IRequest {
   RenderBlockRequest({
     required this.name,

@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 // no-op
 
-/// Create a Navigation Autosave (POST /wp/v2/navigation/<id>/autosaves)
+/// Create a Navigation Autosave (POST `/wp/v2/navigation/<id>/autosaves`)
 final class CreateNavigationAutosaveRequest extends IRequest {
   CreateNavigationAutosaveRequest({
     required this.parent,

@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Menu Location (GET /wp/v2/menu-locations/<location>)
+/// Retrieve a Menu Location (GET `/wp/v2/menu-locations/<location>`)
 final class RetrieveMenuLocationRequest extends IRequest {
   RetrieveMenuLocationRequest({
     required this.location,

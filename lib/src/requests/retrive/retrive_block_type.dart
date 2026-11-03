@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a single Block Type (wp/v2/block-types/<namespace>/<name>)
+/// Retrieve a single Block Type (`wp/v2/block-types/<namespace>/<name>`)
 final class RetrieveBlockTypeRequest extends IRequest {
   RetrieveBlockTypeRequest({
     required this.namespace,

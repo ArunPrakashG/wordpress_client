@@ -251,7 +251,7 @@ abstract base class BaseQueryBuilder<TSelf extends BaseQueryBuilder<TSelf, R>,
   }
 }
 
-/// Builder for list operations: returns List<T>.
+/// Builder for list operations: returns `List<T>`.
 final class ListQueryBuilder<T, R extends IRequest>
     extends BaseQueryBuilder<ListQueryBuilder<T, R>, R> {
   ListQueryBuilder({

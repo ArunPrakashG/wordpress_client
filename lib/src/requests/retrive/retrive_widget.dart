@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Widget: GET /wp/v2/widgets/<id>
+/// Retrieve a Widget: GET `/wp/v2/widgets/<id>`
 final class RetrieveWidgetRequest extends IRequest {
   RetrieveWidgetRequest({
     required this.id,

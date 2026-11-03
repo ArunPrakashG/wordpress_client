@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Media Item (POST /wp/v2/media/<id>).
+/// Update a Media Item (POST `/wp/v2/media/<id>`).
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/media/#update-a-media-item
 final class UpdateMediaRequest extends IRequest {

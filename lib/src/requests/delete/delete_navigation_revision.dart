@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Delete a Navigation Revision (DELETE /wp/v2/navigation/<parent>/revisions/<id>)
+/// Delete a Navigation Revision (DELETE `/wp/v2/navigation/<parent>/revisions/<id>`)
 final class DeleteNavigationRevisionRequest extends IRequest {
   DeleteNavigationRevisionRequest({
     required this.parent,

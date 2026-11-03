@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update an existing Post (POST /wp/v2/posts/<id>).
+/// Update an existing Post (POST `/wp/v2/posts/<id>`).
 ///
 /// Reference: https://developer.wordpress.org/rest-api/reference/posts/#update-a-post
 final class UpdatePostRequest extends IRequest {

@@ -20,10 +20,10 @@ DateTime? parseDateIfNotNull(dynamic json) {
 
 /// Maps a JSON object to a Dart object with error handling.
 ///
-/// [mapper] A function that converts a Map<String, dynamic> to type T.
+/// [mapper] A function that converts a `Map<String, dynamic>` to type T.
 /// [json] The JSON object to map.
 ///
-/// Returns null if the input is null or not a Map<String, dynamic>.
+/// Returns null if the input is null or not a `Map<String, dynamic>`.
 /// If an error occurs during mapping, returns null instead of throwing an exception.
 T? mapGuarded<T>({
   required T Function(Map<String, dynamic> json) mapper,

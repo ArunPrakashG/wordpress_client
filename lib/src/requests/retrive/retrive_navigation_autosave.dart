@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a specific Navigation Autosave (GET /wp/v2/navigation/<id>/autosaves/<autosaveId>)
+/// Retrieve a specific Navigation Autosave (GET `/wp/v2/navigation/<id>/autosaves/<autosaveId>`)
 final class RetrieveNavigationAutosaveRequest extends IRequest {
   RetrieveNavigationAutosaveRequest({
     required this.parent,

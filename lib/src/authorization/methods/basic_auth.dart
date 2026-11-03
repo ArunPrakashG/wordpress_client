@@ -50,7 +50,7 @@ final class BasicAuth extends IAuthorization {
 
   /// Generates the authorization header value.
   ///
-  /// Returns a Future<String> containing the Basic Auth header value.
+  /// Returns a `Future<String>` containing the Basic Auth header value.
   /// The returned string is in the format: "Basic base64EncodedCredentials"
   @override
   Future<String?> generateAuthUrl() async {

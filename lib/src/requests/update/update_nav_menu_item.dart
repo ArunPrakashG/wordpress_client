@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Nav Menu Item (POST /wp/v2/menu-items/<id>)
+/// Update a Nav Menu Item (POST `/wp/v2/menu-items/<id>`)
 final class UpdateNavMenuItemRequest extends IRequest {
   UpdateNavMenuItemRequest({
     required this.id,

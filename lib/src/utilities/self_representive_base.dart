@@ -12,7 +12,7 @@ abstract class ISelfRespresentive {
     required this.self,
   });
 
-  /// Represents the entire JSON response as a Map<String, dynamic>.
+  /// Represents the entire JSON response as a `Map<String, dynamic>`.
   ///
   /// This field is particularly useful in the following scenarios:
   /// 1. When the API response contains extra fields that are not explicitly modeled.

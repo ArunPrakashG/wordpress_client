@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Sidebar: GET /wp/v2/sidebars/<id>
+/// Retrieve a Sidebar: GET `/wp/v2/sidebars/<id>`
 final class RetrieveSidebarRequest extends IRequest {
   RetrieveSidebarRequest({
     required this.id,

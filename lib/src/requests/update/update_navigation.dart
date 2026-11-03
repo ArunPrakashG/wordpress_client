@@ -1,7 +1,7 @@
 import '../../../wordpress_client.dart';
 // no-op
 
-/// Update a Navigation (POST /wp/v2/navigation/<id>)
+/// Update a Navigation (POST `/wp/v2/navigation/<id>`)
 final class UpdateNavigationRequest extends IRequest {
   UpdateNavigationRequest({
     required this.id,

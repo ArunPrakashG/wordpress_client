@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update a Sidebar: POST /wp/v2/sidebars/<id>
+/// Update a Sidebar: POST `/wp/v2/sidebars/<id>`
 final class UpdateSidebarRequest extends IRequest {
   UpdateSidebarRequest({
     required this.id,

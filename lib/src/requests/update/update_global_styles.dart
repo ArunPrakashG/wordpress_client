@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Update Global Styles (POST /wp/v2/global-styles/<id>)
+/// Update Global Styles (POST `/wp/v2/global-styles/<id>`)
 final class UpdateGlobalStylesRequest extends IRequest {
   UpdateGlobalStylesRequest({
     required this.id,

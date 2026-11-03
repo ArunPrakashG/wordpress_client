@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Template (GET /wp/v2/templates/<id>)
+/// Retrieve a Template (GET `/wp/v2/templates/<id>`)
 final class RetrieveTemplateRequest extends IRequest {
   RetrieveTemplateRequest({
     required this.id,

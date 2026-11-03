@@ -1,6 +1,6 @@
 import '../../../wordpress_client.dart';
 
-/// Retrieve a Template Part (GET /wp/v2/template-parts/<id>)
+/// Retrieve a Template Part (GET `/wp/v2/template-parts/<id>`)
 final class RetrieveTemplatePartRequest extends IRequest {
   RetrieveTemplatePartRequest({
     required this.id,
