@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
@@ -45,6 +47,21 @@ final class WordpressRawResponse {
     this.extra = const {},
     this.message,
   });
+
+  /// Restores a response saved with [toJson].
+  factory WordpressRawResponse.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic> map(Object? value) =>
+        value is Map ? value.cast<String, dynamic>() : const {};
+
+    return WordpressRawResponse(
+      data: json['data'],
+      code: json['code'] as int,
+      headers: map(json['headers']),
+      duration: Duration(microseconds: json['durationUs'] as int? ?? 0),
+      extra: map(json['extra']),
+      message: json['message'] as String?,
+    );
+  }
 
   /// The entire response body. Can be null.
   ///
@@ -296,6 +313,33 @@ final class WordpressRawResponse {
         headers.hashCode ^
         duration.hashCode ^
         message.hashCode;
+  }
+
+  /// A JSON encodable form, for caches that persist responses.
+  ///
+  /// [requestHeaders] are left out so credentials are never persisted, and
+  /// so are [extra] values that are not JSON. [data] is kept as it is.
+  Map<String, dynamic> toJson() {
+    bool encodable(Object? value) {
+      try {
+        jsonEncode(value);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    return {
+      'data': data,
+      'code': code,
+      'headers': headers,
+      'durationUs': duration.inMicroseconds,
+      'extra': {
+        for (final MapEntry(:key, :value) in extra.entries)
+          if (encodable(value)) key: value,
+      },
+      'message': message,
+    };
   }
 
   /// Creates a copy of this [WordpressRawResponse] with the given fields replaced with new values.

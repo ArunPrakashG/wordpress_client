@@ -72,7 +72,7 @@ services:
       WP_USERNAME: ${WP_USERNAME:-admin}
       WP_PASSWORD: ${WP_PASSWORD:-password}
       WP_EMAIL: ${WP_EMAIL:-admin@example.com}
-      WP_PLUGINS: ${WP_PLUGINS:-jwt-authentication-for-wp-rest-api}
+      WP_PLUGINS: ${WP_PLUGINS:-jwt-authentication-for-wp-rest-api wp-graphql}
     volumes:
       - wordpress_data:/var/www/html
     command:

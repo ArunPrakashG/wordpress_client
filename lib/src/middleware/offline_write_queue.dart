@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import '../library_exports.dart';
+import '../utilities/json_persistence.dart';
 
 /// A write (POST, PUT, PATCH or DELETE) that could not reach the server and
 /// is waiting to be replayed by [OfflineWriteQueue.flush].
@@ -91,8 +92,10 @@ final class QueuedWrite {
 
 /// Where an [OfflineWriteQueue] keeps its writes.
 ///
-/// Implement this on top of `shared_preferences`, a file or a database to
-/// survive app restarts (see [QueuedWrite.toJson]).
+/// [MemoryWriteQueueStore] loses writes when the app exits. To keep them, use
+/// [JsonWriteQueueStore] over any text storage, `FileWriteQueueStore` from
+/// `package:wordpress_client/io.dart`, or implement this interface on top of
+/// a database (see [QueuedWrite.toJson]).
 abstract interface class WriteQueueStore {
   /// Every queued write, oldest first.
   Future<List<QueuedWrite>> all();
@@ -117,6 +120,73 @@ final class MemoryWriteQueueStore implements WriteQueueStore {
   @override
   Future<void> remove(String id) async {
     _writes.removeWhere((w) => w.id == id);
+  }
+}
+
+/// A [WriteQueueStore] saved as one JSON document through two callbacks, so
+/// it works with any text storage: `shared_preferences`, a file, browser
+/// `localStorage` or a key-value table.
+///
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// final store = JsonWriteQueueStore(
+///   read: () async => prefs.getString('wp_queue'),
+///   write: (json) => prefs.setString('wp_queue', json),
+/// );
+/// ```
+///
+/// The document is read once, on first use, and written after every change.
+/// Saved writes hold no headers or credentials (see [QueuedWrite]).
+final class JsonWriteQueueStore implements WriteQueueStore {
+  JsonWriteQueueStore({
+    required PersistRead read,
+    required PersistWrite write,
+  }) : _persistence = JsonPersistence(read: read, write: write);
+
+  final JsonPersistence _persistence;
+  Future<List<QueuedWrite>>? _writes;
+
+  Future<List<QueuedWrite>> _load() {
+    return _writes ??= _persistence.load().then((document) {
+      final writes = <QueuedWrite>[];
+      if (document is! List) {
+        return writes;
+      }
+
+      for (final item in document) {
+        try {
+          writes.add(QueuedWrite.fromJson((item as Map).cast()));
+        } catch (_) {
+          // Skip an entry that was saved by an incompatible version.
+        }
+      }
+
+      return writes;
+    });
+  }
+
+  Future<void> _save(List<QueuedWrite> writes) {
+    return _persistence.save([for (final w in writes) w.toJson()]);
+  }
+
+  @override
+  Future<List<QueuedWrite>> all() async => List.unmodifiable(await _load());
+
+  @override
+  Future<void> add(QueuedWrite write) async {
+    final writes = await _load();
+    writes.add(write);
+    await _save(writes);
+  }
+
+  @override
+  Future<void> remove(String id) async {
+    final writes = await _load();
+    final before = writes.length;
+    writes.removeWhere((w) => w.id == id);
+    if (writes.length != before) {
+      await _save(writes);
+    }
   }
 }
 

@@ -18,6 +18,7 @@ export 'helpers.dart'
         decodeByMultiKeys,
         using,
         getMIMETypeFromExtension;
+export 'json_persistence.dart' show PersistRead, PersistWrite;
 export 'lazy.dart';
 export 'request_url.dart';
 export 'typedefs.dart';
