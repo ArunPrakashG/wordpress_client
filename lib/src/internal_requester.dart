@@ -101,6 +101,8 @@ final class InternalRequester extends IRequestExecutor {
 
   @override
   void configure(BootstrapConfiguration configuration) {
+    // Kept so reconfigure() and forNetworkSite() start from current settings.
+    _configuration = configuration;
     _isDebugMode = configuration.enableDebugMode;
 
     if (configuration.defaultAuthorization != null &&

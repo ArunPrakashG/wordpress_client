@@ -297,6 +297,71 @@ final class WordpressClient implements IDisposable {
   /// The path component of the base URL.
   String get path => baseUrl.path;
 
+  /// The root of the site this client talks to: [baseUrl] without its REST
+  /// path, e.g. `https://example.com/blog` for
+  /// `https://example.com/blog/wp-json/wp/v2`.
+  Uri get siteUrl {
+    final segments = baseUrl.pathSegments;
+    final marker = segments.indexOf('wp-json');
+
+    return Uri(
+      scheme: baseUrl.scheme,
+      userInfo: baseUrl.userInfo,
+      host: baseUrl.host,
+      port: baseUrl.hasPort ? baseUrl.port : null,
+      pathSegments: marker < 0 ? segments : segments.sublist(0, marker),
+    );
+  }
+
+  /// A new client for another site of a multisite network (or any other
+  /// WordPress site), configured like this one.
+  ///
+  /// [site] is the other site's root. A relative URI is resolved against
+  /// [siteUrl], which suits sub-directory networks; pass an absolute one for
+  /// sub-domain networks:
+  ///
+  /// ```dart
+  /// final auth = WordpressAuth.appPassword(user: 'admin', appPassword: pw);
+  /// final shop = client.forNetworkSite(
+  ///   Uri.parse('/shop/'),
+  ///   bootstrapper: (b) => b.withDefaultAuthorization(auth).build(),
+  /// );
+  /// final blog = client.forNetworkSite(Uri.parse('https://blog.example.com'));
+  /// ```
+  ///
+  /// Timeouts, headers, the user agent, retry, deduplication and
+  /// concurrency settings, Dio interceptors and the HTTP adapter carry over.
+  /// The default authorization and the middlewares do not, since they hold
+  /// per-site state (tokens, queued writes); add them in [bootstrapper],
+  /// which receives the copied settings. Interfaces registered with
+  /// [register] are not copied either.
+  WordpressClient forNetworkSite(
+    Uri site, {
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    final root = site.isAbsolute ? site : siteUrl.resolveUri(site);
+    final restBase = root.replace(
+      pathSegments: [
+        ...root.pathSegments.where((s) => s.isNotEmpty),
+        'wp-json',
+        'wp',
+        'v2',
+      ],
+    );
+
+    final current = _requester._configuration;
+    final builder = BootstrapBuilder.fromConfiguration(current)
+        .withoutDefaultAuthorization()
+        .withoutMiddlewares();
+
+    return WordpressClient.fromDioInstance(
+      baseUrl: restBase,
+      instance: Dio()..httpClientAdapter = _requester._client.httpClientAdapter,
+      bootstrapper: (_) => (bootstrapper?.call(builder) ?? builder.build())
+          .copyWith(connectTimeout: current.connectTimeout),
+    );
+  }
+
   /// Indicates whether this [WordpressClient] instance has been disposed.
   bool get disposed => _isDisposed;
 
