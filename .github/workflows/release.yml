@@ -23,6 +23,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Pushes below choose their own token.
+          persist-credentials: false
 
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@v1
@@ -63,7 +65,29 @@ jobs:
         run: |
           git tag v${{ steps.bump.outputs.new_version }}
 
+      # A tag pushed with GITHUB_TOKEN does not start other workflows, so
+      # publish.yml would not run. The tag is pushed with the GH_TOKEN secret
+      # (a token with contents: write) when it is set.
       - name: Push changes and tag
+        env:
+          VERSION: ${{ steps.bump.outputs.new_version }}
+          ACTIONS_TOKEN: ${{ github.token }}
+          RELEASE_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git push origin HEAD:master
-          git push origin v${{ steps.bump.outputs.new_version }}
+          repo="github.com/${GITHUB_REPOSITORY}.git"
+          git push "https://x-access-token:${ACTIONS_TOKEN}@${repo}" HEAD:master
+          if [ -n "$RELEASE_TOKEN" ] && git push "https://x-access-token:${RELEASE_TOKEN}@${repo}" "v${VERSION}"; then
+            echo "Tag v${VERSION} pushed; publish.yml publishes it to pub.dev."
+          else
+            git push "https://x-access-token:${ACTIONS_TOKEN}@${repo}" "v${VERSION}"
+            echo "::warning::Tag pushed with GITHUB_TOKEN, so publish.yml will not start. Set a valid GH_TOKEN secret, or re-push the tag: git push origin :refs/tags/v${VERSION} && git push origin v${VERSION}"
+          fi
+
+      - name: Create GitHub release
+        env:
+          VERSION: ${{ steps.bump.outputs.new_version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dart run tool/changelog_section.dart "$VERSION" > release-notes.md ||
+            echo "See CHANGELOG.md for the changes in ${VERSION}." > release-notes.md
+          gh release create "v${VERSION}" --title "v${VERSION}" --notes-file release-notes.md --verify-tag
