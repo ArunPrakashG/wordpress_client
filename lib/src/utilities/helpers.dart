@@ -153,7 +153,22 @@ bool isValidRestApiUrl(Uri uri, {bool forceHttps = false}) {
     return false;
   }
 
-  return uri.pathSegments.isNotEmpty && uri.pathSegments.contains('wp-json');
+  return uri.pathSegments.isNotEmpty &&
+      (uri.pathSegments.contains('wp-json') || isWordpressComApiUrl(uri));
+}
+
+/// The WordPress.com REST API host, which also serves Jetpack sites.
+const String wordpressComApiHost = 'public-api.wordpress.com';
+
+/// Whether [uri] is a WordPress.com site API base such as
+/// `https://public-api.wordpress.com/wp/v2/sites/example.wordpress.com`.
+bool isWordpressComApiUrl(Uri uri) {
+  final segments = uri.pathSegments.where((s) => s.isNotEmpty).toList();
+  final sites = segments.indexOf('sites');
+
+  return uri.host == wordpressComApiHost &&
+      sites > 0 &&
+      sites + 1 < segments.length;
 }
 
 /// Checks if a given integer is a valid port number.

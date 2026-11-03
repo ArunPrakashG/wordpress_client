@@ -35,4 +35,7 @@ abstract final class WordpressAuth {
     required String password,
   }) =>
       BasicJwtAuth(userName: user, password: password);
+
+  /// A ready-made bearer token, e.g. a WordPress.com OAuth2 token.
+  static IAuthorization bearer(String token) => BearerTokenAuth(token);
 }

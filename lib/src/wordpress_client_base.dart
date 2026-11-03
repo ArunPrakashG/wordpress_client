@@ -141,6 +141,55 @@ final class WordpressClient implements IDisposable {
     );
   }
 
+  /// Creates a [WordpressClient] for a site hosted on WordPress.com, or a
+  /// self-hosted site connected through Jetpack, via
+  /// `https://public-api.wordpress.com/wp/v2/sites/<site>`.
+  ///
+  /// [site] is the site's domain (`example.wordpress.com`, or a custom
+  /// domain) or its numeric ID. [accessToken] is an OAuth2 token from
+  /// [WordpressComOAuth]; without one only public content can be read.
+  ///
+  /// ```dart
+  /// final client = WordpressClient.forWordpressCom(
+  ///   site: 'example.wordpress.com',
+  ///   accessToken: token.accessToken,
+  /// );
+  /// final posts = await client.posts.list(ListPostRequest());
+  /// ```
+  ///
+  /// The `wp/v2` routes and `client.resource(namespace: ...)` work as on a
+  /// self-hosted site. Features that rely on self-hosted plugins or
+  /// `wp-json` URLs (JWT and application passwords, GraphQL, the
+  /// application password flow) do not apply on WordPress.com.
+  factory WordpressClient.forWordpressCom({
+    required String site,
+    String? accessToken,
+    BootstrapConfiguration Function(BootstrapBuilder builder)? bootstrapper,
+  }) {
+    // Accept a pasted site URL too: https://example.wordpress.com/
+    final parsed = Uri.tryParse(site.trim());
+    final trimmed =
+        parsed != null && parsed.host.isNotEmpty ? parsed.host : site.trim();
+    if (trimmed.isEmpty || trimmed.contains('/')) {
+      throw ArgumentError.value(
+        site,
+        'site',
+        'Pass the site domain or ID, e.g. example.wordpress.com',
+      );
+    }
+
+    return WordpressClient(
+      baseUrl: Uri.https(wordpressComApiHost, '/wp/v2/sites/$trimmed'),
+      bootstrapper: (builder) {
+        if (accessToken != null) {
+          builder.withDefaultAuthorization(BearerTokenAuth(accessToken));
+        }
+
+        return bootstrapper?.call(builder) ?? builder.build();
+      },
+    );
+  }
+
   /// Creates a [WordpressClient] instance without a base URL.
   ///
   /// This constructor is useful when you don't know the base URL at initialization time.
@@ -299,9 +348,18 @@ final class WordpressClient implements IDisposable {
 
   /// The root of the site this client talks to: [baseUrl] without its REST
   /// path, e.g. `https://example.com/blog` for
-  /// `https://example.com/blog/wp-json/wp/v2`.
+  /// `https://example.com/blog/wp-json/wp/v2`. For a WordPress.com client
+  /// it is the site's domain when the site was given by domain.
   Uri get siteUrl {
     final segments = baseUrl.pathSegments;
+
+    // public-api.wordpress.com/wp/v2/sites/<site>: the site is its domain.
+    if (isWordpressComApiUrl(baseUrl)) {
+      final site = segments[segments.indexOf('sites') + 1];
+      if (site.contains('.')) {
+        return Uri.https(site);
+      }
+    }
     final marker = segments.indexOf('wp-json');
 
     return Uri(
